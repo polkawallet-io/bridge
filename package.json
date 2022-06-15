@@ -1,0 +1,36 @@
+{
+  "name": "@polkawallet/bridge",
+  "version": "0.0.1",
+  "description": "polkawallet bridge sdk",
+  "main": "index.js",
+  "author": "Polkawallet developers <hello@polkawallet.io>",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": "https://github.com/polkawallet-io/bridge.git",
+  "homepage": "https://github.com/polkawallet-io/bridge",
+  "scripts": {
+    "build": "tsc --build",
+    "lint": "polkadot-dev-run-lint",
+    "clean": "polkadot-dev-clean-build",
+    "postinstall": "polkadot-dev-yarn-only",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@acala-network/api": "^4.1.6-3",
+    "@acala-network/sdk": "^4.1.6-3",
+    "@acala-network/sdk-core": "^4.1.6-3",
+    "@polkadot/api": "^8.5.1",
+    "@polkadot/types": "^8.5.1",
+    "lodash": "^4.17.20",
+    "rxjs": "^7.4.0"
+  },
+  "devDependencies": {
+    "@polkadot/dev": "^0.67.3",
+    "@types/jest": "^28.1.1",
+    "@types/lodash": "^4.14.161",
+    "jest": "^28.1.1"
+  }
+}
