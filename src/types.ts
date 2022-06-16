@@ -35,6 +35,12 @@ export interface CrossChainInputConfigs {
   tokenDecimals: number;
 }
 
+export interface BridgeTxParams {
+  module: string;
+  call: string;
+  params: any[];
+}
+
 export interface BridgeSDKConfigs {
   adapters: BaseCrossChainAdapter[];
 }

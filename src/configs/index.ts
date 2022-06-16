@@ -1,6 +1,6 @@
 import { Chain } from "../types";
-import { kusamaChains } from "./kusama";
-import { polkadotChains } from "./polkadot";
+import { kusamaChains } from "./kusama-chains";
+import { polkadotChains } from "./polkadot-chains";
 
 const data = {
   ...kusamaChains,

@@ -2,11 +2,9 @@ import { AnyApi, FixedPointNumber } from "@acala-network/sdk-core";
 import { Wallet } from "@acala-network/sdk/wallet";
 import { combineLatest, map, Observable } from "rxjs";
 import { chains, RegisteredChain } from "../configs";
-import { Chain, CrossChainRouter, CrossChainTransferParams } from "../types";
+import { BalanceData, BridgeTxParams, Chain, CrossChainRouter, CrossChainTransferParams, TokenBalance } from "../types";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { isChainEqual } from "../utils/is-chain-equal";
-import { SubmittableExtrinsic } from "@polkadot/api/types";
-import { TokenBalance } from "@acala-network/sdk/types";
 
 interface AcalaAdaptorConfigs {
   api: AnyApi;
@@ -36,14 +34,14 @@ export class BaseAcalaAdaptor extends BaseCrossChainAdapter {
     );
   }
 
-  public subscribeAvailableBalance(token: string, address: string): Observable<FixedPointNumber> {
-    return this.wallet.subscribeBalance(token, address).pipe(map((r) => r.available));
+  public subscribeTokenBalance(token: string, address: string): Observable<BalanceData> {
+    return this.wallet.subscribeBalance(token, address);
   }
 
   public subscribeMaxInput(token: string, address: string, to: RegisteredChain): Observable<FixedPointNumber> {
     const { nativeToken } = this.wallet.getPresetTokens();
     return combineLatest({
-      txFee: this.measureTransferFee({
+      txFee: this.estimateTxFee({
         amount: FixedPointNumber.ZERO,
         to,
         token,
@@ -71,20 +69,13 @@ export class BaseAcalaAdaptor extends BaseCrossChainAdapter {
     return this.wallet.__getToken(token).decimals;
   }
 
-  // all token's destination weight in karura/acala is same
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private getDestinationWeight(_token: string): number {
-    return 5 * 1_000_000_000;
-  }
-
-  public createTx(params: CrossChainTransferParams): SubmittableExtrinsic<"rxjs"> | SubmittableExtrinsic<"promise"> {
+  public getBridgeTxParams(params: CrossChainTransferParams): BridgeTxParams {
     const { to, token, address, amount } = params;
     const tokenFormSDK = this.wallet.__getToken(token);
     const accountId = this.api.createType("AccountId32", address).toHex();
     const toChain = chains[to];
 
     if (isChainEqual(toChain, "statemine")) {
-      const call = this.api.tx.polkadotXcm.limitedReserveTransferAssets;
       const dst = { X2: ["Parent", { ParaChain: toChain.paraChainId }] };
       const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
       const ass = [
@@ -98,19 +89,26 @@ export class BaseAcalaAdaptor extends BaseCrossChainAdapter {
         },
       ];
 
-      return call({ V0: dst }, { V0: acc }, { V0: ass }, 0, "Unlimited");
+      return {
+        module: "polkadotXcm",
+        call: "limitedReserveTransferAssets",
+        params: [{ V0: dst }, { V0: acc }, { V0: ass }, 0, "Unlimited"],
+      };
     }
 
+    const dest_weight = 5 * 1_000_000_000;
+
     if (isChainEqual(toChain, "kusama") || isChainEqual(toChain, "polkadot")) {
-      const call = this.api.tx.xTokens.transfer;
       const dst = { interior: { X1: { AccountId32: { id: accountId, network: "Any" } } }, parents: 1 };
 
-      return call(tokenFormSDK.toChainData() as any, amount.toChainData(), { V1: dst }, this.getDestinationWeight(token));
+      return {
+        module: "xTokens",
+        call: "transfer",
+        params: [tokenFormSDK.toChainData() as any, amount.toChainData(), { V1: dst }, dest_weight],
+      };
     }
 
     // if destination is not statemine/kusama
-    const call = this.api.tx.xTokens.transfer;
-
     const dst = {
       parents: 1,
       interior: {
@@ -118,7 +116,11 @@ export class BaseAcalaAdaptor extends BaseCrossChainAdapter {
       },
     };
 
-    return call(tokenFormSDK.toChainData() as any, amount.toChainData(), { V1: dst }, this.getDestinationWeight(token));
+    return {
+      module: "xTokens",
+      call: "transfer",
+      params: [tokenFormSDK.toChainData() as any, amount.toChainData(), { V1: dst }, dest_weight],
+    };
   }
 }
 

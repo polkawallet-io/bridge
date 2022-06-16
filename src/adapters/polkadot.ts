@@ -1,12 +1,10 @@
 import { AnyApi, FixedPointNumber as FN, Token } from "@acala-network/sdk-core";
 import { CurrencyNotFound } from "../errors";
-import { SubmittableExtrinsic } from "@polkadot/api/types";
-import { ISubmittableResult } from "@polkadot/types/types";
 import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
 import { combineLatest, map, Observable, of } from "rxjs";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { chains, RegisteredChain } from "../configs";
-import { Chain, CrossChainRouter, CrossChainTransferParams, BalanceData, BalanceAdapter, TokenBalance } from "../types";
+import { Chain, CrossChainRouter, CrossChainTransferParams, BalanceData, BalanceAdapter, TokenBalance, BridgeTxParams } from "../types";
 import { Storage } from "../utils/storage";
 
 interface PolkadotAdapterConfigs {
@@ -75,13 +73,13 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     this.balanceAdapter = new PolkadotBalanceAdapter({ api: configs.api });
   }
 
-  public subscribeAvailableBalance(token: string, address: string): Observable<FN> {
-    return this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available));
+  public subscribeTokenBalance(token: string, address: string): Observable<BalanceData> {
+    return this.balanceAdapter.subscribeBalance(token, address);
   }
 
   public subscribeMaxInput(token: string, address: string, to: RegisteredChain): Observable<FN> {
     return combineLatest({
-      txFee: this.measureTransferFee({
+      txFee: this.estimateTxFee({
         amount: FN.ZERO,
         to,
         token,
@@ -106,7 +104,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
 
   public getCrossChainFee(token: string): TokenBalance {
     return {
-      token: "KSM",
+      token,
       balance: FN.fromInner(crossChainFeeConfigs[token] ?? "0", this.balanceAdapter.decimals),
     };
   }
@@ -117,22 +115,24 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     return this.balanceAdapter.decimals;
   }
 
-  public createTx(
-    params: CrossChainTransferParams
-  ): SubmittableExtrinsic<"promise", ISubmittableResult> | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
+  public getBridgeTxParams(params: CrossChainTransferParams): BridgeTxParams {
     const { to, token, address, amount } = params;
     const toChain = chains[to];
 
     if (token !== this.balanceAdapter.nativeToken) throw new CurrencyNotFound(token);
 
     const accountId = this.api.createType("AccountId32", address).toHex();
-    const tx = this.api.tx.xcmPallet.reserveTransferAssets;
+
     const dst = { X1: { ParaChain: toChain.paraChainId }, parents: 0 };
     const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
     const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
     const callParams = [{ V0: dst }, { V0: acc }, { V0: ass }, 0];
 
-    return tx(...callParams);
+    return {
+      module: "xcmPallet",
+      call: "reserveTransferAssets",
+      params: callParams,
+    };
   }
 }
 

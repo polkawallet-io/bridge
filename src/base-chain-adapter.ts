@@ -6,6 +6,8 @@ import {
   CrossChianBalanceChangedConfigs,
   BalanceChangedStatus,
   TokenBalance,
+  BridgeTxParams,
+  BalanceData,
 } from "./types";
 import { RegisteredChain } from "./configs";
 import { AnyApi, FixedPointNumber } from "@acala-network/sdk-core";
@@ -65,7 +67,7 @@ export abstract class BaseCrossChainAdapter {
     );
   }
 
-  protected measureTransferFee(params: CrossChainTransferParams) {
+  protected estimateTxFee(params: CrossChainTransferParams) {
     let tx = this.createTx({ ...params });
 
     if (this.api.type === "rxjs") {
@@ -97,14 +99,14 @@ export abstract class BaseCrossChainAdapter {
 
     let savedBalance: FixedPointNumber | undefined;
 
-    return this.subscribeAvailableBalance(token, address).pipe(
+    return this.subscribeTokenBalance(token, address).pipe(
       timeout(configs.timeout || DEFAULT_TX_CHECKING_TIMEOUT),
       map((balance) => {
         if (!savedBalance) {
-          savedBalance = balance;
+          savedBalance = balance.available;
         }
 
-        const diff = balance.minus(savedBalance);
+        const diff = balance.available.minus(savedBalance);
 
         if (savedBalance && diff.gte(target)) {
           return BalanceChangedStatus.SUCCESS;
@@ -122,12 +124,17 @@ export abstract class BaseCrossChainAdapter {
     );
   }
 
-  public abstract subscribeAvailableBalance(token: string, address: string): Observable<FixedPointNumber>;
+  public createTx(
+    params: CrossChainTransferParams
+  ): SubmittableExtrinsic<"promise", ISubmittableResult> | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
+    const txParams = this.getBridgeTxParams({ ...params });
+    return (this.api as any)[txParams.module][txParams.call](...txParams.params);
+  }
+
+  public abstract subscribeTokenBalance(token: string, address: string): Observable<BalanceData>;
   public abstract subscribeMinInput(token: string): Observable<FixedPointNumber>;
   public abstract subscribeMaxInput(token: string, address: string, to: RegisteredChain): Observable<FixedPointNumber>;
   public abstract getCrossChainFee(token: string): TokenBalance;
   public abstract getCrossChainTokenDecimals(token: string): number;
-  public abstract createTx(
-    params: CrossChainTransferParams
-  ): SubmittableExtrinsic<"promise", ISubmittableResult> | SubmittableExtrinsic<"rxjs", ISubmittableResult>;
+  public abstract getBridgeTxParams(params: CrossChainTransferParams): BridgeTxParams;
 }
