@@ -9,7 +9,7 @@ import {
   BridgeTxParams,
   BalanceData,
 } from "./types";
-import { RegisteredChain } from "./configs";
+import { RegisteredChainName } from "./configs";
 import { AnyApi, FixedPointNumber } from "@acala-network/sdk-core";
 import { of, combineLatest, Observable, timeout, TimeoutError, from } from "rxjs";
 import { map, catchError } from "rxjs/operators";
@@ -22,7 +22,7 @@ export abstract class BaseCrossChainAdapter {
   protected routers: Omit<CrossChainRouter, "from">[];
   protected api!: AnyApi;
   readonly chain: Chain;
-  private findAdapter!: (chain: Chain | RegisteredChain) => BaseCrossChainAdapter;
+  private findAdapter!: (chain: Chain | RegisteredChainName) => BaseCrossChainAdapter;
 
   constructor(api: AnyApi, chain: Chain, routers: Omit<CrossChainRouter, "from">[]) {
     this.api = api;
@@ -30,7 +30,7 @@ export abstract class BaseCrossChainAdapter {
     this.routers = routers;
   }
 
-  public injectFindAdapter(func: (chain: RegisteredChain | Chain) => BaseCrossChainAdapter): void {
+  public injectFindAdapter(func: (chain: RegisteredChainName | Chain) => BaseCrossChainAdapter): void {
     this.findAdapter = func;
   }
 
@@ -133,7 +133,7 @@ export abstract class BaseCrossChainAdapter {
 
   public abstract subscribeTokenBalance(token: string, address: string): Observable<BalanceData>;
   public abstract subscribeMinInput(token: string): Observable<FixedPointNumber>;
-  public abstract subscribeMaxInput(token: string, address: string, to: RegisteredChain): Observable<FixedPointNumber>;
+  public abstract subscribeMaxInput(token: string, address: string, to: RegisteredChainName): Observable<FixedPointNumber>;
   public abstract getCrossChainFee(token: string): TokenBalance;
   public abstract getCrossChainTokenDecimals(token: string): number;
   public abstract getBridgeTxParams(params: CrossChainTransferParams): BridgeTxParams;

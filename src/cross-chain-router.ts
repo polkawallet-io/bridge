@@ -1,12 +1,12 @@
 import { Chain, CrossChainRouter } from "./types";
-import { chains, RegisteredChain } from "./configs";
+import { chains, RegisteredChainName } from "./configs";
 import { isChainEqual } from "./utils/is-chain-equal";
 import { isEmpty, overEvery, uniqWith } from "lodash";
 import { BaseCrossChainAdapter } from "./base-chain-adapter";
 
 interface RouterFilter {
-  from?: Chain | RegisteredChain;
-  to?: Chain | RegisteredChain;
+  from?: Chain | RegisteredChainName;
+  to?: Chain | RegisteredChainName;
   token?: string;
 }
 
@@ -23,7 +23,7 @@ export class Bridge {
     this.adapters = configs?.adapters || [];
   }
 
-  public findAdapterByName(chain: RegisteredChain | Chain): BaseCrossChainAdapter | undefined {
+  public findAdapterByName(chain: RegisteredChainName | Chain): BaseCrossChainAdapter | undefined {
     return this.adapters.find((i) => isChainEqual(chain, i.chain));
   }
 

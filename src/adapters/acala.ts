@@ -1,8 +1,8 @@
 import { AnyApi, FixedPointNumber } from "@acala-network/sdk-core";
 import { Wallet } from "@acala-network/sdk/wallet";
 import { combineLatest, map, Observable } from "rxjs";
-import { chains, RegisteredChain } from "../configs";
-import { BalanceData, BridgeTxParams, Chain, CrossChainRouter, CrossChainTransferParams, TokenBalance } from "../types";
+import { chains, RegisteredChainName } from "../configs";
+import { BalanceData, BridgeTxParams, CrossChainRouter, CrossChainTransferParams, Chain, TokenBalance } from "../types";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { isChainEqual } from "../utils/is-chain-equal";
 
@@ -38,7 +38,7 @@ export class BaseAcalaAdaptor extends BaseCrossChainAdapter {
     return this.wallet.subscribeBalance(token, address);
   }
 
-  public subscribeMaxInput(token: string, address: string, to: RegisteredChain): Observable<FixedPointNumber> {
+  public subscribeMaxInput(token: string, address: string, to: RegisteredChainName): Observable<FixedPointNumber> {
     const { nativeToken } = this.wallet.getPresetTokens();
     return combineLatest({
       txFee: this.estimateTxFee({
@@ -139,22 +139,22 @@ export class KaruraAdaptor extends BaseAcalaAdaptor {
       // kusama
       { to: chains.kusama, token: "KSM" },
       // bifrost
-      { to: chains.bifrost, token: "KSM" },
-      { to: chains.bifrost, token: "KAR" },
-      { to: chains.bifrost, token: "KUSD" },
-      { to: chains.bifrost, token: "BNC" },
-      { to: chains.bifrost, token: "VSKSM" },
+      // { to: chains.bifrost, token: "KSM" },
+      // { to: chains.bifrost, token: "KAR" },
+      // { to: chains.bifrost, token: "KUSD" },
+      // { to: chains.bifrost, token: "BNC" },
+      // { to: chains.bifrost, token: "VSKSM" },
       // statemine
       { to: chains.statemine, token: "RMRK" },
       { to: chains.statemine, token: "ARIS" },
       // quartz
-      { to: chains.quartz, token: "QTZ" },
+      // { to: chains.quartz, token: "QTZ" },
       // kintsugi
-      { to: chains.kintsugi, token: "KINT" },
+      // { to: chains.kintsugi, token: "KINT" },
       // khala
-      { to: chains.khala, token: "KAR" },
-      { to: chains.khala, token: "KUSD" },
-      { to: chains.khala, token: "PHA" },
+      // { to: chains.khala, token: "KAR" },
+      // { to: chains.khala, token: "KUSD" },
+      // { to: chains.khala, token: "PHA" },
     ]);
   }
 }

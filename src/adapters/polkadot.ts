@@ -3,7 +3,7 @@ import { CurrencyNotFound } from "../errors";
 import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
 import { combineLatest, map, Observable, of } from "rxjs";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { chains, RegisteredChain } from "../configs";
+import { chains, RegisteredChainName } from "../configs";
 import { Chain, CrossChainRouter, CrossChainTransferParams, BalanceData, BalanceAdapter, TokenBalance, BridgeTxParams } from "../types";
 import { Storage } from "../utils/storage";
 
@@ -77,7 +77,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     return this.balanceAdapter.subscribeBalance(token, address);
   }
 
-  public subscribeMaxInput(token: string, address: string, to: RegisteredChain): Observable<FN> {
+  public subscribeMaxInput(token: string, address: string, to: RegisteredChainName): Observable<FN> {
     return combineLatest({
       txFee: this.estimateTxFee({
         amount: FN.ZERO,

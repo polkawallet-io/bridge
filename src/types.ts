@@ -1,12 +1,12 @@
 import { FixedPointNumber, Token } from "@acala-network/sdk-core";
 import { Observable } from "rxjs";
 import { BaseCrossChainAdapter } from "./base-chain-adapter";
-import { RegisteredChain } from "./configs";
+import { RegisteredChainName } from "./configs";
 
 export type CROSS_CHAIN_ENV = "kusama" | "polkadot";
 
 export interface Chain {
-  readonly id: RegisteredChain;
+  readonly id: RegisteredChainName;
   readonly display: string;
   // chain icon resource path
   readonly icon: string;
@@ -22,7 +22,7 @@ export interface CrossChainRouter {
 
 export interface CrossChainTransferParams {
   amount: FixedPointNumber;
-  to: RegisteredChain;
+  to: RegisteredChainName;
   token: string;
   address: string;
 }

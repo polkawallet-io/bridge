@@ -7,6 +7,6 @@ const data = {
   ...polkadotChains,
 };
 
-export type RegisteredChain = keyof typeof data;
+export type RegisteredChainName = keyof typeof data;
 
-export const chains = data as Record<RegisteredChain, Chain>;
+export const chains = data as Record<RegisteredChainName, Chain>;
