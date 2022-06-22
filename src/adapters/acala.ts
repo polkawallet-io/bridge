@@ -1,7 +1,7 @@
 import { AnyApi, FixedPointNumber } from "@acala-network/sdk-core";
 import { Wallet } from "@acala-network/sdk/wallet";
 import { combineLatest, map, Observable } from "rxjs";
-import { chains, RegisteredChainName } from "../configs";
+import { chains, RegisteredChainName, xcmFeeConfig } from "../configs";
 import { BalanceData, BridgeTxParams, CrossChainRouter, CrossChainTransferParams, Chain, TokenBalance } from "../types";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { isChainEqual } from "../utils/is-chain-equal";
@@ -10,11 +10,6 @@ interface AcalaAdaptorConfigs {
   api: AnyApi;
   wallet: Wallet;
 }
-
-const crossChainFeeConfigs: Record<string, string> = {
-  KSM: "64000000",
-  DOT: "64000000",
-};
 
 export class BaseAcalaAdaptor extends BaseCrossChainAdapter {
   private wallet: Wallet;
@@ -26,10 +21,10 @@ export class BaseAcalaAdaptor extends BaseCrossChainAdapter {
     this.wallet = wallet;
   }
 
-  public subscribeMinInput(token: string): Observable<FixedPointNumber> {
+  public subscribeMinInput(token: string, to: RegisteredChainName): Observable<FixedPointNumber> {
     return this.wallet.subscribeToken(token).pipe(
       map((r) => {
-        return r.ed.add(this.getCrossChainFee(token)?.balance || FixedPointNumber.ZERO);
+        return r.ed.add(this.getCrossChainFee(token, to)?.balance || FixedPointNumber.ZERO);
       })
     );
   }
@@ -41,12 +36,15 @@ export class BaseAcalaAdaptor extends BaseCrossChainAdapter {
   public subscribeMaxInput(token: string, address: string, to: RegisteredChainName): Observable<FixedPointNumber> {
     const { nativeToken } = this.wallet.getPresetTokens();
     return combineLatest({
-      txFee: this.estimateTxFee({
-        amount: FixedPointNumber.ZERO,
-        to,
-        token,
-        address,
-      }),
+      txFee:
+        token === nativeToken.name
+          ? this.estimateTxFee({
+              amount: FixedPointNumber.ZERO,
+              to,
+              token,
+              address,
+            })
+          : "0",
       balance: this.wallet.subscribeBalance(token, address).pipe(map((i) => i.available)),
     }).pipe(
       map(({ txFee, balance }) => {
@@ -58,15 +56,11 @@ export class BaseAcalaAdaptor extends BaseCrossChainAdapter {
     );
   }
 
-  public getCrossChainFee(token: string): TokenBalance {
+  public getCrossChainFee(token: string, destChain: RegisteredChainName): TokenBalance {
     return {
       token,
-      balance: FixedPointNumber.fromInner(crossChainFeeConfigs[token] ?? "0", this.wallet.__getToken(token).decimals),
+      balance: FixedPointNumber.fromInner((xcmFeeConfig[destChain][token]?.fee as string) ?? "0", this.wallet.__getToken(token).decimals),
     };
-  }
-
-  public getCrossChainTokenDecimals(token: string): number {
-    return this.wallet.__getToken(token).decimals;
   }
 
   public getBridgeTxParams(params: CrossChainTransferParams): BridgeTxParams {
@@ -139,22 +133,21 @@ export class KaruraAdaptor extends BaseAcalaAdaptor {
       // kusama
       { to: chains.kusama, token: "KSM" },
       // bifrost
-      // { to: chains.bifrost, token: "KSM" },
-      // { to: chains.bifrost, token: "KAR" },
-      // { to: chains.bifrost, token: "KUSD" },
-      // { to: chains.bifrost, token: "BNC" },
-      // { to: chains.bifrost, token: "VSKSM" },
+      { to: chains.bifrost, token: "KAR" },
+      { to: chains.bifrost, token: "KUSD" },
+      { to: chains.bifrost, token: "BNC" },
+      { to: chains.bifrost, token: "VSKSM" },
       // statemine
       { to: chains.statemine, token: "RMRK" },
       { to: chains.statemine, token: "ARIS" },
       // quartz
-      // { to: chains.quartz, token: "QTZ" },
+      { to: chains.quartz, token: "QTZ" },
       // kintsugi
-      // { to: chains.kintsugi, token: "KINT" },
+      { to: chains.kintsugi, token: "KINT" },
       // khala
-      // { to: chains.khala, token: "KAR" },
-      // { to: chains.khala, token: "KUSD" },
-      // { to: chains.khala, token: "PHA" },
+      { to: chains.khala, token: "KAR" },
+      { to: chains.khala, token: "KUSD" },
+      { to: chains.khala, token: "PHA" },
     ]);
   }
 }

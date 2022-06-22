@@ -3,18 +3,13 @@ import { CurrencyNotFound } from "../errors";
 import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
 import { combineLatest, map, Observable, of } from "rxjs";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { chains, RegisteredChainName } from "../configs";
-import { Chain, CrossChainRouter, CrossChainTransferParams, BalanceData, BalanceAdapter, TokenBalance, BridgeTxParams } from "../types";
-import { Storage } from "../utils/storage";
+import { chains, RegisteredChainName, xcmFeeConfig } from "../configs";
+import { Chain, CrossChainRouter, CrossChainTransferParams, BalanceData, BalanceAdapter, BridgeTxParams, TokenBalance } from "../types";
+import { Storage } from "@acala-network/sdk/utils/storage";
 
 interface PolkadotAdapterConfigs {
   api: AnyApi;
 }
-
-const crossChainFeeConfigs: Record<string, string> = {
-  KSM: "106666660",
-  DOT: "106666660",
-};
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const createBalanceStorages = (api: AnyApi) => {
@@ -98,21 +93,15 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     );
   }
 
-  public subscribeMinInput(token: string): Observable<FN> {
-    return of(this.balanceAdapter.getED(token).add(this.getCrossChainFee(token)?.balance || FN.ZERO));
+  public subscribeMinInput(token: string, to: RegisteredChainName): Observable<FN> {
+    return of(this.balanceAdapter.getED(token).add(this.getCrossChainFee(token, to).balance || FN.ZERO));
   }
 
-  public getCrossChainFee(token: string): TokenBalance {
+  public getCrossChainFee(token: string, destChain: RegisteredChainName): TokenBalance {
     return {
       token,
-      balance: FN.fromInner(crossChainFeeConfigs[token] ?? "0", this.balanceAdapter.decimals),
+      balance: FN.fromInner((xcmFeeConfig[destChain][token]?.fee as string) ?? "0", this.balanceAdapter.decimals),
     };
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getCrossChainTokenDecimals(_token: string): number {
-    // ignore the token params for only KSM/DOT
-    return this.balanceAdapter.decimals;
   }
 
   public getBridgeTxParams(params: CrossChainTransferParams): BridgeTxParams {
@@ -123,14 +112,19 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api.createType("AccountId32", address).toHex();
 
-    const dst = { X1: { ParaChain: toChain.paraChainId }, parents: 0 };
-    const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
-    const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
-    const callParams = [{ V0: dst }, { V0: acc }, { V0: ass }, 0];
+    const dst = { interior: { X1: { ParaChain: toChain.paraChainId } }, parents: 0 };
+    const acc = { interior: { X1: { AccountId32: { id: accountId, network: "Any" } } }, parents: 0 };
+    const ass = [
+      {
+        fun: { Fungible: amount.toChainData() },
+        id: { Concrete: { interior: "Here", parents: 0 } },
+      },
+    ];
+    const callParams = [{ V1: dst }, { V1: acc }, { V1: ass }, 0, "Unlimited"];
 
     return {
       module: "xcmPallet",
-      call: "reserveTransferAssets",
+      call: "limitedReserveTransferAssets",
       params: callParams,
     };
   }

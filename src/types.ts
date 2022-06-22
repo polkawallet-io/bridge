@@ -12,6 +12,7 @@ export interface Chain {
   readonly icon: string;
   // set id to -1 if the chain is para chain
   readonly paraChainId: number;
+  readonly ss58Prefix: number;
 }
 
 export interface CrossChainRouter {
@@ -30,9 +31,12 @@ export interface CrossChainTransferParams {
 export interface CrossChainInputConfigs {
   minInput: FixedPointNumber;
   maxInput: FixedPointNumber;
-  destCrossChainFee: TokenBalance;
   ss58Prefix: number;
-  tokenDecimals: number;
+}
+
+export interface CrossChainFeeConfig {
+  fee: string;
+  existentialDeposit: string;
 }
 
 export interface BridgeTxParams {

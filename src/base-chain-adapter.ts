@@ -5,11 +5,11 @@ import {
   CrossChainTransferParams,
   CrossChianBalanceChangedConfigs,
   BalanceChangedStatus,
-  TokenBalance,
   BridgeTxParams,
   BalanceData,
+  TokenBalance,
 } from "./types";
-import { RegisteredChainName } from "./configs";
+import { chains, RegisteredChainName } from "./configs";
 import { AnyApi, FixedPointNumber } from "@acala-network/sdk-core";
 import { of, combineLatest, Observable, timeout, TimeoutError, from } from "rxjs";
 import { map, catchError } from "rxjs/operators";
@@ -22,16 +22,11 @@ export abstract class BaseCrossChainAdapter {
   protected routers: Omit<CrossChainRouter, "from">[];
   protected api!: AnyApi;
   readonly chain: Chain;
-  private findAdapter!: (chain: Chain | RegisteredChainName) => BaseCrossChainAdapter;
 
   constructor(api: AnyApi, chain: Chain, routers: Omit<CrossChainRouter, "from">[]) {
     this.api = api;
     this.chain = chain;
     this.routers = routers;
-  }
-
-  public injectFindAdapter(func: (chain: RegisteredChainName | Chain) => BaseCrossChainAdapter): void {
-    this.findAdapter = func;
   }
 
   public getRouters(): CrossChainRouter[] {
@@ -44,11 +39,9 @@ export abstract class BaseCrossChainAdapter {
 
   public subscribeInputConfigs(params: Omit<CrossChainTransferParams, "amount">): Observable<CrossChainInputConfigs> {
     const { to, token, address } = params;
-    const toAdapter = this.findAdapter(to);
 
     // subscribe destination min receive
-    const crossChainFee = toAdapter.getCrossChainFee(token);
-    const minInput$ = toAdapter.subscribeMinInput(token);
+    const minInput$ = this.subscribeMinInput(token, to);
     const maxInput$ = this.subscribeMaxInput(token, address, to);
 
     return combineLatest({
@@ -59,9 +52,7 @@ export abstract class BaseCrossChainAdapter {
         return {
           minInput,
           maxInput,
-          ss58Prefix: toAdapter.getSS58Prefix(),
-          destCrossChainFee: crossChainFee,
-          tokenDecimals: toAdapter.getCrossChainTokenDecimals(token),
+          ss58Prefix: chains[to].ss58Prefix,
         };
       })
     );
@@ -128,13 +119,12 @@ export abstract class BaseCrossChainAdapter {
     params: CrossChainTransferParams
   ): SubmittableExtrinsic<"promise", ISubmittableResult> | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
     const txParams = this.getBridgeTxParams({ ...params });
-    return (this.api as any)[txParams.module][txParams.call](...txParams.params);
+    return (this.api as any).tx[txParams.module][txParams.call](...txParams.params);
   }
 
   public abstract subscribeTokenBalance(token: string, address: string): Observable<BalanceData>;
-  public abstract subscribeMinInput(token: string): Observable<FixedPointNumber>;
+  public abstract subscribeMinInput(token: string, to: RegisteredChainName): Observable<FixedPointNumber>;
   public abstract subscribeMaxInput(token: string, address: string, to: RegisteredChainName): Observable<FixedPointNumber>;
-  public abstract getCrossChainFee(token: string): TokenBalance;
-  public abstract getCrossChainTokenDecimals(token: string): number;
+  public abstract getCrossChainFee(token: string, destChain: RegisteredChainName): TokenBalance;
   public abstract getBridgeTxParams(params: CrossChainTransferParams): BridgeTxParams;
 }

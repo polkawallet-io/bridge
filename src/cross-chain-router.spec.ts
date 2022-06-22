@@ -54,40 +54,40 @@ describe.skip("cross-chain-router-manager", () => {
     expect(isChainEqual("kusama", chains.karura)).toBe(false);
   });
 
-  // test("getRouter should be ok", async () => {
-  //   const r1 = manager.getRouters({ from: "karura" });
-  //   // const r2 = manager.getRouters({ from: "khala" });
-  //   const r3 = manager.getRouters({ from: "karura", to: "khala" });
-  //   const r4 = manager.getRouters({ from: "karura", to: "khala", token: "AUSD" });
-  //   const r5 = manager.getRouters({ to: "karura" });
-  //   const r6 = manager.getRouters({ to: "karura", token: "AUSD" });
-  //   const r7 = manager.getRouters({ token: "AUSD" });
-  //   const r8 = manager.getRouters({ token: "RMRK" });
-  //   const r9 = manager.getRouters();
+  test("getRouter should be ok", async () => {
+    const r1 = manager.getRouters({ from: "karura" });
+    // const r2 = manager.getRouters({ from: "khala" });
+    const r3 = manager.getRouters({ from: "karura", to: "khala" });
+    const r4 = manager.getRouters({ from: "karura", to: "khala", token: "AUSD" });
+    const r5 = manager.getRouters({ to: "karura" });
+    const r6 = manager.getRouters({ to: "karura", token: "AUSD" });
+    const r7 = manager.getRouters({ token: "AUSD" });
+    const r8 = manager.getRouters({ token: "RMRK" });
+    const r9 = manager.getRouters();
 
-  //   expect(r1.length).toEqual(4);
-  //   // expect(r2.length).toEqual(3);
-  //   expect(r3.length).toEqual(3);
-  //   expect(r4.length).toEqual(1);
-  //   expect(r5.length).toEqual(5);
-  //   expect(r6.length).toEqual(1);
-  //   expect(r7.length).toEqual(2);
-  //   expect(r8.length).toEqual(1);
-  //   expect(r9.length).toEqual(9);
-  // });
+    expect(r1.length).toEqual(4);
+    // expect(r2.length).toEqual(3);
+    expect(r3.length).toEqual(3);
+    expect(r4.length).toEqual(1);
+    expect(r5.length).toEqual(5);
+    expect(r6.length).toEqual(1);
+    expect(r7.length).toEqual(2);
+    expect(r8.length).toEqual(1);
+    expect(r9.length).toEqual(9);
+  });
 
-  // test("get* should be ok", async () => {
-  //   const r1 = manager.getDestiantionsChains({ from: "karura" });
-  //   const r2 = manager.getFromChains({ to: "karura" });
+  test("get* should be ok", async () => {
+    const r1 = manager.getDestiantionsChains({ from: "karura" });
+    const r2 = manager.getFromChains({ to: "karura" });
 
-  //   expect(r1.length).toEqual(2);
-  //   expect(r1[0].display).toEqual("Kusama");
-  //   expect(r1[1].display).toEqual("Phala");
-  //   expect(r2.length).toEqual(3);
-  //   expect(r2[0].display).toEqual("Phala");
-  //   expect(r2[1].display).toEqual("Kusama");
-  //   expect(r2[2].display).toEqual("Statemine");
-  // });
+    expect(r1.length).toEqual(2);
+    expect(r1[0].display).toEqual("Kusama");
+    expect(r1[1].display).toEqual("Khala");
+    expect(r2.length).toEqual(3);
+    expect(r2[0].display).toEqual("Khala");
+    expect(r2[1].display).toEqual("Kusama");
+    expect(r2[2].display).toEqual("Statemine");
+  });
 
   beforeAll(async () => {
     await initSDK();

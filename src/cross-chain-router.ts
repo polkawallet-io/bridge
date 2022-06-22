@@ -19,8 +19,12 @@ export class Bridge {
   private adapters: BaseCrossChainAdapter[];
 
   constructor(configs?: BridgeConfigs) {
-    this.routers = [];
     this.adapters = configs?.adapters || [];
+
+    this.routers = [];
+    this.adapters.forEach((e) => {
+      this.routers = [...this.routers, ...e.getRouters()];
+    });
   }
 
   public findAdapterByName(chain: RegisteredChainName | Chain): BaseCrossChainAdapter | undefined {
@@ -32,8 +36,8 @@ export class Bridge {
     const from = typeof router.from === "string" ? chains[router.from] : router.from;
     const to = typeof router.to === "string" ? chains[router.to] : router.to;
 
-    // push routers if from & to adapters are both set
-    if (!checkAdapter || (this.findAdapterByName(from) && this.findAdapterByName(to) && checkAdapter)) {
+    // push routers if from adapter is set
+    if (!checkAdapter || (this.findAdapterByName(from) && checkAdapter)) {
       this.routers.push({ from, to, token });
     }
   }

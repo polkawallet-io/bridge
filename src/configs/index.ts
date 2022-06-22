@@ -1,12 +1,18 @@
-import { Chain } from "../types";
+import { Chain, CrossChainFeeConfig } from "../types";
 import { kusamaChains } from "./kusama-chains";
 import { polkadotChains } from "./polkadot-chains";
+import { kusamaXcmFeeConfig, kusamaCommonXcmFeeConfig } from "./kusama-xcm-fee";
 
-const data = {
+const chainsAll = {
   ...kusamaChains,
   ...polkadotChains,
 };
 
-export type RegisteredChainName = keyof typeof data;
+export type RegisteredChainName = keyof typeof chainsAll;
 
-export const chains = data as Record<RegisteredChainName, Chain>;
+export const chains = chainsAll as Record<RegisteredChainName, Chain>;
+
+export const xcmFeeConfig = { ...kusamaXcmFeeConfig, ...kusamaCommonXcmFeeConfig } as Record<
+  RegisteredChainName,
+  Record<string, CrossChainFeeConfig>
+>;
