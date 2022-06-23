@@ -1,6 +1,5 @@
 import { FixedPointNumber, Token } from "@acala-network/sdk-core";
 import { Observable } from "rxjs";
-import { BaseCrossChainAdapter } from "./base-chain-adapter";
 import { RegisteredChainName } from "./configs";
 
 export type CROSS_CHAIN_ENV = "kusama" | "polkadot";
@@ -45,10 +44,6 @@ export interface BridgeTxParams {
   params: any[];
 }
 
-export interface BridgeSDKConfigs {
-  adapters: BaseCrossChainAdapter[];
-}
-
 export interface CrossChianBalanceChangedConfigs {
   token: string;
   address: string;
@@ -62,11 +57,6 @@ export enum BalanceChangedStatus {
   "SUCCESS",
   "TIMEOUT",
   "UNKNOWN_ERROR",
-}
-
-export interface BaseSDK {
-  get isReady(): Promise<boolean>;
-  get isReady$(): Observable<boolean>;
 }
 
 export interface TokenBalance {
