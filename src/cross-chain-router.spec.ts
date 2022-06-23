@@ -6,7 +6,7 @@ import { Bridge } from "./cross-chain-router";
 import { chains } from "./configs";
 import { isChainEqual } from "./utils/is-chain-equal";
 
-describe.skip("cross-chain-router-manager", () => {
+describe("cross-chain-router-manager", () => {
   let manager: Bridge;
   let api: ApiPromise;
   let wallet: Wallet;

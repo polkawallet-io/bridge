@@ -13,4 +13,18 @@ export const polkadotChains = {
     paraChainId: 2000,
     ss58Prefix: 10,
   },
+  parallel: {
+    id: "parallel",
+    display: "Parallel",
+    icon: "https://resources.acala.network/networks/parallel.png",
+    paraChainId: 2012,
+    ss58Prefix: 172,
+  },
+  moonbeam: {
+    id: "moonbeam",
+    display: "Moonbeam",
+    icon: "https://resources.acala.network/networks/moonbeam.png",
+    paraChainId: 2004,
+    ss58Prefix: 1284,
+  },
 };

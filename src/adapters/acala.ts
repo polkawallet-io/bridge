@@ -1,7 +1,8 @@
 import { AnyApi, FixedPointNumber } from "@acala-network/sdk-core";
 import { Wallet } from "@acala-network/sdk/wallet";
 import { combineLatest, map, Observable } from "rxjs";
-import { chains, RegisteredChainName, xcmFeeConfig } from "../configs";
+import { chains, RegisteredChainName } from "../configs";
+import { xcmFeeConfig } from "../configs/xcm-fee";
 import { BalanceData, BridgeTxParams, CrossChainRouter, CrossChainTransferParams, Chain, TokenBalance } from "../types";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { isChainEqual } from "../utils/is-chain-equal";

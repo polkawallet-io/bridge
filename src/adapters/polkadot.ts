@@ -3,7 +3,8 @@ import { CurrencyNotFound } from "../errors";
 import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
 import { combineLatest, map, Observable, of } from "rxjs";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { chains, RegisteredChainName, xcmFeeConfig } from "../configs";
+import { chains, RegisteredChainName } from "../configs";
+import { xcmFeeConfig } from "../configs/xcm-fee";
 import { Chain, CrossChainRouter, CrossChainTransferParams, BalanceData, BalanceAdapter, BridgeTxParams, TokenBalance } from "../types";
 import { Storage } from "@acala-network/sdk/utils/storage";
 
