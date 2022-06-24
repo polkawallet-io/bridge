@@ -7,15 +7,15 @@ import { BalanceData, BridgeTxParams, CrossChainRouter, CrossChainTransferParams
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { isChainEqual } from "../utils/is-chain-equal";
 
-interface AcalaAdaptorConfigs {
+interface AcalaAdapterConfigs {
   api: AnyApi;
   wallet: Wallet;
 }
 
-export class BaseAcalaAdaptor extends BaseCrossChainAdapter {
+export class BaseAcalaAdapter extends BaseCrossChainAdapter {
   private wallet: Wallet;
 
-  constructor(configs: AcalaAdaptorConfigs, chain: Chain, routers: Omit<CrossChainRouter, "from">[]) {
+  constructor(configs: AcalaAdapterConfigs, chain: Chain, routers: Omit<CrossChainRouter, "from">[]) {
     super(configs.api, chain, routers);
     const { wallet } = configs;
 
@@ -119,8 +119,8 @@ export class BaseAcalaAdaptor extends BaseCrossChainAdapter {
   }
 }
 
-export class AcalaAdaptor extends BaseAcalaAdaptor {
-  constructor(configs: AcalaAdaptorConfigs) {
+export class AcalaAdapter extends BaseAcalaAdapter {
+  constructor(configs: AcalaAdapterConfigs) {
     super(configs, chains.acala, [
       // polkadot
       { to: chains.polkadot, token: "DOT" },
@@ -128,8 +128,8 @@ export class AcalaAdaptor extends BaseAcalaAdaptor {
   }
 }
 
-export class KaruraAdaptor extends BaseAcalaAdaptor {
-  constructor(configs: AcalaAdaptorConfigs) {
+export class KaruraAdapter extends BaseAcalaAdapter {
+  constructor(configs: AcalaAdapterConfigs) {
     super(configs, chains.karura, [
       // kusama
       { to: chains.kusama, token: "KSM" },

@@ -3,10 +3,10 @@ import { ApiProvider } from "../api-provider";
 import { firstValueFrom } from "rxjs";
 import { Bridge } from "../cross-chain-router";
 import { Wallet } from "@acala-network/sdk";
-import { KaruraAdaptor } from "./acala";
+import { KaruraAdapter } from "./acala";
 import { FixedPointNumber } from "@acala-network/sdk-core";
 
-describe("acala-adaptor should work", () => {
+describe("acala-adapter should work", () => {
   jest.setTimeout(30000);
 
   const testAccount = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
@@ -24,17 +24,17 @@ describe("acala-adaptor should work", () => {
     await wallet.isReady;
 
     const bridge = new Bridge({
-      adapters: [new KaruraAdaptor({ api: provider.getApi(fromChain), wallet })],
+      adapters: [new KaruraAdapter({ api: provider.getApi(fromChain), wallet })],
     });
 
     expect(bridge.getDestiantionsChains({ from: chains.karura, token: "KSM" }).length).toEqual(1);
     expect(bridge.getDestiantionsChains({ from: chains.karura, token: "KAR" }).length).toEqual(2);
     expect(bridge.getDestiantionsChains({ from: chains.karura, token: "KUSD" }).length).toEqual(2);
 
-    const adaptor = bridge.findAdapterByName(fromChain);
+    const adapter = bridge.findAdapterByName(fromChain);
 
-    if (adaptor) {
-      const networkProps = await adaptor.getNetworkProperties();
+    if (adapter) {
+      const networkProps = await adapter.getNetworkProperties();
       expect(networkProps.ss58Format).toEqual(8);
       expect(networkProps.tokenSymbol.length).toBeGreaterThanOrEqual(1);
       expect(networkProps.tokenSymbol[0]).toEqual("KAR");
@@ -43,8 +43,8 @@ describe("acala-adaptor should work", () => {
     }
 
     async function runMyTestSuit(to: RegisteredChainName, token: string) {
-      if (adaptor) {
-        const balance = await firstValueFrom(adaptor.subscribeTokenBalance(token, testAccount));
+      if (adapter) {
+        const balance = await firstValueFrom(adapter.subscribeTokenBalance(token, testAccount));
         console.log(
           `balance ${token}: free-${balance.free.toNumber()} locked-${balance.locked.toNumber()} available-${balance.available.toNumber()}`
         );
@@ -52,7 +52,7 @@ describe("acala-adaptor should work", () => {
         expect(balance.free.toNumber()).toBeGreaterThanOrEqual(balance.available.toNumber());
         expect(balance.free.toNumber()).toEqual(balance.locked.add(balance.available).toNumber());
 
-        const inputConfig = await firstValueFrom(adaptor.subscribeInputConfigs({ to, token, address: testAccount }));
+        const inputConfig = await firstValueFrom(adapter.subscribeInputConfigs({ to, token, address: testAccount }));
 
         console.log(
           `inputConfig: min-${inputConfig.minInput.toNumber()} max-${inputConfig.maxInput.toNumber()} ss58-${inputConfig.ss58Prefix}`
@@ -60,11 +60,11 @@ describe("acala-adaptor should work", () => {
         expect(inputConfig.minInput.toNumber()).toBeGreaterThan(0);
         expect(inputConfig.maxInput.toNumber()).toBeLessThanOrEqual(balance.available.toNumber());
 
-        const destFee = adaptor.getCrossChainFee(token, to);
+        const destFee = adapter.getCrossChainFee(token, to);
         console.log(`destFee: fee-${destFee.balance.toNumber()} ${destFee.token}`);
         expect(destFee.balance.toNumber()).toBeGreaterThan(0);
 
-        const tx = adaptor.getBridgeTxParams({
+        const tx = adapter.getBridgeTxParams({
           amount: FixedPointNumber.fromInner("10000000000", 10),
           to,
           token,
