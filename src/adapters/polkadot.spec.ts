@@ -27,6 +27,13 @@ describe("polkadot-adaptor should work", () => {
 
     const kusamaAdaptor = bridge.findAdapterByName(fromChain);
     if (kusamaAdaptor) {
+      const networkProps: any = await kusamaAdaptor.getNetworkProperties();
+      expect(networkProps.ss58Format).toEqual(2);
+      expect(networkProps.tokenSymbol.length).toBeGreaterThanOrEqual(1);
+      expect(networkProps.tokenSymbol[0]).toEqual("KSM");
+      expect(networkProps.tokenDecimals.length).toBeGreaterThanOrEqual(1);
+      expect(networkProps.tokenDecimals[0]).toEqual(12);
+
       const balance = await firstValueFrom(kusamaAdaptor.subscribeTokenBalance("KSM", testAccount));
       console.log(`balance: free-${balance.free.toNumber()} locked-${balance.locked.toNumber()} available-${balance.available.toNumber()}`);
       expect(balance.available.toNumber()).toBeGreaterThanOrEqual(0);

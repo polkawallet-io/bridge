@@ -8,13 +8,15 @@ import {
   BridgeTxParams,
   BalanceData,
   TokenBalance,
+  NetworkProps,
 } from "./types";
 import { chains, RegisteredChainName } from "./configs";
 import { AnyApi, FixedPointNumber } from "@acala-network/sdk-core";
-import { of, combineLatest, Observable, timeout, TimeoutError, from } from "rxjs";
+import { of, combineLatest, Observable, timeout, TimeoutError, from, firstValueFrom } from "rxjs";
 import { map, catchError } from "rxjs/operators";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
+import { ApiRx } from "@polkadot/api";
 
 const DEFAULT_TX_CHECKING_TIMEOUT = 2 * 60 * 1000;
 
@@ -81,6 +83,15 @@ export abstract class BaseCrossChainAdapter {
         return feeData.partialFee.toString();
       })()
     );
+  }
+
+  public async getNetworkProperties(): Promise<NetworkProps> {
+    const props = await firstValueFrom((this.api as ApiRx).rpc.system.properties());
+    return {
+      ss58Format: parseInt(props.ss58Format.toString()),
+      tokenDecimals: props.tokenDecimals.toJSON() as number[],
+      tokenSymbol: props.tokenSymbol.toJSON() as string[],
+    };
   }
 
   public subscribeBalanceChanged(configs: CrossChianBalanceChangedConfigs): Observable<BalanceChangedStatus> {

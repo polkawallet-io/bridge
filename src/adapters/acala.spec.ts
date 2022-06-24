@@ -33,6 +33,15 @@ describe("acala-adaptor should work", () => {
 
     const adaptor = bridge.findAdapterByName(fromChain);
 
+    if (adaptor) {
+      const networkProps = await adaptor.getNetworkProperties();
+      expect(networkProps.ss58Format).toEqual(8);
+      expect(networkProps.tokenSymbol.length).toBeGreaterThanOrEqual(1);
+      expect(networkProps.tokenSymbol[0]).toEqual("KAR");
+      expect(networkProps.tokenDecimals.length).toBeGreaterThanOrEqual(1);
+      expect(networkProps.tokenDecimals[0]).toEqual(12);
+    }
+
     async function runMyTestSuit(to: RegisteredChainName, token: string) {
       if (adaptor) {
         const balance = await firstValueFrom(adaptor.subscribeTokenBalance(token, testAccount));

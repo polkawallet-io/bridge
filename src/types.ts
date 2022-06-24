@@ -14,6 +14,12 @@ export interface Chain {
   readonly ss58Prefix: number;
 }
 
+export interface NetworkProps {
+  ss58Format: number;
+  tokenDecimals: number[];
+  tokenSymbol: string[];
+}
+
 export interface CrossChainRouter {
   from: Chain;
   to: Chain;
