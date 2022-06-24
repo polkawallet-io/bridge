@@ -1,6 +1,6 @@
 {
   "name": "@polkawallet/bridge",
-  "version": "0.0.1-1",
+  "version": "0.0.1-2",
   "description": "polkawallet bridge sdk",
   "main": "index.js",
   "author": "Polkawallet developers <hello@polkawallet.io>",
@@ -13,9 +13,6 @@
   "homepage": "https://github.com/polkawallet-io/bridge",
   "scripts": {
     "build": "tsc --build",
-    "lint": "polkadot-dev-run-lint",
-    "clean": "polkadot-dev-clean-build",
-    "postinstall": "polkadot-dev-yarn-only",
     "test": "jest"
   },
   "dependencies": {
