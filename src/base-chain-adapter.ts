@@ -22,13 +22,22 @@ const DEFAULT_TX_CHECKING_TIMEOUT = 2 * 60 * 1000;
 
 export abstract class BaseCrossChainAdapter {
   protected routers: Omit<CrossChainRouter, "from">[];
-  protected api!: AnyApi;
+  protected api?: AnyApi;
   readonly chain: Chain;
 
-  constructor(api: AnyApi, chain: Chain, routers: Omit<CrossChainRouter, "from">[]) {
-    this.api = api;
+  constructor(chain: Chain, routers: Omit<CrossChainRouter, "from">[]) {
     this.chain = chain;
     this.routers = routers;
+  }
+
+  public async setApi(api: AnyApi) {
+    this.api = api;
+
+    if (this.api?.type === "rxjs") {
+      await firstValueFrom(api.isReady as Observable<ApiRx>);
+    }
+
+    await api.isReady;
   }
 
   public getRouters(): CrossChainRouter[] {
@@ -36,7 +45,7 @@ export abstract class BaseCrossChainAdapter {
   }
 
   public getSS58Prefix(): number {
-    return Number(this.api.registry.chainSS58?.toString());
+    return Number(this.api?.registry.chainSS58?.toString());
   }
 
   public subscribeInputConfigs(params: Omit<CrossChainTransferParams, "amount">): Observable<CrossChainInputConfigs> {
@@ -63,7 +72,7 @@ export abstract class BaseCrossChainAdapter {
   protected estimateTxFee(params: CrossChainTransferParams) {
     let tx = this.createTx({ ...params });
 
-    if (this.api.type === "rxjs") {
+    if (this.api?.type === "rxjs") {
       tx = tx as SubmittableExtrinsic<"rxjs", ISubmittableResult>;
 
       return tx.paymentInfo(params.address).pipe(

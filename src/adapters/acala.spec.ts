@@ -2,7 +2,6 @@ import { chains, RegisteredChainName } from "../configs";
 import { ApiProvider } from "../api-provider";
 import { firstValueFrom } from "rxjs";
 import { Bridge } from "../cross-chain-router";
-import { Wallet } from "@acala-network/sdk";
 import { KaruraAdapter } from "./acala";
 import { FixedPointNumber } from "@acala-network/sdk-core";
 
@@ -20,11 +19,11 @@ describe("acala-adapter should work", () => {
     const fromChain = "karura";
     await connect(fromChain);
 
-    const wallet = new Wallet(provider.getApi(fromChain));
-    await wallet.isReady;
+    const karura = new KaruraAdapter();
+    await karura.setApi(provider.getApi(fromChain));
 
     const bridge = new Bridge({
-      adapters: [new KaruraAdapter({ api: provider.getApi(fromChain), wallet })],
+      adapters: [karura],
     });
 
     expect(bridge.getDestiantionsChains({ from: chains.karura, token: "KSM" }).length).toEqual(1);

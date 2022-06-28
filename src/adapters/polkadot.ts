@@ -8,10 +8,6 @@ import { xcmFeeConfig } from "../configs/xcm-fee";
 import { Chain, CrossChainRouter, CrossChainTransferParams, BalanceData, BalanceAdapter, BridgeTxParams, TokenBalance } from "../types";
 import { Storage } from "@acala-network/sdk/utils/storage";
 
-interface PolkadotAdapterConfigs {
-  api: AnyApi;
-}
-
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const createBalanceStorages = (api: AnyApi) => {
   return {
@@ -63,17 +59,37 @@ class PolkadotBalanceAdapter implements BalanceAdapter {
 }
 
 class BasePolkadotAdapter extends BaseCrossChainAdapter {
-  private balanceAdapter: PolkadotBalanceAdapter;
-  constructor(configs: PolkadotAdapterConfigs, chain: Chain, routers: Omit<CrossChainRouter, "from">[]) {
-    super(configs.api, chain, routers);
-    this.balanceAdapter = new PolkadotBalanceAdapter({ api: configs.api });
+  private balanceAdapter?: PolkadotBalanceAdapter;
+  constructor(chain: Chain, routers: Omit<CrossChainRouter, "from">[]) {
+    super(chain, routers);
+  }
+
+  public override async setApi(api: AnyApi) {
+    this.api = api;
+
+    await api.isReady;
+
+    this.balanceAdapter = new PolkadotBalanceAdapter({ api });
   }
 
   public subscribeTokenBalance(token: string, address: string): Observable<BalanceData> {
+    if (!this.balanceAdapter) {
+      return new Observable((sub) =>
+        sub.next({
+          free: FN.ZERO,
+          locked: FN.ZERO,
+          available: FN.ZERO,
+          reserved: FN.ZERO,
+        })
+      );
+    }
+
     return this.balanceAdapter.subscribeBalance(token, address);
   }
 
   public subscribeMaxInput(token: string, address: string, to: RegisteredChainName): Observable<FN> {
+    if (!this.balanceAdapter) return new Observable((sub) => sub.next(FN.ZERO));
+
     return combineLatest({
       txFee: this.estimateTxFee({
         amount: FN.ZERO,
@@ -85,23 +101,25 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     }).pipe(
       map(({ txFee, balance }) => {
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, this.balanceAdapter.decimals).mul(new FN(feeFactor));
-        const ed = this.balanceAdapter.getED();
+        const fee = FN.fromInner(txFee, this.balanceAdapter!.decimals).mul(new FN(feeFactor));
+        const ed = this.balanceAdapter?.getED();
 
         // always minus ed
-        return balance.minus(fee).minus(ed);
+        return balance.minus(fee).minus(ed || FN.ZERO);
       })
     );
   }
 
   public subscribeMinInput(token: string, to: RegisteredChainName): Observable<FN> {
+    if (!this.balanceAdapter) return new Observable((sub) => sub.next(FN.ZERO));
+
     return of(this.balanceAdapter.getED(token).add(this.getCrossChainFee(token, to).balance || FN.ZERO));
   }
 
   public getCrossChainFee(token: string, destChain: RegisteredChainName): TokenBalance {
     return {
       token,
-      balance: FN.fromInner((xcmFeeConfig[destChain][token]?.fee as string) ?? "0", this.balanceAdapter.decimals),
+      balance: FN.fromInner((xcmFeeConfig[destChain][token]?.fee as string) ?? "0", this.balanceAdapter?.decimals),
     };
   }
 
@@ -109,9 +127,9 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     const { to, token, address, amount } = params;
     const toChain = chains[to];
 
-    if (token !== this.balanceAdapter.nativeToken) throw new CurrencyNotFound(token);
+    if (token !== this.balanceAdapter?.nativeToken) throw new CurrencyNotFound(token);
 
-    const accountId = this.api.createType("AccountId32", address).toHex();
+    const accountId = this.api?.createType("AccountId32", address).toHex();
 
     const dst = { interior: { X1: { ParaChain: toChain.paraChainId } }, parents: 0 };
     const acc = { interior: { X1: { AccountId32: { id: accountId, network: "Any" } } }, parents: 0 };
@@ -132,13 +150,13 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
 }
 
 export class PolkadotAdapter extends BasePolkadotAdapter {
-  constructor(configs: PolkadotAdapterConfigs) {
-    super(configs, chains.polkadot, [{ to: chains.acala, token: "DOT" }]);
+  constructor() {
+    super(chains.polkadot, [{ to: chains.acala, token: "DOT" }]);
   }
 }
 
 export class KusamaAdapter extends BasePolkadotAdapter {
-  constructor(configs: PolkadotAdapterConfigs) {
-    super(configs, chains.kusama, [{ to: chains.karura, token: "KSM" }]);
+  constructor() {
+    super(chains.kusama, [{ to: chains.karura, token: "KSM" }]);
   }
 }

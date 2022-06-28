@@ -8,7 +8,7 @@ import {
 } from "@polkadot/apps-config/endpoints";
 import { RegisteredChainName } from "./configs";
 
-import { map, raceWith, combineLatest } from "rxjs";
+import { map, combineLatest, Observable, race } from "rxjs";
 import { options } from "@acala-network/api";
 
 export class ApiProvider {
@@ -34,16 +34,14 @@ export class ApiProvider {
           );
         }
         if (nodes.length > 1) {
-          return this.connect(nodes.slice(0, 1), chain).pipe(raceWith(...nodes.slice(1).map((node) => this.connect([node], chain))));
-        } else if (nodes.length === 1) {
-          return this.connect(nodes, chain);
+          return race(nodes.map((node) => this.connect([node], chain)));
         }
-        return null;
+        return this.connect(nodes, chain);
       })
     );
   }
 
-  public connect(nodes: string[], chainName: RegisteredChainName) {
+  public connect(nodes: string[], chainName: RegisteredChainName): Observable<RegisteredChainName | null> {
     if (!!this.apis[chainName]) {
       this.apis[chainName].disconnect();
       delete this.apis[chainName];

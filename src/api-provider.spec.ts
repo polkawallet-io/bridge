@@ -18,9 +18,9 @@ describe("api-provider", () => {
     expect(res.length).toEqual(chains.length);
 
     expect(res[0]).toEqual(chains[0]);
-    // expect(res[1]).toEqual(chains[1]);
-    // expect(res[2]).toEqual(chains[2]);
-    // expect(res[3]).toEqual(chains[3]);
+    expect(res[1]).toEqual(chains[1]);
+    expect(res[2]).toEqual(chains[2]);
+    expect(res[3]).toEqual(chains[3]);
 
     expect(provider.getApi(chains[0])).toBeDefined();
     expect(provider.getApi(chains[1])).toBeDefined();

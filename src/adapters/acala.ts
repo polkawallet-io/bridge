@@ -1,28 +1,36 @@
 import { AnyApi, FixedPointNumber } from "@acala-network/sdk-core";
 import { Wallet } from "@acala-network/sdk/wallet";
-import { combineLatest, map, Observable } from "rxjs";
+import { combineLatest, firstValueFrom, map, Observable } from "rxjs";
 import { chains, RegisteredChainName } from "../configs";
 import { xcmFeeConfig } from "../configs/xcm-fee";
 import { BalanceData, BridgeTxParams, CrossChainRouter, CrossChainTransferParams, Chain, TokenBalance } from "../types";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { isChainEqual } from "../utils/is-chain-equal";
-
-interface AcalaAdapterConfigs {
-  api: AnyApi;
-  wallet: Wallet;
-}
+import { ApiRx } from "@polkadot/api";
 
 export class BaseAcalaAdapter extends BaseCrossChainAdapter {
-  private wallet: Wallet;
+  private wallet?: Wallet;
 
-  constructor(configs: AcalaAdapterConfigs, chain: Chain, routers: Omit<CrossChainRouter, "from">[]) {
-    super(configs.api, chain, routers);
-    const { wallet } = configs;
+  constructor(chain: Chain, routers: Omit<CrossChainRouter, "from">[]) {
+    super(chain, routers);
+  }
 
-    this.wallet = wallet;
+  public override async setApi(api: AnyApi) {
+    this.api = api;
+
+    if (this.api?.type === "rxjs") {
+      await firstValueFrom(api.isReady as Observable<ApiRx>);
+    }
+    await api.isReady;
+
+    this.wallet = new Wallet(api);
+
+    await this.wallet.isReady;
   }
 
   public subscribeMinInput(token: string, to: RegisteredChainName): Observable<FixedPointNumber> {
+    if (!this.wallet) return new Observable((sub) => sub.next(FixedPointNumber.ZERO));
+
     return this.wallet.subscribeToken(token).pipe(
       map((r) => {
         return r.ed.add(this.getCrossChainFee(token, to)?.balance || FixedPointNumber.ZERO);
@@ -31,11 +39,25 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
   }
 
   public subscribeTokenBalance(token: string, address: string): Observable<BalanceData> {
+    if (!this.wallet) {
+      return new Observable((sub) =>
+        sub.next({
+          free: FixedPointNumber.ZERO,
+          locked: FixedPointNumber.ZERO,
+          available: FixedPointNumber.ZERO,
+          reserved: FixedPointNumber.ZERO,
+        })
+      );
+    }
+
     return this.wallet.subscribeBalance(token, address);
   }
 
   public subscribeMaxInput(token: string, address: string, to: RegisteredChainName): Observable<FixedPointNumber> {
-    const { nativeToken } = this.wallet.getPresetTokens();
+    if (!this.wallet) return new Observable((sub) => sub.next(FixedPointNumber.ZERO));
+
+    const tokens = this.wallet.getPresetTokens();
+    const { nativeToken } = tokens;
     return combineLatest({
       txFee:
         token === nativeToken.name
@@ -60,14 +82,14 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
   public getCrossChainFee(token: string, destChain: RegisteredChainName): TokenBalance {
     return {
       token,
-      balance: FixedPointNumber.fromInner((xcmFeeConfig[destChain][token]?.fee as string) ?? "0", this.wallet.__getToken(token).decimals),
+      balance: FixedPointNumber.fromInner((xcmFeeConfig[destChain][token]?.fee as string) ?? "0", this.wallet?.__getToken(token).decimals),
     };
   }
 
   public getBridgeTxParams(params: CrossChainTransferParams): BridgeTxParams {
     const { to, token, address, amount } = params;
-    const tokenFormSDK = this.wallet.__getToken(token);
-    const accountId = this.api.createType("AccountId32", address).toHex();
+    const tokenFormSDK = this.wallet?.__getToken(token);
+    const accountId = this.api?.createType("AccountId32", address).toHex();
     const toChain = chains[to];
 
     if (isChainEqual(toChain, "statemine")) {
@@ -77,7 +99,7 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
         {
           ConcreteFungible: {
             id: {
-              X2: [{ PalletInstance: tokenFormSDK.locations?.palletInstance }, { GeneralIndex: tokenFormSDK.locations?.generalIndex }],
+              X2: [{ PalletInstance: tokenFormSDK?.locations?.palletInstance }, { GeneralIndex: tokenFormSDK?.locations?.generalIndex }],
             },
             amount: amount.toChainData(),
           },
@@ -99,7 +121,7 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
       return {
         module: "xTokens",
         call: "transfer",
-        params: [tokenFormSDK.toChainData() as any, amount.toChainData(), { V1: dst }, dest_weight],
+        params: [tokenFormSDK?.toChainData() as any, amount.toChainData(), { V1: dst }, dest_weight],
       };
     }
 
@@ -114,14 +136,14 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
     return {
       module: "xTokens",
       call: "transfer",
-      params: [tokenFormSDK.toChainData() as any, amount.toChainData(), { V1: dst }, dest_weight],
+      params: [tokenFormSDK?.toChainData() as any, amount.toChainData(), { V1: dst }, dest_weight],
     };
   }
 }
 
 export class AcalaAdapter extends BaseAcalaAdapter {
-  constructor(configs: AcalaAdapterConfigs) {
-    super(configs, chains.acala, [
+  constructor() {
+    super(chains.acala, [
       // polkadot
       { to: chains.polkadot, token: "DOT" },
     ]);
@@ -129,8 +151,8 @@ export class AcalaAdapter extends BaseAcalaAdapter {
 }
 
 export class KaruraAdapter extends BaseAcalaAdapter {
-  constructor(configs: AcalaAdapterConfigs) {
-    super(configs, chains.karura, [
+  constructor() {
+    super(chains.karura, [
       // kusama
       { to: chains.kusama, token: "KSM" },
       // bifrost

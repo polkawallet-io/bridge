@@ -19,8 +19,11 @@ describe("polkadot-adapter should work", () => {
     const fromChain = "kusama";
     await connect(fromChain);
 
+    const kusama = new KusamaAdapter();
+    await kusama.setApi(provider.getApi(fromChain));
+
     const bridge = new Bridge({
-      adapters: [new KusamaAdapter({ api: provider.getApi(fromChain) })],
+      adapters: [kusama],
     });
 
     expect(bridge.getDestiantionsChains({ from: chains.kusama, token: "KSM" }).length).toEqual(1);
