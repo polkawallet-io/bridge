@@ -2,6 +2,8 @@ import { FixedPointNumber, Token } from "@acala-network/sdk-core";
 import { Observable } from "rxjs";
 import { RegisteredChainName } from "./configs";
 
+export { FixedPointNumber as FN } from "@acala-network/sdk-core";
+
 export type CROSS_CHAIN_ENV = "kusama" | "polkadot";
 
 export interface Chain {
