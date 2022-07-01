@@ -1,6 +1,6 @@
 {
   "name": "@polkawallet/bridge",
-  "version": "0.0.1-8",
+  "version": "0.0.1-9",
   "description": "polkawallet bridge sdk",
   "main": "build/index.js",
   "types": "build/index.d.ts",

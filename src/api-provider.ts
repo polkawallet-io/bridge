@@ -23,12 +23,12 @@ export class ApiProvider {
     return this.promiseApis[chainName];
   }
 
-  public connectFromChain(chainName: RegisteredChainName[], nodeList: Record<RegisteredChainName, string[]> | undefined) {
+  public connectFromChain(chainName: RegisteredChainName[], nodeList: Partial<Record<RegisteredChainName, string[]>> | undefined) {
     return combineLatest(
       chainName.map((chain) => {
         let nodes: string[];
-        if (nodeList) {
-          nodes = nodeList[chain];
+        if (nodeList && nodeList[chain]) {
+          nodes = nodeList[chain]!;
         } else {
           if (chain === "kusama") {
             nodes = Object.values(prodRelayKusama.providers).filter((e) => e.startsWith("wss://"));
@@ -56,6 +56,8 @@ export class ApiProvider {
     if (!!this.apis[chainName]) {
       this.apis[chainName].disconnect();
       delete this.apis[chainName];
+    }
+    if (!!this.promiseApis[chainName]) {
       this.promiseApis[chainName].disconnect();
       delete this.promiseApis[chainName];
     }
@@ -75,12 +77,16 @@ export class ApiProvider {
       map((api) => {
         // connect success
         if (!!api) {
+          if (!this.apis[chainName]) {
+            this.apis[chainName] = api;
+          } else {
+            api.disconnect();
+          }
+
           promiseApi.then((res) => {
-            if (!this.apis[chainName]) {
-              this.apis[chainName] = api;
+            if (!this.promiseApis[chainName]) {
               this.promiseApis[chainName] = res;
             } else {
-              api.disconnect();
               res.disconnect();
             }
           });

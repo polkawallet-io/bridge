@@ -13,7 +13,11 @@ describe("api-provider", () => {
     expect(provider.getApi(chains[0])).toEqual(undefined);
     expect(provider.getApi(chains[1])).toEqual(undefined);
 
-    const res = await firstValueFrom(provider.connectFromChain(chains, undefined));
+    const res = await firstValueFrom(
+      provider.connectFromChain(chains, {
+        karura: ["wss://karura.polkawallet.io"],
+      })
+    );
 
     expect(res.length).toEqual(chains.length);
 
