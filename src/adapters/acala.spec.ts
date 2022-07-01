@@ -12,7 +12,7 @@ describe("acala-adapter should work", () => {
   const provider = new ApiProvider();
 
   async function connect(chain: RegisteredChainName) {
-    return firstValueFrom(provider.connectFromChain([chain]));
+    return firstValueFrom(provider.connectFromChain([chain], undefined));
   }
 
   test("connect karura to do xcm", async () => {

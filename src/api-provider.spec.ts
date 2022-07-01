@@ -13,7 +13,7 @@ describe("api-provider", () => {
     expect(provider.getApi(chains[0])).toEqual(undefined);
     expect(provider.getApi(chains[1])).toEqual(undefined);
 
-    const res = await firstValueFrom(provider.connectFromChain(chains));
+    const res = await firstValueFrom(provider.connectFromChain(chains, undefined));
 
     expect(res.length).toEqual(chains.length);
 
@@ -27,5 +27,8 @@ describe("api-provider", () => {
 
     expect((await firstValueFrom(provider.getApi(chains[2]).rpc.system.chain())).toLowerCase()).toEqual(chains[2]);
     expect((await firstValueFrom(provider.getApi(chains[3]).rpc.system.chain())).toLowerCase()).toEqual(chains[3]);
+
+    expect((await provider.getApiPromise(chains[0]).rpc.system.chain()).toLowerCase()).toEqual(chains[0]);
+    expect((await provider.getApiPromise(chains[1]).rpc.system.chain()).toLowerCase()).toEqual(chains[1]);
   });
 });

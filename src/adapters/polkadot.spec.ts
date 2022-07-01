@@ -12,7 +12,7 @@ describe("polkadot-adapter should work", () => {
   const provider = new ApiProvider();
 
   async function connect(chain: RegisteredChainName) {
-    return firstValueFrom(provider.connectFromChain([chain]));
+    return firstValueFrom(provider.connectFromChain([chain], undefined));
   }
 
   test("connect kusama to do xcm", async () => {

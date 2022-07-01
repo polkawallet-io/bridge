@@ -1,4 +1,4 @@
-import { ApiRx, WsProvider } from "@polkadot/api";
+import { ApiPromise, ApiRx, WsProvider } from "@polkadot/api";
 import {
   prodParasKusama,
   prodRelayKusama,
@@ -13,25 +13,36 @@ import { options } from "@acala-network/api";
 
 export class ApiProvider {
   protected apis: Record<string, ApiRx> = {};
+  protected promiseApis: Record<string, ApiPromise> = {};
 
   public getApi(chainName: string) {
     return this.apis[chainName];
   }
 
-  public connectFromChain(chainName: RegisteredChainName[]) {
+  public getApiPromise(chainName: string) {
+    return this.promiseApis[chainName];
+  }
+
+  public connectFromChain(chainName: RegisteredChainName[], nodeList: Record<RegisteredChainName, string[]> | undefined) {
     return combineLatest(
       chainName.map((chain) => {
         let nodes: string[];
-        if (chain === "kusama") {
-          nodes = Object.values(prodRelayKusama.providers).filter((e) => e.startsWith("wss://"));
-        } else if (chain === "polkadot") {
-          nodes = Object.values(prodRelayPolkadot.providers).filter((e) => e.startsWith("wss://"));
-        } else if (chain === "statemine") {
-          nodes = Object.values(prodParasKusamaCommon.find((e) => e.info === chain)?.providers || {}).filter((e) => e.startsWith("wss://"));
+        if (nodeList) {
+          nodes = nodeList[chain];
         } else {
-          nodes = Object.values([...prodParasKusama, ...prodParasPolkadot].find((e) => e.info === chain)?.providers || {}).filter((e) =>
-            e.startsWith("wss://")
-          );
+          if (chain === "kusama") {
+            nodes = Object.values(prodRelayKusama.providers).filter((e) => e.startsWith("wss://"));
+          } else if (chain === "polkadot") {
+            nodes = Object.values(prodRelayPolkadot.providers).filter((e) => e.startsWith("wss://"));
+          } else if (chain === "statemine") {
+            nodes = Object.values(prodParasKusamaCommon.find((e) => e.info === chain)?.providers || {}).filter((e) =>
+              e.startsWith("wss://")
+            );
+          } else {
+            nodes = Object.values([...prodParasKusama, ...prodParasPolkadot].find((e) => e.info === chain)?.providers || {}).filter((e) =>
+              e.startsWith("wss://")
+            );
+          }
         }
         if (nodes.length > 1) {
           return race(nodes.map((node) => this.connect([node], chain)));
@@ -45,28 +56,34 @@ export class ApiProvider {
     if (!!this.apis[chainName]) {
       this.apis[chainName].disconnect();
       delete this.apis[chainName];
+      this.promiseApis[chainName].disconnect();
+      delete this.promiseApis[chainName];
     }
 
     const wsProvider = new WsProvider(nodes);
 
     const isAcala = chainName === "acala" || chainName === "karura";
-    return ApiRx.create(
-      isAcala
-        ? options({
-            provider: wsProvider,
-          })
-        : {
-            provider: wsProvider,
-          }
-    ).pipe(
+    const option = isAcala
+      ? options({
+          provider: wsProvider,
+        })
+      : {
+          provider: wsProvider,
+        };
+    const promiseApi = ApiPromise.create(option);
+    return ApiRx.create(option).pipe(
       map((api) => {
         // connect success
         if (!!api) {
-          if (!this.apis[chainName]) {
-            this.apis[chainName] = api;
-          } else {
-            api.disconnect();
-          }
+          promiseApi.then((res) => {
+            if (!this.apis[chainName]) {
+              this.apis[chainName] = api;
+              this.promiseApis[chainName] = res;
+            } else {
+              api.disconnect();
+              res.disconnect();
+            }
+          });
           return chainName;
         }
         return null;
