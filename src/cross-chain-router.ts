@@ -10,21 +10,17 @@ interface RouterFilter {
   token?: string;
 }
 
-interface BridgeConfigs {
+interface BridgeRouterManagerConfigs {
   adapters: BaseCrossChainAdapter[];
 }
 
-export class Bridge {
+export class BridgeRouterManager {
   private routers: CrossChainRouter[];
   private adapters: BaseCrossChainAdapter[];
 
-  constructor(configs?: BridgeConfigs) {
-    this.adapters = configs?.adapters || [];
-
+  constructor(configs?: BridgeRouterManagerConfigs) {
     this.routers = [];
-    this.adapters.forEach((e) => {
-      this.routers = [...this.routers, ...e.getRouters()];
-    });
+    this.adapters = configs?.adapters || [];
   }
 
   public findAdapterByName(chain: RegisteredChainName | Chain): BaseCrossChainAdapter | undefined {

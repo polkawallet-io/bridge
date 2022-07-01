@@ -1,9 +1,9 @@
 import { chains, RegisteredChainName } from "../configs";
 import { ApiProvider } from "../api-provider";
 import { firstValueFrom } from "rxjs";
-import { Bridge } from "../cross-chain-router";
 import { KusamaAdapter } from "./polkadot";
 import { FixedPointNumber } from "@acala-network/sdk-core";
+import { Bridge } from "..";
 
 describe("polkadot-adapter should work", () => {
   jest.setTimeout(30000);
@@ -26,9 +26,9 @@ describe("polkadot-adapter should work", () => {
       adapters: [kusama],
     });
 
-    expect(bridge.getDestiantionsChains({ from: chains.kusama, token: "KSM" }).length).toEqual(1);
+    expect(bridge.router.getDestiantionsChains({ from: chains.kusama, token: "KSM" }).length).toEqual(1);
 
-    const kusamaAdapter = bridge.findAdapterByName(fromChain);
+    const kusamaAdapter = bridge.findAdapter(fromChain);
     if (kusamaAdapter) {
       const networkProps: any = await kusamaAdapter.getNetworkProperties();
       expect(networkProps.ss58Format).toEqual(2);

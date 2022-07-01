@@ -1,6 +1,6 @@
 import { AnyApi, FixedPointNumber } from "@acala-network/sdk-core";
 import { Wallet } from "@acala-network/sdk/wallet";
-import { combineLatest, firstValueFrom, map, Observable } from "rxjs";
+import { combineLatest, firstValueFrom, map, Observable, catchError } from "rxjs";
 import { chains, RegisteredChainName } from "../configs";
 import { xcmFeeConfig } from "../configs/xcm-fee";
 import { BalanceData, BridgeTxParams, CrossChainRouter, CrossChainTransferParams, Chain, TokenBalance } from "../types";
@@ -39,18 +39,20 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
   }
 
   public subscribeTokenBalance(token: string, address: string): Observable<BalanceData> {
+    const zeroResult: Observable<BalanceData> = new Observable((sub) =>
+      sub.next({
+        free: FixedPointNumber.ZERO,
+        locked: FixedPointNumber.ZERO,
+        available: FixedPointNumber.ZERO,
+        reserved: FixedPointNumber.ZERO,
+      })
+    );
+
     if (!this.wallet) {
-      return new Observable((sub) =>
-        sub.next({
-          free: FixedPointNumber.ZERO,
-          locked: FixedPointNumber.ZERO,
-          available: FixedPointNumber.ZERO,
-          reserved: FixedPointNumber.ZERO,
-        })
-      );
+      return zeroResult;
     }
 
-    return this.wallet.subscribeBalance(token, address);
+    return this.wallet.subscribeBalance(token, address).pipe(catchError((_) => zeroResult));
   }
 
   public subscribeMaxInput(token: string, address: string, to: RegisteredChainName): Observable<FixedPointNumber> {

@@ -17,6 +17,7 @@ import { map, catchError } from "rxjs/operators";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { ApiRx } from "@polkadot/api";
+import { xcmFeeConfig } from "./configs/xcm-fee";
 
 const DEFAULT_TX_CHECKING_TIMEOUT = 2 * 60 * 1000;
 
@@ -24,6 +25,8 @@ export abstract class BaseCrossChainAdapter {
   protected routers: Omit<CrossChainRouter, "from">[];
   protected api?: AnyApi;
   readonly chain: Chain;
+  // @ts-ignore
+  private findAdapter!: (chain: Chain | RegisteredChainName) => BaseCrossChainAdapter;
 
   constructor(chain: Chain, routers: Omit<CrossChainRouter, "from">[]) {
     this.chain = chain;
@@ -38,6 +41,10 @@ export abstract class BaseCrossChainAdapter {
     }
 
     await api.isReady;
+  }
+
+  public injectFindAdapter(func: (chain: RegisteredChainName | Chain) => BaseCrossChainAdapter): void {
+    this.findAdapter = func;
   }
 
   public getRouters(): CrossChainRouter[] {
@@ -64,6 +71,7 @@ export abstract class BaseCrossChainAdapter {
           minInput,
           maxInput,
           ss58Prefix: chains[to].ss58Prefix,
+          destFee: xcmFeeConfig[to][token].fee,
         };
       })
     );

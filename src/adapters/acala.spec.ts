@@ -1,9 +1,9 @@
 import { chains, RegisteredChainName } from "../configs";
 import { ApiProvider } from "../api-provider";
 import { firstValueFrom } from "rxjs";
-import { Bridge } from "../cross-chain-router";
 import { KaruraAdapter } from "./acala";
 import { FixedPointNumber } from "@acala-network/sdk-core";
+import { Bridge } from "..";
 
 describe("acala-adapter should work", () => {
   jest.setTimeout(30000);
@@ -12,6 +12,7 @@ describe("acala-adapter should work", () => {
   const provider = new ApiProvider();
 
   async function connect(chain: RegisteredChainName) {
+    // return firstValueFrom(provider.connectFromChain([chain], { karura: ["wss://crosschain-dev.polkawallet.io:9907"] }));
     return firstValueFrom(provider.connectFromChain([chain], undefined));
   }
 
@@ -26,11 +27,11 @@ describe("acala-adapter should work", () => {
       adapters: [karura],
     });
 
-    expect(bridge.getDestiantionsChains({ from: chains.karura, token: "KSM" }).length).toEqual(1);
-    expect(bridge.getDestiantionsChains({ from: chains.karura, token: "KAR" }).length).toEqual(2);
-    expect(bridge.getDestiantionsChains({ from: chains.karura, token: "KUSD" }).length).toEqual(2);
+    expect(bridge.router.getDestiantionsChains({ from: chains.karura, token: "KSM" }).length).toEqual(1);
+    expect(bridge.router.getDestiantionsChains({ from: chains.karura, token: "KAR" }).length).toEqual(2);
+    expect(bridge.router.getDestiantionsChains({ from: chains.karura, token: "KUSD" }).length).toEqual(2);
 
-    const adapter = bridge.findAdapterByName(fromChain);
+    const adapter = bridge.findAdapter(fromChain);
 
     if (adapter) {
       const networkProps = await adapter.getNetworkProperties();
@@ -69,16 +70,19 @@ describe("acala-adapter should work", () => {
           token,
           address: testAccount,
         });
-        expect(tx.module).toEqual("xTokens");
-        expect(tx.call).toEqual("transfer");
-        expect(tx.params.length).toEqual(4);
+        if (to !== "statemine") {
+          expect(tx.module).toEqual("xTokens");
+          expect(tx.call).toEqual("transfer");
+          expect(tx.params.length).toEqual(4);
+        }
       }
     }
 
-    await runMyTestSuit("kusama", "KSM");
-    await runMyTestSuit("bifrost", "KAR");
-    await runMyTestSuit("bifrost", "KUSD");
-    await runMyTestSuit("khala", "KAR");
-    await runMyTestSuit("khala", "KUSD");
+    await runMyTestSuit("statemine", "RMRK");
+    // await runMyTestSuit("kusama", "KSM");
+    // await runMyTestSuit("bifrost", "KAR");
+    // await runMyTestSuit("bifrost", "KUSD");
+    // await runMyTestSuit("khala", "KAR");
+    // await runMyTestSuit("khala", "KUSD");
   });
 });

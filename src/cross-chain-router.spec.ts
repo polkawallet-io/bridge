@@ -2,12 +2,12 @@ import { WsProvider } from "@polkadot/rpc-provider";
 import { ApiPromise } from "@polkadot/api";
 import { options } from "@acala-network/api";
 import { Wallet } from "@acala-network/sdk/wallet";
-import { Bridge } from "./cross-chain-router";
+import { BridgeRouterManager } from "./cross-chain-router";
 import { chains } from "./configs";
 import { isChainEqual } from "./utils/is-chain-equal";
 
 describe("cross-chain-router-manager", () => {
-  let manager: Bridge;
+  let manager: BridgeRouterManager;
   let api: ApiPromise;
   let wallet: Wallet;
 
@@ -26,7 +26,7 @@ describe("cross-chain-router-manager", () => {
 
     await wallet.isReady;
 
-    manager = new Bridge();
+    manager = new BridgeRouterManager();
 
     await manager.addRouters(
       [

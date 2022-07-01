@@ -1,5 +1,6 @@
 import { FixedPointNumber, Token } from "@acala-network/sdk-core";
 import { Observable } from "rxjs";
+import { BaseCrossChainAdapter } from "./base-chain-adapter";
 import { RegisteredChainName } from "./configs";
 
 export { FixedPointNumber as FN } from "@acala-network/sdk-core";
@@ -39,6 +40,7 @@ export interface CrossChainInputConfigs {
   minInput: FixedPointNumber;
   maxInput: FixedPointNumber;
   ss58Prefix: number;
+  destFee: string;
 }
 
 export interface CrossChainFeeConfig {
@@ -50,6 +52,10 @@ export interface BridgeTxParams {
   module: string;
   call: string;
   params: any[];
+}
+
+export interface BridgeConfigs {
+  adapters: BaseCrossChainAdapter[];
 }
 
 export interface CrossChianBalanceChangedConfigs {
