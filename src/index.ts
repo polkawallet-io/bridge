@@ -26,7 +26,8 @@ export class Bridge implements BaseSDK {
   public init(): void {
     this.adapters.forEach((i) => this.router.addRouters(i.getRouters()));
     this.adapters.forEach((i) => i.injectFindAdapter(this.findAdapter));
-    this.isReady$.next(true);
+    
+    this.router.updateDisabledRouters().then(() => this.isReady$.next(true));
   }
 
   public get isReady(): Promise<boolean> {

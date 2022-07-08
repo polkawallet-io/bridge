@@ -24,6 +24,7 @@
     "@polkadot/api": "^8.5.1",
     "@polkadot/apps-config": "^0.116.1",
     "@polkadot/types": "^8.5.1",
+    "axios": "^0.27.2",
     "lodash": "^4.17.20",
     "rxjs": "^7.4.0"
   },
