@@ -64,11 +64,11 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
       txFee:
         token === nativeToken.name
           ? this.estimateTxFee({
-              amount: FixedPointNumber.ZERO,
-              to,
-              token,
-              address,
-            })
+            amount: FixedPointNumber.ZERO,
+            to,
+            token,
+            address,
+          })
           : "0",
       balance: this.wallet.subscribeBalance(token, address).pipe(map((i) => i.available)),
     }).pipe(
@@ -94,28 +94,49 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
     const accountId = this.api?.createType("AccountId32", address).toHex();
     const toChain = chains[to];
 
-    if (isChainEqual(toChain, "statemine")) {
-      const dst = { X2: ["Parent", { ParaChain: toChain.paraChainId }] };
-      const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
-      const ass = [
-        {
-          ConcreteFungible: {
-            id: {
-              X2: [{ PalletInstance: tokenFormSDK?.locations?.palletInstance }, { GeneralIndex: tokenFormSDK?.locations?.generalIndex }],
-            },
-            amount: amount.toChainData(),
-          },
-        },
-      ];
+    // if (isChainEqual(toChain, "statemine")) {
+    //   const dst = { X2: ["Parent", { ParaChain: toChain.paraChainId }] };
+    //   const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
+    //   const ass = [
+    //     {
+    //       ConcreteFungible: {
+    //         id: {
+    //           X2: [{ PalletInstance: tokenFormSDK?.locations?.palletInstance }, { GeneralIndex: tokenFormSDK?.locations?.generalIndex }],
+    //         },
+    //         amount: amount.toChainData(),
+    //       },
+    //     },
+    //   ];
 
-      return {
-        module: "polkadotXcm",
-        call: "limitedReserveTransferAssets",
-        params: [{ V0: dst }, { V0: acc }, { V0: ass }, 0, "Unlimited"],
-      };
-    }
+    //   return {
+    //     module: "polkadotXcm",
+    //     call: "limitedReserveTransferAssets",
+    //     params: [{ V0: dst }, { V0: acc }, { V0: ass }, 0, "Unlimited"],
+    //   };
+    // }
 
     const dest_weight = 5 * 1_000_000_000;
+
+    if (isChainEqual(toChain, 'moonriver') || isChainEqual(toChain, 'moonbeam')) {
+      const dst = {
+        parents: 1,
+        interior: {
+          X2: [{ Parachain: toChain.paraChainId }, { AccountKey20: { key: accountId, network: "Any" } }],
+        },
+      };
+
+      return token === "KAR" || token === "KUSD" || token === "fa://3" || token === "ACA" || token === "AUSD" || token === "fa://0"
+        ? {
+          module: "xTokens",
+          call: "transfer",
+          params: [tokenFormSDK?.toChainData() as any, amount, { V1: dst }, dest_weight],
+        }
+        : {
+          module: "xTokens",
+          call: "transferMulticurrencies",
+          params: [[[tokenFormSDK?.toChainData() as any, amount], xcmFeeConfig[this.chain.id][token].fee], 1, { V1: dst }, dest_weight],
+        }
+    }
 
     if (isChainEqual(toChain, "kusama") || isChainEqual(toChain, "polkadot")) {
       const dst = { interior: { X1: { AccountId32: { id: accountId, network: "Any" } } }, parents: 1 };
@@ -135,11 +156,17 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
       },
     };
 
-    return {
-      module: "xTokens",
-      call: "transfer",
-      params: [tokenFormSDK?.toChainData() as any, amount.toChainData(), { V1: dst }, dest_weight],
-    };
+    return isChainEqual(toChain, 'statemine')
+      ? {
+        module: "xTokens",
+        call: "transferMulticurrencies",
+        params: [[[tokenFormSDK?.toChainData(), amount], xcmFeeConfig[this.chain.id][token].fee], 1, { V1: dst }, dest_weight],
+      }
+      : {
+        module: "xTokens",
+        call: "transfer",
+        params: [tokenFormSDK?.toChainData() as any, amount.toChainData(), { V1: dst }, dest_weight],
+      }
   }
 }
 
@@ -148,6 +175,13 @@ export class AcalaAdapter extends BaseAcalaAdapter {
     super(chains.acala, [
       // polkadot
       { to: chains.polkadot, token: "DOT" },
+      // moonbeam
+      { to: chains.moonbeam, token: "GLMR" },
+      // parallel
+      { to: chains.parallel, token: "ACA" },
+      { to: chains.parallel, token: "AUSD" },
+      { to: chains.parallel, token: "LDOT" },
+      { to: chains.parallel, token: "PARA" },
     ]);
   }
 }
@@ -173,6 +207,29 @@ export class KaruraAdapter extends BaseAcalaAdapter {
       { to: chains.khala, token: "KAR" },
       { to: chains.khala, token: "KUSD" },
       { to: chains.khala, token: "PHA" },
+      // heiko
+      { to: chains.heiko, token: "KAR" },
+      { to: chains.heiko, token: "KUSD" },
+      { to: chains.heiko, token: "LKSM" },
+      { to: chains.heiko, token: "HKO" },
+      // moon
+      { to: chains.moonriver, token: "MOVR" },
+      // kico
+      { to: chains.kico, token: "KAR" },
+      { to: chains.kico, token: "KUSD" },
+      { to: chains.kico, token: "KICO" },
+      // crust shadow
+      { to: chains.shadow, token: "CSM" },
+      // calamari 
+      { to: chains.calamari, token: "KAR" },
+      { to: chains.calamari, token: "KUSD" },
+      { to: chains.calamari, token: "LKSM" },
+      { to: chains.calamari, token: "KMA" },
+      // integritee
+      { to: chains.integritee, token: "TEER" },
+      // altair
+      { to: chains.altair, token: "KUSD" },
+      { to: chains.altair, token: "AIR" },
     ]);
   }
 }

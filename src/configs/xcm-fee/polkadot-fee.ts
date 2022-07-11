@@ -2,7 +2,7 @@ import { CrossChainFeeConfig } from "src/types";
 
 export const polkadotXcmFeeConfig: Record<string, Record<string, CrossChainFeeConfig>> = {
   polkadot: {
-    KSM: {
+    DOT: {
       fee: "482771104",
       existentialDeposit: "10000000000",
     },
