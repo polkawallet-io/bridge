@@ -6,6 +6,13 @@ export const polkadotChains = {
     paraChainId: -1,
     ss58Prefix: 0,
   },
+  statemint: {
+    id: "statemint",
+    display: "Statemint",
+    icon: "https://resources.acala.network/networks/statemine.png",
+    paraChainId: 1000,
+    ss58Prefix: 0,
+  },
   acala: {
     id: "acala",
     display: "Acala",

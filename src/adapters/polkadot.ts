@@ -131,19 +131,34 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    const dst = { interior: { X1: { ParaChain: toChain.paraChainId } }, parents: 0 };
-    const acc = { interior: { X1: { AccountId32: { id: accountId, network: "Any" } } }, parents: 0 };
-    const ass = [
-      {
-        fun: { Fungible: amount.toChainData() },
-        id: { Concrete: { interior: "Here", parents: 0 } },
-      },
-    ];
-    const callParams = [{ V1: dst }, { V1: acc }, { V1: ass }, 0, "Unlimited"];
+    // to statemine
+    if (to === "statemine") {
+      const dst = { interior: { X1: { ParaChain: toChain.paraChainId } }, parents: 0 };
+      const acc = { interior: { X1: { AccountId32: { id: accountId, network: "Any" } } }, parents: 0 };
+      const ass = [
+        {
+          fun: { Fungible: amount.toChainData() },
+          id: { Concrete: { interior: "Here", parents: 0 } },
+        },
+      ];
+      const callParams = [{ V1: dst }, { V1: acc }, { V1: ass }, 0, "Unlimited"];
+
+      return {
+        module: "xcmPallet",
+        call: "limitedTeleportAssets",
+        params: callParams,
+      };
+    }
+
+    // to karura/acala
+    const dst = { X1: { Parachain: toChain.paraChainId } };
+    const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
+    const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
+    const callParams = [{ V0: dst }, { V0: acc }, { V0: ass }, 0];
 
     return {
       module: "xcmPallet",
-      call: "limitedReserveTransferAssets",
+      call: "reserveTransferAssets",
       params: callParams,
     };
   }
@@ -157,6 +172,9 @@ export class PolkadotAdapter extends BasePolkadotAdapter {
 
 export class KusamaAdapter extends BasePolkadotAdapter {
   constructor() {
-    super(chains.kusama, [{ to: chains.karura, token: "KSM" }]);
+    super(chains.kusama, [
+      { to: chains.statemine, token: "KSM" },
+      { to: chains.karura, token: "KSM" },
+    ]);
   }
 }

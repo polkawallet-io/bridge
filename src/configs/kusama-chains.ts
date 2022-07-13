@@ -10,7 +10,7 @@ export const kusamaChains = {
     id: "statemine",
     display: "Statemine",
     icon: "https://resources.acala.network/networks/statemine.png",
-    paraChainId: 2001,
+    paraChainId: 1000,
     ss58Prefix: 2,
   },
   karura: {
@@ -95,6 +95,20 @@ export const kusamaChains = {
     display: "Altair",
     icon: "https://resources.acala.network/networks/altair.png",
     paraChainId: 2088,
+    ss58Prefix: 136,
+  },
+  crab: {
+    id: "crab",
+    display: "Darwinia Crab",
+    icon: "https://resources.acala.network/networks/crab.png",
+    paraChainId: 2105,
+    ss58Prefix: 136,
+  },
+  turing: {
+    id: "turing",
+    display: "Turing Network",
+    icon: "https://resources.acala.network/networks/turing.png",
+    paraChainId: 2114,
     ss58Prefix: 136,
   },
 };

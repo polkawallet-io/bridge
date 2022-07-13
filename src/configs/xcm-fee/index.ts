@@ -13,6 +13,8 @@ import { kintsugiXcmFeeConfig } from "./kintsugi-fee";
 import { moonbeamXcmFeeConfig } from "./moonbeam-fee";
 import { parallelXcmFeeConfig } from "./parallel-fee";
 import { quartzXcmFeeConfig } from "./quartz-fee";
+import { darwiniaXcmFeeConfig } from "./darwinia-fee";
+import { turingXcmFeeConfig } from "./turing-fee";
 
 export const xcmFeeConfig = {
   ...polkadotXcmFeeConfig,
@@ -27,7 +29,9 @@ export const xcmFeeConfig = {
   ...moonbeamXcmFeeConfig,
   ...parallelXcmFeeConfig,
   ...altairXcmFeeConfig,
+  ...darwiniaXcmFeeConfig,
   ...calamariXcmFeeConfig,
   ...crustXcmFeeConfig,
   ...integriteeXcmFeeConfig,
+  ...turingXcmFeeConfig,
 } as Record<RegisteredChainName, Record<string, CrossChainFeeConfig>>;
