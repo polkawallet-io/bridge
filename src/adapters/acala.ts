@@ -63,12 +63,15 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
     return combineLatest({
       txFee:
         token === nativeToken.name
-          ? this.estimateTxFee({
-              amount: FixedPointNumber.ZERO,
-              to,
-              token,
-              address,
-            })
+          ? this.estimateTxFee(
+              {
+                amount: FixedPointNumber.ZERO,
+                to,
+                token,
+                address: to === "moonriver" || to === "moonbeam" ? "0x0000000000000000000000000000000000000000" : address,
+              },
+              address
+            )
           : "0",
       balance: this.wallet.subscribeBalance(token, address).pipe(map((i) => i.available)),
     }).pipe(
@@ -91,7 +94,6 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
   public getBridgeTxParams(params: CrossChainTransferParams): BridgeTxParams {
     const { to, token, address, amount } = params;
     const tokenFormSDK = this.wallet?.__getToken(token);
-    const accountId = this.api?.createType("AccountId32", address).toHex();
     const toChain = chains[to];
 
     const dest_weight = 5 * 1_000_000_000;
@@ -101,11 +103,11 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
       const dst = {
         parents: 1,
         interior: {
-          X2: [{ Parachain: toChain.paraChainId }, { AccountKey20: { key: accountId, network: "Any" } }],
+          X2: [{ Parachain: toChain.paraChainId }, { AccountKey20: { key: address, network: "Any" } }],
         },
       };
 
-      return token === "KAR" || token === "KUSD" || token === "fa://3" || token === "ACA" || token === "AUSD" || token === "fa://0"
+      return token === "KAR" || token === "KUSD" || token === "MOVR" || token === "ACA" || token === "AUSD" || token === "GLMR"
         ? {
             module: "xTokens",
             call: "transfer",
@@ -125,6 +127,8 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
             ],
           };
     }
+
+    const accountId = this.api?.createType("AccountId32", address).toHex();
 
     // to other parachains
     let dst: any = {

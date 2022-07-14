@@ -77,13 +77,13 @@ export abstract class BaseCrossChainAdapter {
     );
   }
 
-  protected estimateTxFee(params: CrossChainTransferParams) {
+  protected estimateTxFee(params: CrossChainTransferParams, signer: string) {
     let tx = this.createTx({ ...params });
 
     if (this.api?.type === "rxjs") {
       tx = tx as SubmittableExtrinsic<"rxjs", ISubmittableResult>;
 
-      return tx.paymentInfo(params.address).pipe(
+      return tx.paymentInfo(signer).pipe(
         map((feeData) => {
           return feeData.partialFee.toString();
         })
@@ -95,7 +95,7 @@ export abstract class BaseCrossChainAdapter {
 
     return from(
       (async () => {
-        const feeData = await tx.paymentInfo(params.address);
+        const feeData = await tx.paymentInfo(signer);
 
         return feeData.partialFee.toString();
       })()

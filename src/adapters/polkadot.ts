@@ -91,12 +91,15 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     if (!this.balanceAdapter) return new Observable((sub) => sub.next(FN.ZERO));
 
     return combineLatest({
-      txFee: this.estimateTxFee({
-        amount: FN.ZERO,
-        to,
-        token,
-        address,
-      }),
+      txFee: this.estimateTxFee(
+        {
+          amount: FN.ZERO,
+          to,
+          token,
+          address,
+        },
+        address
+      ),
       balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
     }).pipe(
       map(({ txFee, balance }) => {
