@@ -34,4 +34,11 @@ export const polkadotChains = {
     paraChainId: 2004,
     ss58Prefix: 1284,
   },
+  interlay: {
+    id: "interlay",
+    display: "Interlay",
+    icon: "https://resources.acala.network/networks/interlay.png",
+    paraChainId: 2032,
+    ss58Prefix: 2032,
+  },
 };

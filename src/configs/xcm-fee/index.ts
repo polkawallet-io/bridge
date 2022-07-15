@@ -15,6 +15,7 @@ import { parallelXcmFeeConfig } from "./parallel-fee";
 import { quartzXcmFeeConfig } from "./quartz-fee";
 import { darwiniaXcmFeeConfig } from "./darwinia-fee";
 import { turingXcmFeeConfig } from "./turing-fee";
+import { astarXcmFeeConfig } from "./astar-fee";
 
 export const xcmFeeConfig = {
   ...polkadotXcmFeeConfig,
@@ -34,4 +35,5 @@ export const xcmFeeConfig = {
   ...crustXcmFeeConfig,
   ...integriteeXcmFeeConfig,
   ...turingXcmFeeConfig,
+  ...astarXcmFeeConfig,
 } as Record<RegisteredChainName, Record<string, CrossChainFeeConfig>>;

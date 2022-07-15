@@ -85,7 +85,7 @@ export const kusamaChains = {
   },
   integritee: {
     id: "integritee",
-    display: "Integritee Network",
+    display: "Integritee",
     icon: "https://resources.acala.network/networks/integritee.png",
     paraChainId: 2015,
     ss58Prefix: 13,
@@ -106,9 +106,16 @@ export const kusamaChains = {
   },
   turing: {
     id: "turing",
-    display: "Turing Network",
+    display: "Turing",
     icon: "https://resources.acala.network/networks/turing.png",
     paraChainId: 2114,
     ss58Prefix: 136,
+  },
+  shiden: {
+    id: "shiden",
+    display: "Shiden",
+    icon: "https://resources.acala.network/networks/shiden.png",
+    paraChainId: 2007,
+    ss58Prefix: 5,
   },
 };
