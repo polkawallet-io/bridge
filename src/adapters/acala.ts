@@ -33,6 +33,7 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
 
     return this.wallet.subscribeToken(token).pipe(
       map((r) => {
+        if ((to === "statemine" && token !== "KSM") || (to === "statemint" && token !== "DOT")) return FixedPointNumber.ZERO;
         return r.ed.add(this.getCrossChainFee(token, to)?.balance || FixedPointNumber.ZERO);
       })
     );
