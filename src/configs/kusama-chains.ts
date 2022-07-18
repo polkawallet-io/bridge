@@ -118,4 +118,11 @@ export const kusamaChains = {
     paraChainId: 2007,
     ss58Prefix: 5,
   },
+  pichiu: {
+    id: "pichiu",
+    display: "Pichiu",
+    icon: "https://resources.acala.network/networks/pichiu.png",
+    paraChainId: 2102,
+    ss58Prefix: 42,
+  },
 };

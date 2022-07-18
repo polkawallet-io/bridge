@@ -87,5 +87,5 @@ export interface BalanceData {
 
 export interface BalanceAdapter {
   subscribeBalance(token: Token | string, address: string): Observable<BalanceData>;
-  getED(token: Token | string): FixedPointNumber;
+  getED(token: Token | string): Observable<FixedPointNumber>;
 }

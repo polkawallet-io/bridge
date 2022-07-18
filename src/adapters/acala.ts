@@ -238,6 +238,11 @@ export class KaruraAdapter extends BaseAcalaAdapter {
       { to: chains.turing, token: "KUSD" },
       { to: chains.turing, token: "LKSM" },
       { to: chains.turing, token: "TUR" },
+      // pichiu
+      { to: chains.pichiu, token: "KAR" },
+      { to: chains.pichiu, token: "KUSD" },
+      { to: chains.pichiu, token: "LKSM" },
+      { to: chains.pichiu, token: "PCHU" },
     ]);
   }
 }

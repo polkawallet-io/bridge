@@ -7,6 +7,13 @@ import { chains, RegisteredChainName } from "../configs";
 import { xcmFeeConfig } from "../configs/xcm-fee";
 import { Chain, CrossChainRouter, CrossChainTransferParams, BalanceData, BalanceAdapter, BridgeTxParams, TokenBalance } from "../types";
 import { Storage } from "@acala-network/sdk/utils/storage";
+import { BN } from "@polkadot/util";
+
+const supported_assets: Record<string, BN> = {
+  RMRK: new BN(8),
+  ARIS: new BN(16),
+  USDT: new BN(1984),
+};
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const createBalanceStorages = (api: AnyApi) => {
@@ -17,20 +24,38 @@ const createBalanceStorages = (api: AnyApi) => {
         path: "derive.balances.all",
         params: [address],
       }),
+    assets: (assetId: BN, address: string) =>
+      Storage.create<any>({
+        api: api,
+        path: "query.assets.account",
+        params: [assetId, address],
+      }),
+    assetsMeta: (assetId: BN) =>
+      Storage.create<any>({
+        api: api,
+        path: "query.assets.metadata",
+        params: [assetId],
+      }),
+    assetsInfo: (assetId: BN) =>
+      Storage.create<any>({
+        api: api,
+        path: "query.assets.asset",
+        params: [assetId],
+      }),
   };
 };
 
-interface PolkadotBalanceAdapterConfigs {
+interface StatemintBalanceAdapterConfigs {
   api: AnyApi;
 }
 
-class PolkadotBalanceAdapter implements BalanceAdapter {
+class StatemintBalanceAdapter implements BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
   readonly decimals: number;
   readonly ed: FN;
   readonly nativeToken: string;
 
-  constructor({ api }: PolkadotBalanceAdapterConfigs) {
+  constructor({ api }: StatemintBalanceAdapterConfigs) {
     this.storages = createBalanceStorages(api);
     this.decimals = api.registry.chainDecimals[0];
     this.ed = FN.fromInner(api.consts.balances.existentialDeposit.toString(), this.decimals);
@@ -40,26 +65,49 @@ class PolkadotBalanceAdapter implements BalanceAdapter {
   public subscribeBalance(token: string, address: string): Observable<BalanceData> {
     const storage = this.storages.balances(address);
 
-    if (token !== this.nativeToken) throw new CurrencyNotFound(token);
+    if (token === this.nativeToken) {
+      return storage.observable.pipe(
+        map((data) => ({
+          free: FN.fromInner(data.freeBalance.toString(), this.decimals),
+          locked: FN.fromInner(data.lockedBalance.toString(), this.decimals),
+          reserved: FN.fromInner(data.reservedBalance.toString(), this.decimals),
+          available: FN.fromInner(data.availableBalance.toString(), this.decimals),
+        }))
+      );
+    }
 
-    return storage.observable.pipe(
-      map((data) => ({
-        free: FN.fromInner(data.freeBalance.toString(), this.decimals),
-        locked: FN.fromInner(data.lockedBalance.toString(), this.decimals),
-        reserved: FN.fromInner(data.reservedBalance.toString(), this.decimals),
-        available: FN.fromInner(data.availableBalance.toString(), this.decimals),
+    const assetId = supported_assets[token];
+    if (!assetId) throw new CurrencyNotFound(token);
+
+    return combineLatest({
+      meta: this.storages.assetsMeta(assetId).observable,
+      balance: this.storages.assets(assetId, address).observable,
+    }).pipe(
+      map(({ meta, balance }) => ({
+        free: FN.fromInner(balance.balance?.toString() || "0", meta.decimals?.toNumber()),
+        locked: new FN(0),
+        reserved: new FN(0),
+        available: FN.fromInner(balance.balance?.toString() || "0", meta.decimals?.toNumber()),
       }))
     );
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getED(_token?: string | Token): Observable<FN> {
-    return of(this.ed);
+  public getED(token?: string | Token): Observable<FN> {
+    if (token === this.nativeToken) return of(this.ed);
+
+    const assetId = supported_assets[token as string];
+    if (!assetId) throw new CurrencyNotFound(token as string);
+
+    return combineLatest({
+      info: this.storages.assetsInfo(assetId).observable,
+      meta: this.storages.assetsMeta(assetId).observable,
+    }).pipe(map(({ info, meta }) => FN.fromInner(info.minBalance?.toString() || "0", meta.decimals?.toNumber())));
   }
 }
 
-class BasePolkadotAdapter extends BaseCrossChainAdapter {
-  private balanceAdapter?: PolkadotBalanceAdapter;
+class BaseStatemintAdapter extends BaseCrossChainAdapter {
+  private balanceAdapter?: StatemintBalanceAdapter;
   constructor(chain: Chain, routers: Omit<CrossChainRouter, "from">[]) {
     super(chain, routers);
   }
@@ -69,7 +117,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.balanceAdapter = new PolkadotBalanceAdapter({ api });
+    this.balanceAdapter = new StatemintBalanceAdapter({ api });
   }
 
   public subscribeTokenBalance(token: string, address: string): Observable<BalanceData> {
@@ -101,7 +149,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
         address
       ),
       balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getED(),
+      ed: this.balanceAdapter?.getED(token),
     }).pipe(
       map(({ txFee, balance, ed }) => {
         const feeFactor = 1.2;
@@ -130,54 +178,67 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     const { to, token, address, amount } = params;
     const toChain = chains[to];
 
-    if (token !== this.balanceAdapter?.nativeToken) throw new CurrencyNotFound(token);
-
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    // to statemine
-    if (to === "statemine") {
-      const dst = { interior: { X1: { ParaChain: toChain.paraChainId } }, parents: 0 };
+    // to relay chain
+    if (to === "kusama" || to === "polkadot") {
+      if (token !== this.balanceAdapter?.nativeToken) throw new CurrencyNotFound(token);
+
+      const dst = { interior: "Here", parents: 1 };
       const acc = { interior: { X1: { AccountId32: { id: accountId, network: "Any" } } }, parents: 0 };
       const ass = [
         {
           fun: { Fungible: amount.toChainData() },
-          id: { Concrete: { interior: "Here", parents: 0 } },
+          id: { Concrete: { interior: "Here", parents: 1 } },
         },
       ];
       const callParams = [{ V1: dst }, { V1: acc }, { V1: ass }, 0, "Unlimited"];
 
       return {
-        module: "xcmPallet",
+        module: "polkadotXcm",
         call: "limitedTeleportAssets",
         params: callParams,
       };
     }
 
     // to karura/acala
-    const dst = { X1: { Parachain: toChain.paraChainId } };
+    const assetId = supported_assets[token];
+    if ((to !== "acala" && to !== "karura") || token === this.balanceAdapter?.nativeToken || !assetId)
+      throw new CurrencyNotFound(token as string);
+
+    const dst = { X2: ["Parent", { Parachain: toChain.paraChainId }] };
     const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
-    const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
-    const callParams = [{ V0: dst }, { V0: acc }, { V0: ass }, 0];
+    const ass = [
+      {
+        ConcreteFungible: {
+          id: { X2: [{ PalletInstance: 50 }, { GeneralIndex: assetId }] },
+          amount: amount.toChainData(),
+        },
+      },
+    ];
+    const callParams = [{ V0: dst }, { V0: acc }, { V0: ass }, 0, "Unlimited"];
 
     return {
-      module: "xcmPallet",
-      call: "reserveTransferAssets",
+      module: "polkadotXcm",
+      call: "limitedReserveTransferAssets",
       params: callParams,
     };
   }
 }
 
-export class PolkadotAdapter extends BasePolkadotAdapter {
+export class StatemintAdapter extends BaseStatemintAdapter {
   constructor() {
-    super(chains.polkadot, [{ to: chains.acala, token: "DOT" }]);
+    super(chains.statemint, [{ to: chains.polkadot, token: "DOT" }]);
   }
 }
 
-export class KusamaAdapter extends BasePolkadotAdapter {
+export class StatemineAdapter extends BaseStatemintAdapter {
   constructor() {
-    super(chains.kusama, [
-      { to: chains.statemine, token: "KSM" },
-      { to: chains.karura, token: "KSM" },
+    super(chains.statemine, [
+      { to: chains.kusama, token: "KSM" },
+      { to: chains.karura, token: "RMRK" },
+      { to: chains.karura, token: "ARIS" },
+      { to: chains.karura, token: "USDT" },
     ]);
   }
 }
