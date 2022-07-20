@@ -1,6 +1,6 @@
 import { AnyApi, FixedPointNumber } from "@acala-network/sdk-core";
 import { Wallet } from "@acala-network/sdk/wallet";
-import { combineLatest, firstValueFrom, map, Observable, catchError } from "rxjs";
+import { combineLatest, firstValueFrom, map, Observable, catchError, of } from "rxjs";
 import { chains, RegisteredChainName } from "../configs";
 import { xcmFeeConfig } from "../configs/xcm-fee";
 import { BalanceData, BridgeTxParams, CrossChainRouter, CrossChainTransferParams, Chain, TokenBalance } from "../types";
@@ -31,12 +31,7 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
   public subscribeMinInput(token: string, to: RegisteredChainName): Observable<FixedPointNumber> {
     if (!this.wallet) return new Observable((sub) => sub.next(FixedPointNumber.ZERO));
 
-    return this.wallet.subscribeToken(token).pipe(
-      map((r) => {
-        if ((to === "statemine" && token !== "KSM") || (to === "statemint" && token !== "DOT")) return FixedPointNumber.ZERO;
-        return r.ed.add(this.getCrossChainFee(token, to)?.balance || FixedPointNumber.ZERO);
-      })
-    );
+    return of(this.getDestED(token, to).balance.add(this.getCrossChainFee(token, to)?.balance || FixedPointNumber.ZERO));
   }
 
   public subscribeTokenBalance(token: string, address: string): Observable<BalanceData> {
@@ -89,6 +84,16 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
     return {
       token,
       balance: FixedPointNumber.fromInner((xcmFeeConfig[destChain][token]?.fee as string) ?? "0", this.wallet?.__getToken(token).decimals),
+    };
+  }
+
+  public getDestED(token: string, destChain: RegisteredChainName): TokenBalance {
+    return {
+      token,
+      balance: FixedPointNumber.fromInner(
+        (xcmFeeConfig[destChain][token]?.existentialDeposit as string) ?? "0",
+        this.wallet?.__getToken(token).decimals
+      ),
     };
   }
 
@@ -179,6 +184,8 @@ export class AcalaAdapter extends BaseAcalaAdapter {
       { to: chains.parallel, token: "AUSD" },
       { to: chains.parallel, token: "LDOT" },
       { to: chains.parallel, token: "PARA" },
+      // interlay
+      { to: chains.interlay, token: "INTR" },
     ]);
   }
 }
@@ -243,6 +250,9 @@ export class KaruraAdapter extends BaseAcalaAdapter {
       { to: chains.pichiu, token: "KUSD" },
       { to: chains.pichiu, token: "LKSM" },
       { to: chains.pichiu, token: "PCHU" },
+      // shiden
+      { to: chains.shiden, token: "SDN" },
+      { to: chains.shiden, token: "KUSD" },
     ]);
   }
 }

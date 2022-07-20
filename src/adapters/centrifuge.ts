@@ -7,12 +7,14 @@ import { chains, RegisteredChainName } from "../configs";
 import { xcmFeeConfig } from "../configs/xcm-fee";
 import { Chain, CrossChainRouter, CrossChainTransferParams, BalanceData, BalanceAdapter, BridgeTxParams, TokenBalance } from "../types";
 import { Storage } from "@acala-network/sdk/utils/storage";
-import { BN } from "@polkadot/util";
 
-const supported_assets: Record<string, BN> = {
-  RMRK: new BN(8),
-  ARIS: new BN(16),
-  USDT: new BN(1984),
+interface CentrifugeToken {
+  symbol: string;
+  decimals: number;
+}
+
+const supported_tokens: Record<string, CentrifugeToken> = {
+  KUSD: { symbol: "KUSD", decimals: 12 },
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -24,39 +26,30 @@ const createBalanceStorages = (api: AnyApi) => {
         path: "derive.balances.all",
         params: [address],
       }),
-    assets: (assetId: BN, address: string) =>
+    assets: (address: string, token: string) =>
       Storage.create<any>({
         api: api,
-        path: "query.assets.account",
-        params: [assetId, address],
-      }),
-    assetsMeta: (assetId: BN) =>
-      Storage.create<any>({
-        api: api,
-        path: "query.assets.metadata",
-        params: [assetId],
-      }),
-    assetsInfo: (assetId: BN) =>
-      Storage.create<any>({
-        api: api,
-        path: "query.assets.asset",
-        params: [assetId],
+        path: "query.ormlTokens.accounts",
+        params: [address, token],
       }),
   };
 };
 
-interface StatemintBalanceAdapterConfigs {
+interface CentrifugeBalanceAdapterConfigs {
+  chain: RegisteredChainName;
   api: AnyApi;
 }
 
-class StatemintBalanceAdapter implements BalanceAdapter {
+class CentrifugeBalanceAdapter implements BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
+  readonly chain: RegisteredChainName;
   readonly decimals: number;
   readonly ed: FN;
   readonly nativeToken: string;
 
-  constructor({ api }: StatemintBalanceAdapterConfigs) {
+  constructor({ chain, api }: CentrifugeBalanceAdapterConfigs) {
     this.storages = createBalanceStorages(api);
+    this.chain = chain;
     this.decimals = api.registry.chainDecimals[0];
     this.ed = FN.fromInner(api.consts.balances.existentialDeposit.toString(), this.decimals);
     this.nativeToken = api.registry.chainTokens[0];
@@ -76,19 +69,19 @@ class StatemintBalanceAdapter implements BalanceAdapter {
       );
     }
 
-    const assetId = supported_assets[token];
-    if (!assetId) throw new CurrencyNotFound(token);
+    const tokenObj = supported_tokens[token];
+    if (!tokenObj) throw new CurrencyNotFound(token);
 
-    return combineLatest({
-      meta: this.storages.assetsMeta(assetId).observable,
-      balance: this.storages.assets(assetId, address).observable,
-    }).pipe(
-      map(({ meta, balance }) => ({
-        free: FN.fromInner(balance.balance?.toString() || "0", meta.decimals?.toNumber()),
-        locked: new FN(0),
-        reserved: new FN(0),
-        available: FN.fromInner(balance.balance?.toString() || "0", meta.decimals?.toNumber()),
-      }))
+    return this.storages.assets(address, tokenObj.symbol).observable.pipe(
+      map((balance) => {
+        const amount = FN.fromInner(balance.free?.toString() || "0", tokenObj.decimals);
+        return {
+          free: amount,
+          locked: new FN(0),
+          reserved: new FN(0),
+          available: amount,
+        };
+      })
     );
   }
 
@@ -96,18 +89,15 @@ class StatemintBalanceAdapter implements BalanceAdapter {
   public getED(token?: string | Token): Observable<FN> {
     if (token === this.nativeToken) return of(this.ed);
 
-    const assetId = supported_assets[token as string];
-    if (!assetId) throw new CurrencyNotFound(token as string);
+    const tokenObj = supported_tokens[token as string];
+    if (!tokenObj) throw new CurrencyNotFound(token as string);
 
-    return combineLatest({
-      info: this.storages.assetsInfo(assetId).observable,
-      meta: this.storages.assetsMeta(assetId).observable,
-    }).pipe(map(({ info, meta }) => FN.fromInner(info.minBalance?.toString() || "0", meta.decimals?.toNumber())));
+    return of(FN.fromInner(xcmFeeConfig[this.chain][tokenObj.symbol].existentialDeposit, tokenObj.decimals));
   }
 }
 
-class BaseStatemintAdapter extends BaseCrossChainAdapter {
-  private balanceAdapter?: StatemintBalanceAdapter;
+class BaseCentrifugeAdapter extends BaseCrossChainAdapter {
+  private balanceAdapter?: CentrifugeBalanceAdapter;
   constructor(chain: Chain, routers: Omit<CrossChainRouter, "from">[]) {
     super(chain, routers);
   }
@@ -117,7 +107,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.balanceAdapter = new StatemintBalanceAdapter({ api });
+    this.balanceAdapter = new CentrifugeBalanceAdapter({ chain: this.chain.id, api });
   }
 
   public subscribeTokenBalance(token: string, address: string): Observable<BalanceData> {
@@ -187,65 +177,32 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    // to relay chain
-    if (to === "kusama" || to === "polkadot") {
-      if (token !== this.balanceAdapter?.nativeToken) throw new CurrencyNotFound(token);
-
-      const dst = { interior: "Here", parents: 1 };
-      const acc = { interior: { X1: { AccountId32: { id: accountId, network: "Any" } } }, parents: 0 };
-      const ass = [
-        {
-          fun: { Fungible: amount.toChainData() },
-          id: { Concrete: { interior: "Here", parents: 1 } },
-        },
-      ];
-      const callParams = [{ V1: dst }, { V1: acc }, { V1: ass }, 0, "Unlimited"];
-
-      return {
-        module: "polkadotXcm",
-        call: "limitedTeleportAssets",
-        params: callParams,
-      };
-    }
-
-    // to karura/acala
-    const assetId = supported_assets[token];
-    if ((to !== "acala" && to !== "karura") || token === this.balanceAdapter?.nativeToken || !assetId)
-      throw new CurrencyNotFound(token as string);
-
-    const dst = { X2: ["Parent", { Parachain: toChain.paraChainId }] };
-    const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
-    const ass = [
-      {
-        ConcreteFungible: {
-          id: { X2: [{ PalletInstance: 50 }, { GeneralIndex: assetId }] },
-          amount: amount.toChainData(),
-        },
-      },
-    ];
-    const callParams = [{ V0: dst }, { V0: acc }, { V0: ass }, 0, "Unlimited"];
+    const tokenObj = supported_tokens[token];
+    if (!tokenObj && token !== this.balanceAdapter?.nativeToken) throw new CurrencyNotFound(token);
 
     return {
-      module: "polkadotXcm",
-      call: "limitedReserveTransferAssets",
-      params: callParams,
+      module: "xTokens",
+      call: "transfer",
+      params: [
+        token === this.balanceAdapter?.nativeToken ? "Native" : tokenObj.symbol,
+        amount.toChainData(),
+        {
+          V1: {
+            parents: 1,
+            interior: { X2: [{ Parachain: toChain.paraChainId }, { AccountId32: { id: accountId, network: "Any" } }] },
+          },
+        },
+        5_000_000_000,
+      ],
     };
   }
 }
 
-export class StatemintAdapter extends BaseStatemintAdapter {
+export class AltairAdapter extends BaseCentrifugeAdapter {
   constructor() {
-    super(chains.statemint, [{ to: chains.polkadot, token: "DOT" }]);
-  }
-}
-
-export class StatemineAdapter extends BaseStatemintAdapter {
-  constructor() {
-    super(chains.statemine, [
-      { to: chains.kusama, token: "KSM" },
-      { to: chains.karura, token: "RMRK" },
-      { to: chains.karura, token: "ARIS" },
-      { to: chains.karura, token: "USDT" },
+    super(chains.altair, [
+      { to: chains.karura, token: "AIR" },
+      { to: chains.karura, token: "KUSD" },
     ]);
   }
 }

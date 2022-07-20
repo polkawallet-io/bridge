@@ -11,6 +11,8 @@ export const acalaXcmFeeConfig: Record<string, Record<string, CrossChainFeeConfi
     PARA: { fee: "6400000000", existentialDeposit: "100000000000" },
     // moonbeam
     GLMR: { fee: "6400000000000000", existentialDeposit: "100000000000000000" },
+    // interlay
+    INTR: { fee: "93240000", existentialDeposit: "1000000000" },
   },
 };
 
@@ -49,5 +51,9 @@ export const karuraXcmFeeConfig: Record<string, Record<string, CrossChainFeeConf
     TEER: { fee: "6400000000", existentialDeposit: "100000000000" },
     // altair
     AIR: { fee: "6400000000000000", existentialDeposit: "1000000000000" },
+    // shiden
+    SDN: { fee: "932400000000000", existentialDeposit: "10000000000000000" },
+    // pichiu
+    PCHU: { fee: "9324000000000000", existentialDeposit: "100000000000000000" },
   },
 };

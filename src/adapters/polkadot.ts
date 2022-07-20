@@ -116,7 +116,14 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
   public subscribeMinInput(token: string, to: RegisteredChainName): Observable<FN> {
     if (!this.balanceAdapter) return new Observable((sub) => sub.next(FN.ZERO));
 
-    return this.balanceAdapter.getED(token).pipe(map((ed) => ed.add(this.getCrossChainFee(token, to).balance || FN.ZERO)));
+    return of(this.getDestED(token, to).balance.add(this.getCrossChainFee(token, to).balance || FN.ZERO));
+  }
+
+  public getDestED(token: string, destChain: RegisteredChainName): TokenBalance {
+    return {
+      token,
+      balance: FN.fromInner((xcmFeeConfig[destChain][token]?.existentialDeposit as string) ?? "0", this.balanceAdapter?.decimals),
+    };
   }
 
   public getCrossChainFee(token: string, destChain: RegisteredChainName): TokenBalance {

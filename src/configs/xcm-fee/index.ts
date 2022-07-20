@@ -2,7 +2,7 @@ import { RegisteredChainName } from "..";
 import { CrossChainFeeConfig } from "../../types";
 import { polkadotXcmFeeConfig, statemineXcmFeeConfig } from "./polkadot-fee";
 import { acalaXcmFeeConfig, karuraXcmFeeConfig } from "./acala-fee";
-import { altairXcmFeeConfig } from "./altair-fee";
+import { centrifugeXcmFeeConfig } from "./centrifuge-fee";
 import { bifrostXcmFeeConfig } from "./bifrost-fee";
 import { calamariXcmFeeConfig } from "./calamari-fee";
 import { crustXcmFeeConfig } from "./crust-fee";
@@ -30,7 +30,7 @@ export const xcmFeeConfig = {
   ...kicoXcmFeeConfig,
   ...moonbeamXcmFeeConfig,
   ...parallelXcmFeeConfig,
-  ...altairXcmFeeConfig,
+  ...centrifugeXcmFeeConfig,
   ...darwiniaXcmFeeConfig,
   ...calamariXcmFeeConfig,
   ...crustXcmFeeConfig,
