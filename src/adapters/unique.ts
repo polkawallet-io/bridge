@@ -4,13 +4,8 @@ import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
 import { combineLatest, map, Observable, of } from "rxjs";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { chains, RegisteredChainName } from "../configs";
-import { xcmFeeConfig } from "../configs/xcm-fee";
 import { Chain, CrossChainRouter, CrossChainTransferParams, BalanceData, BalanceAdapter, BridgeTxParams } from "../types";
 import { Storage } from "@acala-network/sdk/utils/storage";
-
-const supported_tokens: Record<string, string> = {
-  KUSD: "18446744073709551616",
-};
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const createBalanceStorages = (api: AnyApi) => {
@@ -21,28 +16,22 @@ const createBalanceStorages = (api: AnyApi) => {
         path: "derive.balances.all",
         params: [address],
       }),
-    assets: (tokenId: string, address: string) =>
-      Storage.create<any>({
-        api: api,
-        path: "query.assets.account",
-        params: [tokenId, address],
-      }),
   };
 };
 
-interface AstarBalanceAdapterConfigs {
+interface UniqueBalanceAdapterConfigs {
   chain: RegisteredChainName;
   api: AnyApi;
 }
 
-class AstarBalanceAdapter implements BalanceAdapter {
+class UniqueBalanceAdapter implements BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
   readonly chain: RegisteredChainName;
   readonly decimals: number;
   readonly ed: FN;
   readonly nativeToken: string;
 
-  constructor({ chain, api }: AstarBalanceAdapterConfigs) {
+  constructor({ chain, api }: UniqueBalanceAdapterConfigs) {
     this.storages = createBalanceStorages(api);
     this.chain = chain;
     this.decimals = api.registry.chainDecimals[0];
@@ -53,47 +42,26 @@ class AstarBalanceAdapter implements BalanceAdapter {
   public subscribeBalance(token: string, address: string): Observable<BalanceData> {
     const storage = this.storages.balances(address);
 
-    if (token === this.nativeToken) {
-      return storage.observable.pipe(
-        map((data) => ({
-          free: FN.fromInner(data.freeBalance.toString(), this.decimals),
-          locked: FN.fromInner(data.lockedBalance.toString(), this.decimals),
-          reserved: FN.fromInner(data.reservedBalance.toString(), this.decimals),
-          available: FN.fromInner(data.availableBalance.toString(), this.decimals),
-        }))
-      );
-    }
+    if (token !== this.nativeToken) throw new CurrencyNotFound(token);
 
-    const tokenId = supported_tokens[token];
-    if (!tokenId) throw new CurrencyNotFound(token);
-
-    return this.storages.assets(tokenId, address).observable.pipe(
-      map((balance) => {
-        const amount = FN.fromInner(balance.balance?.toString() || "0", this.getTokenDecimals(token));
-        return {
-          free: amount,
-          locked: new FN(0),
-          reserved: new FN(0),
-          available: amount,
-        };
-      })
+    return storage.observable.pipe(
+      map((data) => ({
+        free: FN.fromInner(data.freeBalance.toString(), this.decimals),
+        locked: FN.fromInner(data.lockedBalance.toString(), this.decimals),
+        reserved: FN.fromInner(data.reservedBalance.toString(), this.decimals),
+        available: FN.fromInner(data.availableBalance.toString(), this.decimals),
+      }))
     );
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public getED(token?: string | Token): Observable<FN> {
-    if (token === this.nativeToken) return of(this.ed);
-
-    return of(FN.fromInner(xcmFeeConfig[this.chain][token as string].existentialDeposit, this.getTokenDecimals(token as string)));
-  }
-
-  public getTokenDecimals(token: string): number {
-    return xcmFeeConfig[this.chain][token]?.decimals || this.decimals;
+    return of(this.ed);
   }
 }
 
-class BaseAstarAdapter extends BaseCrossChainAdapter {
-  private balanceAdapter?: AstarBalanceAdapter;
+class BaseUniqueAdapter extends BaseCrossChainAdapter {
+  private balanceAdapter?: UniqueBalanceAdapter;
   constructor(chain: Chain, routers: Omit<CrossChainRouter, "from">[]) {
     super(chain, routers);
   }
@@ -103,7 +71,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.balanceAdapter = new AstarBalanceAdapter({ chain: this.chain.id, api });
+    this.balanceAdapter = new UniqueBalanceAdapter({ chain: this.chain.id, api });
   }
 
   public subscribeTokenBalance(token: string, address: string): Observable<BalanceData> {
@@ -154,51 +122,24 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
     const { to, token, address, amount } = params;
     const toChain = chains[to];
 
+    if (token !== this.balanceAdapter?.nativeToken) throw new CurrencyNotFound(token);
+
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    const dst = { parents: 1, interior: { X1: { Parachain: toChain.paraChainId } } };
-    const acc = { parents: 0, interior: { X1: { AccountId32: { id: accountId, network: "Any" } } } };
-    let ass: any = [{ id: { Concrete: { parents: 0, interior: "Here" } }, fun: { Fungible: amount.toChainData() } }];
+    const dst = { X2: ["Parent", { ParaChain: toChain.paraChainId }] };
+    const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
+    const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
 
-    if (token === this.balanceAdapter?.nativeToken) {
-      return {
-        module: "polkadotXcm",
-        call: "reserveTransferAssets",
-        params: [{ V1: dst }, { V1: acc }, { V1: ass }, 0],
-      };
-    }
-
-    const tokenIds: Record<string, string> = {
-      KUSD: "0x0081",
-    };
-
-    const tokenId = tokenIds[token];
-    if (!tokenId) throw new CurrencyNotFound(token);
-
-    ass = [
-      {
-        id: {
-          Concrete: {
-            parents: 1,
-            interior: { X2: [{ Parachain: toChain.paraChainId }, { GeneralKey: tokenId }] },
-          },
-        },
-        fun: { Fungible: amount.toChainData() },
-      },
-    ];
     return {
       module: "polkadotXcm",
-      call: "reserveTransferAssets",
-      params: [{ V1: dst }, { V1: acc }, { V1: ass }, 0],
+      call: "limitedReserveTransferAssets",
+      params: [{ V0: dst }, { V0: acc }, { V0: ass }, 0, "Unlimited"],
     };
   }
 }
 
-export class ShidenAdapter extends BaseAstarAdapter {
+export class QuartzAdapter extends BaseUniqueAdapter {
   constructor() {
-    super(chains.shiden, [
-      { to: chains.karura, token: "SDN" },
-      { to: chains.karura, token: "KUSD" },
-    ]);
+    super(chains.quartz, [{ to: chains.karura, token: "QTZ" }]);
   }
 }

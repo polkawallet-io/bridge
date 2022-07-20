@@ -11,13 +11,14 @@ import {
   NetworkProps,
 } from "./types";
 import { chains, RegisteredChainName } from "./configs";
-import { AnyApi, FixedPointNumber } from "@acala-network/sdk-core";
+import { AnyApi, FixedPointNumber as FN } from "@acala-network/sdk-core";
 import { of, combineLatest, Observable, timeout, TimeoutError, from, firstValueFrom } from "rxjs";
 import { map, catchError } from "rxjs/operators";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { ApiRx } from "@polkadot/api";
 import { xcmFeeConfig } from "./configs/xcm-fee";
+import { TokenConfigNotFound } from "./errors";
 
 const DEFAULT_TX_CHECKING_TIMEOUT = 2 * 60 * 1000;
 
@@ -77,6 +78,28 @@ export abstract class BaseCrossChainAdapter {
     );
   }
 
+  public subscribeMinInput(token: string, to: RegisteredChainName): Observable<FN> {
+    return of(this.getDestED(token, to).balance.add(this.getCrossChainFee(token, to).balance || FN.ZERO));
+  }
+
+  public getDestED(token: string, destChain: RegisteredChainName): TokenBalance {
+    if (!xcmFeeConfig[destChain][token]) throw new TokenConfigNotFound(token, destChain);
+
+    return {
+      token,
+      balance: FN.fromInner(xcmFeeConfig[destChain][token]?.existentialDeposit ?? "0", xcmFeeConfig[destChain][token]?.decimals ?? 12),
+    };
+  }
+
+  public getCrossChainFee(token: string, destChain: RegisteredChainName): TokenBalance {
+    if (!xcmFeeConfig[destChain][token]) throw new TokenConfigNotFound(token, destChain);
+
+    return {
+      token,
+      balance: FN.fromInner(xcmFeeConfig[destChain][token]?.fee ?? "0", xcmFeeConfig[destChain][token]?.decimals ?? 12),
+    };
+  }
+
   protected estimateTxFee(params: CrossChainTransferParams, signer: string) {
     let tx = this.createTx({ ...params });
 
@@ -114,9 +137,9 @@ export abstract class BaseCrossChainAdapter {
   public subscribeBalanceChanged(configs: CrossChianBalanceChangedConfigs): Observable<BalanceChangedStatus> {
     const { token, address, amount, tolerance } = configs;
     // allow 1% tolerance as default
-    const target = amount.mul(new FixedPointNumber(1 - (tolerance || 0.01)));
+    const target = amount.mul(new FN(1 - (tolerance || 0.01)));
 
-    let savedBalance: FixedPointNumber | undefined;
+    let savedBalance: FN | undefined;
 
     return this.subscribeTokenBalance(token, address).pipe(
       timeout(configs.timeout || DEFAULT_TX_CHECKING_TIMEOUT),
@@ -151,8 +174,6 @@ export abstract class BaseCrossChainAdapter {
   }
 
   public abstract subscribeTokenBalance(token: string, address: string): Observable<BalanceData>;
-  public abstract subscribeMinInput(token: string, to: RegisteredChainName): Observable<FixedPointNumber>;
-  public abstract subscribeMaxInput(token: string, address: string, to: RegisteredChainName): Observable<FixedPointNumber>;
-  public abstract getCrossChainFee(token: string, destChain: RegisteredChainName): TokenBalance;
+  public abstract subscribeMaxInput(token: string, address: string, to: RegisteredChainName): Observable<FN>;
   public abstract getBridgeTxParams(params: CrossChainTransferParams): BridgeTxParams;
 }

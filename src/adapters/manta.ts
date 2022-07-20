@@ -1,5 +1,5 @@
 import { AnyApi, FixedPointNumber as FN, Token } from "@acala-network/sdk-core";
-import { CurrencyNotFound } from "../errors";
+import { CurrencyNotFound, TokenConfigNotFound } from "../errors";
 import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
 import { combineLatest, map, Observable, of } from "rxjs";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
@@ -8,8 +8,12 @@ import { xcmFeeConfig } from "../configs/xcm-fee";
 import { Chain, CrossChainRouter, CrossChainTransferParams, BalanceData, BalanceAdapter, BridgeTxParams } from "../types";
 import { Storage } from "@acala-network/sdk/utils/storage";
 
-const supported_tokens: Record<string, string> = {
-  KUSD: "18446744073709551616",
+const supported_tokens: Record<string, number> = {
+  KMA: 1,
+  KUSD: 9,
+  LKSM: 10,
+  KSM: 12,
+  KAR: 8,
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -21,28 +25,28 @@ const createBalanceStorages = (api: AnyApi) => {
         path: "derive.balances.all",
         params: [address],
       }),
-    assets: (tokenId: string, address: string) =>
+    assets: (id: number, address: string) =>
       Storage.create<any>({
         api: api,
         path: "query.assets.account",
-        params: [tokenId, address],
+        params: [id, address],
       }),
   };
 };
 
-interface AstarBalanceAdapterConfigs {
+interface MantaBalanceAdapterConfigs {
   chain: RegisteredChainName;
   api: AnyApi;
 }
 
-class AstarBalanceAdapter implements BalanceAdapter {
+class MantaBalanceAdapter implements BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
   readonly chain: RegisteredChainName;
   readonly decimals: number;
   readonly ed: FN;
   readonly nativeToken: string;
 
-  constructor({ chain, api }: AstarBalanceAdapterConfigs) {
+  constructor({ chain, api }: MantaBalanceAdapterConfigs) {
     this.storages = createBalanceStorages(api);
     this.chain = chain;
     this.decimals = api.registry.chainDecimals[0];
@@ -64,12 +68,12 @@ class AstarBalanceAdapter implements BalanceAdapter {
       );
     }
 
-    const tokenId = supported_tokens[token];
-    if (!tokenId) throw new CurrencyNotFound(token);
+    const tokenID = supported_tokens[token];
+    if (!tokenID) throw new CurrencyNotFound(token);
 
-    return this.storages.assets(tokenId, address).observable.pipe(
+    return this.storages.assets(tokenID, address).observable.pipe(
       map((balance) => {
-        const amount = FN.fromInner(balance.balance?.toString() || "0", this.getTokenDecimals(token));
+        const amount = FN.fromInner(balance.unwrapOrDefault()?.balance?.toString() || "0", this.getTokenDecimals(token));
         return {
           free: amount,
           locked: new FN(0),
@@ -84,16 +88,20 @@ class AstarBalanceAdapter implements BalanceAdapter {
   public getED(token?: string | Token): Observable<FN> {
     if (token === this.nativeToken) return of(this.ed);
 
+    if (!xcmFeeConfig[this.chain][token as string]) throw new TokenConfigNotFound(token as string, this.chain);
+
     return of(FN.fromInner(xcmFeeConfig[this.chain][token as string].existentialDeposit, this.getTokenDecimals(token as string)));
   }
 
   public getTokenDecimals(token: string): number {
-    return xcmFeeConfig[this.chain][token]?.decimals || this.decimals;
+    if (!xcmFeeConfig[this.chain][token]) throw new TokenConfigNotFound(token, this.chain);
+
+    return xcmFeeConfig[this.chain][token].decimals;
   }
 }
 
-class BaseAstarAdapter extends BaseCrossChainAdapter {
-  private balanceAdapter?: AstarBalanceAdapter;
+class BaseMantaAdapter extends BaseCrossChainAdapter {
+  private balanceAdapter?: MantaBalanceAdapter;
   constructor(chain: Chain, routers: Omit<CrossChainRouter, "from">[]) {
     super(chain, routers);
   }
@@ -103,7 +111,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.balanceAdapter = new AstarBalanceAdapter({ chain: this.chain.id, api });
+    this.balanceAdapter = new MantaBalanceAdapter({ chain: this.chain.id, api });
   }
 
   public subscribeTokenBalance(token: string, address: string): Observable<BalanceData> {
@@ -156,49 +164,35 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    const dst = { parents: 1, interior: { X1: { Parachain: toChain.paraChainId } } };
-    const acc = { parents: 0, interior: { X1: { AccountId32: { id: accountId, network: "Any" } } } };
-    let ass: any = [{ id: { Concrete: { parents: 0, interior: "Here" } }, fun: { Fungible: amount.toChainData() } }];
-
-    if (token === this.balanceAdapter?.nativeToken) {
-      return {
-        module: "polkadotXcm",
-        call: "reserveTransferAssets",
-        params: [{ V1: dst }, { V1: acc }, { V1: ass }, 0],
-      };
-    }
-
-    const tokenIds: Record<string, string> = {
-      KUSD: "0x0081",
-    };
-
-    const tokenId = tokenIds[token];
+    const tokenId = supported_tokens[token];
     if (!tokenId) throw new CurrencyNotFound(token);
 
-    ass = [
-      {
-        id: {
-          Concrete: {
+    return {
+      module: "xTokens",
+      call: "transfer",
+      params: [
+        { MantaCurrency: tokenId },
+        amount.toChainData(),
+        {
+          V1: {
             parents: 1,
-            interior: { X2: [{ Parachain: toChain.paraChainId }, { GeneralKey: tokenId }] },
+            interior: { X2: [{ Parachain: toChain.paraChainId }, { AccountId32: { id: accountId, network: "Any" } }] },
           },
         },
-        fun: { Fungible: amount.toChainData() },
-      },
-    ];
-    return {
-      module: "polkadotXcm",
-      call: "reserveTransferAssets",
-      params: [{ V1: dst }, { V1: acc }, { V1: ass }, 0],
+        5_000_000_000,
+      ],
     };
   }
 }
 
-export class ShidenAdapter extends BaseAstarAdapter {
+export class CalamariAdapter extends BaseMantaAdapter {
   constructor() {
-    super(chains.shiden, [
-      { to: chains.karura, token: "SDN" },
+    super(chains.calamari, [
+      { to: chains.karura, token: "KMA" },
       { to: chains.karura, token: "KUSD" },
+      { to: chains.karura, token: "LKSM" },
+      { to: chains.karura, token: "KSM" },
+      { to: chains.karura, token: "KAR" },
     ]);
   }
 }

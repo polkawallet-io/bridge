@@ -8,8 +8,13 @@ import { xcmFeeConfig } from "../configs/xcm-fee";
 import { Chain, CrossChainRouter, CrossChainTransferParams, BalanceData, BalanceAdapter, BridgeTxParams } from "../types";
 import { Storage } from "@acala-network/sdk/utils/storage";
 
-const supported_tokens: Record<string, string> = {
-  KUSD: "18446744073709551616",
+const supported_tokens: Record<string, Object> = {
+  KUSD: { Stable: "KUSD" },
+  AUSD: { Stable: "AUSD" },
+  BNC: { Native: "BNC" },
+  VSKSM: { VSToken: "KSM" },
+  KSM: { Token: "KSM" },
+  KAR: { Token: "KAR" },
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -21,28 +26,28 @@ const createBalanceStorages = (api: AnyApi) => {
         path: "derive.balances.all",
         params: [address],
       }),
-    assets: (tokenId: string, address: string) =>
+    assets: (address: string, token: Object) =>
       Storage.create<any>({
         api: api,
-        path: "query.assets.account",
-        params: [tokenId, address],
+        path: "query.tokens.accounts",
+        params: [address, token],
       }),
   };
 };
 
-interface AstarBalanceAdapterConfigs {
+interface BifrostBalanceAdapterConfigs {
   chain: RegisteredChainName;
   api: AnyApi;
 }
 
-class AstarBalanceAdapter implements BalanceAdapter {
+class BifrostBalanceAdapter implements BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
   readonly chain: RegisteredChainName;
   readonly decimals: number;
   readonly ed: FN;
   readonly nativeToken: string;
 
-  constructor({ chain, api }: AstarBalanceAdapterConfigs) {
+  constructor({ chain, api }: BifrostBalanceAdapterConfigs) {
     this.storages = createBalanceStorages(api);
     this.chain = chain;
     this.decimals = api.registry.chainDecimals[0];
@@ -67,9 +72,9 @@ class AstarBalanceAdapter implements BalanceAdapter {
     const tokenId = supported_tokens[token];
     if (!tokenId) throw new CurrencyNotFound(token);
 
-    return this.storages.assets(tokenId, address).observable.pipe(
+    return this.storages.assets(address, tokenId).observable.pipe(
       map((balance) => {
-        const amount = FN.fromInner(balance.balance?.toString() || "0", this.getTokenDecimals(token));
+        const amount = FN.fromInner(balance.free?.toString() || "0", this.getTokenDecimals(token));
         return {
           free: amount,
           locked: new FN(0),
@@ -92,8 +97,8 @@ class AstarBalanceAdapter implements BalanceAdapter {
   }
 }
 
-class BaseAstarAdapter extends BaseCrossChainAdapter {
-  private balanceAdapter?: AstarBalanceAdapter;
+class BaseBifrostAdapter extends BaseCrossChainAdapter {
+  private balanceAdapter?: BifrostBalanceAdapter;
   constructor(chain: Chain, routers: Omit<CrossChainRouter, "from">[]) {
     super(chain, routers);
   }
@@ -103,7 +108,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.balanceAdapter = new AstarBalanceAdapter({ chain: this.chain.id, api });
+    this.balanceAdapter = new BifrostBalanceAdapter({ chain: this.chain.id, api });
   }
 
   public subscribeTokenBalance(token: string, address: string): Observable<BalanceData> {
@@ -156,49 +161,35 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    const dst = { parents: 1, interior: { X1: { Parachain: toChain.paraChainId } } };
-    const acc = { parents: 0, interior: { X1: { AccountId32: { id: accountId, network: "Any" } } } };
-    let ass: any = [{ id: { Concrete: { parents: 0, interior: "Here" } }, fun: { Fungible: amount.toChainData() } }];
-
-    if (token === this.balanceAdapter?.nativeToken) {
-      return {
-        module: "polkadotXcm",
-        call: "reserveTransferAssets",
-        params: [{ V1: dst }, { V1: acc }, { V1: ass }, 0],
-      };
-    }
-
-    const tokenIds: Record<string, string> = {
-      KUSD: "0x0081",
-    };
-
-    const tokenId = tokenIds[token];
+    const tokenId = supported_tokens[token];
     if (!tokenId) throw new CurrencyNotFound(token);
 
-    ass = [
-      {
-        id: {
-          Concrete: {
+    return {
+      module: "xTokens",
+      call: "transfer",
+      params: [
+        tokenId,
+        amount.toChainData(),
+        {
+          V1: {
             parents: 1,
-            interior: { X2: [{ Parachain: toChain.paraChainId }, { GeneralKey: tokenId }] },
+            interior: { X2: [{ Parachain: toChain.paraChainId }, { AccountId32: { id: accountId, network: "Any" } }] },
           },
         },
-        fun: { Fungible: amount.toChainData() },
-      },
-    ];
-    return {
-      module: "polkadotXcm",
-      call: "reserveTransferAssets",
-      params: [{ V1: dst }, { V1: acc }, { V1: ass }, 0],
+        5_000_000_000,
+      ],
     };
   }
 }
 
-export class ShidenAdapter extends BaseAstarAdapter {
+export class BifrostAdapter extends BaseBifrostAdapter {
   constructor() {
-    super(chains.shiden, [
-      { to: chains.karura, token: "SDN" },
+    super(chains.bifrost, [
+      { to: chains.karura, token: "BNC" },
       { to: chains.karura, token: "KUSD" },
+      { to: chains.karura, token: "VSKSM" },
+      { to: chains.karura, token: "KSM" },
+      { to: chains.karura, token: "KAR" },
     ]);
   }
 }

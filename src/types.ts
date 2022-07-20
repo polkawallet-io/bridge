@@ -46,6 +46,7 @@ export interface CrossChainInputConfigs {
 export interface CrossChainFeeConfig {
   fee: string;
   existentialDeposit: string;
+  decimals: number;
 }
 
 export interface BridgeTxParams {

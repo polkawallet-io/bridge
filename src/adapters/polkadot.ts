@@ -4,8 +4,7 @@ import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
 import { combineLatest, map, Observable, of } from "rxjs";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { chains, RegisteredChainName } from "../configs";
-import { xcmFeeConfig } from "../configs/xcm-fee";
-import { Chain, CrossChainRouter, CrossChainTransferParams, BalanceData, BalanceAdapter, BridgeTxParams, TokenBalance } from "../types";
+import { Chain, CrossChainRouter, CrossChainTransferParams, BalanceData, BalanceAdapter, BridgeTxParams } from "../types";
 import { Storage } from "@acala-network/sdk/utils/storage";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -111,26 +110,6 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
         return balance.minus(fee).minus(ed || FN.ZERO);
       })
     );
-  }
-
-  public subscribeMinInput(token: string, to: RegisteredChainName): Observable<FN> {
-    if (!this.balanceAdapter) return new Observable((sub) => sub.next(FN.ZERO));
-
-    return of(this.getDestED(token, to).balance.add(this.getCrossChainFee(token, to).balance || FN.ZERO));
-  }
-
-  public getDestED(token: string, destChain: RegisteredChainName): TokenBalance {
-    return {
-      token,
-      balance: FN.fromInner((xcmFeeConfig[destChain][token]?.existentialDeposit as string) ?? "0", this.balanceAdapter?.decimals),
-    };
-  }
-
-  public getCrossChainFee(token: string, destChain: RegisteredChainName): TokenBalance {
-    return {
-      token,
-      balance: FN.fromInner((xcmFeeConfig[destChain][token]?.fee as string) ?? "0", this.balanceAdapter?.decimals),
-    };
   }
 
   public getBridgeTxParams(params: CrossChainTransferParams): BridgeTxParams {

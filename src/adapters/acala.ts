@@ -7,6 +7,7 @@ import { BalanceData, BridgeTxParams, CrossChainRouter, CrossChainTransferParams
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { isChainEqual } from "../utils/is-chain-equal";
 import { ApiRx } from "@polkadot/api";
+import { TokenConfigNotFound } from "src/errors";
 
 export class BaseAcalaAdapter extends BaseCrossChainAdapter {
   private wallet?: Wallet;
@@ -28,7 +29,7 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
     await this.wallet.isReady;
   }
 
-  public subscribeMinInput(token: string, to: RegisteredChainName): Observable<FixedPointNumber> {
+  public override subscribeMinInput(token: string, to: RegisteredChainName): Observable<FixedPointNumber> {
     if (!this.wallet) return new Observable((sub) => sub.next(FixedPointNumber.ZERO));
 
     return of(this.getDestED(token, to).balance.add(this.getCrossChainFee(token, to)?.balance || FixedPointNumber.ZERO));
@@ -80,14 +81,16 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
     );
   }
 
-  public getCrossChainFee(token: string, destChain: RegisteredChainName): TokenBalance {
+  public override getCrossChainFee(token: string, destChain: RegisteredChainName): TokenBalance {
+    if (!xcmFeeConfig[destChain][token]) throw new TokenConfigNotFound(token, destChain);
     return {
       token,
       balance: FixedPointNumber.fromInner((xcmFeeConfig[destChain][token]?.fee as string) ?? "0", this.wallet?.__getToken(token).decimals),
     };
   }
 
-  public getDestED(token: string, destChain: RegisteredChainName): TokenBalance {
+  public override getDestED(token: string, destChain: RegisteredChainName): TokenBalance {
+    if (!xcmFeeConfig[destChain][token]) throw new TokenConfigNotFound(token, destChain);
     return {
       token,
       balance: FixedPointNumber.fromInner(

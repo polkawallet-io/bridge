@@ -5,16 +5,11 @@ import { combineLatest, map, Observable, of } from "rxjs";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { chains, RegisteredChainName } from "../configs";
 import { xcmFeeConfig } from "../configs/xcm-fee";
-import { Chain, CrossChainRouter, CrossChainTransferParams, BalanceData, BalanceAdapter, BridgeTxParams, TokenBalance } from "../types";
+import { Chain, CrossChainRouter, CrossChainTransferParams, BalanceData, BalanceAdapter, BridgeTxParams } from "../types";
 import { Storage } from "@acala-network/sdk/utils/storage";
 
-interface CentrifugeToken {
-  symbol: string;
-  decimals: number;
-}
-
-const supported_tokens: Record<string, CentrifugeToken> = {
-  KUSD: { symbol: "KUSD", decimals: 12 },
+const supported_tokens: Record<string, string> = {
+  KUSD: "KUSD",
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -69,12 +64,12 @@ class CentrifugeBalanceAdapter implements BalanceAdapter {
       );
     }
 
-    const tokenObj = supported_tokens[token];
-    if (!tokenObj) throw new CurrencyNotFound(token);
+    const tokenId = supported_tokens[token];
+    if (!tokenId) throw new CurrencyNotFound(token);
 
-    return this.storages.assets(address, tokenObj.symbol).observable.pipe(
+    return this.storages.assets(address, tokenId).observable.pipe(
       map((balance) => {
-        const amount = FN.fromInner(balance.free?.toString() || "0", tokenObj.decimals);
+        const amount = FN.fromInner(balance.free?.toString() || "0", this.getTokenDecimals(tokenId));
         return {
           free: amount,
           locked: new FN(0),
@@ -89,10 +84,11 @@ class CentrifugeBalanceAdapter implements BalanceAdapter {
   public getED(token?: string | Token): Observable<FN> {
     if (token === this.nativeToken) return of(this.ed);
 
-    const tokenObj = supported_tokens[token as string];
-    if (!tokenObj) throw new CurrencyNotFound(token as string);
+    return of(FN.fromInner(xcmFeeConfig[this.chain][token as string].existentialDeposit, this.getTokenDecimals(token as string)));
+  }
 
-    return of(FN.fromInner(xcmFeeConfig[this.chain][tokenObj.symbol].existentialDeposit, tokenObj.decimals));
+  public getTokenDecimals(token: string): number {
+    return xcmFeeConfig[this.chain][token]?.decimals || this.decimals;
   }
 }
 
@@ -129,15 +125,18 @@ class BaseCentrifugeAdapter extends BaseCrossChainAdapter {
     if (!this.balanceAdapter) return new Observable((sub) => sub.next(FN.ZERO));
 
     return combineLatest({
-      txFee: this.estimateTxFee(
-        {
-          amount: FN.ZERO,
-          to,
-          token,
-          address,
-        },
-        address
-      ),
+      txFee:
+        token === this.balanceAdapter?.nativeToken
+          ? this.estimateTxFee(
+              {
+                amount: FN.ZERO,
+                to,
+                token,
+                address,
+              },
+              address
+            )
+          : "0",
       balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
       ed: this.balanceAdapter?.getED(token),
     }).pipe(
@@ -151,40 +150,20 @@ class BaseCentrifugeAdapter extends BaseCrossChainAdapter {
     );
   }
 
-  public subscribeMinInput(token: string, to: RegisteredChainName): Observable<FN> {
-    if (!this.balanceAdapter) return new Observable((sub) => sub.next(FN.ZERO));
-
-    return of(this.getDestED(token, to).balance.add(this.getCrossChainFee(token, to).balance || FN.ZERO));
-  }
-
-  public getDestED(token: string, destChain: RegisteredChainName): TokenBalance {
-    return {
-      token,
-      balance: FN.fromInner((xcmFeeConfig[destChain][token]?.existentialDeposit as string) ?? "0", this.balanceAdapter?.decimals),
-    };
-  }
-
-  public getCrossChainFee(token: string, destChain: RegisteredChainName): TokenBalance {
-    return {
-      token,
-      balance: FN.fromInner((xcmFeeConfig[destChain][token]?.fee as string) ?? "0", this.balanceAdapter?.decimals),
-    };
-  }
-
   public getBridgeTxParams(params: CrossChainTransferParams): BridgeTxParams {
     const { to, token, address, amount } = params;
     const toChain = chains[to];
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    const tokenObj = supported_tokens[token];
-    if (!tokenObj && token !== this.balanceAdapter?.nativeToken) throw new CurrencyNotFound(token);
+    const tokenId = supported_tokens[token];
+    if (!tokenId && token !== this.balanceAdapter?.nativeToken) throw new CurrencyNotFound(token);
 
     return {
       module: "xTokens",
       call: "transfer",
       params: [
-        token === this.balanceAdapter?.nativeToken ? "Native" : tokenObj.symbol,
+        token === this.balanceAdapter?.nativeToken ? "Native" : tokenId,
         amount.toChainData(),
         {
           V1: {
