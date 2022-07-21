@@ -2,20 +2,49 @@ import { FixedPointNumber, Token } from '@acala-network/sdk-core';
 import { Observable } from 'rxjs';
 
 import { BaseCrossChainAdapter } from './base-chain-adapter';
-import { RegisteredChainName } from './configs';
+import { ChainName } from './configs';
 
 export { FixedPointNumber as FN } from '@acala-network/sdk-core';
 
-export type CROSS_CHAIN_ENV = 'kusama' | 'polkadot';
+export type ChainType = 'substract' | 'ethereum';
 
 export interface Chain {
-  readonly id: RegisteredChainName;
+  // unique chain id
+  readonly id: ChainName;
+  // chain name for display
   readonly display: string;
+  // chain is `substract` or `ethereum` like
+  readonly type: ChainType;
   // chain icon resource path
   readonly icon: string;
   // set id to -1 if the chain is para chain
   readonly paraChainId: number;
+  // the chain SS58 Prefix
   readonly ss58Prefix: number;
+}
+
+export interface MultipleChainToken {
+  // token name
+  name: string;
+  // token symbol
+  symbol: string;
+  // decimals configs in multiple chain, the decimals are same in different chains in most times.
+  decimals?: number | { [k in ChainName]: number};
+  // existential deposit configs in multiple chain, the ED are same in different chains in most times.
+  ed?: bigint | { [k in ChainName]: bigint }
+}
+
+export interface CrossChainRouter {
+  // from chain name
+  from: ChainName;
+  // to chain name
+  to: ChainName;
+  // token name
+  token: string;
+  // XCM transfer weight limit
+  weightLimit: bigint | 'Unlimit';
+  // XCM transfer fee charged by `to chain`
+  fee: bigint;
 }
 
 export interface NetworkProps {
@@ -24,17 +53,11 @@ export interface NetworkProps {
   tokenSymbol: string[];
 }
 
-export interface CrossChainRouter {
-  from: Chain;
-  to: Chain;
-  token: string;
-}
-
 export interface CrossChainTransferParams {
-  amount: FixedPointNumber;
-  to: RegisteredChainName;
-  token: string;
   address: string;
+  amount: FixedPointNumber;
+  to: ChainName;
+  token: string;
 }
 
 export interface CrossChainInputConfigs {
@@ -60,7 +83,7 @@ export interface BridgeConfigs {
   adapters: BaseCrossChainAdapter[];
 }
 
-export interface CrossChianBalanceChangedConfigs {
+export interface CrossChainBalanceChangedConfigs {
   token: string;
   address: string;
   amount: FixedPointNumber;

@@ -4,7 +4,7 @@ import { combineLatest, map, Observable, race } from 'rxjs';
 import { ApiPromise, ApiRx, WsProvider } from '@polkadot/api';
 import { prodParasKusama, prodParasKusamaCommon, prodParasPolkadot, prodRelayKusama, prodRelayPolkadot } from '@polkadot/apps-config/endpoints';
 
-import { RegisteredChainName } from './configs';
+import { ChainName } from './configs';
 
 export class ApiProvider {
   protected apis: Record<string, ApiRx> = {};
@@ -18,7 +18,7 @@ export class ApiProvider {
     return this.promiseApis[chainName];
   }
 
-  public connectFromChain (chainName: RegisteredChainName[], nodeList: Partial<Record<RegisteredChainName, string[]>> | undefined) {
+  public connectFromChain (chainName: ChainName[], nodeList: Partial<Record<ChainName, string[]>> | undefined) {
     return combineLatest(
       chainName.map((chain) => {
         let nodes: string[];
@@ -50,7 +50,7 @@ export class ApiProvider {
     );
   }
 
-  public connect (nodes: string[], chainName: RegisteredChainName): Observable<RegisteredChainName | null> {
+  public connect (nodes: string[], chainName: ChainName): Observable<ChainName | null> {
     if (this.apis[chainName]) {
       this.apis[chainName].disconnect();
       delete this.apis[chainName];
@@ -99,7 +99,7 @@ export class ApiProvider {
     );
   }
 
-  public disconnect (chainName: RegisteredChainName) {
+  public disconnect (chainName: ChainName) {
     if (this.apis[chainName]) {
       this.apis[chainName].disconnect();
       delete this.apis[chainName];

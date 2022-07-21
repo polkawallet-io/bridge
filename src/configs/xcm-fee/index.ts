@@ -1,5 +1,5 @@
 import { CrossChainFeeConfig } from '../../types';
-import { RegisteredChainName } from '..';
+import { ChainName } from '..';
 import { acalaXcmFeeConfig, karuraXcmFeeConfig } from './acala-fee';
 import { astarXcmFeeConfig } from './astar-fee';
 import { bifrostXcmFeeConfig } from './bifrost-fee';
@@ -38,4 +38,4 @@ export const xcmFeeConfig = {
   ...turingXcmFeeConfig,
   ...astarXcmFeeConfig,
   ...pichiuXcmFeeConfig
-} as Record<RegisteredChainName, Record<string, CrossChainFeeConfig>>;
+} as Record<ChainName, Record<string, CrossChainFeeConfig>>;

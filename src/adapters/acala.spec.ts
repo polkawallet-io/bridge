@@ -2,7 +2,7 @@ import { FixedPointNumber } from '@acala-network/sdk-core';
 import { firstValueFrom } from 'rxjs';
 
 import { ApiProvider } from '../api-provider';
-import { chains, RegisteredChainName } from '../configs';
+import { chains, ChainName } from '../configs';
 import { Bridge } from '..';
 import { KaruraAdapter } from './acala';
 
@@ -12,7 +12,7 @@ describe('acala-adapter should work', () => {
   const testAccount = '5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN';
   const provider = new ApiProvider();
 
-  async function connect (chain: RegisteredChainName) {
+  async function connect (chain: ChainName) {
     // return firstValueFrom(provider.connectFromChain([chain], { karura: ["wss://crosschain-dev.polkawallet.io:9907"] }));
     return firstValueFrom(provider.connectFromChain([chain], undefined));
   }
@@ -46,7 +46,7 @@ describe('acala-adapter should work', () => {
       expect(networkProps.tokenDecimals[0]).toEqual(12);
     }
 
-    async function runMyTestSuit (to: RegisteredChainName, token: string) {
+    async function runMyTestSuit (to: ChainName, token: string) {
       if (adapter) {
         const balance = await firstValueFrom(adapter.subscribeTokenBalance(token, testAccount));
 

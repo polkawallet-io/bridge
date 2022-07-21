@@ -6,7 +6,7 @@ import { TokenConfigNotFound } from 'src/errors';
 import { ApiRx } from '@polkadot/api';
 
 import { BaseCrossChainAdapter } from '../base-chain-adapter';
-import { chains, RegisteredChainName } from '../configs';
+import { chains, ChainName } from '../configs';
 import { xcmFeeConfig } from '../configs/xcm-fee';
 import { BalanceData, BridgeTxParams, Chain, CrossChainRouter, CrossChainTransferParams, TokenBalance } from '../types';
 import { isChainEqual } from '../utils/is-chain-equal';
@@ -32,7 +32,7 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
     await this.wallet.isReady;
   }
 
-  public override subscribeMinInput (token: string, to: RegisteredChainName): Observable<FixedPointNumber> {
+  public override subscribeMinInput (token: string, to: ChainName): Observable<FixedPointNumber> {
     if (!this.wallet) {
       return new Observable((sub) => sub.next(FixedPointNumber.ZERO));
     }
@@ -57,7 +57,7 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
     return this.wallet.subscribeBalance(token, address).pipe(catchError((_) => zeroResult));
   }
 
-  public subscribeMaxInput (token: string, address: string, to: RegisteredChainName): Observable<FixedPointNumber> {
+  public subscribeMaxInput (token: string, address: string, to: ChainName): Observable<FixedPointNumber> {
     if (!this.wallet) {
       return new Observable((sub) => sub.next(FixedPointNumber.ZERO));
     }
@@ -89,7 +89,7 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
     );
   }
 
-  public override getCrossChainFee (token: string, destChain: RegisteredChainName): TokenBalance {
+  public override getCrossChainFee (token: string, destChain: ChainName): TokenBalance {
     if (!xcmFeeConfig[destChain][token]) {
       throw new TokenConfigNotFound(token, destChain);
     }
@@ -100,7 +100,7 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
     };
   }
 
-  public override getDestED (token: string, destChain: RegisteredChainName): TokenBalance {
+  public override getDestED (token: string, destChain: ChainName): TokenBalance {
     if (!xcmFeeConfig[destChain][token]) {
       throw new TokenConfigNotFound(token, destChain);
     }
