@@ -1,50 +1,55 @@
-import { chains, RegisteredChainName } from "../configs";
-import { ApiProvider } from "../api-provider";
-import { firstValueFrom } from "rxjs";
-import { KaruraAdapter } from "./acala";
-import { FixedPointNumber } from "@acala-network/sdk-core";
-import { Bridge } from "..";
+import { FixedPointNumber } from '@acala-network/sdk-core';
+import { firstValueFrom } from 'rxjs';
 
-describe("acala-adapter should work", () => {
+import { ApiProvider } from '../api-provider';
+import { chains, RegisteredChainName } from '../configs';
+import { Bridge } from '..';
+import { KaruraAdapter } from './acala';
+
+describe('acala-adapter should work', () => {
   jest.setTimeout(30000);
 
-  const testAccount = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
+  const testAccount = '5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN';
   const provider = new ApiProvider();
 
-  async function connect(chain: RegisteredChainName) {
+  async function connect (chain: RegisteredChainName) {
     // return firstValueFrom(provider.connectFromChain([chain], { karura: ["wss://crosschain-dev.polkawallet.io:9907"] }));
     return firstValueFrom(provider.connectFromChain([chain], undefined));
   }
 
-  test("connect karura to do xcm", async () => {
-    const fromChain = "karura";
+  test('connect karura to do xcm', async () => {
+    const fromChain = 'karura';
+
     await connect(fromChain);
 
     const karura = new KaruraAdapter();
+
     await karura.setApi(provider.getApi(fromChain));
 
     const bridge = new Bridge({
-      adapters: [karura],
+      adapters: [karura]
     });
 
-    expect(bridge.router.getDestiantionsChains({ from: chains.karura, token: "KSM" }).length).toEqual(1);
-    expect(bridge.router.getDestiantionsChains({ from: chains.karura, token: "KAR" }).length).toEqual(2);
-    expect(bridge.router.getDestiantionsChains({ from: chains.karura, token: "KUSD" }).length).toEqual(2);
+    expect(bridge.router.getDestiantionsChains({ from: chains.karura, token: 'KSM' }).length).toEqual(1);
+    expect(bridge.router.getDestiantionsChains({ from: chains.karura, token: 'KAR' }).length).toEqual(2);
+    expect(bridge.router.getDestiantionsChains({ from: chains.karura, token: 'KUSD' }).length).toEqual(2);
 
     const adapter = bridge.findAdapter(fromChain);
 
     if (adapter) {
       const networkProps = await adapter.getNetworkProperties();
+
       expect(networkProps.ss58Format).toEqual(8);
       expect(networkProps.tokenSymbol.length).toBeGreaterThanOrEqual(1);
-      expect(networkProps.tokenSymbol[0]).toEqual("KAR");
+      expect(networkProps.tokenSymbol[0]).toEqual('KAR');
       expect(networkProps.tokenDecimals.length).toBeGreaterThanOrEqual(1);
       expect(networkProps.tokenDecimals[0]).toEqual(12);
     }
 
-    async function runMyTestSuit(to: RegisteredChainName, token: string) {
+    async function runMyTestSuit (to: RegisteredChainName, token: string) {
       if (adapter) {
         const balance = await firstValueFrom(adapter.subscribeTokenBalance(token, testAccount));
+
         console.log(
           `balance ${token}: free-${balance.free.toNumber()} locked-${balance.locked.toNumber()} available-${balance.available.toNumber()}`
         );
@@ -61,24 +66,26 @@ describe("acala-adapter should work", () => {
         expect(inputConfig.maxInput.toNumber()).toBeLessThanOrEqual(balance.available.toNumber());
 
         const destFee = adapter.getCrossChainFee(token, to);
+
         console.log(`destFee: fee-${destFee.balance.toNumber()} ${destFee.token}`);
         expect(destFee.balance.toNumber()).toBeGreaterThan(0);
 
         const tx = adapter.getBridgeTxParams({
-          amount: FixedPointNumber.fromInner("10000000000", 10),
+          amount: FixedPointNumber.fromInner('10000000000', 10),
           to,
           token,
-          address: testAccount,
+          address: testAccount
         });
-        if (to !== "statemine") {
-          expect(tx.module).toEqual("xTokens");
-          expect(tx.call).toEqual("transfer");
+
+        if (to !== 'statemine') {
+          expect(tx.module).toEqual('xTokens');
+          expect(tx.call).toEqual('transfer');
           expect(tx.params.length).toEqual(4);
         }
       }
     }
 
-    await runMyTestSuit("statemine", "RMRK");
+    await runMyTestSuit('statemine', 'RMRK');
     // await runMyTestSuit("kusama", "KSM");
     // await runMyTestSuit("bifrost", "KAR");
     // await runMyTestSuit("bifrost", "KUSD");

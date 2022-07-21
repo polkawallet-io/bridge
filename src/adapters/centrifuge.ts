@@ -1,15 +1,17 @@
-import { AnyApi, FixedPointNumber as FN, Token } from "@acala-network/sdk-core";
-import { CurrencyNotFound } from "../errors";
-import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
-import { combineLatest, map, Observable, of } from "rxjs";
-import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { chains, RegisteredChainName } from "../configs";
-import { xcmFeeConfig } from "../configs/xcm-fee";
-import { Chain, CrossChainRouter, CrossChainTransferParams, BalanceData, BalanceAdapter, BridgeTxParams } from "../types";
-import { Storage } from "@acala-network/sdk/utils/storage";
+import { Storage } from '@acala-network/sdk/utils/storage';
+import { AnyApi, FixedPointNumber as FN, Token } from '@acala-network/sdk-core';
+import { combineLatest, map, Observable, of } from 'rxjs';
+
+import { DeriveBalancesAll } from '@polkadot/api-derive/balances/types';
+
+import { BaseCrossChainAdapter } from '../base-chain-adapter';
+import { chains, RegisteredChainName } from '../configs';
+import { xcmFeeConfig } from '../configs/xcm-fee';
+import { CurrencyNotFound } from '../errors';
+import { BalanceAdapter, BalanceData, BridgeTxParams, Chain, CrossChainRouter, CrossChainTransferParams } from '../types';
 
 const supported_tokens: Record<string, string> = {
-  KUSD: "KUSD",
+  KUSD: 'KUSD'
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -17,16 +19,16 @@ const createBalanceStorages = (api: AnyApi) => {
   return {
     balances: (address: string) =>
       Storage.create<DeriveBalancesAll>({
-        api: api,
-        path: "derive.balances.all",
-        params: [address],
+        api,
+        path: 'derive.balances.all',
+        params: [address]
       }),
     assets: (address: string, token: string) =>
       Storage.create<any>({
-        api: api,
-        path: "query.ormlTokens.accounts",
-        params: [address, token],
-      }),
+        api,
+        path: 'query.ormlTokens.accounts',
+        params: [address, token]
+      })
   };
 };
 
@@ -42,7 +44,7 @@ class CentrifugeBalanceAdapter implements BalanceAdapter {
   readonly ed: FN;
   readonly nativeToken: string;
 
-  constructor({ chain, api }: CentrifugeBalanceAdapterConfigs) {
+  constructor ({ api, chain }: CentrifugeBalanceAdapterConfigs) {
     this.storages = createBalanceStorages(api);
     this.chain = chain;
     this.decimals = api.registry.chainDecimals[0];
@@ -50,7 +52,7 @@ class CentrifugeBalanceAdapter implements BalanceAdapter {
     this.nativeToken = api.registry.chainTokens[0];
   }
 
-  public subscribeBalance(token: string, address: string): Observable<BalanceData> {
+  public subscribeBalance (token: string, address: string): Observable<BalanceData> {
     const storage = this.storages.balances(address);
 
     if (token === this.nativeToken) {
@@ -59,46 +61,52 @@ class CentrifugeBalanceAdapter implements BalanceAdapter {
           free: FN.fromInner(data.freeBalance.toString(), this.decimals),
           locked: FN.fromInner(data.lockedBalance.toString(), this.decimals),
           reserved: FN.fromInner(data.reservedBalance.toString(), this.decimals),
-          available: FN.fromInner(data.availableBalance.toString(), this.decimals),
+          available: FN.fromInner(data.availableBalance.toString(), this.decimals)
         }))
       );
     }
 
     const tokenId = supported_tokens[token];
-    if (!tokenId) throw new CurrencyNotFound(token);
+
+    if (!tokenId) {
+      throw new CurrencyNotFound(token);
+    }
 
     return this.storages.assets(address, tokenId).observable.pipe(
       map((balance) => {
-        const amount = FN.fromInner(balance.free?.toString() || "0", this.getTokenDecimals(tokenId));
+        const amount = FN.fromInner(balance.free?.toString() || '0', this.getTokenDecimals(tokenId));
+
         return {
           free: amount,
           locked: new FN(0),
           reserved: new FN(0),
-          available: amount,
+          available: amount
         };
       })
     );
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getED(token?: string | Token): Observable<FN> {
-    if (token === this.nativeToken) return of(this.ed);
+  public getED (token?: string | Token): Observable<FN> {
+    if (token === this.nativeToken) {
+      return of(this.ed);
+    }
 
     return of(FN.fromInner(xcmFeeConfig[this.chain][token as string].existentialDeposit, this.getTokenDecimals(token as string)));
   }
 
-  public getTokenDecimals(token: string): number {
+  public getTokenDecimals (token: string): number {
     return xcmFeeConfig[this.chain][token]?.decimals || this.decimals;
   }
 }
 
 class BaseCentrifugeAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: CentrifugeBalanceAdapter;
-  constructor(chain: Chain, routers: Omit<CrossChainRouter, "from">[]) {
+  constructor (chain: Chain, routers: Omit<CrossChainRouter, 'from'>[]) {
     super(chain, routers);
   }
 
-  public override async setApi(api: AnyApi) {
+  public override async setApi (api: AnyApi) {
     this.api = api;
 
     await api.isReady;
@@ -106,14 +114,14 @@ class BaseCentrifugeAdapter extends BaseCrossChainAdapter {
     this.balanceAdapter = new CentrifugeBalanceAdapter({ chain: this.chain.id, api });
   }
 
-  public subscribeTokenBalance(token: string, address: string): Observable<BalanceData> {
+  public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
     if (!this.balanceAdapter) {
       return new Observable((sub) =>
         sub.next({
           free: FN.ZERO,
           locked: FN.ZERO,
           available: FN.ZERO,
-          reserved: FN.ZERO,
+          reserved: FN.ZERO
         })
       );
     }
@@ -121,26 +129,28 @@ class BaseCentrifugeAdapter extends BaseCrossChainAdapter {
     return this.balanceAdapter.subscribeBalance(token, address);
   }
 
-  public subscribeMaxInput(token: string, address: string, to: RegisteredChainName): Observable<FN> {
-    if (!this.balanceAdapter) return new Observable((sub) => sub.next(FN.ZERO));
+  public subscribeMaxInput (token: string, address: string, to: RegisteredChainName): Observable<FN> {
+    if (!this.balanceAdapter) {
+      return new Observable((sub) => sub.next(FN.ZERO));
+    }
 
     return combineLatest({
       txFee:
         token === this.balanceAdapter?.nativeToken
           ? this.estimateTxFee(
-              {
-                amount: FN.ZERO,
-                to,
-                token,
-                address,
-              },
+            {
+              amount: FN.ZERO,
+              to,
+              token,
               address
-            )
-          : "0",
+            },
+            address
+          )
+          : '0',
       balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getED(token),
+      ed: this.balanceAdapter?.getED(token)
     }).pipe(
-      map(({ txFee, balance, ed }) => {
+      map(({ balance, ed, txFee }) => {
         const feeFactor = 1.2;
         const fee = FN.fromInner(txFee, this.balanceAdapter!.decimals).mul(new FN(feeFactor));
 
@@ -150,38 +160,41 @@ class BaseCentrifugeAdapter extends BaseCrossChainAdapter {
     );
   }
 
-  public getBridgeTxParams(params: CrossChainTransferParams): BridgeTxParams {
-    const { to, token, address, amount } = params;
+  public getBridgeTxParams (params: CrossChainTransferParams): BridgeTxParams {
+    const { address, amount, to, token } = params;
     const toChain = chains[to];
 
-    const accountId = this.api?.createType("AccountId32", address).toHex();
+    const accountId = this.api?.createType('AccountId32', address).toHex();
 
     const tokenId = supported_tokens[token];
-    if (!tokenId && token !== this.balanceAdapter?.nativeToken) throw new CurrencyNotFound(token);
+
+    if (!tokenId && token !== this.balanceAdapter?.nativeToken) {
+      throw new CurrencyNotFound(token);
+    }
 
     return {
-      module: "xTokens",
-      call: "transfer",
+      module: 'xTokens',
+      call: 'transfer',
       params: [
-        token === this.balanceAdapter?.nativeToken ? "Native" : tokenId,
+        token === this.balanceAdapter?.nativeToken ? 'Native' : tokenId,
         amount.toChainData(),
         {
           V1: {
             parents: 1,
-            interior: { X2: [{ Parachain: toChain.paraChainId }, { AccountId32: { id: accountId, network: "Any" } }] },
-          },
+            interior: { X2: [{ Parachain: toChain.paraChainId }, { AccountId32: { id: accountId, network: 'Any' } }] }
+          }
         },
-        5_000_000_000,
-      ],
+        5_000_000_000
+      ]
     };
   }
 }
 
 export class AltairAdapter extends BaseCentrifugeAdapter {
-  constructor() {
+  constructor () {
     super(chains.altair, [
-      { to: chains.karura, token: "AIR" },
-      { to: chains.karura, token: "KUSD" },
+      { to: chains.karura, token: 'AIR' },
+      { to: chains.karura, token: 'KUSD' }
     ]);
   }
 }

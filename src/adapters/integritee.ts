@@ -1,21 +1,23 @@
-import { AnyApi, FixedPointNumber as FN, Token } from "@acala-network/sdk-core";
-import { CurrencyNotFound } from "../errors";
-import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
-import { combineLatest, map, Observable, of } from "rxjs";
-import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { chains, RegisteredChainName } from "../configs";
-import { Chain, CrossChainRouter, CrossChainTransferParams, BalanceData, BalanceAdapter, BridgeTxParams } from "../types";
-import { Storage } from "@acala-network/sdk/utils/storage";
+import { Storage } from '@acala-network/sdk/utils/storage';
+import { AnyApi, FixedPointNumber as FN, Token } from '@acala-network/sdk-core';
+import { combineLatest, map, Observable, of } from 'rxjs';
+
+import { DeriveBalancesAll } from '@polkadot/api-derive/balances/types';
+
+import { BaseCrossChainAdapter } from '../base-chain-adapter';
+import { chains, RegisteredChainName } from '../configs';
+import { CurrencyNotFound } from '../errors';
+import { BalanceAdapter, BalanceData, BridgeTxParams, Chain, CrossChainRouter, CrossChainTransferParams } from '../types';
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const createBalanceStorages = (api: AnyApi) => {
   return {
     balances: (address: string) =>
       Storage.create<DeriveBalancesAll>({
-        api: api,
-        path: "derive.balances.all",
-        params: [address],
-      }),
+        api,
+        path: 'derive.balances.all',
+        params: [address]
+      })
   };
 };
 
@@ -31,7 +33,7 @@ class IntegriteeBalanceAdapter implements BalanceAdapter {
   readonly ed: FN;
   readonly nativeToken: string;
 
-  constructor({ chain, api }: IntegriteeBalanceAdapterConfigs) {
+  constructor ({ api, chain }: IntegriteeBalanceAdapterConfigs) {
     this.storages = createBalanceStorages(api);
     this.chain = chain;
     this.decimals = api.registry.chainDecimals[0];
@@ -39,34 +41,36 @@ class IntegriteeBalanceAdapter implements BalanceAdapter {
     this.nativeToken = api.registry.chainTokens[0];
   }
 
-  public subscribeBalance(token: string, address: string): Observable<BalanceData> {
+  public subscribeBalance (token: string, address: string): Observable<BalanceData> {
     const storage = this.storages.balances(address);
 
-    if (token !== this.nativeToken) throw new CurrencyNotFound(token);
+    if (token !== this.nativeToken) {
+      throw new CurrencyNotFound(token);
+    }
 
     return storage.observable.pipe(
       map((data) => ({
         free: FN.fromInner(data.freeBalance.toString(), this.decimals),
         locked: FN.fromInner(data.lockedBalance.toString(), this.decimals),
         reserved: FN.fromInner(data.reservedBalance.toString(), this.decimals),
-        available: FN.fromInner(data.availableBalance.toString(), this.decimals),
+        available: FN.fromInner(data.availableBalance.toString(), this.decimals)
       }))
     );
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getED(token?: string | Token): Observable<FN> {
+  public getED (token?: string | Token): Observable<FN> {
     return of(this.ed);
   }
 }
 
 class BaseIntegriteeAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: IntegriteeBalanceAdapter;
-  constructor(chain: Chain, routers: Omit<CrossChainRouter, "from">[]) {
+  constructor (chain: Chain, routers: Omit<CrossChainRouter, 'from'>[]) {
     super(chain, routers);
   }
 
-  public override async setApi(api: AnyApi) {
+  public override async setApi (api: AnyApi) {
     this.api = api;
 
     await api.isReady;
@@ -74,14 +78,14 @@ class BaseIntegriteeAdapter extends BaseCrossChainAdapter {
     this.balanceAdapter = new IntegriteeBalanceAdapter({ chain: this.chain.id, api });
   }
 
-  public subscribeTokenBalance(token: string, address: string): Observable<BalanceData> {
+  public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
     if (!this.balanceAdapter) {
       return new Observable((sub) =>
         sub.next({
           free: FN.ZERO,
           locked: FN.ZERO,
           available: FN.ZERO,
-          reserved: FN.ZERO,
+          reserved: FN.ZERO
         })
       );
     }
@@ -89,26 +93,28 @@ class BaseIntegriteeAdapter extends BaseCrossChainAdapter {
     return this.balanceAdapter.subscribeBalance(token, address);
   }
 
-  public subscribeMaxInput(token: string, address: string, to: RegisteredChainName): Observable<FN> {
-    if (!this.balanceAdapter) return new Observable((sub) => sub.next(FN.ZERO));
+  public subscribeMaxInput (token: string, address: string, to: RegisteredChainName): Observable<FN> {
+    if (!this.balanceAdapter) {
+      return new Observable((sub) => sub.next(FN.ZERO));
+    }
 
     return combineLatest({
       txFee:
         token === this.balanceAdapter?.nativeToken
           ? this.estimateTxFee(
-              {
-                amount: FN.ZERO,
-                to,
-                token,
-                address,
-              },
+            {
+              amount: FN.ZERO,
+              to,
+              token,
               address
-            )
-          : "0",
+            },
+            address
+          )
+          : '0',
       balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getED(token),
+      ed: this.balanceAdapter?.getED(token)
     }).pipe(
-      map(({ txFee, balance, ed }) => {
+      map(({ balance, ed, txFee }) => {
         const feeFactor = 1.2;
         const fee = FN.fromInner(txFee, this.balanceAdapter!.decimals).mul(new FN(feeFactor));
 
@@ -118,32 +124,32 @@ class BaseIntegriteeAdapter extends BaseCrossChainAdapter {
     );
   }
 
-  public getBridgeTxParams(params: CrossChainTransferParams): BridgeTxParams {
-    const { to, token, address, amount } = params;
+  public getBridgeTxParams (params: CrossChainTransferParams): BridgeTxParams {
+    const { address, amount, to, token } = params;
     const toChain = chains[to];
 
-    const accountId = this.api?.createType("AccountId32", address).toHex();
+    const accountId = this.api?.createType('AccountId32', address).toHex();
 
     return {
-      module: "xTokens",
-      call: "transfer",
+      module: 'xTokens',
+      call: 'transfer',
       params: [
         token,
         amount.toChainData(),
         {
           V1: {
             parents: 1,
-            interior: { X2: [{ Parachain: toChain.paraChainId }, { AccountId32: { id: accountId, network: "Any" } }] },
-          },
+            interior: { X2: [{ Parachain: toChain.paraChainId }, { AccountId32: { id: accountId, network: 'Any' } }] }
+          }
         },
-        5_000_000_000,
-      ],
+        5_000_000_000
+      ]
     };
   }
 }
 
 export class IntegriteeAdapter extends BaseIntegriteeAdapter {
-  constructor() {
-    super(chains.integritee, [{ to: chains.karura, token: "TEER" }]);
+  constructor () {
+    super(chains.integritee, [{ to: chains.karura, token: 'TEER' }]);
   }
 }

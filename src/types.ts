@@ -1,11 +1,12 @@
-import { FixedPointNumber, Token } from "@acala-network/sdk-core";
-import { Observable } from "rxjs";
-import { BaseCrossChainAdapter } from "./base-chain-adapter";
-import { RegisteredChainName } from "./configs";
+import { FixedPointNumber, Token } from '@acala-network/sdk-core';
+import { Observable } from 'rxjs';
 
-export { FixedPointNumber as FN } from "@acala-network/sdk-core";
+import { BaseCrossChainAdapter } from './base-chain-adapter';
+import { RegisteredChainName } from './configs';
 
-export type CROSS_CHAIN_ENV = "kusama" | "polkadot";
+export { FixedPointNumber as FN } from '@acala-network/sdk-core';
+
+export type CROSS_CHAIN_ENV = 'kusama' | 'polkadot';
 
 export interface Chain {
   readonly id: RegisteredChainName;
@@ -68,10 +69,10 @@ export interface CrossChianBalanceChangedConfigs {
 }
 
 export enum BalanceChangedStatus {
-  "CHECKING",
-  "SUCCESS",
-  "TIMEOUT",
-  "UNKNOWN_ERROR",
+  'CHECKING',
+  'SUCCESS',
+  'TIMEOUT',
+  'UNKNOWN_ERROR',
 }
 
 export interface TokenBalance {

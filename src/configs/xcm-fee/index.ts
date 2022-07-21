@@ -1,22 +1,22 @@
-import { RegisteredChainName } from "..";
-import { CrossChainFeeConfig } from "../../types";
-import { polkadotXcmFeeConfig, statemineXcmFeeConfig } from "./polkadot-fee";
-import { acalaXcmFeeConfig, karuraXcmFeeConfig } from "./acala-fee";
-import { centrifugeXcmFeeConfig } from "./centrifuge-fee";
-import { bifrostXcmFeeConfig } from "./bifrost-fee";
-import { mantaXcmFeeConfig } from "./manta-fee";
-import { crustXcmFeeConfig } from "./crust-fee";
-import { integriteeXcmFeeConfig } from "./integritee-fee";
-import { khalaXcmFeeConfig } from "./khala-fee";
-import { kicoXcmFeeConfig } from "./kico-fee";
-import { kintsugiXcmFeeConfig } from "./kintsugi-fee";
-import { moonbeamXcmFeeConfig } from "./moonbeam-fee";
-import { parallelXcmFeeConfig } from "./parallel-fee";
-import { uniqueXcmFeeConfig } from "./unique-fee";
-import { darwiniaXcmFeeConfig } from "./darwinia-fee";
-import { turingXcmFeeConfig } from "./turing-fee";
-import { astarXcmFeeConfig } from "./astar-fee";
-import { pichiuXcmFeeConfig } from "./pichiu-fee";
+import { CrossChainFeeConfig } from '../../types';
+import { RegisteredChainName } from '..';
+import { acalaXcmFeeConfig, karuraXcmFeeConfig } from './acala-fee';
+import { astarXcmFeeConfig } from './astar-fee';
+import { bifrostXcmFeeConfig } from './bifrost-fee';
+import { centrifugeXcmFeeConfig } from './centrifuge-fee';
+import { crustXcmFeeConfig } from './crust-fee';
+import { darwiniaXcmFeeConfig } from './darwinia-fee';
+import { integriteeXcmFeeConfig } from './integritee-fee';
+import { khalaXcmFeeConfig } from './khala-fee';
+import { kicoXcmFeeConfig } from './kico-fee';
+import { kintsugiXcmFeeConfig } from './kintsugi-fee';
+import { mantaXcmFeeConfig } from './manta-fee';
+import { moonbeamXcmFeeConfig } from './moonbeam-fee';
+import { parallelXcmFeeConfig } from './parallel-fee';
+import { pichiuXcmFeeConfig } from './pichiu-fee';
+import { polkadotXcmFeeConfig, statemineXcmFeeConfig } from './polkadot-fee';
+import { turingXcmFeeConfig } from './turing-fee';
+import { uniqueXcmFeeConfig } from './unique-fee';
 
 export const xcmFeeConfig = {
   ...polkadotXcmFeeConfig,
@@ -37,5 +37,5 @@ export const xcmFeeConfig = {
   ...integriteeXcmFeeConfig,
   ...turingXcmFeeConfig,
   ...astarXcmFeeConfig,
-  ...pichiuXcmFeeConfig,
+  ...pichiuXcmFeeConfig
 } as Record<RegisteredChainName, Record<string, CrossChainFeeConfig>>;

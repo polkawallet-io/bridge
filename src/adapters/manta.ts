@@ -1,19 +1,21 @@
-import { AnyApi, FixedPointNumber as FN, Token } from "@acala-network/sdk-core";
-import { CurrencyNotFound, TokenConfigNotFound } from "../errors";
-import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
-import { combineLatest, map, Observable, of } from "rxjs";
-import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { chains, RegisteredChainName } from "../configs";
-import { xcmFeeConfig } from "../configs/xcm-fee";
-import { Chain, CrossChainRouter, CrossChainTransferParams, BalanceData, BalanceAdapter, BridgeTxParams } from "../types";
-import { Storage } from "@acala-network/sdk/utils/storage";
+import { Storage } from '@acala-network/sdk/utils/storage';
+import { AnyApi, FixedPointNumber as FN, Token } from '@acala-network/sdk-core';
+import { combineLatest, map, Observable, of } from 'rxjs';
+
+import { DeriveBalancesAll } from '@polkadot/api-derive/balances/types';
+
+import { BaseCrossChainAdapter } from '../base-chain-adapter';
+import { chains, RegisteredChainName } from '../configs';
+import { xcmFeeConfig } from '../configs/xcm-fee';
+import { CurrencyNotFound, TokenConfigNotFound } from '../errors';
+import { BalanceAdapter, BalanceData, BridgeTxParams, Chain, CrossChainRouter, CrossChainTransferParams } from '../types';
 
 const supported_tokens: Record<string, number> = {
   KMA: 1,
   KUSD: 9,
   LKSM: 10,
   KSM: 12,
-  KAR: 8,
+  KAR: 8
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -21,16 +23,16 @@ const createBalanceStorages = (api: AnyApi) => {
   return {
     balances: (address: string) =>
       Storage.create<DeriveBalancesAll>({
-        api: api,
-        path: "derive.balances.all",
-        params: [address],
+        api,
+        path: 'derive.balances.all',
+        params: [address]
       }),
     assets: (id: number, address: string) =>
       Storage.create<any>({
-        api: api,
-        path: "query.assets.account",
-        params: [id, address],
-      }),
+        api,
+        path: 'query.assets.account',
+        params: [id, address]
+      })
   };
 };
 
@@ -46,7 +48,7 @@ class MantaBalanceAdapter implements BalanceAdapter {
   readonly ed: FN;
   readonly nativeToken: string;
 
-  constructor({ chain, api }: MantaBalanceAdapterConfigs) {
+  constructor ({ api, chain }: MantaBalanceAdapterConfigs) {
     this.storages = createBalanceStorages(api);
     this.chain = chain;
     this.decimals = api.registry.chainDecimals[0];
@@ -54,7 +56,7 @@ class MantaBalanceAdapter implements BalanceAdapter {
     this.nativeToken = api.registry.chainTokens[0];
   }
 
-  public subscribeBalance(token: string, address: string): Observable<BalanceData> {
+  public subscribeBalance (token: string, address: string): Observable<BalanceData> {
     const storage = this.storages.balances(address);
 
     if (token === this.nativeToken) {
@@ -63,38 +65,48 @@ class MantaBalanceAdapter implements BalanceAdapter {
           free: FN.fromInner(data.freeBalance.toString(), this.decimals),
           locked: FN.fromInner(data.lockedBalance.toString(), this.decimals),
           reserved: FN.fromInner(data.reservedBalance.toString(), this.decimals),
-          available: FN.fromInner(data.availableBalance.toString(), this.decimals),
+          available: FN.fromInner(data.availableBalance.toString(), this.decimals)
         }))
       );
     }
 
     const tokenID = supported_tokens[token];
-    if (!tokenID) throw new CurrencyNotFound(token);
+
+    if (!tokenID) {
+      throw new CurrencyNotFound(token);
+    }
 
     return this.storages.assets(tokenID, address).observable.pipe(
       map((balance) => {
-        const amount = FN.fromInner(balance.unwrapOrDefault()?.balance?.toString() || "0", this.getTokenDecimals(token));
+        const amount = FN.fromInner(balance.unwrapOrDefault()?.balance?.toString() || '0', this.getTokenDecimals(token));
+
         return {
           free: amount,
           locked: new FN(0),
           reserved: new FN(0),
-          available: amount,
+          available: amount
         };
       })
     );
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getED(token?: string | Token): Observable<FN> {
-    if (token === this.nativeToken) return of(this.ed);
+  public getED (token?: string | Token): Observable<FN> {
+    if (token === this.nativeToken) {
+      return of(this.ed);
+    }
 
-    if (!xcmFeeConfig[this.chain][token as string]) throw new TokenConfigNotFound(token as string, this.chain);
+    if (!xcmFeeConfig[this.chain][token as string]) {
+      throw new TokenConfigNotFound(token as string, this.chain);
+    }
 
     return of(FN.fromInner(xcmFeeConfig[this.chain][token as string].existentialDeposit, this.getTokenDecimals(token as string)));
   }
 
-  public getTokenDecimals(token: string): number {
-    if (!xcmFeeConfig[this.chain][token]) throw new TokenConfigNotFound(token, this.chain);
+  public getTokenDecimals (token: string): number {
+    if (!xcmFeeConfig[this.chain][token]) {
+      throw new TokenConfigNotFound(token, this.chain);
+    }
 
     return xcmFeeConfig[this.chain][token].decimals;
   }
@@ -102,11 +114,11 @@ class MantaBalanceAdapter implements BalanceAdapter {
 
 class BaseMantaAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: MantaBalanceAdapter;
-  constructor(chain: Chain, routers: Omit<CrossChainRouter, "from">[]) {
+  constructor (chain: Chain, routers: Omit<CrossChainRouter, 'from'>[]) {
     super(chain, routers);
   }
 
-  public override async setApi(api: AnyApi) {
+  public override async setApi (api: AnyApi) {
     this.api = api;
 
     await api.isReady;
@@ -114,14 +126,14 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
     this.balanceAdapter = new MantaBalanceAdapter({ chain: this.chain.id, api });
   }
 
-  public subscribeTokenBalance(token: string, address: string): Observable<BalanceData> {
+  public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
     if (!this.balanceAdapter) {
       return new Observable((sub) =>
         sub.next({
           free: FN.ZERO,
           locked: FN.ZERO,
           available: FN.ZERO,
-          reserved: FN.ZERO,
+          reserved: FN.ZERO
         })
       );
     }
@@ -129,26 +141,28 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
     return this.balanceAdapter.subscribeBalance(token, address);
   }
 
-  public subscribeMaxInput(token: string, address: string, to: RegisteredChainName): Observable<FN> {
-    if (!this.balanceAdapter) return new Observable((sub) => sub.next(FN.ZERO));
+  public subscribeMaxInput (token: string, address: string, to: RegisteredChainName): Observable<FN> {
+    if (!this.balanceAdapter) {
+      return new Observable((sub) => sub.next(FN.ZERO));
+    }
 
     return combineLatest({
       txFee:
         token === this.balanceAdapter?.nativeToken
           ? this.estimateTxFee(
-              {
-                amount: FN.ZERO,
-                to,
-                token,
-                address,
-              },
+            {
+              amount: FN.ZERO,
+              to,
+              token,
               address
-            )
-          : "0",
+            },
+            address
+          )
+          : '0',
       balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getED(token),
+      ed: this.balanceAdapter?.getED(token)
     }).pipe(
-      map(({ txFee, balance, ed }) => {
+      map(({ balance, ed, txFee }) => {
         const feeFactor = 1.2;
         const fee = FN.fromInner(txFee, this.balanceAdapter!.decimals).mul(new FN(feeFactor));
 
@@ -158,41 +172,44 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
     );
   }
 
-  public getBridgeTxParams(params: CrossChainTransferParams): BridgeTxParams {
-    const { to, token, address, amount } = params;
+  public getBridgeTxParams (params: CrossChainTransferParams): BridgeTxParams {
+    const { address, amount, to, token } = params;
     const toChain = chains[to];
 
-    const accountId = this.api?.createType("AccountId32", address).toHex();
+    const accountId = this.api?.createType('AccountId32', address).toHex();
 
     const tokenId = supported_tokens[token];
-    if (!tokenId) throw new CurrencyNotFound(token);
+
+    if (!tokenId) {
+      throw new CurrencyNotFound(token);
+    }
 
     return {
-      module: "xTokens",
-      call: "transfer",
+      module: 'xTokens',
+      call: 'transfer',
       params: [
         { MantaCurrency: tokenId },
         amount.toChainData(),
         {
           V1: {
             parents: 1,
-            interior: { X2: [{ Parachain: toChain.paraChainId }, { AccountId32: { id: accountId, network: "Any" } }] },
-          },
+            interior: { X2: [{ Parachain: toChain.paraChainId }, { AccountId32: { id: accountId, network: 'Any' } }] }
+          }
         },
-        5_000_000_000,
-      ],
+        5_000_000_000
+      ]
     };
   }
 }
 
 export class CalamariAdapter extends BaseMantaAdapter {
-  constructor() {
+  constructor () {
     super(chains.calamari, [
-      { to: chains.karura, token: "KMA" },
-      { to: chains.karura, token: "KUSD" },
-      { to: chains.karura, token: "LKSM" },
-      { to: chains.karura, token: "KSM" },
-      { to: chains.karura, token: "KAR" },
+      { to: chains.karura, token: 'KMA' },
+      { to: chains.karura, token: 'KUSD' },
+      { to: chains.karura, token: 'LKSM' },
+      { to: chains.karura, token: 'KSM' },
+      { to: chains.karura, token: 'KAR' }
     ]);
   }
 }
