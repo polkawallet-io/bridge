@@ -34,14 +34,6 @@ describe('polkadot-adapter should work', () => {
     const kusamaAdapter = bridge.findAdapter(fromChain);
 
     if (kusamaAdapter) {
-      const networkProps: any = await kusamaAdapter.getNetworkProperties();
-
-      expect(networkProps.ss58Format).toEqual(2);
-      expect(networkProps.tokenSymbol.length).toBeGreaterThanOrEqual(1);
-      expect(networkProps.tokenSymbol[0]).toEqual('KSM');
-      expect(networkProps.tokenDecimals.length).toBeGreaterThanOrEqual(1);
-      expect(networkProps.tokenDecimals[0]).toEqual(12);
-
       const balance = await firstValueFrom(kusamaAdapter.subscribeTokenBalance('KSM', testAccount));
 
       console.log(`balance: free-${balance.free.toNumber()} locked-${balance.locked.toNumber()} available-${balance.available.toNumber()}`);
@@ -49,7 +41,7 @@ describe('polkadot-adapter should work', () => {
       expect(balance.free.toNumber()).toBeGreaterThanOrEqual(balance.available.toNumber());
       expect(balance.free.toNumber()).toEqual(balance.locked.add(balance.available).toNumber());
 
-      const inputConfig = await firstValueFrom(kusamaAdapter.subscribeInputConfigs({ to: 'karura', token: 'KSM', address: testAccount }));
+      const inputConfig = await firstValueFrom(kusamaAdapter.subscribeInputConfigs({ to: 'karura', token: 'KSM', address: testAccount, signer: testAccount }));
 
       console.log(
         `inputConfig: min-${inputConfig.minInput.toNumber()} max-${inputConfig.maxInput.toNumber()} ss58-${inputConfig.ss58Prefix}`
@@ -62,16 +54,17 @@ describe('polkadot-adapter should work', () => {
       console.log(`destFee: ${destFee.balance.toNumber()} ${destFee.token}`);
       expect(destFee.balance.toNumber()).toBeGreaterThan(0);
 
-      const tx = kusamaAdapter.getBridgeTxParams({
+      const tx = kusamaAdapter.createTx({
         amount: FixedPointNumber.fromInner('10000000000', 10),
         to: 'karura',
         token: 'KSM',
-        address: testAccount
+        address: testAccount,
+        signer: testAccount
       });
 
-      expect(tx.module).toEqual('xcmPallet');
-      expect(tx.call).toEqual('limitedReserveTransferAssets');
-      expect(tx.params.length).toEqual(5);
+      expect(tx.method.section).toEqual('xcmPallet');
+      expect(tx.method.method).toEqual('limitedReserveTransferAssets');
+      expect(tx.args.length).toEqual(5);
     }
   });
 });

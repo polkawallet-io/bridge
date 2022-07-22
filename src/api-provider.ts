@@ -4,6 +4,7 @@ import { combineLatest, map, Observable, race } from 'rxjs';
 import { ApiPromise, ApiRx, WsProvider } from '@polkadot/api';
 import { prodParasKusama, prodParasKusamaCommon, prodParasPolkadot, prodRelayKusama, prodRelayPolkadot } from '@polkadot/apps-config/endpoints';
 
+import { isChainEqual } from './utils/is-chain-equal';
 import { ChainName } from './configs';
 
 export class ApiProvider {
@@ -21,12 +22,10 @@ export class ApiProvider {
   public connectFromChain (chainName: ChainName[], nodeList: Partial<Record<ChainName, string[]>> | undefined) {
     return combineLatest(
       chainName.map((chain) => {
-        let nodes: string[];
+        let nodes = (nodeList || {})[chain];
 
-        if (nodeList && nodeList[chain]) {
-          nodes = nodeList[chain]!;
-        } else {
-          if (chain === 'kusama') {
+        if (!nodes) {
+          if (isChainEqual(chain, 'kusama')) {
             nodes = Object.values(prodRelayKusama.providers).filter((e) => e.startsWith('wss://'));
           } else if (chain === 'polkadot') {
             nodes = Object.values(prodRelayPolkadot.providers).filter((e) => e.startsWith('wss://'));

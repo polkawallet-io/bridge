@@ -1,13 +1,16 @@
 import { Storage } from '@acala-network/sdk/utils/storage';
-import { AnyApi, FixedPointNumber as FN, Token } from '@acala-network/sdk-core';
-import { combineLatest, map, Observable, of } from 'rxjs';
+import { AnyApi, FixedPointNumber as FN } from '@acala-network/sdk-core';
+import { combineLatest, map, Observable } from 'rxjs';
 
+import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { DeriveBalancesAll } from '@polkadot/api-derive/balances/types';
+import { ISubmittableResult } from '@polkadot/types/types';
 
+import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
 import { BaseCrossChainAdapter } from '../base-chain-adapter';
-import { chains, ChainName } from '../configs';
-import { CurrencyNotFound } from '../errors';
-import { BalanceAdapter, BalanceData, BridgeTxParams, Chain, CrossChainRouter, CrossChainTransferParams } from '../types';
+import { ChainName, chains, routersConfig } from '../configs';
+import { ApiNotFound, CurrencyNotFound } from '../errors';
+import { BalanceData, CrossChainTransferParams } from '../types';
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const createBalanceStorages = (api: AnyApi) => {
@@ -21,21 +24,13 @@ const createBalanceStorages = (api: AnyApi) => {
   };
 };
 
-interface PolkadotBalanceAdapterConfigs {
-  api: AnyApi;
-}
-
-class PolkadotBalanceAdapter implements BalanceAdapter {
+class PolkadotBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
-  readonly decimals: number;
-  readonly ed: FN;
-  readonly nativeToken: string;
 
-  constructor ({ api }: PolkadotBalanceAdapterConfigs) {
+  constructor ({ api, chain }: BalanceAdapterConfigs) {
+    super({ chain, api });
+
     this.storages = createBalanceStorages(api);
-    this.decimals = api.registry.chainDecimals[0];
-    this.ed = FN.fromInner(api.consts.balances.existentialDeposit.toString(), this.decimals);
-    this.nativeToken = api.registry.chainTokens[0];
   }
 
   public subscribeBalance (token: string, address: string): Observable<BalanceData> {
@@ -54,25 +49,17 @@ class PolkadotBalanceAdapter implements BalanceAdapter {
       }))
     );
   }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getED (_token?: string | Token): Observable<FN> {
-    return of(this.ed);
-  }
 }
 
 class BasePolkadotAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: PolkadotBalanceAdapter;
-  constructor (chain: Chain, routers: Omit<CrossChainRouter, 'from'>[]) {
-    super(chain, routers);
-  }
 
   public override async setApi (api: AnyApi) {
     this.api = api;
 
     await api.isReady;
 
-    this.balanceAdapter = new PolkadotBalanceAdapter({ api });
+    this.balanceAdapter = new PolkadotBalanceAdapter({ chain: this.chain.id, api });
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
@@ -101,16 +88,16 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
           amount: FN.ZERO,
           to,
           token,
-          address
-        },
-        address
+          address,
+          signer: address
+        }
       ),
       balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getED()
+      ed: this.balanceAdapter?.getTokenED()
     }).pipe(
       map(({ balance, ed, txFee }) => {
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, this.balanceAdapter!.decimals).mul(new FN(feeFactor));
+        const fee = FN.fromInner(txFee, this.balanceAdapter?.getTokenDecimals()).mul(new FN(feeFactor));
 
         // always minus ed
         return balance.minus(fee).minus(ed || FN.ZERO);
@@ -118,7 +105,11 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     );
   }
 
-  public getBridgeTxParams (params: CrossChainTransferParams): BridgeTxParams {
+  public createTx (params: CrossChainTransferParams): SubmittableExtrinsic<'promise', ISubmittableResult> | SubmittableExtrinsic<'rxjs', ISubmittableResult> {
+    if (this.api === undefined) {
+      throw new ApiNotFound(this.chain.id);
+    }
+
     const { address, amount, to, token } = params;
     const toChain = chains[to];
 
@@ -138,40 +129,27 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
           id: { Concrete: { interior: 'Here', parents: 0 } }
         }
       ];
-      const callParams = [{ V1: dst }, { V1: acc }, { V1: ass }, 0, 'Unlimited'];
 
-      return {
-        module: 'xcmPallet',
-        call: 'limitedTeleportAssets',
-        params: callParams
-      };
+      return this.api?.tx.xcmPallet.limitedTeleportAssets({ V1: dst }, { V1: acc }, { V1: ass }, 0, 'Unlimited');
     }
 
     // to karura/acala
     const dst = { X1: { Parachain: toChain.paraChainId } };
     const acc = { X1: { AccountId32: { id: accountId, network: 'Any' } } };
     const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
-    const callParams = [{ V0: dst }, { V0: acc }, { V0: ass }, 0];
 
-    return {
-      module: 'xcmPallet',
-      call: 'reserveTransferAssets',
-      params: callParams
-    };
+    return this.api?.tx.xcmPallet.reserveTransferAssets({ V0: dst }, { V0: acc }, { V0: ass }, 0);
   }
 }
 
 export class PolkadotAdapter extends BasePolkadotAdapter {
   constructor () {
-    super(chains.polkadot, [{ to: chains.acala, token: 'DOT' }]);
+    super(chains.polkadot, routersConfig.polkadot);
   }
 }
 
 export class KusamaAdapter extends BasePolkadotAdapter {
   constructor () {
-    super(chains.kusama, [
-      { to: chains.statemine, token: 'KSM' },
-      { to: chains.karura, token: 'KSM' }
-    ]);
+    super(chains.kusama, routersConfig.kusama);
   }
 }

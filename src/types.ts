@@ -1,5 +1,4 @@
-import { FixedPointNumber, Token } from '@acala-network/sdk-core';
-import { Observable } from 'rxjs';
+import { FixedPointNumber } from '@acala-network/sdk-core';
 
 import { BaseCrossChainAdapter } from './base-chain-adapter';
 import { ChainName } from './configs';
@@ -23,28 +22,44 @@ export interface Chain {
   readonly ss58Prefix: number;
 }
 
-export interface MultipleChainToken {
+export interface MultiChainToken {
   // token name
   name: string;
   // token symbol
   symbol: string;
   // decimals configs in multiple chain, the decimals are same in different chains in most times.
-  decimals?: number | { [k in ChainName]: number};
+  decimals: number | Partial<{ [k in ChainName]: number}>;
   // existential deposit configs in multiple chain, the ED are same in different chains in most times.
-  ed?: bigint | { [k in ChainName]: bigint }
+  ed: FixedPointNumber | Partial<{ [k in ChainName]: FixedPointNumber }>
 }
 
-export interface CrossChainRouter {
+export interface CrossChainRouterConfigs {
   // from chain name
   from: ChainName;
   // to chain name
   to: ChainName;
   // token name
   token: string;
+  // xcm config
+  xcm?: XCMTransferConfigs;
+}
+
+export interface CrossChainRouter {
+  // from chain name
+  from: Chain;
+  // to chain name
+  to: Chain;
+  // token name
+  token: string;
+  // xcm config
+  xcm?: XCMTransferConfigs;
+}
+
+export interface XCMTransferConfigs {
   // XCM transfer weight limit
-  weightLimit: bigint | 'Unlimit';
+  weightLimit: FixedPointNumber | 'Unlimit';
   // XCM transfer fee charged by `to chain`
-  fee: bigint;
+  fee: TokenBalance;
 }
 
 export interface NetworkProps {
@@ -54,6 +69,7 @@ export interface NetworkProps {
 }
 
 export interface CrossChainTransferParams {
+  signer: string;
   address: string;
   amount: FixedPointNumber;
   to: ChainName;
@@ -64,20 +80,21 @@ export interface CrossChainInputConfigs {
   minInput: FixedPointNumber;
   maxInput: FixedPointNumber;
   ss58Prefix: number;
-  destFee: string;
+  destFee: TokenBalance;
+  estimateFee: string;
 }
 
-export interface CrossChainFeeConfig {
-  fee: string;
-  existentialDeposit: string;
-  decimals: number;
-}
+// export interface CrossChainFeeConfig {
+//   fee: string;
+//   existentialDeposit: string;
+//   decimals: number;
+// }
 
-export interface BridgeTxParams {
-  module: string;
-  call: string;
-  params: any[];
-}
+// export interface BridgeTxParams {
+//   module: string;
+//   call: string;
+//   params: any[];
+// }
 
 export interface BridgeConfigs {
   adapters: BaseCrossChainAdapter[];
@@ -99,7 +116,7 @@ export enum BalanceChangedStatus {
 }
 
 export interface TokenBalance {
-  token: Token | string;
+  token: string;
   balance: FixedPointNumber;
 }
 
@@ -108,9 +125,4 @@ export interface BalanceData {
   locked: FixedPointNumber;
   reserved: FixedPointNumber;
   available: FixedPointNumber;
-}
-
-export interface BalanceAdapter {
-  subscribeBalance(token: Token | string, address: string): Observable<BalanceData>;
-  getED(token: Token | string): Observable<FixedPointNumber>;
 }

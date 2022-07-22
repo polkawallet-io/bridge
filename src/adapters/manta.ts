@@ -1,16 +1,18 @@
 import { Storage } from '@acala-network/sdk/utils/storage';
-import { AnyApi, FixedPointNumber as FN, Token } from '@acala-network/sdk-core';
-import { combineLatest, map, Observable, of } from 'rxjs';
+import { AnyApi, FixedPointNumber as FN } from '@acala-network/sdk-core';
+import { combineLatest, map, Observable } from 'rxjs';
 
+import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { DeriveBalancesAll } from '@polkadot/api-derive/balances/types';
+import { ISubmittableResult } from '@polkadot/types/types';
 
+import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
 import { BaseCrossChainAdapter } from '../base-chain-adapter';
-import { chains, ChainName } from '../configs';
-import { xcmFeeConfig } from '../configs/xcm-fee';
-import { CurrencyNotFound, TokenConfigNotFound } from '../errors';
-import { BalanceAdapter, BalanceData, BridgeTxParams, Chain, CrossChainRouter, CrossChainTransferParams } from '../types';
+import { ChainName, chains, routersConfig } from '../configs';
+import { ApiNotFound, CurrencyNotFound } from '../errors';
+import { BalanceData, CrossChainTransferParams } from '../types';
 
-const supported_tokens: Record<string, number> = {
+const SUPPORTED_TOKENS: Record<string, number> = {
   KMA: 1,
   KUSD: 9,
   LKSM: 10,
@@ -36,24 +38,12 @@ const createBalanceStorages = (api: AnyApi) => {
   };
 };
 
-interface MantaBalanceAdapterConfigs {
-  chain: ChainName;
-  api: AnyApi;
-}
-
-class MantaBalanceAdapter implements BalanceAdapter {
+class MantaBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
-  readonly chain: ChainName;
-  readonly decimals: number;
-  readonly ed: FN;
-  readonly nativeToken: string;
 
-  constructor ({ api, chain }: MantaBalanceAdapterConfigs) {
+  constructor ({ api, chain }: BalanceAdapterConfigs) {
+    super({ api, chain });
     this.storages = createBalanceStorages(api);
-    this.chain = chain;
-    this.decimals = api.registry.chainDecimals[0];
-    this.ed = FN.fromInner(api.consts.balances.existentialDeposit.toString(), this.decimals);
-    this.nativeToken = api.registry.chainTokens[0];
   }
 
   public subscribeBalance (token: string, address: string): Observable<BalanceData> {
@@ -70,7 +60,7 @@ class MantaBalanceAdapter implements BalanceAdapter {
       );
     }
 
-    const tokenID = supported_tokens[token];
+    const tokenID = SUPPORTED_TOKENS[token];
 
     if (!tokenID) {
       throw new CurrencyNotFound(token);
@@ -89,34 +79,10 @@ class MantaBalanceAdapter implements BalanceAdapter {
       })
     );
   }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getED (token?: string | Token): Observable<FN> {
-    if (token === this.nativeToken) {
-      return of(this.ed);
-    }
-
-    if (!xcmFeeConfig[this.chain][token as string]) {
-      throw new TokenConfigNotFound(token as string, this.chain);
-    }
-
-    return of(FN.fromInner(xcmFeeConfig[this.chain][token as string].existentialDeposit, this.getTokenDecimals(token as string)));
-  }
-
-  public getTokenDecimals (token: string): number {
-    if (!xcmFeeConfig[this.chain][token]) {
-      throw new TokenConfigNotFound(token, this.chain);
-    }
-
-    return xcmFeeConfig[this.chain][token].decimals;
-  }
 }
 
 class BaseMantaAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: MantaBalanceAdapter;
-  constructor (chain: Chain, routers: Omit<CrossChainRouter, 'from'>[]) {
-    super(chain, routers);
-  }
 
   public override async setApi (api: AnyApi) {
     this.api = api;
@@ -154,17 +120,17 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
               amount: FN.ZERO,
               to,
               token,
-              address
-            },
-            address
+              address,
+              signer: address
+            }
           )
           : '0',
       balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getED(token)
+      ed: this.balanceAdapter?.getTokenED(token)
     }).pipe(
       map(({ balance, ed, txFee }) => {
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, this.balanceAdapter!.decimals).mul(new FN(feeFactor));
+        const fee = FN.fromInner(txFee, this.balanceAdapter?.getTokenDecimals(token)).mul(new FN(feeFactor));
 
         // always minus ed
         return balance.minus(fee).minus(ed || FN.ZERO);
@@ -172,44 +138,37 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
     );
   }
 
-  public getBridgeTxParams (params: CrossChainTransferParams): BridgeTxParams {
+  public createTx (params: CrossChainTransferParams): SubmittableExtrinsic<'promise', ISubmittableResult> | SubmittableExtrinsic<'rxjs', ISubmittableResult> {
+    if (this.api === undefined) {
+      throw new ApiNotFound(this.chain.id);
+    }
+
     const { address, amount, to, token } = params;
     const toChain = chains[to];
 
     const accountId = this.api?.createType('AccountId32', address).toHex();
 
-    const tokenId = supported_tokens[token];
+    const tokenId = SUPPORTED_TOKENS[token];
 
     if (!tokenId) {
       throw new CurrencyNotFound(token);
     }
 
-    return {
-      module: 'xTokens',
-      call: 'transfer',
-      params: [
-        { MantaCurrency: tokenId },
-        amount.toChainData(),
-        {
-          V1: {
-            parents: 1,
-            interior: { X2: [{ Parachain: toChain.paraChainId }, { AccountId32: { id: accountId, network: 'Any' } }] }
-          }
-        },
-        5_000_000_000
-      ]
-    };
+    return this.api?.tx.xTokens.transfer(
+      { MantaCurrency: tokenId },
+      amount.toChainData(),
+      {
+        V1: {
+          parents: 1,
+          interior: { X2: [{ Parachain: toChain.paraChainId }, { AccountId32: { id: accountId, network: 'Any' } }] }
+        }
+      },
+      this.getDestWeight(token, to)?.toString());
   }
 }
 
 export class CalamariAdapter extends BaseMantaAdapter {
   constructor () {
-    super(chains.calamari, [
-      { to: chains.karura, token: 'KMA' },
-      { to: chains.karura, token: 'KUSD' },
-      { to: chains.karura, token: 'LKSM' },
-      { to: chains.karura, token: 'KSM' },
-      { to: chains.karura, token: 'KAR' }
-    ]);
+    super(chains.calamari, routersConfig.calamari);
   }
 }

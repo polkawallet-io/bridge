@@ -35,15 +35,15 @@ describe('cross-chain-router-manager', () => {
 
     await manager.addRouters(
       [
-        { from: chains.karura, to: chains.kusama, token: 'KSM' },
-        { from: chains.karura, to: chains.khala, token: 'KSM' },
-        { from: chains.karura, to: chains.khala, token: 'AUSD' },
-        { from: chains.karura, to: chains.khala, token: 'LKSM' },
-        { from: chains.khala, to: chains.karura, token: 'KSM' },
-        { from: chains.khala, to: chains.karura, token: 'AUSD' },
-        { from: chains.khala, to: chains.karura, token: 'LKSM' },
-        { from: chains.kusama, to: chains.karura, token: 'KSM' },
-        { from: chains.statemine, to: chains.karura, token: 'RMRK' }
+        { from: chains.karura.id, to: chains.kusama.id, token: 'KSM' },
+        { from: chains.karura.id, to: chains.khala.id, token: 'KSM' },
+        { from: chains.karura.id, to: chains.khala.id, token: 'AUSD' },
+        { from: chains.karura.id, to: chains.khala.id, token: 'LKSM' },
+        { from: chains.khala.id, to: chains.karura.id, token: 'KSM' },
+        { from: chains.khala.id, to: chains.karura.id, token: 'AUSD' },
+        { from: chains.khala.id, to: chains.karura.id, token: 'LKSM' },
+        { from: chains.kusama.id, to: chains.karura.id, token: 'KSM' },
+        { from: chains.statemine.id, to: chains.karura.id, token: 'RMRK' }
       ],
       false
     );

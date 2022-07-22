@@ -3,8 +3,8 @@ import { isEmpty, overEvery, uniqWith } from 'lodash';
 
 import { isChainEqual } from './utils/is-chain-equal';
 import { BaseCrossChainAdapter } from './base-chain-adapter';
-import { chains, ChainName } from './configs';
-import { Chain, CrossChainRouter } from './types';
+import { ChainName, chains } from './configs';
+import { Chain, CrossChainRouter, CrossChainRouterConfigs } from './types';
 
 const CONFIG_URL = 'https://api.polkawallet.io/devConfiguration/config/bridge.json';
 
@@ -39,19 +39,19 @@ export class BridgeRouterManager {
     return this.adapters.find((i) => isChainEqual(chain, i.chain));
   }
 
-  public async addRouter (router: CrossChainRouter, checkAdapter = true): Promise<void> {
-    const { token } = router;
+  public addRouter (router: CrossChainRouterConfigs, checkAdapter = true) {
+    const { token, xcm } = router;
     const from = typeof router.from === 'string' ? chains[router.from] : router.from;
     const to = typeof router.to === 'string' ? chains[router.to] : router.to;
 
     // push routers if from adapter is set
     if (!checkAdapter || (this.findAdapterByName(from) && checkAdapter)) {
-      this.routers.push({ from, to, token });
+      this.routers.push({ from, to, token, xcm });
     }
   }
 
-  public async addRouters (routers: CrossChainRouter[], checkAdapter = true): Promise<void> {
-    await Promise.all(routers.map((i) => this.addRouter(i, checkAdapter)));
+  public addRouters (routers: CrossChainRouterConfigs[], checkAdapter = true) {
+    routers.map((i) => this.addRouter(i, checkAdapter));
   }
 
   public getRouters (params?: RouterFilter): CrossChainRouter[] {

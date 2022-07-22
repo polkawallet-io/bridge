@@ -1,4 +1,4 @@
-import { Chain } from 'src/types';
+import { Chain } from '../../types';
 
 import { kusamaChains } from './kusama-chains';
 import { polkadotChains } from './polkadot-chains';

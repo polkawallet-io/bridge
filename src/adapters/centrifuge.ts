@@ -1,16 +1,18 @@
 import { Storage } from '@acala-network/sdk/utils/storage';
-import { AnyApi, FixedPointNumber as FN, Token } from '@acala-network/sdk-core';
-import { combineLatest, map, Observable, of } from 'rxjs';
+import { AnyApi, FixedPointNumber as FN } from '@acala-network/sdk-core';
+import { combineLatest, map, Observable } from 'rxjs';
 
+import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { DeriveBalancesAll } from '@polkadot/api-derive/balances/types';
+import { ISubmittableResult } from '@polkadot/types/types';
 
+import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
 import { BaseCrossChainAdapter } from '../base-chain-adapter';
-import { chains, ChainName } from '../configs';
-import { xcmFeeConfig } from '../configs/xcm-fee';
-import { CurrencyNotFound } from '../errors';
-import { BalanceAdapter, BalanceData, BridgeTxParams, Chain, CrossChainRouter, CrossChainTransferParams } from '../types';
+import { ChainName, chains, routersConfig } from '../configs';
+import { ApiNotFound, CurrencyNotFound } from '../errors';
+import { BalanceData, CrossChainTransferParams } from '../types';
 
-const supported_tokens: Record<string, string> = {
+const SUPPORTED_TOKENS: Record<string, string> = {
   KUSD: 'KUSD'
 };
 
@@ -32,24 +34,12 @@ const createBalanceStorages = (api: AnyApi) => {
   };
 };
 
-interface CentrifugeBalanceAdapterConfigs {
-  chain: ChainName;
-  api: AnyApi;
-}
-
-class CentrifugeBalanceAdapter implements BalanceAdapter {
+class CentrifugeBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
-  readonly chain: ChainName;
-  readonly decimals: number;
-  readonly ed: FN;
-  readonly nativeToken: string;
 
-  constructor ({ api, chain }: CentrifugeBalanceAdapterConfigs) {
+  constructor ({ api, chain }: BalanceAdapterConfigs) {
+    super({ api, chain });
     this.storages = createBalanceStorages(api);
-    this.chain = chain;
-    this.decimals = api.registry.chainDecimals[0];
-    this.ed = FN.fromInner(api.consts.balances.existentialDeposit.toString(), this.decimals);
-    this.nativeToken = api.registry.chainTokens[0];
   }
 
   public subscribeBalance (token: string, address: string): Observable<BalanceData> {
@@ -66,7 +56,7 @@ class CentrifugeBalanceAdapter implements BalanceAdapter {
       );
     }
 
-    const tokenId = supported_tokens[token];
+    const tokenId = SUPPORTED_TOKENS[token];
 
     if (!tokenId) {
       throw new CurrencyNotFound(token);
@@ -85,26 +75,10 @@ class CentrifugeBalanceAdapter implements BalanceAdapter {
       })
     );
   }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getED (token?: string | Token): Observable<FN> {
-    if (token === this.nativeToken) {
-      return of(this.ed);
-    }
-
-    return of(FN.fromInner(xcmFeeConfig[this.chain][token as string].existentialDeposit, this.getTokenDecimals(token as string)));
-  }
-
-  public getTokenDecimals (token: string): number {
-    return xcmFeeConfig[this.chain][token]?.decimals || this.decimals;
-  }
 }
 
 class BaseCentrifugeAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: CentrifugeBalanceAdapter;
-  constructor (chain: Chain, routers: Omit<CrossChainRouter, 'from'>[]) {
-    super(chain, routers);
-  }
 
   public override async setApi (api: AnyApi) {
     this.api = api;
@@ -142,17 +116,17 @@ class BaseCentrifugeAdapter extends BaseCrossChainAdapter {
               amount: FN.ZERO,
               to,
               token,
-              address
-            },
-            address
+              address,
+              signer: address
+            }
           )
           : '0',
       balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getED(token)
+      ed: this.balanceAdapter?.getTokenED(token)
     }).pipe(
       map(({ balance, ed, txFee }) => {
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, this.balanceAdapter!.decimals).mul(new FN(feeFactor));
+        const fee = FN.fromInner(txFee, this.balanceAdapter?.getTokenDecimals(token)).mul(new FN(feeFactor));
 
         // always minus ed
         return balance.minus(fee).minus(ed || FN.ZERO);
@@ -160,41 +134,37 @@ class BaseCentrifugeAdapter extends BaseCrossChainAdapter {
     );
   }
 
-  public getBridgeTxParams (params: CrossChainTransferParams): BridgeTxParams {
+  public createTx (params: CrossChainTransferParams): SubmittableExtrinsic<'promise', ISubmittableResult> | SubmittableExtrinsic<'rxjs', ISubmittableResult> {
+    if (this.api === undefined) {
+      throw new ApiNotFound(this.chain.id);
+    }
+
     const { address, amount, to, token } = params;
     const toChain = chains[to];
 
     const accountId = this.api?.createType('AccountId32', address).toHex();
 
-    const tokenId = supported_tokens[token];
+    const tokenId = SUPPORTED_TOKENS[token];
 
     if (!tokenId && token !== this.balanceAdapter?.nativeToken) {
       throw new CurrencyNotFound(token);
     }
 
-    return {
-      module: 'xTokens',
-      call: 'transfer',
-      params: [
-        token === this.balanceAdapter?.nativeToken ? 'Native' : tokenId,
-        amount.toChainData(),
-        {
-          V1: {
-            parents: 1,
-            interior: { X2: [{ Parachain: toChain.paraChainId }, { AccountId32: { id: accountId, network: 'Any' } }] }
-          }
-        },
-        5_000_000_000
-      ]
-    };
+    return this.api?.tx.xTokens.transfer(
+      token === this.balanceAdapter?.nativeToken ? 'Native' : tokenId,
+      amount.toChainData(),
+      {
+        V1: {
+          parents: 1,
+          interior: { X2: [{ Parachain: toChain.paraChainId }, { AccountId32: { id: accountId, network: 'Any' } }] }
+        }
+      },
+      this.getDestWeight(token, to)?.toString());
   }
 }
 
 export class AltairAdapter extends BaseCentrifugeAdapter {
   constructor () {
-    super(chains.altair, [
-      { to: chains.karura, token: 'AIR' },
-      { to: chains.karura, token: 'KUSD' }
-    ]);
+    super(chains.altair, routersConfig.altair);
   }
 }

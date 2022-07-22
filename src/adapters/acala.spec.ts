@@ -36,16 +36,6 @@ describe('acala-adapter should work', () => {
 
     const adapter = bridge.findAdapter(fromChain);
 
-    if (adapter) {
-      const networkProps = await adapter.getNetworkProperties();
-
-      expect(networkProps.ss58Format).toEqual(8);
-      expect(networkProps.tokenSymbol.length).toBeGreaterThanOrEqual(1);
-      expect(networkProps.tokenSymbol[0]).toEqual('KAR');
-      expect(networkProps.tokenDecimals.length).toBeGreaterThanOrEqual(1);
-      expect(networkProps.tokenDecimals[0]).toEqual(12);
-    }
-
     async function runMyTestSuit (to: ChainName, token: string) {
       if (adapter) {
         const balance = await firstValueFrom(adapter.subscribeTokenBalance(token, testAccount));
@@ -57,7 +47,7 @@ describe('acala-adapter should work', () => {
         expect(balance.free.toNumber()).toBeGreaterThanOrEqual(balance.available.toNumber());
         expect(balance.free.toNumber()).toEqual(balance.locked.add(balance.available).toNumber());
 
-        const inputConfig = await firstValueFrom(adapter.subscribeInputConfigs({ to, token, address: testAccount }));
+        const inputConfig = await firstValueFrom(adapter.subscribeInputConfigs({ to, token, address: testAccount, signer: testAccount }));
 
         console.log(
           `inputConfig: min-${inputConfig.minInput.toNumber()} max-${inputConfig.maxInput.toNumber()} ss58-${inputConfig.ss58Prefix}`
@@ -70,17 +60,18 @@ describe('acala-adapter should work', () => {
         console.log(`destFee: fee-${destFee.balance.toNumber()} ${destFee.token}`);
         expect(destFee.balance.toNumber()).toBeGreaterThan(0);
 
-        const tx = adapter.getBridgeTxParams({
+        const tx = adapter.createTx({
           amount: FixedPointNumber.fromInner('10000000000', 10),
           to,
           token,
-          address: testAccount
+          address: testAccount,
+          signer: testAccount
         });
 
         if (to !== 'statemine') {
-          expect(tx.module).toEqual('xTokens');
-          expect(tx.call).toEqual('transfer');
-          expect(tx.params.length).toEqual(4);
+          expect(tx.method.section).toEqual('xTokens');
+          expect(tx.method.method).toEqual('transfer');
+          expect(tx.args.length).toEqual(4);
         }
       }
     }

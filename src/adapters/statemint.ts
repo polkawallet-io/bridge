@@ -1,16 +1,19 @@
 import { Storage } from '@acala-network/sdk/utils/storage';
-import { AnyApi, FixedPointNumber as FN, Token } from '@acala-network/sdk-core';
+import { AnyApi, FixedPointNumber as FN } from '@acala-network/sdk-core';
 import { combineLatest, map, Observable, of } from 'rxjs';
 
+import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { DeriveBalancesAll } from '@polkadot/api-derive/balances/types';
+import { ISubmittableResult } from '@polkadot/types/types';
 import { BN } from '@polkadot/util';
 
+import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
 import { BaseCrossChainAdapter } from '../base-chain-adapter';
-import { chains, ChainName } from '../configs';
-import { CurrencyNotFound } from '../errors';
-import { BalanceAdapter, BalanceData, BridgeTxParams, Chain, CrossChainRouter, CrossChainTransferParams } from '../types';
+import { ChainName, chains, routersConfig } from '../configs';
+import { ApiNotFound, CurrencyNotFound } from '../errors';
+import { BalanceData, CrossChainTransferParams } from '../types';
 
-const supported_assets: Record<string, BN> = {
+const SUPPORTED_TOKENS: Record<string, BN> = {
   RMRK: new BN(8),
   ARIS: new BN(16),
   USDT: new BN(1984)
@@ -46,21 +49,12 @@ const createBalanceStorages = (api: AnyApi) => {
   };
 };
 
-interface StatemintBalanceAdapterConfigs {
-  api: AnyApi;
-}
-
-class StatemintBalanceAdapter implements BalanceAdapter {
+class StatemintBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
-  readonly decimals: number;
-  readonly ed: FN;
-  readonly nativeToken: string;
 
-  constructor ({ api }: StatemintBalanceAdapterConfigs) {
+  constructor ({ api, chain }: BalanceAdapterConfigs) {
+    super({ api, chain });
     this.storages = createBalanceStorages(api);
-    this.decimals = api.registry.chainDecimals[0];
-    this.ed = FN.fromInner(api.consts.balances.existentialDeposit.toString(), this.decimals);
-    this.nativeToken = api.registry.chainTokens[0];
   }
 
   public subscribeBalance (token: string, address: string): Observable<BalanceData> {
@@ -77,7 +71,7 @@ class StatemintBalanceAdapter implements BalanceAdapter {
       );
     }
 
-    const assetId = supported_assets[token];
+    const assetId = SUPPORTED_TOKENS[token];
 
     if (!assetId) {
       throw new CurrencyNotFound(token);
@@ -101,15 +95,15 @@ class StatemintBalanceAdapter implements BalanceAdapter {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getED (token?: string | Token): Observable<FN> {
-    if (token === this.nativeToken) {
+  public override getTokenED (token?: string): Observable<FN> {
+    if (!token || token === this.nativeToken) {
       return of(this.ed);
     }
 
-    const assetId = supported_assets[token as string];
+    const assetId = SUPPORTED_TOKENS[token];
 
     if (!assetId) {
-      throw new CurrencyNotFound(token as string);
+      throw new CurrencyNotFound(token);
     }
 
     return combineLatest({
@@ -121,16 +115,13 @@ class StatemintBalanceAdapter implements BalanceAdapter {
 
 class BaseStatemintAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: StatemintBalanceAdapter;
-  constructor (chain: Chain, routers: Omit<CrossChainRouter, 'from'>[]) {
-    super(chain, routers);
-  }
 
   public override async setApi (api: AnyApi) {
     this.api = api;
 
     await api.isReady;
 
-    this.balanceAdapter = new StatemintBalanceAdapter({ api });
+    this.balanceAdapter = new StatemintBalanceAdapter({ api, chain: this.chain.id });
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
@@ -161,17 +152,18 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
               amount: FN.ZERO,
               to,
               token,
-              address
-            },
-            address
+              address,
+              signer: address
+            }
+
           )
           : '0',
       balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getED(token)
+      ed: this.balanceAdapter?.getTokenED(token)
     }).pipe(
       map(({ balance, ed, txFee }) => {
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, this.balanceAdapter!.decimals).mul(new FN(feeFactor));
+        const fee = FN.fromInner(txFee, this.balanceAdapter?.getTokenDecimals(token)).mul(new FN(feeFactor));
 
         // always minus ed
         return balance.minus(fee).minus(ed || FN.ZERO);
@@ -179,7 +171,11 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
     );
   }
 
-  public getBridgeTxParams (params: CrossChainTransferParams): BridgeTxParams {
+  public createTx (params: CrossChainTransferParams): SubmittableExtrinsic<'promise', ISubmittableResult> | SubmittableExtrinsic<'rxjs', ISubmittableResult> {
+    if (this.api === undefined) {
+      throw new ApiNotFound(this.chain.id);
+    }
+
     const { address, amount, to, token } = params;
     const toChain = chains[to];
 
@@ -199,17 +195,12 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
           id: { Concrete: { interior: 'Here', parents: 1 } }
         }
       ];
-      const callParams = [{ V1: dst }, { V1: acc }, { V1: ass }, 0, 'Unlimited'];
 
-      return {
-        module: 'polkadotXcm',
-        call: 'limitedTeleportAssets',
-        params: callParams
-      };
+      return this.api?.tx.polkadotXcm.limitedTeleportAssets({ V1: dst }, { V1: acc }, { V1: ass }, 0, this.getDestWeight(token, to)?.toString());
     }
 
     // to karura/acala
-    const assetId = supported_assets[token];
+    const assetId = SUPPORTED_TOKENS[token];
 
     if ((to !== 'acala' && to !== 'karura') || token === this.balanceAdapter?.nativeToken || !assetId) {
       throw new CurrencyNotFound(token);
@@ -225,29 +216,19 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
         }
       }
     ];
-    const callParams = [{ V0: dst }, { V0: acc }, { V0: ass }, 0, 'Unlimited'];
 
-    return {
-      module: 'polkadotXcm',
-      call: 'limitedReserveTransferAssets',
-      params: callParams
-    };
+    return this.api?.tx.polkadotXcm.limitedReserveTransferAssets({ V0: dst }, { V0: acc }, { V0: ass }, 0, this.getDestWeight(token, to)?.toString());
   }
 }
 
 export class StatemintAdapter extends BaseStatemintAdapter {
   constructor () {
-    super(chains.statemint, [{ to: chains.polkadot, token: 'DOT' }]);
+    super(chains.statemint, routersConfig.statemint);
   }
 }
 
 export class StatemineAdapter extends BaseStatemintAdapter {
   constructor () {
-    super(chains.statemine, [
-      { to: chains.kusama, token: 'KSM' },
-      { to: chains.karura, token: 'RMRK' },
-      { to: chains.karura, token: 'ARIS' },
-      { to: chains.karura, token: 'USDT' }
-    ]);
+    super(chains.statemine, routersConfig.statemine);
   }
 }
