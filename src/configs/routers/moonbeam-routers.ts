@@ -1,11 +1,13 @@
+import { BN } from '@polkadot/util';
+
 import { CrossChainRouterConfigs, FN } from '../../types';
 
 export const moonbeamRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'from'>[]> = {
   moonriver: [
-    { to: 'karura', token: 'MOVR', xcm: { fee: { token: 'DOT', balance: new FN('64000000000000') }, weightLimit: new FN(5_000_000_000) } }
+    { to: 'karura', token: 'MOVR', xcm: { fee: { token: 'MOVR', balance: FN.fromInner('64000000000000', 18) }, weightLimit: new BN(5_000_000_000) } }
   ],
   moonbeam: [
-    { to: 'acala', token: 'GLMR', xcm: { fee: { token: 'DOT', balance: new FN('6400000000000000') }, weightLimit: new FN(5_000_000_000) } }
+    { to: 'acala', token: 'GLMR', xcm: { fee: { token: 'GLMR', balance: FN.fromInner('6400000000000000', 18) }, weightLimit: new BN(5_000_000_000) } }
   ]
   // moonriver: {
   //   MOVR: { fee: '80000000000000', existentialDeposit: '1000000000000000', decimals: 18 },

@@ -1,11 +1,13 @@
+import { BN } from '@polkadot/util';
+
 import { CrossChainRouterConfigs, FN } from '../../types';
 
 export const parallelRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'from'>[]> = {
   heiko: [
-    { to: 'karura', token: 'HKO', xcm: { fee: { token: 'DOT', balance: new FN('6400000000') }, weightLimit: new FN(5_000_000_000) } }
+    { to: 'karura', token: 'HKO', xcm: { fee: { token: 'HKO', balance: FN.fromInner('6400000000', 12) }, weightLimit: new BN(5_000_000_000) } }
   ],
   parallel: [
-    { to: 'karura', token: 'PARA', xcm: { fee: { token: 'DOT', balance: new FN('6400000000') }, weightLimit: new FN(5_000_000_000) } }
+    { to: 'karura', token: 'PARA', xcm: { fee: { token: 'PARA', balance: FN.fromInner('6400000000', 12) }, weightLimit: new BN(5_000_000_000) } }
   ]
   // heiko: {
   //   HKO: { fee: '1440000000', existentialDeposit: '100000000000', decimals: 12 },

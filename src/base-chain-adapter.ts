@@ -5,6 +5,7 @@ import { catchError, map } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { ISubmittableResult } from '@polkadot/types/types';
+import { BN } from '@polkadot/util';
 
 import { multiChainTokensConfig } from './configs/tokens';
 import { ChainName, chains } from './configs';
@@ -78,6 +79,24 @@ export abstract class BaseCrossChainAdapter {
     return of(this.getDestED(token, to).balance.add(this.getCrossChainFee(token, to).balance || FN.ZERO));
   }
 
+  public getTokenDecimals (token: string, destChain: ChainName): number {
+    const tokenConfig = multiChainTokensConfig[token];
+
+    if (!tokenConfig) {
+      throw new TokenConfigNotFound(token);
+    }
+
+    if (typeof tokenConfig.decimals === 'number') {
+      return tokenConfig.decimals;
+    }
+
+    if (tokenConfig.decimals[destChain] === undefined) {
+      throw new TokenConfigItemNotFound(token, 'decimals', destChain);
+    }
+
+    return tokenConfig.decimals[destChain] || 18;
+  }
+
   public getDestED (token: string, destChain: ChainName): TokenBalance {
     const tokenConfig = multiChainTokensConfig[token];
 
@@ -85,10 +104,10 @@ export abstract class BaseCrossChainAdapter {
       throw new TokenConfigNotFound(token);
     }
 
-    if (tokenConfig.ed instanceof FN) {
+    if (tokenConfig.ed instanceof BN) {
       return {
         token,
-        balance: tokenConfig.ed
+        balance: FN.fromInner(tokenConfig.ed.toString(), this.getTokenDecimals(token, destChain))
       };
     }
 
@@ -98,7 +117,7 @@ export abstract class BaseCrossChainAdapter {
 
     return {
       token,
-      balance: tokenConfig.ed[destChain] || FN.ZERO
+      balance: FN.fromInner(tokenConfig.ed[destChain]?.toString() || '0', this.getTokenDecimals(token, destChain))
     };
   }
 
@@ -112,7 +131,7 @@ export abstract class BaseCrossChainAdapter {
     return router.xcm?.fee || { token, balance: new FN(0) };
   }
 
-  public getDestWeight (token: string, destChain: ChainName): FN | 'Unlimit' | undefined {
+  public getDestWeight (token: string, destChain: ChainName): BN | 'Unlimit' | undefined {
     const router = this.routers.find((e) => e.to === destChain && e.token === token);
 
     if (!router) {

@@ -1,19 +1,21 @@
-import { FN, MultiChainToken } from '../../types';
+import { BN } from '@polkadot/util';
+
+import { MultiChainToken } from '../../types';
 
 export const interlayTokensConfig: Record<string, MultiChainToken> = {
   INTR: { name: 'INTR',
     symbol: 'INTR',
     decimals: 10,
     ed: {
-      interlay: new FN('0'),
-      acala: new FN('1000000000')
+      interlay: new BN('0'),
+      acala: new BN('1000000000')
     } },
   IBCT: { name: 'IBCT',
     symbol: 'IBCT',
     decimals: 8,
     ed: {
-      interlay: new FN('0'),
-      acala: new FN('0')
+      interlay: new BN('0'),
+      acala: new BN('0')
     } }
 };
 
@@ -22,14 +24,14 @@ export const kintsugiTokensConfig: Record<string, MultiChainToken> = {
     symbol: 'KINT',
     decimals: 12,
     ed: {
-      kintsugi: new FN('0'),
-      karura: new FN('0')
+      kintsugi: new BN('0'),
+      karura: new BN('0')
     } },
   KBTC: { name: 'KBTC',
     symbol: 'KBTC',
     decimals: 8,
     ed: {
-      kintsugi: new FN('0'),
-      karura: new FN('0')
+      kintsugi: new BN('0'),
+      karura: new BN('0')
     } }
 };

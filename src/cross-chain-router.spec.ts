@@ -97,4 +97,18 @@ describe.skip('cross-chain-router-manager', () => {
   beforeAll(async () => {
     await initSDK();
   });
+
+  // test('get routers config should be ok', async () => {
+
+  //   manager = new BridgeRouterManager();
+
+  //   manager.addRouters(
+  //     routersConfig.karura.map(e => ({...e, from: 'karura'})),
+  //     false
+  //   );
+
+  //   const routers = manager.getRouters();
+  //   console.log(routers[0].xcm?.weightLimit?.toString());
+  //   expect(routers[0].xcm?.fee.token).toEqual('KSM');
+  // });
 });

@@ -1,11 +1,13 @@
-import { FN, MultiChainToken } from '../../types';
+import { BN } from '@polkadot/util';
+
+import { MultiChainToken } from '../../types';
 
 export const shadowTokensConfig: Record<string, MultiChainToken> = {
   CSM: { name: 'CSM',
     symbol: 'CSM',
     decimals: 12,
     ed: {
-      shadow: new FN('1000000000000'),
-      karura: new FN('1000000000000')
+      shadow: new BN('1000000000000'),
+      karura: new BN('1000000000000')
     } }
 };

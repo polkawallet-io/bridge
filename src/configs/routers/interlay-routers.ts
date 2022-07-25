@@ -1,11 +1,13 @@
+import { BN } from '@polkadot/util';
+
 import { CrossChainRouterConfigs, FN } from '../../types';
 
 export const interlayRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'from'>[]> = {
   kintsugi: [
-    { to: 'karura', token: 'KINT', xcm: { fee: { token: 'DOT', balance: new FN('170666666') }, weightLimit: new FN(5_000_000_000) } }
+    { to: 'karura', token: 'KINT', xcm: { fee: { token: 'KINT', balance: FN.fromInner('170666666', 12) }, weightLimit: new BN(5_000_000_000) } }
   ],
   interlay: [
-    { to: 'karura', token: 'INTR', xcm: { fee: { token: 'DOT', balance: new FN('93240000') }, weightLimit: new FN(5_000_000_000) } }
+    { to: 'karura', token: 'INTR', xcm: { fee: { token: 'INTR', balance: FN.fromInner('93240000', 10) }, weightLimit: new BN(5_000_000_000) } }
   ]
   // kintsugi: {
   //   KINT: { fee: '170666666', existentialDeposit: '0', decimals: 12 },

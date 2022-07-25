@@ -2,6 +2,7 @@ import { AnyApi } from '@acala-network/sdk-core';
 import { of } from 'rxjs';
 
 import { Observable } from '@polkadot/types/types';
+import { BN, BN_ZERO } from '@polkadot/util';
 
 import { multiChainTokensConfig } from './configs/tokens';
 import { ChainName } from './configs';
@@ -31,21 +32,23 @@ export abstract class BalanceAdapter {
       return of(this.ed);
     }
 
+    const decimals = this.getTokenDecimals(token);
+
     const tokenConfig = multiChainTokensConfig[token];
 
     if (!tokenConfig) {
       throw new TokenConfigNotFound(token);
     }
 
-    if (tokenConfig.ed instanceof FN) {
-      return of(tokenConfig.ed);
+    if (tokenConfig.ed instanceof BN) {
+      return of(FN.fromInner(tokenConfig.ed.toString(), decimals));
     }
 
     if (tokenConfig.ed[this.chain] === undefined) {
       throw new TokenConfigItemNotFound(token, 'ed', this.chain);
     }
 
-    return of(tokenConfig.ed[this.chain] || FN.ZERO);
+    return of(FN.fromInner((tokenConfig.ed[this.chain] || BN_ZERO).toString(), decimals));
   }
 
   public getTokenDecimals (token?: string): number {

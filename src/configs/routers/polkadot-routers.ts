@@ -1,11 +1,13 @@
+import { BN } from '@polkadot/util';
+
 import { CrossChainRouterConfigs, FN } from '../../types';
 
 export const polkadotRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'from'>[]> = {
   polkadot: [
-    { to: 'acala', token: 'DOT', xcm: { fee: { token: 'DOT', balance: new FN('4285630') }, weightLimit: new FN(5_000_000_000) } }
+    { to: 'acala', token: 'DOT', xcm: { fee: { token: 'DOT', balance: FN.fromInner('4285630', 10) }, weightLimit: new BN(5_000_000_000) } }
   ],
   kusama: [
-    { to: 'karura', token: 'KSM', xcm: { fee: { token: 'DOT', balance: new FN('64000000') }, weightLimit: new FN(5_000_000_000) } }
+    { to: 'karura', token: 'KSM', xcm: { fee: { token: 'KSM', balance: FN.fromInner('64000000', 12) }, weightLimit: new BN(5_000_000_000) } }
   ]
   // polkadot: {
   //   DOT: { fee: '482771104', existentialDeposit: '10000000000', decimals: 10 }
@@ -17,8 +19,8 @@ export const polkadotRoutersConfig: Record<string, Omit<CrossChainRouterConfigs,
 
 export const statemineRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'from'>[]> = {
   statemine: [
-    { to: 'kusama', token: 'KSM', xcm: { fee: { token: 'DOT', balance: new FN('64000000') }, weightLimit: new FN(5_000_000_000) } },
-    { to: 'karura', token: 'RMRK', xcm: { fee: { token: 'DOT', balance: new FN('64000000') }, weightLimit: new FN(5_000_000_000) } }
+    { to: 'kusama', token: 'KSM', xcm: { fee: { token: 'KSM', balance: FN.fromInner('64000000', 12) }, weightLimit: new BN(5_000_000_000) } },
+    { to: 'karura', token: 'RMRK', xcm: { fee: { token: 'KSM', balance: FN.fromInner('64000000', 12) }, weightLimit: new BN(5_000_000_000) } }
   ]
   // statemine: {
   //   KSM: { fee: '4000000000', existentialDeposit: '33333333', decimals: 12 },

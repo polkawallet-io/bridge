@@ -1,8 +1,10 @@
+import { BN } from '@polkadot/util';
+
 import { CrossChainRouterConfigs, FN } from '../../types';
 
 export const bifrostRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'from'>[]> = {
   bifrost: [
-    { to: 'karura', token: 'BNC', xcm: { fee: { token: 'DOT', balance: new FN('5120000000') }, weightLimit: new FN(5_000_000_000) } }
+    { to: 'karura', token: 'BNC', xcm: { fee: { token: 'BNC', balance: FN.fromInner('5120000000', 12) }, weightLimit: new BN(5_000_000_000) } }
   ]
   // bifrost: {
   //   KAR: { fee: '4800000000', existentialDeposit: '148000000', decimals: 12 },

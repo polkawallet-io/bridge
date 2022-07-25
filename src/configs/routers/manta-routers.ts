@@ -1,8 +1,10 @@
+import { BN } from '@polkadot/util';
+
 import { CrossChainRouterConfigs, FN } from '../../types';
 
 export const mantaRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'from'>[]> = {
   calamari: [
-    { to: 'karura', token: 'KMA', xcm: { fee: { token: 'DOT', balance: new FN('6400000000') }, weightLimit: new FN(5_000_000_000) } }
+    { to: 'karura', token: 'KMA', xcm: { fee: { token: 'KMA', balance: FN.fromInner('6400000000', 12) }, weightLimit: new BN(5_000_000_000) } }
   ]
   // calamari: {
   //   KMA: { fee: '4000000', existentialDeposit: '100000000000', decimals: 12 },

@@ -1,5 +1,7 @@
 import { FixedPointNumber } from '@acala-network/sdk-core';
 
+import { BN } from '@polkadot/util';
+
 import { BaseCrossChainAdapter } from './base-chain-adapter';
 import { ChainName } from './configs';
 
@@ -30,7 +32,7 @@ export interface MultiChainToken {
   // decimals configs in multiple chain, the decimals are same in different chains in most times.
   decimals: number | Partial<{ [k in ChainName]: number}>;
   // existential deposit configs in multiple chain, the ED are same in different chains in most times.
-  ed: FixedPointNumber | Partial<{ [k in ChainName]: FixedPointNumber }>
+  ed: BN | Partial<{ [k in ChainName]: BN }>
 }
 
 export interface CrossChainRouterConfigs {
@@ -57,7 +59,7 @@ export interface CrossChainRouter {
 
 export interface XCMTransferConfigs {
   // XCM transfer weight limit
-  weightLimit: FixedPointNumber | 'Unlimit';
+  weightLimit: BN | 'Unlimit';
   // XCM transfer fee charged by `to chain`
   fee: TokenBalance;
 }
