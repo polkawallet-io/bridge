@@ -141,7 +141,7 @@ export abstract class BaseCrossChainAdapter {
     return router.xcm?.weightLimit;
   }
 
-  protected estimateTxFee (params: CrossChainTransferParams) {
+  public estimateTxFee (params: CrossChainTransferParams) {
     let tx = this.createTx({ ...params });
 
     if (this.api?.type === 'rxjs') {
