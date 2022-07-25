@@ -31,8 +31,6 @@ describe('acala-adapter should work', () => {
     });
 
     expect(bridge.router.getDestiantionsChains({ from: chains.karura, token: 'KSM' }).length).toEqual(1);
-    expect(bridge.router.getDestiantionsChains({ from: chains.karura, token: 'KAR' }).length).toEqual(2);
-    expect(bridge.router.getDestiantionsChains({ from: chains.karura, token: 'KUSD' }).length).toEqual(2);
 
     const adapter = bridge.findAdapter(fromChain);
 
@@ -77,7 +75,7 @@ describe('acala-adapter should work', () => {
     }
 
     await runMyTestSuit('statemine', 'RMRK');
-    // await runMyTestSuit("kusama", "KSM");
+    await runMyTestSuit("kusama", "KSM");
     // await runMyTestSuit("bifrost", "KAR");
     // await runMyTestSuit("bifrost", "KUSD");
     // await runMyTestSuit("khala", "KAR");

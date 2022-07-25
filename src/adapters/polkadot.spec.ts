@@ -63,8 +63,8 @@ describe('polkadot-adapter should work', () => {
       });
 
       expect(tx.method.section).toEqual('xcmPallet');
-      expect(tx.method.method).toEqual('limitedReserveTransferAssets');
-      expect(tx.args.length).toEqual(5);
+      expect(tx.method.method).toEqual('reserveTransferAssets');
+      expect(tx.args.length).toEqual(4);
     }
   });
 });

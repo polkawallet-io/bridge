@@ -22,7 +22,7 @@ export const acalaRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'f
 export const karuraRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'from'>[]> = {
   karura: [
     { to: 'kusama', token: 'KSM', xcm: { fee: { token: 'KSM', balance: new FN('79999999') }, weightLimit: new FN(5_000_000_000) } },
-    { to: 'statemine', token: 'KSM', xcm: { fee: { token: 'KSM', balance: new FN('79999999') }, weightLimit: new FN(5_000_000_000) } }
+    { to: 'statemine', token: 'RMRK', xcm: { fee: { token: 'KSM', balance: new FN('16000000000') }, weightLimit: new FN(5_000_000_000) } }
   ]
   // {
   // common
