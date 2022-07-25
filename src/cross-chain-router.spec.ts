@@ -8,7 +8,7 @@ import { isChainEqual } from './utils/is-chain-equal';
 import { chains } from './configs';
 import { BridgeRouterManager } from './cross-chain-router';
 
-describe('cross-chain-router-manager', () => {
+describe.skip('cross-chain-router-manager', () => {
   let manager: BridgeRouterManager;
   let api: ApiPromise;
   let wallet: Wallet;

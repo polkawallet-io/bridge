@@ -6,7 +6,7 @@ import { chains, ChainName } from '../configs';
 import { Bridge } from '..';
 import { KusamaAdapter } from './polkadot';
 
-describe('polkadot-adapter should work', () => {
+describe.skip('polkadot-adapter should work', () => {
   jest.setTimeout(30000);
 
   const testAccount = '5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN';
