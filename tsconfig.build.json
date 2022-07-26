@@ -1,0 +1,14 @@
+{
+  "extends": "@polkadot/dev/config/tsconfig.json",
+  "exclude": ["build/**/*", "**/build/**/*"],
+  "compilerOptions": {
+    "target": "es2019",
+    "module": "CommonJS",
+    "baseUrl": ".",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "emitDeclarationOnly": false,
+    "outDir": "build",
+    "typeRoots": ["./node_modules/@polkadot/ts", "./node_modules/@types"]
+  }
+}

@@ -1,21 +1,22 @@
-import { RegisteredChainName } from "./configs";
-import { ApiProvider } from "./api-provider";
-import { firstValueFrom } from "rxjs";
+import { firstValueFrom } from 'rxjs';
 
-describe("api-provider", () => {
+import { ApiProvider } from './api-provider';
+import { ChainName } from './configs';
+
+describe.skip('api-provider', () => {
   jest.setTimeout(30000);
 
   const provider = new ApiProvider();
 
-  test("connectFromChain should be ok", async () => {
-    const chains: RegisteredChainName[] = ["kusama", "karura", "polkadot", "acala"];
+  test('connectFromChain should be ok', async () => {
+    const chains: ChainName[] = ['kusama', 'karura', 'polkadot', 'acala'];
 
     expect(provider.getApi(chains[0])).toEqual(undefined);
     expect(provider.getApi(chains[1])).toEqual(undefined);
 
     const res = await firstValueFrom(
       provider.connectFromChain(chains, {
-        karura: ["wss://karura.polkawallet.io"],
+        karura: ['wss://karura.polkawallet.io']
       })
     );
 
