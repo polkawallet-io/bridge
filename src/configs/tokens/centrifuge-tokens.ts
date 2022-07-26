@@ -8,6 +8,6 @@ export const altairTokensConfig: Record<string, MultiChainToken> = {
     decimals: 18,
     ed: {
       altair: new BN('1000000000000'),
-      karura: new BN('1000000000000')
+      karura: new BN('100000000000000000')
     } }
 };

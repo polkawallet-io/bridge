@@ -49,13 +49,13 @@ export abstract class BaseCrossChainAdapter {
   }
 
   public subscribeInputConfigs (params: Omit<CrossChainTransferParams, 'amount'>): Observable<CrossChainInputConfigs> {
-    const { address, to, token } = params;
+    const { signer, to, token } = params;
 
     const destFee = this.getCrossChainFee(token, to);
 
     // subscribe destination min receive
     const minInput$ = this.subscribeMinInput(token, to);
-    const maxInput$ = this.subscribeMaxInput(token, address, to);
+    const maxInput$ = this.subscribeMaxInput(token, signer, to);
     const estimateFee$ = this.estimateTxFee({ ...params, amount: new FN('10000000000') });
 
     return combineLatest({
@@ -76,7 +76,9 @@ export abstract class BaseCrossChainAdapter {
   }
 
   public subscribeMinInput (token: string, to: ChainName): Observable<FN> {
-    return of(this.getDestED(token, to).balance.add(this.getCrossChainFee(token, to).balance || FN.ZERO));
+    const destED = this.getDestED(token, to);
+
+    return of((destED.token === token ? destED.balance : FN.ZERO).add(this.getCrossChainFee(token, to).balance || FN.ZERO));
   }
 
   public getTokenDecimals (token: string, destChain: ChainName): number {
@@ -131,7 +133,7 @@ export abstract class BaseCrossChainAdapter {
     return router.xcm?.fee || { token, balance: new FN(0) };
   }
 
-  public getDestWeight (token: string, destChain: ChainName): BN | 'Unlimit' | undefined {
+  public getDestWeight (token: string, destChain: ChainName): BN | 'Unlimited' | 'Limited' | undefined {
     const router = this.routers.find((e) => e.to === destChain && e.token === token);
 
     if (!router) {

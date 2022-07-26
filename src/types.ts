@@ -59,7 +59,7 @@ export interface CrossChainRouter {
 
 export interface XCMTransferConfigs {
   // XCM transfer weight limit
-  weightLimit: BN | 'Unlimit';
+  weightLimit: BN | 'Unlimited' | 'Limited';
   // XCM transfer fee charged by `to chain`
   fee: TokenBalance;
 }

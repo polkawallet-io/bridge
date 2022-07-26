@@ -4,13 +4,10 @@ import { CrossChainRouterConfigs, FN } from '../../types';
 
 export const mantaRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'from'>[]> = {
   calamari: [
-    { to: 'karura', token: 'KMA', xcm: { fee: { token: 'KMA', balance: FN.fromInner('6400000000', 12) }, weightLimit: new BN(5_000_000_000) } }
+    { to: 'karura', token: 'KMA', xcm: { fee: { token: 'KMA', balance: FN.fromInner('6400000000', 12) }, weightLimit: new BN(5_000_000_000) } },
+    { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', balance: FN.fromInner('6381112603', 12) }, weightLimit: new BN(5_000_000_000) } },
+    { to: 'karura', token: 'KAR', xcm: { fee: { token: 'KAR', balance: FN.fromInner('6400000000', 12) }, weightLimit: new BN(5_000_000_000) } },
+    { to: 'karura', token: 'LKSM', xcm: { fee: { token: 'LKSM', balance: FN.fromInner('452334406', 12) }, weightLimit: new BN(5_000_000_000) } },
+    { to: 'karura', token: 'KSM', xcm: { fee: { token: 'KSM', balance: FN.fromInner('54632622', 12) }, weightLimit: new BN(5_000_000_000) } }
   ]
-  // calamari: {
-  //   KMA: { fee: '4000000', existentialDeposit: '100000000000', decimals: 12 },
-  //   KUSD: { fee: '100000000000', existentialDeposit: '10000000000', decimals: 12 },
-  //   KAR: { fee: '100000000000', existentialDeposit: '100000000000', decimals: 12 },
-  //   LKSM: { fee: '7692307692', existentialDeposit: '500000000', decimals: 12 },
-  //   KSM: { fee: '666666666', existentialDeposit: '100000000', decimals: 12 }
-  // }
 };

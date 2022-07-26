@@ -8,7 +8,7 @@ export const bifrostTokensConfig: Record<string, MultiChainToken> = {
     decimals: 12,
     ed: {
       bifrost: new BN('10000000000'),
-      karura: new BN('10000000000')
+      karura: new BN('8000000000')
     } },
   VSKSM: { name: 'VSKSM',
     symbol: 'VSKSM',

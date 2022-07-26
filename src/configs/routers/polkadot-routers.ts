@@ -1,31 +1,21 @@
-import { BN } from '@polkadot/util';
 
 import { CrossChainRouterConfigs, FN } from '../../types';
 
 export const polkadotRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'from'>[]> = {
   polkadot: [
-    { to: 'acala', token: 'DOT', xcm: { fee: { token: 'DOT', balance: FN.fromInner('4285630', 10) }, weightLimit: new BN(5_000_000_000) } }
+    { to: 'acala', token: 'DOT', xcm: { fee: { token: 'DOT', balance: FN.fromInner('4285630', 10) }, weightLimit: 'Unlimited' } }
   ],
   kusama: [
-    { to: 'karura', token: 'KSM', xcm: { fee: { token: 'KSM', balance: FN.fromInner('64000000', 12) }, weightLimit: new BN(5_000_000_000) } }
+    { to: 'karura', token: 'KSM', xcm: { fee: { token: 'KSM', balance: FN.fromInner('64000000', 12) }, weightLimit: 'Unlimited' } },
+    { to: 'statemine', token: 'KSM', xcm: { fee: { token: 'KSM', balance: FN.fromInner('4000000000', 12) }, weightLimit: 'Unlimited' } }
   ]
-  // polkadot: {
-  //   DOT: { fee: '482771104', existentialDeposit: '10000000000', decimals: 10 }
-  // },
-  // kusama: {
-  //   KSM: { fee: '79999999', existentialDeposit: '33333333', decimals: 12 }
-  // }
 };
 
 export const statemineRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'from'>[]> = {
   statemine: [
-    { to: 'kusama', token: 'KSM', xcm: { fee: { token: 'KSM', balance: FN.fromInner('64000000', 12) }, weightLimit: new BN(5_000_000_000) } },
-    { to: 'karura', token: 'RMRK', xcm: { fee: { token: 'KSM', balance: FN.fromInner('64000000', 12) }, weightLimit: new BN(5_000_000_000) } }
+    { to: 'kusama', token: 'KSM', xcm: { fee: { token: 'KSM', balance: FN.fromInner('106666660', 12) }, weightLimit: 'Unlimited' } },
+    { to: 'karura', token: 'RMRK', xcm: { fee: { token: 'RMRK', balance: FN.fromInner('6400000', 10) }, weightLimit: 'Unlimited' } },
+    { to: 'karura', token: 'ARIS', xcm: { fee: { token: 'ARIS', balance: FN.fromInner('6400000', 8) }, weightLimit: 'Unlimited' } },
+    { to: 'karura', token: 'USDT', xcm: { fee: { token: 'USDT', balance: FN.fromInner('640', 8) }, weightLimit: 'Unlimited' } }
   ]
-  // statemine: {
-  //   KSM: { fee: '4000000000', existentialDeposit: '33333333', decimals: 12 },
-  //   RMRK: { fee: '16000000000', existentialDeposit: '100000000', decimals: 10 },
-  //   USDT: { fee: '16000000000', existentialDeposit: '1000', decimals: 8 },
-  //   ARIS: { fee: '16000000000', existentialDeposit: '10000000', decimals: 8 }
-  // }
 };

@@ -9,6 +9,7 @@ export const polkadotTokensConfig: Record<string, MultiChainToken> = {
     decimals: 12,
     ed: {
       kusama: new BN('79999999'),
+      statemine: new BN('79999999'),
       karura: new BN('100000000'),
       bifrost: new BN('100000000'),
       calamari: new BN('100000000')

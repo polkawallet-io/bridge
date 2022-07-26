@@ -2,72 +2,66 @@ import { BN } from '@polkadot/util';
 
 import { CrossChainRouterConfigs, FN } from '../../types';
 
+const ACALA_DEST_WEIGHT = new BN(5_000_000_000);
+
 export const acalaRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'from'>[]> = {
   acala: [
-    { to: 'polkadot', token: 'DOT', xcm: { fee: { token: 'DOT', balance: FN.fromInner('482771104', 10) }, weightLimit: new BN(5_000_000_000) } }
+    { to: 'polkadot', token: 'DOT', xcm: { fee: { token: 'DOT', balance: FN.fromInner('482771104', 10) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'moonbeam', token: 'GLMR', xcm: { fee: { token: 'GLMR', balance: FN.fromInner('8000000000000000', 18) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'moonbeam', token: 'ACA', xcm: { fee: { token: 'ACA', balance: FN.fromInner('24963428577', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'moonbeam', token: 'AUSD', xcm: { fee: { token: 'AUSD', balance: FN.fromInner('2000000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'parallel', token: 'PARA', xcm: { fee: { token: 'PARA', balance: FN.fromInner('9600000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'parallel', token: 'ACA', xcm: { fee: { token: 'ACA', balance: FN.fromInner('1920000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'parallel', token: 'AUSD', xcm: { fee: { token: 'AUSD', balance: FN.fromInner('2880000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'parallel', token: 'LDOT', xcm: { fee: { token: 'LDOT', balance: FN.fromInner('96000000', 10) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'interlay', token: 'INTR', xcm: { fee: { token: 'INTR', balance: FN.fromInner('21787589', 10) }, weightLimit: ACALA_DEST_WEIGHT } }
   ]
-  // {
-  // // common
-  // DOT: { fee: '4285630', existentialDeposit: '1000000000', decimals: 10 },
-  // ACA: { fee: '6400000000', existentialDeposit: '100000000000', decimals: 12 },
-  // AUSD: { fee: '3721109059', existentialDeposit: '100000000000', decimals: 12 },
-  // LDOT: { fee: '24037893', existentialDeposit: '500000000', decimals: 10 },
-  // // parallel
-  // PARA: { fee: '6400000000', existentialDeposit: '100000000000', decimals: 12 },
-  // // moonbeam
-  // GLMR: { fee: '6400000000000000', existentialDeposit: '100000000000000000', decimals: 18 },
-  // // interlay
-  // INTR: { fee: '93240000', existentialDeposit: '1000000000', decimals: 10 }
-  // }
 };
 
 export const karuraRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'from'>[]> = {
   karura: [
-    { to: 'kusama', token: 'KSM', xcm: { fee: { token: 'KSM', balance: FN.fromInner('79999999', 12) }, weightLimit: new BN(5_000_000_000) } },
-    { to: 'statemine', token: 'RMRK', xcm: { fee: { token: 'KSM', balance: FN.fromInner('16000000000', 12) }, weightLimit: new BN(5_000_000_000) } }
+    { to: 'kusama', token: 'KSM', xcm: { fee: { token: 'KSM', balance: FN.fromInner('79999999', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'statemine', token: 'RMRK', xcm: { fee: { token: 'KSM', balance: FN.fromInner('16000000000', 10) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'statemine', token: 'ARIS', xcm: { fee: { token: 'KSM', balance: FN.fromInner('16000000000', 8) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'statemine', token: 'USDT', xcm: { fee: { token: 'KSM', balance: FN.fromInner('16000000000', 8) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'shiden', token: 'SDN', xcm: { fee: { token: 'SDN', balance: FN.fromInner('4662276356431024', 18) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'shiden', token: 'KUSD', xcm: { fee: { token: 'KUSD', balance: FN.fromInner('1200000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'bifrost', token: 'BNC', xcm: { fee: { token: 'BNC', balance: FN.fromInner('5120000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'bifrost', token: 'KAR', xcm: { fee: { token: 'KAR', balance: FN.fromInner('4800000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'bifrost', token: 'KUSD', xcm: { fee: { token: 'KUSD', balance: FN.fromInner('25600000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'bifrost', token: 'VSKSM', xcm: { fee: { token: 'VSKSM', balance: FN.fromInner('64000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'altair', token: 'AIR', xcm: { fee: { token: 'AIR', balance: FN.fromInner('6400000000000000', 18) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'altair', token: 'KUSD', xcm: { fee: { token: 'KUSD', balance: FN.fromInner('51200000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'shadow', token: 'CSM', xcm: { fee: { token: 'CSM', balance: FN.fromInner('4000000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'crab', token: 'CRAB', xcm: { fee: { token: 'CRAB', balance: FN.fromInner('4000000000', 18) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'integritee', token: 'TEER', xcm: { fee: { token: 'TEER', balance: FN.fromInner('4000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'kintsugi', token: 'KINT', xcm: { fee: { token: 'KINT', balance: FN.fromInner('170666666', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'kintsugi', token: 'KBTC', xcm: { fee: { token: 'KBTC', balance: FN.fromInner('85', 8) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'khala', token: 'PHA', xcm: { fee: { token: 'PHA', balance: FN.fromInner('64000000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'khala', token: 'KUSD', xcm: { fee: { token: 'KUSD', balance: FN.fromInner('16000000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'khala', token: 'KAR', xcm: { fee: { token: 'KAR', balance: FN.fromInner('8000000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'kico', token: 'KICO', xcm: { fee: { token: 'KICO', balance: FN.fromInner('96000000000', 14) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'kico', token: 'KAR', xcm: { fee: { token: 'KAR', balance: FN.fromInner('160000000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'kico', token: 'KUSD', xcm: { fee: { token: 'KUSD', balance: FN.fromInner('320000000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'calamari', token: 'KMA', xcm: { fee: { token: 'KMA', balance: FN.fromInner('4000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'calamari', token: 'KUSD', xcm: { fee: { token: 'KUSD', balance: FN.fromInner('100000000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'calamari', token: 'KAR', xcm: { fee: { token: 'KAR', balance: FN.fromInner('100000000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'calamari', token: 'LKSM', xcm: { fee: { token: 'LKSM', balance: FN.fromInner('7692307692', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'moonriver', token: 'MOVR', xcm: { fee: { token: 'MOVR', balance: FN.fromInner('80000000000000', 18) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'moonriver', token: 'KAR', xcm: { fee: { token: 'KAR', balance: FN.fromInner('9880000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'moonriver', token: 'KUSD', xcm: { fee: { token: 'KUSD', balance: FN.fromInner('16536000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'heiko', token: 'HKO', xcm: { fee: { token: 'HKO', balance: FN.fromInner('1440000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'heiko', token: 'KAR', xcm: { fee: { token: 'KAR', balance: FN.fromInner('2400000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'heiko', token: 'KUSD', xcm: { fee: { token: 'KUSD', balance: FN.fromInner('19200000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'heiko', token: 'LKSM', xcm: { fee: { token: 'LKSM', balance: FN.fromInner('48000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'pichiu', token: 'PCHU', xcm: { fee: { token: 'PCHU', balance: FN.fromInner('400000000000000', 18) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'pichiu', token: 'KAR', xcm: { fee: { token: 'KAR', balance: FN.fromInner('400000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'pichiu', token: 'KUSD', xcm: { fee: { token: 'KUSD', balance: FN.fromInner('400000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'pichiu', token: 'LKSM', xcm: { fee: { token: 'LKSM', balance: FN.fromInner('400000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'turing', token: 'TUR', xcm: { fee: { token: 'TUR', balance: FN.fromInner('1664000000', 10) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'turing', token: 'KAR', xcm: { fee: { token: 'KAR', balance: FN.fromInner('32000000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'turing', token: 'KUSD', xcm: { fee: { token: 'KUSD', balance: FN.fromInner('256000000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'turing', token: 'LKSM', xcm: { fee: { token: 'LKSM', balance: FN.fromInner('6400000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'quartz', token: 'QTZ', xcm: { fee: { token: 'QTZ', balance: FN.fromInner('0', 18) }, weightLimit: ACALA_DEST_WEIGHT } }
   ]
-  // {
-  // common
-  // KSM: { fee: '64000000', existentialDeposit: '100000000', decimals: 12 },
-  // KAR: { fee: '6400000000', existentialDeposit: '100000000000', decimals: 12 },
-  // KUSD: { fee: '10011896008', existentialDeposit: '10000000000', decimals: 12 },
-  // AUSD: { fee: '10011896008', existentialDeposit: '10000000000', decimals: 12 },
-  // LKSM: { fee: '589618748', existentialDeposit: '500000000', decimals: 12 },
-  // // bifrost
-  // BNC: { fee: '5120000000', existentialDeposit: '10000000000', decimals: 12 },
-  // VSKSM: { fee: '64000000', existentialDeposit: '100000000', decimals: 12 },
-  // // statemine
-  // RMRK: { fee: '6400000', existentialDeposit: '100000000', decimals: 10 },
-  // USDT: { fee: '64', existentialDeposit: '1000', decimals: 8 },
-  // ARIS: { fee: '6400000', existentialDeposit: '1000000000000', decimals: 8 },
-  // // quartz
-  // QTZ: { fee: '64000000000000000', existentialDeposit: '1000000000000000000', decimals: 18 },
-  // // kintsugi
-  // KINT: { fee: '170666666', existentialDeposit: '0', decimals: 12 },
-  // KBTC: { fee: '85', existentialDeposit: '0', decimals: 8 },
-  // // parallel heiko
-  // HKO: { fee: '6400000000', existentialDeposit: '100000000000', decimals: 12 },
-  // // khala
-  // PHA: { fee: '51200000000', existentialDeposit: '40000000000', decimals: 12 },
-  // // moonriver
-  // MOVR: { fee: '0', existentialDeposit: '1000000000000000', decimals: 18 },
-  // // kiko
-  // KICO: { fee: '6400000000000', existentialDeposit: '100000000000000', decimals: 14 },
-  // // crust shadow
-  // CSM: { fee: '64000000000', existentialDeposit: '1000000000000', decimals: 12 },
-  // // calamari
-  // KMA: { fee: '6400000000', existentialDeposit: '100000000000', decimals: 12 },
-  // // integritee
-  // TEER: { fee: '6400000000', existentialDeposit: '100000000000', decimals: 12 },
-  // // altair
-  // AIR: { fee: '6400000000000000', existentialDeposit: '1000000000000', decimals: 18 },
-  // // shiden
-  // SDN: { fee: '932400000000000', existentialDeposit: '10000000000000000', decimals: 18 },
-  // // pichiu
-  // PCHU: { fee: '9324000000000000', existentialDeposit: '100000000000000000', decimals: 18 },
-  // // crab
-  // CRAB: { fee: '64000000000000000', existentialDeposit: '1000000000000000000', decimals: 18 },
-  // // turing
-  // TUR: { fee: '2560000000', existentialDeposit: '40000000000', decimals: 10 }
-  // }
 };

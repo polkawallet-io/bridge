@@ -11,7 +11,6 @@ import { interlayRoutersConfig } from './interlay-routers';
 import { khalaRoutersConfig } from './khala-routers';
 import { kicoRoutersConfig } from './kico-routers';
 import { mantaRoutersConfig } from './manta-routers';
-import { moonbeamRoutersConfig } from './moonbeam-routers';
 import { parallelRoutersConfig } from './parallel-routers';
 import { pichiuRoutersConfig } from './pichiu-routers';
 import { polkadotRoutersConfig, statemineRoutersConfig } from './polkadot-routers';
@@ -28,7 +27,6 @@ export const routersConfig = {
   ...interlayRoutersConfig,
   ...khalaRoutersConfig,
   ...kicoRoutersConfig,
-  ...moonbeamRoutersConfig,
   ...parallelRoutersConfig,
   ...centrifugeRoutersConfig,
   ...darwiniaRoutersConfig,

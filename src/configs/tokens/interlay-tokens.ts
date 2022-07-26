@@ -15,7 +15,7 @@ export const interlayTokensConfig: Record<string, MultiChainToken> = {
     decimals: 8,
     ed: {
       interlay: new BN('0'),
-      acala: new BN('0')
+      acala: new BN('100')
     } }
 };
 
@@ -25,13 +25,13 @@ export const kintsugiTokensConfig: Record<string, MultiChainToken> = {
     decimals: 12,
     ed: {
       kintsugi: new BN('0'),
-      karura: new BN('0')
+      karura: new BN('133330000')
     } },
   KBTC: { name: 'KBTC',
     symbol: 'KBTC',
     decimals: 8,
     ed: {
       kintsugi: new BN('0'),
-      karura: new BN('0')
+      karura: new BN('66')
     } }
 };
