@@ -2,7 +2,7 @@ import { BN } from '@polkadot/util';
 
 import { CrossChainRouterConfigs, FN } from '../../types';
 
-export const khalaRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'from'>[]> = {
+export const phalaRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'from'>[]> = {
   khala: [
     { to: 'karura', token: 'PHA', xcm: { fee: { token: 'PHA', balance: FN.fromInner('51200000000', 12) }, weightLimit: new BN(5_000_000_000) } },
     { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', balance: FN.fromInner('4616667257', 12) }, weightLimit: new BN(5_000_000_000) } },

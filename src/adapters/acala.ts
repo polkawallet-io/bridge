@@ -31,13 +31,19 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
 
   public override subscribeMinInput (token: string, to: ChainName): Observable<FixedPointNumber> {
     if (!this.wallet) {
-      return new Observable((sub) => sub.next(FixedPointNumber.ZERO));
+      throw new ApiNotFound(this.chain.id);
     }
 
-    return of(this.getDestED(token, to).balance.add(this.getCrossChainFee(token, to)?.balance || FixedPointNumber.ZERO));
+    const destFee = this.getCrossChainFee(token, to);
+
+    return of(this.getDestED(token, to).balance.add(destFee.token === token ? destFee.balance : FixedPointNumber.ZERO));
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
+    if (!this.wallet) {
+      throw new ApiNotFound(this.chain.id);
+    }
+
     const zeroResult: Observable<BalanceData> = new Observable((sub) =>
       sub.next({
         free: FixedPointNumber.ZERO,
@@ -47,16 +53,12 @@ export class BaseAcalaAdapter extends BaseCrossChainAdapter {
       })
     );
 
-    if (!this.wallet) {
-      return zeroResult;
-    }
-
     return this.wallet.subscribeBalance(token, address).pipe(catchError((_) => zeroResult));
   }
 
   public subscribeMaxInput (token: string, address: string, to: ChainName): Observable<FixedPointNumber> {
     if (!this.wallet) {
-      return new Observable((sub) => sub.next(FixedPointNumber.ZERO));
+      throw new ApiNotFound(this.chain.id);
     }
 
     const tokens = this.wallet.getPresetTokens();

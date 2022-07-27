@@ -3,7 +3,7 @@ import { CrossChainRouterConfigs, FN } from '../../types';
 
 export const polkadotRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'from'>[]> = {
   polkadot: [
-    { to: 'acala', token: 'DOT', xcm: { fee: { token: 'DOT', balance: FN.fromInner('4285630', 10) }, weightLimit: 'Unlimited' } }
+    { to: 'acala', token: 'DOT', xcm: { fee: { token: 'DOT', balance: FN.fromInner('3549633', 10) }, weightLimit: 'Unlimited' } }
   ],
   kusama: [
     { to: 'karura', token: 'KSM', xcm: { fee: { token: 'KSM', balance: FN.fromInner('64000000', 12) }, weightLimit: 'Unlimited' } },

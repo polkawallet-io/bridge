@@ -3,7 +3,7 @@ import { BN } from '@polkadot/util';
 import { MultiChainToken } from '../../types';
 
 export const polkadotTokensConfig: Record<string, MultiChainToken> = {
-  DOT: { name: 'DOT', symbol: 'DOT', decimals: 10, ed: { polkadot: new BN('10000000000'), acala: new BN('1000000000') } },
+  DOT: { name: 'DOT', symbol: 'DOT', decimals: 10, ed: { polkadot: new BN('10000000000'), acala: new BN('100000000') } },
   KSM: { name: 'KSM',
     symbol: 'KSM',
     decimals: 12,

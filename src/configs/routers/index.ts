@@ -8,13 +8,13 @@ import { crustRoutersConfig } from './crust-routers';
 import { darwiniaRoutersConfig } from './darwinia-routers';
 import { integriteeRoutersConfig } from './integritee-routers';
 import { interlayRoutersConfig } from './interlay-routers';
-import { khalaRoutersConfig } from './khala-routers';
 import { kicoRoutersConfig } from './kico-routers';
+import { kylinRoutersConfig } from './kylin-routers';
 import { mantaRoutersConfig } from './manta-routers';
+import { oakRoutersConfig } from './oak-routers';
 import { parallelRoutersConfig } from './parallel-routers';
-import { pichiuRoutersConfig } from './pichiu-routers';
+import { phalaRoutersConfig } from './phala-routers';
 import { polkadotRoutersConfig, statemineRoutersConfig } from './polkadot-routers';
-import { turingRoutersConfig } from './turing-routers';
 import { uniqueRoutersConfig } from './unique-routers';
 
 export const routersConfig = {
@@ -25,7 +25,7 @@ export const routersConfig = {
   ...bifrostRoutersConfig,
   ...uniqueRoutersConfig,
   ...interlayRoutersConfig,
-  ...khalaRoutersConfig,
+  ...phalaRoutersConfig,
   ...kicoRoutersConfig,
   ...parallelRoutersConfig,
   ...centrifugeRoutersConfig,
@@ -33,7 +33,7 @@ export const routersConfig = {
   ...mantaRoutersConfig,
   ...crustRoutersConfig,
   ...integriteeRoutersConfig,
-  ...turingRoutersConfig,
+  ...oakRoutersConfig,
   ...astarRoutersConfig,
-  ...pichiuRoutersConfig
+  ...kylinRoutersConfig
 } as Record<ChainName, Omit<CrossChainRouterConfigs, 'from'>[]>;

@@ -2,7 +2,7 @@ import { BN } from '@polkadot/util';
 
 import { MultiChainToken } from '../../types';
 
-export const turingTokensConfig: Record<string, MultiChainToken> = {
+export const oakTokensConfig: Record<string, MultiChainToken> = {
   TUR: { name: 'TUR',
     symbol: 'TUR',
     decimals: 10,

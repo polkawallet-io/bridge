@@ -6,7 +6,7 @@ const ACALA_DEST_WEIGHT = new BN(5_000_000_000);
 
 export const acalaRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'from'>[]> = {
   acala: [
-    { to: 'polkadot', token: 'DOT', xcm: { fee: { token: 'DOT', balance: FN.fromInner('482771104', 10) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'polkadot', token: 'DOT', xcm: { fee: { token: 'DOT', balance: FN.fromInner('469417452', 10) }, weightLimit: ACALA_DEST_WEIGHT } },
     { to: 'moonbeam', token: 'GLMR', xcm: { fee: { token: 'GLMR', balance: FN.fromInner('8000000000000000', 18) }, weightLimit: ACALA_DEST_WEIGHT } },
     { to: 'moonbeam', token: 'ACA', xcm: { fee: { token: 'ACA', balance: FN.fromInner('24963428577', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
     { to: 'moonbeam', token: 'AUSD', xcm: { fee: { token: 'AUSD', balance: FN.fromInner('2000000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
@@ -21,9 +21,9 @@ export const acalaRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'f
 export const karuraRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'from'>[]> = {
   karura: [
     { to: 'kusama', token: 'KSM', xcm: { fee: { token: 'KSM', balance: FN.fromInner('79999999', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
-    { to: 'statemine', token: 'RMRK', xcm: { fee: { token: 'KSM', balance: FN.fromInner('16000000000', 10) }, weightLimit: ACALA_DEST_WEIGHT } },
-    { to: 'statemine', token: 'ARIS', xcm: { fee: { token: 'KSM', balance: FN.fromInner('16000000000', 8) }, weightLimit: ACALA_DEST_WEIGHT } },
-    { to: 'statemine', token: 'USDT', xcm: { fee: { token: 'KSM', balance: FN.fromInner('16000000000', 8) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'statemine', token: 'RMRK', xcm: { fee: { token: 'KSM', balance: FN.fromInner('16000000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'statemine', token: 'ARIS', xcm: { fee: { token: 'KSM', balance: FN.fromInner('16000000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
+    { to: 'statemine', token: 'USDT', xcm: { fee: { token: 'KSM', balance: FN.fromInner('16000000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
     { to: 'shiden', token: 'SDN', xcm: { fee: { token: 'SDN', balance: FN.fromInner('4662276356431024', 18) }, weightLimit: ACALA_DEST_WEIGHT } },
     { to: 'shiden', token: 'KUSD', xcm: { fee: { token: 'KUSD', balance: FN.fromInner('1200000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },
     { to: 'bifrost', token: 'BNC', xcm: { fee: { token: 'BNC', balance: FN.fromInner('5120000000', 12) }, weightLimit: ACALA_DEST_WEIGHT } },

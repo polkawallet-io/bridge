@@ -76,9 +76,9 @@ export abstract class BaseCrossChainAdapter {
   }
 
   public subscribeMinInput (token: string, to: ChainName): Observable<FN> {
-    const destED = this.getDestED(token, to);
+    const destFee = this.getCrossChainFee(token, to);
 
-    return of((destED.token === token ? destED.balance : FN.ZERO).add(this.getCrossChainFee(token, to).balance || FN.ZERO));
+    return of(this.getDestED(token, to).balance.add(destFee.token === token ? destFee.balance : FN.ZERO));
   }
 
   public getTokenDecimals (token: string, destChain: ChainName): number {
