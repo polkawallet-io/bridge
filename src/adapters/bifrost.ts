@@ -3,7 +3,6 @@ import { AnyApi, FixedPointNumber as FN } from '@acala-network/sdk-core';
 import { combineLatest, map, Observable } from 'rxjs';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
-import { DeriveBalancesAll } from '@polkadot/api-derive/balances/types';
 import { ISubmittableResult } from '@polkadot/types/types';
 
 import { BalanceAdapter } from '../balance-adapter';
@@ -25,9 +24,9 @@ const SUPPORTED_TOKENS: Record<string, unknown> = {
 const createBalanceStorages = (api: AnyApi) => {
   return {
     balances: (address: string) =>
-      Storage.create<DeriveBalancesAll>({
+      Storage.create<any>({
         api,
-        path: 'derive.balances.all',
+        path: 'query.system.account',
         params: [address]
       }),
     assets: (address: string, token: unknown) =>
@@ -57,11 +56,11 @@ class BifrostBalanceAdapter extends BalanceAdapter {
 
     if (token === this.nativeToken) {
       return storage.observable.pipe(
-        map((data) => ({
-          free: FN.fromInner(data.freeBalance.toString(), this.decimals),
-          locked: FN.fromInner(data.lockedBalance.toString(), this.decimals),
-          reserved: FN.fromInner(data.reservedBalance.toString(), this.decimals),
-          available: FN.fromInner(data.availableBalance.toString(), this.decimals)
+        map(({ data }) => ({
+          free: FN.fromInner(data.free.toString(), this.decimals),
+          locked: FN.fromInner(data.miscFrozen.toString(), this.decimals),
+          reserved: FN.fromInner(data.reserved.toString(), this.decimals),
+          available: FN.fromInner(data.free.sub(data.miscFrozen).toString(), this.decimals)
         }))
       );
     }
@@ -100,14 +99,7 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
     if (!this.balanceAdapter) {
-      return new Observable((sub) =>
-        sub.next({
-          free: FN.ZERO,
-          locked: FN.ZERO,
-          available: FN.ZERO,
-          reserved: FN.ZERO
-        })
-      );
+      throw new ApiNotFound(this.chain.id);
     }
 
     return this.balanceAdapter.subscribeBalance(token, address);
@@ -115,7 +107,7 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
 
   public subscribeMaxInput (token: string, address: string, to: ChainName): Observable<FN> {
     if (!this.balanceAdapter) {
-      return new Observable((sub) => sub.next(FN.ZERO));
+      throw new ApiNotFound(this.chain.id);
     }
 
     return combineLatest({

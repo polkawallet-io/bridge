@@ -64,7 +64,7 @@ class AstarBalanceAdapter extends BalanceAdapter {
 
     return this.storages.assets(tokenId, address).observable.pipe(
       map((balance) => {
-        const amount = FN.fromInner(balance.balance?.toString() || '0', this.getTokenDecimals(token));
+        const amount = FN.fromInner(balance.unwrapOrDefault()?.balance?.toString() || '0', this.getTokenDecimals(token));
 
         return {
           free: amount,
@@ -90,14 +90,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
     if (!this.balanceAdapter) {
-      return new Observable((sub) =>
-        sub.next({
-          free: FN.ZERO,
-          locked: FN.ZERO,
-          available: FN.ZERO,
-          reserved: FN.ZERO
-        })
-      );
+      throw new ApiNotFound(this.chain.id);
     }
 
     return this.balanceAdapter.subscribeBalance(token, address);
@@ -105,7 +98,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
 
   public subscribeMaxInput (token: string, address: string, to: ChainName): Observable<FN> {
     if (!this.balanceAdapter) {
-      return new Observable((sub) => sub.next(FN.ZERO));
+      throw new ApiNotFound(this.chain.id);
     }
 
     return combineLatest({

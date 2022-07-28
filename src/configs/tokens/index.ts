@@ -6,14 +6,14 @@ import { shadowTokensConfig } from './crust-tokens';
 import { crabTokensConfig } from './darwinia-tokens';
 import { integriteeTokensConfig } from './integritee-tokens';
 import { interlayTokensConfig, kintsugiTokensConfig } from './interlay-tokens';
-import { khalaTokensConfig } from './khala-tokens';
 import { kicoTokensConfig } from './kico-tokens';
+import { kylinTokensConfig } from './kylin-tokens';
 import { calamariTokensConfig } from './manta-tokens';
 import { moonbeamTokensConfig, moonriverTokensConfig } from './moonbeam-tokens';
+import { oakTokensConfig } from './oak-tokens';
 import { heikoTokensConfig, parallelTokensConfig } from './parallel-tokens';
-import { pichiuTokensConfig } from './pichiu-tokens';
+import { phalaTokensConfig } from './phala-tokens';
 import { polkadotTokensConfig, statemintTokensConfig } from './polkadot-tokens';
-import { turingTokensConfig } from './turing-tokens';
 import { quartzTokensConfig } from './unique-tokens';
 
 export const multiChainTokensConfig = {
@@ -29,14 +29,14 @@ export const multiChainTokensConfig = {
   ...integriteeTokensConfig,
   ...interlayTokensConfig,
   ...kintsugiTokensConfig,
-  ...khalaTokensConfig,
+  ...phalaTokensConfig,
   ...kicoTokensConfig,
   ...calamariTokensConfig,
   ...moonbeamTokensConfig,
   ...moonriverTokensConfig,
   ...parallelTokensConfig,
   ...heikoTokensConfig,
-  ...pichiuTokensConfig,
-  ...turingTokensConfig,
+  ...kylinTokensConfig,
+  ...oakTokensConfig,
   ...quartzTokensConfig
 };

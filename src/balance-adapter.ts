@@ -23,7 +23,7 @@ export abstract class BalanceAdapter {
   constructor ({ api, chain }: BalanceAdapterConfigs) {
     this.chain = chain;
     this.decimals = api.registry.chainDecimals[0];
-    this.ed = FN.fromInner(api.consts.balances.existentialDeposit.toString(), this.decimals);
+    this.ed = FN.fromInner(api.consts.balances?.existentialDeposit?.toString() || '0', this.decimals);
     this.nativeToken = api.registry.chainTokens[0];
   }
 

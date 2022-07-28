@@ -2,7 +2,7 @@ import { BN } from '@polkadot/util';
 
 import { MultiChainToken } from '../../types';
 
-export const pichiuTokensConfig: Record<string, MultiChainToken> = {
+export const kylinTokensConfig: Record<string, MultiChainToken> = {
   PCHU: { name: 'PCHU',
     symbol: 'PCHU',
     decimals: 18,

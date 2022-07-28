@@ -3,62 +3,76 @@ import { AnyApi, FixedPointNumber as FN } from '@acala-network/sdk-core';
 import { combineLatest, map, Observable } from 'rxjs';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
-import { DeriveBalancesAll } from '@polkadot/api-derive/balances/types';
 import { ISubmittableResult } from '@polkadot/types/types';
 
-import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
+import { BalanceAdapter } from '../balance-adapter';
 import { BaseCrossChainAdapter } from '../base-chain-adapter';
 import { ChainName, chains, routersConfig } from '../configs';
 import { ApiNotFound, CurrencyNotFound } from '../errors';
 import { BalanceData, CrossChainTransferParams } from '../types';
 
+const SUPPORTED_TOKENS: Record<string, unknown> = {
+  KINT: { Token: 'KINT' },
+  KBTC: { Token: 'KBTC' },
+  INTR: { Token: 'INTR' }
+};
+
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const createBalanceStorages = (api: AnyApi) => {
   return {
-    balances: (address: string) =>
-      Storage.create<DeriveBalancesAll>({
+    assets: (address: string, token: unknown) =>
+      Storage.create<any>({
         api,
-        path: 'derive.balances.all',
-        params: [address]
+        path: 'query.tokens.accounts',
+        params: [address, token]
       })
   };
 };
 
-class CrustBalanceAdapter extends BalanceAdapter {
+interface InterlayBalanceAdapterConfigs {
+  chain: ChainName;
+  api: AnyApi;
+}
+
+class InterlayBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
-  constructor ({ api, chain }: BalanceAdapterConfigs) {
+  constructor ({ api, chain }: InterlayBalanceAdapterConfigs) {
     super({ api, chain });
     this.storages = createBalanceStorages(api);
   }
 
   public subscribeBalance (token: string, address: string): Observable<BalanceData> {
-    const storage = this.storages.balances(address);
+    const tokenId = SUPPORTED_TOKENS[token];
 
-    if (token !== this.nativeToken) {
+    if (!tokenId) {
       throw new CurrencyNotFound(token);
     }
 
-    return storage.observable.pipe(
-      map((data) => ({
-        free: FN.fromInner(data.freeBalance.toString(), this.decimals),
-        locked: FN.fromInner(data.lockedBalance.toString(), this.decimals),
-        reserved: FN.fromInner(data.reservedBalance.toString(), this.decimals),
-        available: FN.fromInner(data.availableBalance.toString(), this.decimals)
-      }))
+    return this.storages.assets(address, tokenId).observable.pipe(
+      map((balance) => {
+        const amount = FN.fromInner(balance.free?.toString() || '0', this.getTokenDecimals(token));
+
+        return {
+          free: amount,
+          locked: new FN(0),
+          reserved: new FN(0),
+          available: amount
+        };
+      })
     );
   }
 }
 
-class BaseCrustAdapter extends BaseCrossChainAdapter {
-  private balanceAdapter?: CrustBalanceAdapter;
+class BaseInterlayAdapter extends BaseCrossChainAdapter {
+  private balanceAdapter?: InterlayBalanceAdapter;
 
   public override async setApi (api: AnyApi) {
     this.api = api;
 
     await api.isReady;
 
-    this.balanceAdapter = new CrustBalanceAdapter({ chain: this.chain.id, api });
+    this.balanceAdapter = new InterlayBalanceAdapter({ chain: this.chain.id, api });
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
@@ -109,22 +123,35 @@ class BaseCrustAdapter extends BaseCrossChainAdapter {
     const { address, amount, to, token } = params;
     const toChain = chains[to];
 
-    if (token !== this.balanceAdapter?.nativeToken) {
+    const accountId = this.api?.createType('AccountId32', address).toHex();
+
+    const tokenId = SUPPORTED_TOKENS[token];
+
+    if (!tokenId) {
       throw new CurrencyNotFound(token);
     }
 
-    const accountId = this.api?.createType('AccountId32', address).toHex();
-
-    const dst = { X2: ['Parent', { ParaChain: toChain.paraChainId }] };
-    const acc = { X1: { AccountId32: { id: accountId, network: 'Any' } } };
-    const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
-
-    return this.api?.tx.polkadotXcm.limitedReserveTransferAssets({ V0: dst }, { V0: acc }, { V0: ass }, 0, this.getDestWeight(token, to)?.toString());
+    return this.api.tx.xTokens.transfer(
+      tokenId,
+      amount.toChainData(),
+      {
+        V1: {
+          parents: 1,
+          interior: { X2: [{ Parachain: toChain.paraChainId }, { AccountId32: { id: accountId, network: 'Any' } }] }
+        }
+      },
+      this.getDestWeight(token, to)?.toString());
   }
 }
 
-export class ShadowAdapter extends BaseCrustAdapter {
+export class InterlayAdapter extends BaseInterlayAdapter {
   constructor () {
-    super(chains.shadow, routersConfig.shadow);
+    super(chains.interlay, routersConfig.interlay);
+  }
+}
+
+export class KintsugiAdapter extends BaseInterlayAdapter {
+  constructor () {
+    super(chains.kintsugi, routersConfig.kintsugi);
   }
 }

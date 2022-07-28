@@ -2,7 +2,7 @@ import { BN } from '@polkadot/util';
 
 import { MultiChainToken } from '../../types';
 
-export const khalaTokensConfig: Record<string, MultiChainToken> = {
+export const phalaTokensConfig: Record<string, MultiChainToken> = {
   PHA: { name: 'PHA',
     symbol: 'PHA',
     decimals: 12,
