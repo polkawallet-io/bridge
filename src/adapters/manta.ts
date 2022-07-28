@@ -62,7 +62,7 @@ class MantaBalanceAdapter extends BalanceAdapter {
 
     const tokenID = SUPPORTED_TOKENS[token];
 
-    if (!tokenID) {
+    if (tokenID === undefined) {
       throw new CurrencyNotFound(token);
     }
 
@@ -143,7 +143,7 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
 
     const tokenId = SUPPORTED_TOKENS[token];
 
-    if (!tokenId) {
+    if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 
