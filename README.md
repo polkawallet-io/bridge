@@ -6,11 +6,47 @@ You can integrate the amazing multi-chain bridge into your DApp with this SDK.
 
 And you're welcome to add your parachain-adapter into the SDK.
 
+### Supported parachains
+Polkadot:
+
+| from | to | tokens |
+|--|--|--|
+| polkadot | acala | DOT |
+| acala | polkadot | DOT |
+| acala | moonbeam | GLMR ACA AUSD |
+| acala | parallel | PARA ACA AUSD LDOT |
+| acala | interlay | INTR |
+
+Kusama:
+
+| from | to | tokens |
+|--|--|--|
+| kusama | karura | KSM |
+| kusama | statemine | KSM |
+| statemine | karura | RMRK ARIS USDT |
+| karura | kusama | KSM |
+| karura | statemine | RMRK ARIS USDT |
+| karura | bifrost | BNC KAR AUSD VSKSM |
+| karura | shiden | SDN AUSD |
+| karura | altair | AIR AUSD |
+| karura | shadow | CSM |
+| karura | crab | CRAB |
+| karura | integritee | TEER |
+| karura | kintsugi | KINT KBTC |
+| karura | khala | PHA KAR AUSD |
+| karura | kico | KICO KAR AUSD |
+| karura | calamari | KMA KAR AUSD LKSM |
+| karura | moonriver | MOVR KAR AUSD |
+| karura | heiko | HKO KAR AUSD LKSM |
+| karura | pichiu | PCHU KAR AUSD LKSM |
+| karura | turing | TUR KAR AUSD LKSM |
+| karura | quartz | QTZ |
+
 ## Usage
 
 Example: [src/bridge.spec.ts](src/bridge.spec.ts)
 
-#### 1. initiate the bridge SDK
+### 1. initiate the bridge SDK
 
 ```typescript
 /// import any parachain-adapters you want in your bridge.
@@ -41,7 +77,7 @@ const destChains = bridge.router.getDestiantionsChains({from: 'acala'});
 const tokens = bridge.router.getAvailableTokens({from: 'acala', to: 'polkadot'});
 ```
 
-#### 2. network connection
+### 2. network connection
 
 You can use the `ApiProvider` of the SDK which can connect to all the parachains [https://polkadot.js.org/apps](https://polkadot.js.org/apps) supported,
 or you can use your own apiProvider.
@@ -63,7 +99,7 @@ const connected = await firstValueFrom(provider.connectFromChain(chains, undefin
 await Promise.all(chains.map((chain) => availableAdapters[chain].setApi(provider.getApi(chain))));
 ```
 
-#### 3. token balance query & token transfer
+### 3. token balance query & token transfer
 
 ```typescript
 /// balance query
