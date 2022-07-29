@@ -1,17 +1,15 @@
 import { FixedPointNumber } from '@acala-network/sdk-core';
 
-import { BN } from '@polkadot/util';
-
 import { BaseCrossChainAdapter } from './base-chain-adapter';
 import { ChainName } from './configs';
 
 export { FixedPointNumber as FN } from '@acala-network/sdk-core';
 
-export type ChainType = 'substract' | 'ethereum';
+export type ChainType = 'substrate' | 'ethereum';
 
 export interface Chain {
   // unique chain id
-  readonly id: ChainName;
+  readonly id: string;
   // chain name for display
   readonly display: string;
   // chain is `substract` or `ethereum` like
@@ -24,15 +22,11 @@ export interface Chain {
   readonly ss58Prefix: number;
 }
 
-export interface MultiChainToken {
-  // token name
+export interface BasicToken {
   name: string;
-  // token symbol
   symbol: string;
-  // decimals configs in multiple chain, the decimals are same in different chains in most times.
-  decimals: number | Partial<{ [k in ChainName]: number}>;
-  // existential deposit configs in multiple chain, the ED are same in different chains in most times.
-  ed: BN | Partial<{ [k in ChainName]: BN }>
+  decimals: number;
+  ed: string;
 }
 
 export interface CrossChainRouterConfigs {
@@ -59,9 +53,12 @@ export interface CrossChainRouter {
 
 export interface XCMTransferConfigs {
   // XCM transfer weight limit
-  weightLimit: BN | 'Unlimited' | 'Limited';
+  weightLimit: string | 'Unlimited' | 'Limited';
   // XCM transfer fee charged by `to chain`
-  fee: TokenBalance;
+  fee: {
+    token: string;
+    amount: string;
+  };
 }
 
 export interface NetworkProps {
@@ -86,20 +83,15 @@ export interface CrossChainInputConfigs {
   estimateFee: string;
 }
 
-// export interface CrossChainFeeConfig {
-//   fee: string;
-//   existentialDeposit: string;
-//   decimals: number;
-// }
-
-// export interface BridgeTxParams {
-//   module: string;
-//   call: string;
-//   params: any[];
-// }
+export interface RouterFilter {
+  from?: Chain | ChainName;
+  to?: Chain | ChainName;
+  token?: string;
+}
 
 export interface BridgeConfigs {
   adapters: BaseCrossChainAdapter[];
+  routersDisabled?: RouterFilter[];
 }
 
 export interface CrossChainBalanceChangedConfigs {
@@ -117,9 +109,9 @@ export enum BalanceChangedStatus {
   'UNKNOWN_ERROR',
 }
 
-export interface TokenBalance {
+export interface TokenBalance<T = FixedPointNumber> {
   token: string;
-  balance: FixedPointNumber;
+  balance: T;
 }
 
 export interface BalanceData {

@@ -8,9 +8,17 @@ import { ISubmittableResult } from '@polkadot/types/types';
 
 import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
 import { BaseCrossChainAdapter } from '../base-chain-adapter';
-import { ChainName, chains, routersConfig } from '../configs';
+import { ChainName, chains } from '../configs';
 import { ApiNotFound, CurrencyNotFound } from '../errors';
-import { BalanceData, CrossChainTransferParams } from '../types';
+import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferParams } from '../types';
+
+export const integriteeRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  { to: 'karura', token: 'TEER', xcm: { fee: { token: 'TEER', amount: '6400000000' }, weightLimit: '5000000000' } }
+];
+
+export const integriteeTokensConfig: Record<string, BasicToken> = {
+  TEER: { name: 'TEER', symbol: 'TEER', decimals: 12, ed: '100000000000' }
+};
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const createBalanceStorages = (api: AnyApi) => {
@@ -27,8 +35,8 @@ const createBalanceStorages = (api: AnyApi) => {
 class IntegriteeBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
-  constructor ({ api, chain }: BalanceAdapterConfigs) {
-    super({ api, chain });
+  constructor ({ api, chain, tokens }: BalanceAdapterConfigs) {
+    super({ api, chain, tokens });
     this.storages = createBalanceStorages(api);
   }
 
@@ -58,7 +66,7 @@ class BaseIntegriteeAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.balanceAdapter = new IntegriteeBalanceAdapter({ chain: this.chain.id, api });
+    this.balanceAdapter = new IntegriteeBalanceAdapter({ chain: this.chain.id as ChainName, api, tokens: integriteeTokensConfig });
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
@@ -88,15 +96,15 @@ class BaseIntegriteeAdapter extends BaseCrossChainAdapter {
 
           )
           : '0',
-      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getTokenED(token)
+      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available))
     }).pipe(
-      map(({ balance, ed, txFee }) => {
+      map(({ balance, txFee }) => {
+        const tokenMeta = this.balanceAdapter?.getToken(token);
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, this.balanceAdapter?.getTokenDecimals(token)).mul(new FN(feeFactor));
+        const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(new FN(feeFactor));
 
         // always minus ed
-        return balance.minus(fee).minus(ed || FN.ZERO);
+        return balance.minus(fee).minus(FN.fromInner(tokenMeta?.ed || '0', tokenMeta?.decimals));
       })
     );
   }
@@ -126,6 +134,6 @@ class BaseIntegriteeAdapter extends BaseCrossChainAdapter {
 
 export class IntegriteeAdapter extends BaseIntegriteeAdapter {
   constructor () {
-    super(chains.integritee, routersConfig.integritee);
+    super(chains.integritee, integriteeRoutersConfig, integriteeTokensConfig);
   }
 }

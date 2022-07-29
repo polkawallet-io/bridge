@@ -8,9 +8,17 @@ import { ISubmittableResult } from '@polkadot/types/types';
 
 import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
 import { BaseCrossChainAdapter } from '../base-chain-adapter';
-import { ChainName, chains, routersConfig } from '../configs';
+import { ChainName, chains } from '../configs';
 import { ApiNotFound, CurrencyNotFound } from '../errors';
-import { BalanceData, CrossChainTransferParams } from '../types';
+import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferParams } from '../types';
+
+const crabRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  { to: 'karura', token: 'CRAB', xcm: { fee: { token: 'CRAB', amount: '64000000000000000' }, weightLimit: 'Unlimited' } }
+];
+
+export const crabTokensConfig: Record<string, BasicToken> = {
+  CRAB: { name: 'CRAB', symbol: 'CRAB', decimals: 18, ed: '0' }
+};
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const createBalanceStorages = (api: AnyApi) => {
@@ -27,8 +35,8 @@ const createBalanceStorages = (api: AnyApi) => {
 class DarwiniaBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
-  constructor ({ api, chain }: BalanceAdapterConfigs) {
-    super({ api, chain });
+  constructor ({ api, chain, tokens }: BalanceAdapterConfigs) {
+    super({ api, chain, tokens });
     this.storages = createBalanceStorages(api);
   }
 
@@ -58,7 +66,7 @@ class BaseDarwiniaAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.balanceAdapter = new DarwiniaBalanceAdapter({ chain: this.chain.id, api });
+    this.balanceAdapter = new DarwiniaBalanceAdapter({ chain: this.chain.id as ChainName, api, tokens: crabTokensConfig });
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
@@ -88,15 +96,15 @@ class BaseDarwiniaAdapter extends BaseCrossChainAdapter {
 
           )
           : '0',
-      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getTokenED(token)
+      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available))
     }).pipe(
-      map(({ balance, ed, txFee }) => {
+      map(({ balance, txFee }) => {
+        const tokenMeta = this.balanceAdapter?.getToken(token);
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, this.balanceAdapter?.getTokenDecimals(token)).mul(new FN(feeFactor));
+        const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(new FN(feeFactor));
 
         // always minus ed
-        return balance.minus(fee).minus(ed || FN.ZERO);
+        return balance.minus(fee).minus(FN.fromInner(tokenMeta?.ed || '0', tokenMeta?.decimals));
       })
     );
   }
@@ -125,6 +133,6 @@ class BaseDarwiniaAdapter extends BaseCrossChainAdapter {
 
 export class CrabAdapter extends BaseDarwiniaAdapter {
   constructor () {
-    super(chains.crab, routersConfig.crab);
+    super(chains.crab, crabRoutersConfig, crabTokensConfig);
   }
 }

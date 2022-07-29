@@ -7,6 +7,15 @@ export class RouterConfigNotFound extends Error {
   }
 }
 
+export class AdapterNotFound extends Error {
+  constructor (network: string) {
+    super();
+
+    this.message = `${network} adapter not find`;
+    this.name = 'AdapterNotFound';
+  }
+}
+
 export class ApiNotFound extends Error {
   constructor (network: string) {
     super();
@@ -17,20 +26,11 @@ export class ApiNotFound extends Error {
 }
 
 export class TokenConfigNotFound extends Error {
-  constructor (token: string) {
+  constructor (token: string, network: string) {
     super();
 
-    this.message = `can't find ${token} config`;
+    this.message = `can't find ${token} config in ${network}`;
     this.name = 'TokenConfigNotFound';
-  }
-}
-
-export class TokenConfigItemNotFound extends Error {
-  constructor (token: string, item: string, network: string) {
-    super();
-
-    this.message = `can't find ${token} ${item} config in ${network}`;
-    this.name = 'TokenConfigItemNotFound';
   }
 }
 

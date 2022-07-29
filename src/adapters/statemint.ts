@@ -1,6 +1,6 @@
 import { Storage } from '@acala-network/sdk/utils/storage';
 import { AnyApi, FixedPointNumber as FN } from '@acala-network/sdk-core';
-import { combineLatest, map, Observable, of } from 'rxjs';
+import { combineLatest, map, Observable } from 'rxjs';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { DeriveBalancesAll } from '@polkadot/api-derive/balances/types';
@@ -9,9 +9,25 @@ import { BN } from '@polkadot/util';
 
 import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
 import { BaseCrossChainAdapter } from '../base-chain-adapter';
-import { ChainName, chains, routersConfig } from '../configs';
+import { ChainName, chains } from '../configs';
 import { ApiNotFound, CurrencyNotFound } from '../errors';
-import { BalanceData, CrossChainTransferParams } from '../types';
+import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferParams } from '../types';
+
+export const statemineRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  { to: 'kusama', token: 'KSM', xcm: { fee: { token: 'KSM', amount: '106666660' }, weightLimit: 'Unlimited' } },
+  { to: 'karura', token: 'RMRK', xcm: { fee: { token: 'RMRK', amount: '6400000' }, weightLimit: 'Unlimited' } },
+  { to: 'karura', token: 'ARIS', xcm: { fee: { token: 'ARIS', amount: '6400000' }, weightLimit: 'Unlimited' } },
+  { to: 'karura', token: 'USDT', xcm: { fee: { token: 'USDT', amount: '640' }, weightLimit: 'Unlimited' } }
+];
+
+export const statemineTokensConfig: Record<string, Record<string, BasicToken>> = {
+  statemine: {
+    KSM: { name: 'KSM', symbol: 'KSM', decimals: 12, ed: '79999999' },
+    RMRK: { name: 'RMRK', symbol: 'RMRK', decimals: 10, ed: '100000000' },
+    ARIS: { name: 'ARIS', symbol: 'ARIS', decimals: 8, ed: '10000000' },
+    USDT: { name: 'USDT', symbol: 'USDT', decimals: 8, ed: '1000' }
+  }
+};
 
 const SUPPORTED_TOKENS: Record<string, BN> = {
   RMRK: new BN(8),
@@ -52,8 +68,8 @@ const createBalanceStorages = (api: AnyApi) => {
 class StatemintBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
-  constructor ({ api, chain }: BalanceAdapterConfigs) {
-    super({ api, chain });
+  constructor ({ api, chain, tokens }: BalanceAdapterConfigs) {
+    super({ api, chain, tokens });
     this.storages = createBalanceStorages(api);
   }
 
@@ -93,24 +109,6 @@ class StatemintBalanceAdapter extends BalanceAdapter {
       })
     );
   }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public override getTokenED (token?: string): Observable<FN> {
-    if (!token || token === this.nativeToken) {
-      return of(this.ed);
-    }
-
-    const assetId = SUPPORTED_TOKENS[token];
-
-    if (!assetId) {
-      throw new CurrencyNotFound(token);
-    }
-
-    return combineLatest({
-      info: this.storages.assetsInfo(assetId).observable,
-      meta: this.storages.assetsMeta(assetId).observable
-    }).pipe(map(({ info, meta }) => FN.fromInner(info.minBalance?.toString() || '0', meta.decimals?.toNumber())));
-  }
 }
 
 class BaseStatemintAdapter extends BaseCrossChainAdapter {
@@ -121,7 +119,9 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.balanceAdapter = new StatemintBalanceAdapter({ api, chain: this.chain.id });
+    const chain = this.chain.id as ChainName;
+
+    this.balanceAdapter = new StatemintBalanceAdapter({ api, chain, tokens: statemineTokensConfig[chain] });
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
@@ -151,15 +151,15 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
 
           )
           : '0',
-      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getTokenED(token)
+      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available))
     }).pipe(
-      map(({ balance, ed, txFee }) => {
+      map(({ balance, txFee }) => {
+        const tokenMeta = this.balanceAdapter?.getToken(token);
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, this.balanceAdapter?.getTokenDecimals(token)).mul(new FN(feeFactor));
+        const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(new FN(feeFactor));
 
         // always minus ed
-        return balance.minus(fee).minus(ed || FN.ZERO);
+        return balance.minus(fee).minus(FN.fromInner(tokenMeta?.ed || '0', tokenMeta?.decimals));
       })
     );
   }
@@ -214,14 +214,8 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
   }
 }
 
-export class StatemintAdapter extends BaseStatemintAdapter {
-  constructor () {
-    super(chains.statemint, routersConfig.statemint);
-  }
-}
-
 export class StatemineAdapter extends BaseStatemintAdapter {
   constructor () {
-    super(chains.statemine, routersConfig.statemine);
+    super(chains.statemine, statemineRoutersConfig, statemineTokensConfig.statemine);
   }
 }

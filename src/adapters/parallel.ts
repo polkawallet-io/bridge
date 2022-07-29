@@ -6,11 +6,42 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { DeriveBalancesAll } from '@polkadot/api-derive/balances/types';
 import { ISubmittableResult } from '@polkadot/types/types';
 
-import { BalanceAdapter } from '../balance-adapter';
+import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
 import { BaseCrossChainAdapter } from '../base-chain-adapter';
-import { ChainName, chains, routersConfig } from '../configs';
+import { ChainName, chains } from '../configs';
 import { ApiNotFound, CurrencyNotFound } from '../errors';
-import { BalanceData, CrossChainTransferParams } from '../types';
+import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferParams } from '../types';
+
+const DEST_WEIGHT = '5000000000';
+
+export const parallelRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  { to: 'acala', token: 'PARA', xcm: { fee: { token: 'PARA', amount: '6400000000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'acala', token: 'ACA', xcm: { fee: { token: 'ACA', amount: '6400000000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'acala', token: 'AUSD', xcm: { fee: { token: 'AUSD', amount: '3721109059' }, weightLimit: DEST_WEIGHT } },
+  { to: 'acala', token: 'LDOT', xcm: { fee: { token: 'LDOT', amount: '24037893' }, weightLimit: DEST_WEIGHT } }
+];
+
+export const heikoRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  { to: 'karura', token: 'HKO', xcm: { fee: { token: 'HKO', amount: '6400000000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'KAR', xcm: { fee: { token: 'KAR', amount: '6400000000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '8305746640' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'LKSM', xcm: { fee: { token: 'LKSM', amount: '589618748' }, weightLimit: DEST_WEIGHT } }
+];
+
+export const parallelTokensConfig: Record<string, Record<string, BasicToken>> = {
+  parallel: {
+    PARA: { name: 'PARA', symbol: 'PARA', decimals: 12, ed: '100000000000' },
+    ACA: { name: 'ACA', symbol: 'ACA', decimals: 12, ed: '100000000000' },
+    AUSD: { name: 'AUSD', symbol: 'AUSD', decimals: 12, ed: '100000000000' },
+    LDOT: { name: 'LDOT', symbol: 'LDOT', decimals: 10, ed: '500000000' }
+  },
+  heiko: {
+    HKO: { name: 'HKO', symbol: 'HKO', decimals: 12, ed: '100000000000' },
+    KAR: { name: 'KAR', symbol: 'KAR', decimals: 12, ed: '0' },
+    KUSD: { name: 'KUSD', symbol: 'KUSD', decimals: 12, ed: '0' },
+    LKSM: { name: 'LKSM', symbol: 'LKSM', decimals: 12, ed: '0' }
+  }
+};
 
 const SUPPORTED_TOKENS: Record<string, number> = {
   HKO: 0,
@@ -41,16 +72,11 @@ const createBalanceStorages = (api: AnyApi) => {
   };
 };
 
-interface ParallelBalanceAdapterConfigs {
-  chain: ChainName;
-  api: AnyApi;
-}
-
 class ParallelBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
-  constructor ({ api, chain }: ParallelBalanceAdapterConfigs) {
-    super({ api, chain });
+  constructor ({ api, chain, tokens }: BalanceAdapterConfigs) {
+    super({ api, chain, tokens });
     this.storages = createBalanceStorages(api);
   }
 
@@ -76,7 +102,7 @@ class ParallelBalanceAdapter extends BalanceAdapter {
 
     return this.storages.assets(tokenId, address).observable.pipe(
       map((balance) => {
-        const amount = FN.fromInner(balance.unwrapOrDefault()?.balance?.toString() || '0', this.getTokenDecimals(token));
+        const amount = FN.fromInner(balance.unwrapOrDefault()?.balance?.toString() || '0', this.getToken(token).decimals);
 
         return {
           free: amount,
@@ -97,7 +123,9 @@ class BaseParallelAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.balanceAdapter = new ParallelBalanceAdapter({ chain: this.chain.id, api });
+    const chain = this.chain.id as ChainName;
+
+    this.balanceAdapter = new ParallelBalanceAdapter({ chain, api, tokens: parallelTokensConfig[chain] });
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
@@ -127,15 +155,15 @@ class BaseParallelAdapter extends BaseCrossChainAdapter {
 
           )
           : '0',
-      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getTokenED(token)
+      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available))
     }).pipe(
-      map(({ balance, ed, txFee }) => {
+      map(({ balance, txFee }) => {
+        const tokenMeta = this.balanceAdapter?.getToken(token);
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, this.balanceAdapter?.getTokenDecimals(token)).mul(new FN(feeFactor));
+        const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(new FN(feeFactor));
 
         // always minus ed
-        return balance.minus(fee).minus(ed || FN.ZERO);
+        return balance.minus(fee).minus(FN.fromInner(tokenMeta?.ed || '0', tokenMeta?.decimals));
       })
     );
   }
@@ -171,12 +199,12 @@ class BaseParallelAdapter extends BaseCrossChainAdapter {
 
 export class HeikoAdapter extends BaseParallelAdapter {
   constructor () {
-    super(chains.heiko, routersConfig.heiko);
+    super(chains.heiko, heikoRoutersConfig, parallelTokensConfig.heiko);
   }
 }
 
 export class ParallelAdapter extends BaseParallelAdapter {
   constructor () {
-    super(chains.parallel, routersConfig.parallel);
+    super(chains.parallel, parallelRoutersConfig, parallelTokensConfig.parallel);
   }
 }

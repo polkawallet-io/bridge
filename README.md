@@ -1,6 +1,6 @@
-# bridge
+# Polkadot bridge SDK
 
-Polkadot bridge js SDK for multi-chain cross-chain token transfer.
+Polkadot bridge SDK for multi-chain cross-chain token transfer.
 
 You can integrate the amazing multi-chain bridge into your DApp with this SDK.
 
@@ -16,6 +16,8 @@ Polkadot:
 | acala | moonbeam | GLMR ACA AUSD |
 | acala | parallel | PARA ACA AUSD LDOT |
 | acala | interlay | INTR |
+| parallel | acala | PARA ACA AUSD LDOT |
+| interlay | acala | INTR |
 
 Kusama:
 
@@ -29,7 +31,7 @@ Kusama:
 | karura | bifrost | BNC KAR AUSD VSKSM |
 | karura | shiden | SDN AUSD |
 | karura | altair | AIR AUSD |
-| karura | shadow | CSM |
+| karura | shadow | CSM KAR AUSD |
 | karura | crab | CRAB |
 | karura | integritee | TEER |
 | karura | kintsugi | KINT KBTC |
@@ -41,6 +43,26 @@ Kusama:
 | karura | pichiu | PCHU KAR AUSD LKSM |
 | karura | turing | TUR KAR AUSD LKSM |
 | karura | quartz | QTZ |
+| karura | basilisk | BSX AUSD |
+| karura | listen | LIT KAR AUSD LKSM |
+| bifrost | karura | BNC KAR AUSD KSM VSKSM |
+| shiden | karura | SDN AUSD |
+| altair | karura | AIR AUSD |
+| shadow | karura | CSM KAR AUSD |
+| crab | karura | CRAB |
+| integritee | karura | TEER |
+| kintsugi | karura | KINT KBTC |
+| khala | karura | PHA KAR AUSD |
+| kico | karura | KICO KAR AUSD |
+| calamari | karura | KMA KAR AUSD KSM LKSM |
+| moonriver | karura | MOVR KAR AUSD |
+| heiko | karura | HKO KAR AUSD LKSM |
+| pichiu | karura | PCHU KAR AUSD LKSM |
+| turing | karura | TUR KAR AUSD LKSM |
+| quartz | karura | QTZ |
+| basilisk | kusama | KSM |
+| basilisk | karura | BSX AUSD KSM |
+| listen | karura | LIT KAR AUSD LKSM |
 
 ## Usage
 
@@ -142,57 +164,32 @@ Add a new item in `src/configs/chains/polkadot-chains.ts` or `src/configs/chains
 }
 ```
 
-#### 2. Add tokens config
-
-Add a new tokens config file in `src/configs/tokens/`.
-```typescript
-/// acala for example
-/// add `src/configs/tokens/acala-tokens.ts` file
-export const acalaTokensConfig: Record<string, MultiChainToken> = {
-  /// ACA has different `existentialDeposit` on different chains,
-  /// so it has a `Record<ChainName, BN>` value for it's `ed` key.
-  /// And some Tokens may have different `decimals` on different chains.
-  ACA: { name: 'ACA',
-    symbol: 'ACA',
-    decimals: 12,
-    ed: {
-      acala: new BN('100000000000'),
-      moonbeam: new BN('100000000000'),
-      parallel: new BN('100000000000')
-    } },
-  /// ...other tokens
-};
-```
-
-And import the token config file into `src/configs/tokens/index.ts`.
-
-#### 3. Add routers config
-
-Add a new router config file in `src/configs/routers/`.
-```typescript
-/// bifrost for example
-/// add `src/configs/routers/bifrost-routers.ts` file
-export const bifrostRoutersConfig: Record<string, Omit<CrossChainRouterConfigs, 'from'>[]> = {
-  bifrost: [
-    /// router for token `BNC` from `bifrost` to `karura`,
-    /// `xcm.fee` defines the XCM-Fee on karura,
-    /// `xcm.weightLimit` defines the weightLimit value used creating Extrinsic.
-    { to: 'karura', token: 'BNC', xcm: { fee: { token: 'BNC', balance: FN.fromInner('932400000', 12) }, weightLimit: 'Unlimited' } },
-    /// router for token `KUSD` from `bifrost` to `karura`
-    { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', balance: FN.fromInner('3826597686', 12) }, weightLimit: 'Unlimited' } }
-  ]
-};
-```
-
-And import the config file into `src/configs/routers/index.ts`.
-
-#### 4. Create adapter for your parachain
+#### 2. Create adapter for your parachain
 
 Add a new adapter file in `src/adapters/`, and create your `ParachainAdapter` class extends `BaseCrossChainAdapter`.
 
 Example: [src/adapters/bifrost.ts](./src/adapters/bifrost.ts)
 
-##### 4.1 implement public method `subscribeTokenBalance()`
+##### 2.1 define tokens and routers
+
+```typescript
+/// bifrost for example
+export const bifrostTokensConfig: Record<string, MultiChainToken> = {
+  BNC: { name: 'BNC', symbol: 'BNC', decimals: 12, ed: '10000000000' },
+  VSKSM: { name: 'VSKSM', symbol: 'VSKSM', decimals: 12, ed: '100000000' },
+  /// ...other tokens
+};
+export const bifrostRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  /// router for token `BNC` from `bifrost` to `karura`,
+  /// `xcm.fee` defines the XCM-Fee on karura,
+  /// `xcm.weightLimit` defines the weightLimit value used creating Extrinsic.
+  { to: 'karura', token: 'BNC', xcm: { fee: { token: 'BNC', amount: '932400000' }, weightLimit: 'Unlimited' } },
+  /// router for token `KUSD` from `bifrost` to `karura`
+  { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '3826597686' }, weightLimit: 'Unlimited' } }
+];
+```
+
+##### 2.2 implement public method `subscribeTokenBalance()`
 
 Implement the `subscribeTokenBalance` method so the bridge can query token balances.
 
@@ -201,8 +198,8 @@ Implement the `subscribeTokenBalance` method so the bridge can query token balan
 class BifrostBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
-  constructor ({ api, chain }: BalanceAdapterConfigs) {
-    super({ api, chain });
+  constructor ({ api, chain, tokens }: BalanceAdapterConfigs) {
+    super({ api, chain, tokens });
     this.storages = createBalanceStorages(api);
   }
 
@@ -225,7 +222,7 @@ function createBalanceStorages(api: AnyApi) => {
     assets: (tokenId: string, address: string) =>
       Storage.create<any>({
         api,
-        path: 'query.assets.account',
+        path: 'query.tokens.accounts',
         params: [tokenId, address]
       })
   };
@@ -240,7 +237,7 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
 }
 ```
 
-##### 4.2 implement public method `subscribeMaxInput()`
+##### 2.3 implement public method `subscribeMaxInput()`
 
 Implement the `subscribeMaxInput` method so the bridge can set transferable token amount limit.
 
@@ -253,20 +250,21 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
         token === this.balanceAdapter?.nativeToken
           ? this.estimateTxFee()
           : '0',
-      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getTokenED(token)
+      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available))
     }).pipe(
-      map(({ balance, ed, txFee }) => {
+      map(({ balance, txFee }) => {
+        const tokenMeta = this.balanceAdapter?.getToken(token);
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, this.balanceAdapter?.getTokenDecimals(token)).mul(new FN(feeFactor));
-        return balance.minus(fee).minus(ed || FN.ZERO);
+        const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(new FN(feeFactor));
+
+        return balance.minus(fee).minus(FN.fromInner(tokenMeta?.ed || '0', tokenMeta?.decimals));
       })
     );
   }
 }
 ```
 
-##### 4.3 implement public method `createTx()`
+##### 2.4 implement public method `createTx()`
 
 Implement the `createTx` method so the bridge can create the cross-chain transfer Extrinsic.
 
@@ -298,14 +296,14 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
 }
 ```
 
-##### 4.4 pass your routers config to your adapter
+##### 2.5 pass your routers config to your adapter
 
 ```typescript
 /// `chains.bifrost` is the config you added in step 1.
-/// `routersConfig.bifrost` is the config you defined in step 3.
+/// `bifrostRoutersConfig` & `bifrostTokensConfig` is the config you defined in step 2.1.
 export class BifrostAdapter extends BaseBifrostAdapter {
   constructor () {
-    super(chains.bifrost, routersConfig.bifrost);
+    super(chains.bifrost, bifrostRoutersConfig, bifrostTokensConfig);
   }
 }
 ```

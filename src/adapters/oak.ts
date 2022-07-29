@@ -8,9 +8,26 @@ import { ISubmittableResult } from '@polkadot/types/types';
 
 import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
 import { BaseCrossChainAdapter } from '../base-chain-adapter';
-import { ChainName, chains, routersConfig } from '../configs';
+import { ChainName, chains } from '../configs';
 import { ApiNotFound, CurrencyNotFound } from '../errors';
-import { BalanceData, CrossChainTransferParams } from '../types';
+import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferParams } from '../types';
+
+const DEST_WEIGHT = '5000000000';
+
+export const turingRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  { to: 'karura', token: 'TUR', xcm: { fee: { token: 'TUR', amount: '2560000000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'KAR', xcm: { fee: { token: 'KAR', amount: '6400000000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '2626579278' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'LKSM', xcm: { fee: { token: 'LKSM', amount: '480597195' }, weightLimit: DEST_WEIGHT } }
+];
+
+export const turingTokensConfig: Record<string, BasicToken> = {
+  TUR: { name: 'TUR', symbol: 'TUR', decimals: 10, ed: '100000000' },
+  KAR: { name: 'KAR', symbol: 'KAR', decimals: 12, ed: '100000000000' },
+  AUSD: { name: 'AUSD', symbol: 'AUSD', decimals: 12, ed: '10000000000' },
+  KUSD: { name: 'KUSD', symbol: 'KUSD', decimals: 12, ed: '10000000000' },
+  LKSM: { name: 'LKSM', symbol: 'LKSM', decimals: 12, ed: '500000000' }
+};
 
 const SUPPORTED_TOKENS: Record<string, string> = {
   TUR: 'TUR',
@@ -40,8 +57,8 @@ const createBalanceStorages = (api: AnyApi) => {
 class OakBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
-  constructor ({ api, chain }: BalanceAdapterConfigs) {
-    super({ api, chain });
+  constructor ({ api, chain, tokens }: BalanceAdapterConfigs) {
+    super({ api, chain, tokens });
     this.storages = createBalanceStorages(api);
   }
 
@@ -67,7 +84,7 @@ class OakBalanceAdapter extends BalanceAdapter {
 
     return this.storages.assets(address, tokenId).observable.pipe(
       map((balance) => {
-        const amount = FN.fromInner(balance.free?.toString() || '0', this.getTokenDecimals(tokenId));
+        const amount = FN.fromInner(balance.free?.toString() || '0', this.getToken(tokenId).decimals);
 
         return {
           free: amount,
@@ -88,7 +105,7 @@ class BaseOakAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.balanceAdapter = new OakBalanceAdapter({ chain: this.chain.id, api });
+    this.balanceAdapter = new OakBalanceAdapter({ chain: this.chain.id as ChainName, api, tokens: turingTokensConfig });
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
@@ -117,15 +134,15 @@ class BaseOakAdapter extends BaseCrossChainAdapter {
             }
           )
           : '0',
-      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getTokenED(token)
+      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available))
     }).pipe(
-      map(({ balance, ed, txFee }) => {
+      map(({ balance, txFee }) => {
+        const tokenMeta = this.balanceAdapter?.getToken(token);
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, this.balanceAdapter?.getTokenDecimals(token)).mul(new FN(feeFactor));
+        const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(new FN(feeFactor));
 
         // always minus ed
-        return balance.minus(fee).minus(ed || FN.ZERO);
+        return balance.minus(fee).minus(FN.fromInner(tokenMeta?.ed || '0', tokenMeta?.decimals));
       })
     );
   }
@@ -161,6 +178,6 @@ class BaseOakAdapter extends BaseCrossChainAdapter {
 
 export class TuringAdapter extends BaseOakAdapter {
   constructor () {
-    super(chains.turing, routersConfig.turing);
+    super(chains.turing, turingRoutersConfig, turingTokensConfig);
   }
 }

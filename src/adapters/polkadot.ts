@@ -8,9 +8,26 @@ import { ISubmittableResult } from '@polkadot/types/types';
 
 import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
 import { BaseCrossChainAdapter } from '../base-chain-adapter';
-import { ChainName, chains, routersConfig } from '../configs';
+import { ChainName, chains } from '../configs';
 import { ApiNotFound, CurrencyNotFound } from '../errors';
-import { BalanceData, CrossChainTransferParams } from '../types';
+import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferParams } from '../types';
+
+export const polkadotRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  { to: 'acala', token: 'DOT', xcm: { fee: { token: 'DOT', amount: '3549633' }, weightLimit: 'Unlimited' } }
+];
+export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  { to: 'karura', token: 'KSM', xcm: { fee: { token: 'KSM', amount: '64000000' }, weightLimit: 'Unlimited' } },
+  { to: 'statemine', token: 'KSM', xcm: { fee: { token: 'KSM', amount: '4000000000' }, weightLimit: 'Unlimited' } }
+];
+
+const polkadotTokensConfig: Record<string, Record<string, BasicToken>> = {
+  polkadot: {
+    DOT: { name: 'DOT', symbol: 'DOT', decimals: 10, ed: '10000000000' }
+  },
+  kusama: {
+    KSM: { name: 'KSM', symbol: 'KSM', decimals: 12, ed: '79999999' }
+  }
+};
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const createBalanceStorages = (api: AnyApi) => {
@@ -27,8 +44,8 @@ const createBalanceStorages = (api: AnyApi) => {
 class PolkadotBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
-  constructor ({ api, chain }: BalanceAdapterConfigs) {
-    super({ chain, api });
+  constructor ({ api, chain, tokens }: BalanceAdapterConfigs) {
+    super({ chain, api, tokens });
 
     this.storages = createBalanceStorages(api);
   }
@@ -59,7 +76,9 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.balanceAdapter = new PolkadotBalanceAdapter({ chain: this.chain.id, api });
+    const chain = this.chain.id as ChainName;
+
+    this.balanceAdapter = new PolkadotBalanceAdapter({ chain, api, tokens: polkadotTokensConfig[chain] });
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
@@ -85,15 +104,15 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
           signer: address
         }
       ),
-      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getTokenED()
+      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available))
     }).pipe(
-      map(({ balance, ed, txFee }) => {
+      map(({ balance, txFee }) => {
+        const tokenMeta = this.balanceAdapter?.getToken(token);
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, this.balanceAdapter?.getTokenDecimals()).mul(new FN(feeFactor));
+        const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(new FN(feeFactor));
 
         // always minus ed
-        return balance.minus(fee).minus(ed || FN.ZERO);
+        return balance.minus(fee).minus(FN.fromInner(tokenMeta?.ed || '0', tokenMeta?.decimals));
       })
     );
   }
@@ -137,12 +156,12 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
 
 export class PolkadotAdapter extends BasePolkadotAdapter {
   constructor () {
-    super(chains.polkadot, routersConfig.polkadot);
+    super(chains.polkadot, polkadotRoutersConfig, polkadotTokensConfig.polkadot);
   }
 }
 
 export class KusamaAdapter extends BasePolkadotAdapter {
   constructor () {
-    super(chains.kusama, routersConfig.kusama);
+    super(chains.kusama, kusamaRoutersConfig, polkadotTokensConfig.kusama);
   }
 }

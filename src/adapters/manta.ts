@@ -8,9 +8,27 @@ import { ISubmittableResult } from '@polkadot/types/types';
 
 import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
 import { BaseCrossChainAdapter } from '../base-chain-adapter';
-import { ChainName, chains, routersConfig } from '../configs';
+import { ChainName, chains } from '../configs';
 import { ApiNotFound, CurrencyNotFound } from '../errors';
-import { BalanceData, CrossChainTransferParams } from '../types';
+import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferParams } from '../types';
+
+const DEST_WEIGHT = '5000000000';
+
+export const calamariRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  { to: 'karura', token: 'KMA', xcm: { fee: { token: 'KMA', amount: '6400000000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '6381112603' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'KAR', xcm: { fee: { token: 'KAR', amount: '6400000000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'LKSM', xcm: { fee: { token: 'LKSM', amount: '452334406' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'KSM', xcm: { fee: { token: 'KSM', amount: '54632622' }, weightLimit: DEST_WEIGHT } }
+];
+
+export const calamariTokensConfig: Record<string, BasicToken> = {
+  KMA: { name: 'KMA', symbol: 'KMA', decimals: 12, ed: '100000000000' },
+  KAR: { name: 'KAR', symbol: 'KAR', decimals: 12, ed: '100000000000' },
+  KUSD: { name: 'KUSD', symbol: 'KUSD', decimals: 12, ed: '10000000000' },
+  LKSM: { name: 'LKSM', symbol: 'LKSM', decimals: 12, ed: '500000000' },
+  KSM: { name: 'KSM', symbol: 'KSM', decimals: 12, ed: '100000000' }
+};
 
 const SUPPORTED_TOKENS: Record<string, number> = {
   KMA: 1,
@@ -41,8 +59,8 @@ const createBalanceStorages = (api: AnyApi) => {
 class MantaBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
-  constructor ({ api, chain }: BalanceAdapterConfigs) {
-    super({ api, chain });
+  constructor ({ api, chain, tokens }: BalanceAdapterConfigs) {
+    super({ api, chain, tokens });
     this.storages = createBalanceStorages(api);
   }
 
@@ -68,7 +86,7 @@ class MantaBalanceAdapter extends BalanceAdapter {
 
     return this.storages.assets(tokenID, address).observable.pipe(
       map((balance) => {
-        const amount = FN.fromInner(balance.unwrapOrDefault()?.balance?.toString() || '0', this.getTokenDecimals(token));
+        const amount = FN.fromInner(balance.unwrapOrDefault()?.balance?.toString() || '0', this.getToken(token).decimals);
 
         return {
           free: amount,
@@ -89,7 +107,7 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.balanceAdapter = new MantaBalanceAdapter({ chain: this.chain.id, api });
+    this.balanceAdapter = new MantaBalanceAdapter({ chain: this.chain.id as ChainName, api, tokens: calamariTokensConfig });
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
@@ -118,15 +136,15 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
             }
           )
           : '0',
-      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getTokenED(token)
+      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available))
     }).pipe(
-      map(({ balance, ed, txFee }) => {
+      map(({ balance, txFee }) => {
+        const tokenMeta = this.balanceAdapter?.getToken(token);
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, this.balanceAdapter?.getTokenDecimals(token)).mul(new FN(feeFactor));
+        const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(new FN(feeFactor));
 
         // always minus ed
-        return balance.minus(fee).minus(ed || FN.ZERO);
+        return balance.minus(fee).minus(FN.fromInner(tokenMeta?.ed || '0', tokenMeta?.decimals));
       })
     );
   }
@@ -162,6 +180,6 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
 
 export class CalamariAdapter extends BaseMantaAdapter {
   constructor () {
-    super(chains.calamari, routersConfig.calamari);
+    super(chains.calamari, calamariRoutersConfig, calamariTokensConfig);
   }
 }

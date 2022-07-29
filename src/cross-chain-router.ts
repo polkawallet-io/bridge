@@ -4,29 +4,26 @@ import { isEmpty, overEvery, uniqWith } from 'lodash';
 import { isChainEqual } from './utils/is-chain-equal';
 import { BaseCrossChainAdapter } from './base-chain-adapter';
 import { ChainName, chains } from './configs';
-import { Chain, CrossChainRouter, CrossChainRouterConfigs } from './types';
+import { Chain, CrossChainRouter, CrossChainRouterConfigs, RouterFilter } from './types';
 
 const CONFIG_URL = 'https://api.polkawallet.io/devConfiguration/config/bridge.json';
 
-interface RouterFilter {
-  from?: Chain | ChainName;
-  to?: Chain | ChainName;
-  token?: string;
-}
-
 interface BridgeRouterManagerConfigs {
   adapters: BaseCrossChainAdapter[];
+  routersDisabled?: RouterFilter[];
 }
 
 export class BridgeRouterManager {
   private routers: CrossChainRouter[];
-  private routersDisabled: RouterFilter[];
   private adapters: BaseCrossChainAdapter[];
+
+  public routersDisabled: RouterFilter[];
 
   constructor (configs?: BridgeRouterManagerConfigs) {
     this.routers = [];
-    this.routersDisabled = [];
     this.adapters = configs?.adapters || [];
+
+    this.routersDisabled = configs?.routersDisabled || [];
   }
 
   public async updateDisabledRouters () {

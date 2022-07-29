@@ -3,6 +3,7 @@ import { AnyApi, FixedPointNumber as FN } from '@acala-network/sdk-core';
 import { combineLatest, map, Observable } from 'rxjs';
 
 import { SubmittableExtrinsic } from '@polkadot/api/types';
+import { DeriveBalancesAll } from '@polkadot/api-derive/balances/types';
 import { ISubmittableResult } from '@polkadot/types/types';
 
 import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
@@ -13,50 +14,46 @@ import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferPar
 
 const DEST_WEIGHT = '5000000000';
 
-export const bifrostRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
-  { to: 'karura', token: 'BNC', xcm: { fee: { token: 'BNC', amount: '5120000000' }, weightLimit: DEST_WEIGHT } },
-  { to: 'karura', token: 'VSKSM', xcm: { fee: { token: 'VSKSM', amount: '64000000' }, weightLimit: DEST_WEIGHT } },
-  { to: 'karura', token: 'KSM', xcm: { fee: { token: 'KSM', amount: '64000000' }, weightLimit: DEST_WEIGHT } },
-  { to: 'karura', token: 'KAR', xcm: { fee: { token: 'KAR', amount: '6400000000' }, weightLimit: DEST_WEIGHT } },
-  { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '10011896008' }, weightLimit: DEST_WEIGHT } }
+export const listenRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  { to: 'karura', token: 'LT', xcm: { fee: { token: 'LIT', amount: '93240000000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'KAR', xcm: { fee: { token: 'KAR', amount: '93240000000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '5060238106' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'LKSM', xcm: { fee: { token: 'LKSM', amount: '700170039' }, weightLimit: DEST_WEIGHT } }
 ];
 
-export const bifrostTokensConfig: Record<string, BasicToken> = {
-  BNC: { name: 'BNC', symbol: 'BNC', decimals: 12, ed: '10000000000' },
-  VSKSM: { name: 'VSKSM', symbol: 'VSKSM', decimals: 12, ed: '100000000' },
-  KSM: { name: 'KSM', symbol: 'KSM', decimals: 12, ed: '100000000' },
-  KAR: { name: 'KAR', symbol: 'KAR', decimals: 12, ed: '148000000' },
-  KUSD: { name: 'KUSD', symbol: 'KUSD', decimals: 12, ed: '100000000' }
+export const listenTokensConfig: Record<string, BasicToken> = {
+  LT: { name: 'LT', symbol: 'LT', decimals: 12, ed: '500000000000' },
+  KAR: { name: 'KAR', symbol: 'KAR', decimals: 12, ed: '100000000000' },
+  KUSD: { name: 'KUSD', symbol: 'KUSD', decimals: 12, ed: '10000000000' },
+  LKSM: { name: 'LKSM', symbol: 'LKSM', decimals: 12, ed: '500000000' }
 };
 
-const SUPPORTED_TOKENS: Record<string, unknown> = {
-  KUSD: { Stable: 'KUSD' },
-  AUSD: { Stable: 'AUSD' },
-  BNC: { Native: 'BNC' },
-  VSKSM: { VSToken: 'KSM' },
-  KSM: { Token: 'KSM' },
-  KAR: { Token: 'KAR' }
+const SUPPORTED_TOKENS: Record<string, number> = {
+  LT: 0,
+  KAR: 128,
+  KUSD: 129,
+  LKSM: 131
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const createBalanceStorages = (api: AnyApi) => {
   return {
     balances: (address: string) =>
-      Storage.create<any>({
+      Storage.create<DeriveBalancesAll>({
         api,
-        path: 'query.system.account',
+        path: 'derive.balances.all',
         params: [address]
       }),
-    assets: (address: string, token: unknown) =>
+    assets: (tokenId: number, address: string) =>
       Storage.create<any>({
         api,
         path: 'query.tokens.accounts',
-        params: [address, token]
+        params: [address, tokenId]
       })
   };
 };
 
-class BifrostBalanceAdapter extends BalanceAdapter {
+class ListenBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
   constructor ({ api, chain, tokens }: BalanceAdapterConfigs) {
@@ -69,11 +66,11 @@ class BifrostBalanceAdapter extends BalanceAdapter {
 
     if (token === this.nativeToken) {
       return storage.observable.pipe(
-        map(({ data }) => ({
-          free: FN.fromInner(data.free.toString(), this.decimals),
-          locked: FN.fromInner(data.miscFrozen.toString(), this.decimals),
-          reserved: FN.fromInner(data.reserved.toString(), this.decimals),
-          available: FN.fromInner(data.free.sub(data.miscFrozen).toString(), this.decimals)
+        map((data) => ({
+          free: FN.fromInner(data.freeBalance.toString(), this.decimals),
+          locked: FN.fromInner(data.lockedBalance.toString(), this.decimals),
+          reserved: FN.fromInner(data.reservedBalance.toString(), this.decimals),
+          available: FN.fromInner(data.availableBalance.toString(), this.decimals)
         }))
       );
     }
@@ -84,7 +81,7 @@ class BifrostBalanceAdapter extends BalanceAdapter {
       throw new CurrencyNotFound(token);
     }
 
-    return this.storages.assets(address, tokenId).observable.pipe(
+    return this.storages.assets(tokenId, address).observable.pipe(
       map((balance) => {
         const amount = FN.fromInner(balance.free?.toString() || '0', this.getToken(token).decimals);
 
@@ -99,15 +96,15 @@ class BifrostBalanceAdapter extends BalanceAdapter {
   }
 }
 
-class BaseBifrostAdapter extends BaseCrossChainAdapter {
-  private balanceAdapter?: BifrostBalanceAdapter;
+class BaseListenAdapter extends BaseCrossChainAdapter {
+  private balanceAdapter?: ListenBalanceAdapter;
 
   public override async setApi (api: AnyApi) {
     this.api = api;
 
     await api.isReady;
 
-    this.balanceAdapter = new BifrostBalanceAdapter({ chain: this.chain.id as ChainName, api, tokens: bifrostTokensConfig });
+    this.balanceAdapter = new ListenBalanceAdapter({ chain: this.chain.id as ChainName, api, tokens: listenTokensConfig });
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
@@ -156,9 +153,6 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
     }
 
     const { address, amount, to, token } = params;
-    const toChain = chains[to];
-
-    const accountId = this.api?.createType('AccountId32', address).toHex();
 
     const tokenId = SUPPORTED_TOKENS[token];
 
@@ -166,21 +160,19 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
       throw new CurrencyNotFound(token);
     }
 
-    return this.api.tx.xTokens.transfer(
-      tokenId,
-      amount.toChainData(),
-      {
-        V1: {
-          parents: 1,
-          interior: { X2: [{ Parachain: toChain.paraChainId }, { AccountId32: { id: accountId, network: 'Any' } }] }
-        }
-      },
-      this.getDestWeight(token, to)?.toString());
+    const toChain = chains[to];
+    const accountId = this.api?.createType('AccountId32', address).toHex();
+    const dst = {
+      parents: 1,
+      interior: { X2: [{ Parachain: toChain.paraChainId }, { AccountId32: { id: accountId, network: 'Any' } }] }
+    };
+
+    return this.api?.tx.xTokens.transfer(tokenId, amount.toChainData(), { V1: dst }, this.getDestWeight(token, to)?.toString());
   }
 }
 
-export class BifrostAdapter extends BaseBifrostAdapter {
+export class ListenAdapter extends BaseListenAdapter {
   constructor () {
-    super(chains.bifrost, bifrostRoutersConfig, bifrostTokensConfig);
+    super(chains.listen, listenRoutersConfig, listenTokensConfig);
   }
 }
