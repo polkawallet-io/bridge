@@ -14,7 +14,8 @@ import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferPar
 const DEST_WEIGHT = '5000000000';
 
 export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
-  { to: 'acala', token: 'INTR', xcm: { fee: { token: 'INTR', amount: '93240000' }, weightLimit: DEST_WEIGHT } }
+  { to: 'acala', token: 'INTR', xcm: { fee: { token: 'INTR', amount: '93240000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'acala', token: 'IBTC', xcm: { fee: { token: 'IBTC', amount: '9' }, weightLimit: DEST_WEIGHT } }
 ];
 
 export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
@@ -36,7 +37,8 @@ export const interlayTokensConfig: Record<string, Record<string, BasicToken>> = 
 const SUPPORTED_TOKENS: Record<string, unknown> = {
   KINT: { Token: 'KINT' },
   KBTC: { Token: 'KBTC' },
-  INTR: { Token: 'INTR' }
+  INTR: { Token: 'INTR' },
+  IBTC: { Token: 'IBTC' }
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

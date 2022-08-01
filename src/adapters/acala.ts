@@ -23,7 +23,8 @@ export const acalaRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
   { to: 'parallel', token: 'ACA', xcm: { fee: { token: 'ACA', amount: '1920000000' }, weightLimit: ACALA_DEST_WEIGHT } },
   { to: 'parallel', token: 'AUSD', xcm: { fee: { token: 'AUSD', amount: '2880000000' }, weightLimit: ACALA_DEST_WEIGHT } },
   { to: 'parallel', token: 'LDOT', xcm: { fee: { token: 'LDOT', amount: '96000000' }, weightLimit: ACALA_DEST_WEIGHT } },
-  { to: 'interlay', token: 'INTR', xcm: { fee: { token: 'INTR', amount: '21787589' }, weightLimit: ACALA_DEST_WEIGHT } }
+  { to: 'interlay', token: 'INTR', xcm: { fee: { token: 'INTR', amount: '21787589' }, weightLimit: ACALA_DEST_WEIGHT } },
+  { to: 'interlay', token: 'IBTC', xcm: { fee: { token: 'IBTC', amount: '72' }, weightLimit: ACALA_DEST_WEIGHT } }
 ];
 export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
   { to: 'kusama', token: 'KSM', xcm: { fee: { token: 'KSM', amount: '79999999' }, weightLimit: ACALA_DEST_WEIGHT } },

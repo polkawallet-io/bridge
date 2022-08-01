@@ -15,9 +15,9 @@ Polkadot:
 | acala | polkadot | DOT |
 | acala | moonbeam | GLMR ACA AUSD |
 | acala | parallel | PARA ACA AUSD LDOT |
-| acala | interlay | INTR |
+| acala | interlay | INTR IBTC |
 | parallel | acala | PARA ACA AUSD LDOT |
-| interlay | acala | INTR |
+| interlay | acala | INTR IBTC |
 
 Kusama:
 
