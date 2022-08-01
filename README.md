@@ -25,6 +25,7 @@ Kusama:
 |--|--|--|
 | kusama | karura | KSM |
 | kusama | statemine | KSM |
+| kusama | basilisk | KSM |
 | statemine | karura | RMRK ARIS USDT |
 | karura | kusama | KSM |
 | karura | statemine | RMRK ARIS USDT |

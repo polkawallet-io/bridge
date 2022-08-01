@@ -72,7 +72,7 @@ class PhalaBalanceAdapter extends BalanceAdapter {
     };
     const tokenId = SUPPORTED_TOKENS[token];
 
-    if (!tokenId) {
+    if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 
@@ -169,7 +169,7 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
 
       const tokenId = tokenIds[token];
 
-      if (!tokenId) {
+      if (tokenId === undefined) {
         throw new CurrencyNotFound(token);
       }
 

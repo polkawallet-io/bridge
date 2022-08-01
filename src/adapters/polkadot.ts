@@ -17,6 +17,7 @@ export const polkadotRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
 ];
 export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
   { to: 'karura', token: 'KSM', xcm: { fee: { token: 'KSM', amount: '64000000' }, weightLimit: 'Unlimited' } },
+  { to: 'basilisk', token: 'KSM', xcm: { fee: { token: 'KSM', amount: '10185185' }, weightLimit: 'Unlimited' } },
   { to: 'statemine', token: 'KSM', xcm: { fee: { token: 'KSM', amount: '4000000000' }, weightLimit: 'Unlimited' } }
 ];
 
@@ -132,7 +133,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     const accountId = this.api?.createType('AccountId32', address).toHex();
 
     // to statemine
-    if (to === 'statemine') {
+    if (to === 'statemine' || to === 'statemint') {
       const dst = { interior: { X1: { ParaChain: toChain.paraChainId } }, parents: 0 };
       const acc = { interior: { X1: { AccountId32: { id: accountId, network: 'Any' } } }, parents: 0 };
       const ass = [
@@ -146,11 +147,20 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     }
 
     // to karura/acala
+    if (to === 'acala' || to === 'karura') {
+      const dst = { X1: { Parachain: toChain.paraChainId } };
+      const acc = { X1: { AccountId32: { id: accountId, network: 'Any' } } };
+      const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
+
+      return this.api?.tx.xcmPallet.reserveTransferAssets({ V0: dst }, { V0: acc }, { V0: ass }, 0);
+    }
+
+    // to other parachain
     const dst = { X1: { Parachain: toChain.paraChainId } };
     const acc = { X1: { AccountId32: { id: accountId, network: 'Any' } } };
     const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
 
-    return this.api?.tx.xcmPallet.reserveTransferAssets({ V0: dst }, { V0: acc }, { V0: ass }, 0);
+    return this.api?.tx.xcmPallet.limitedReserveTransferAssets({ V0: dst }, { V0: acc }, { V0: ass }, 0, this.getDestWeight(token, to)?.toString());
   }
 }
 

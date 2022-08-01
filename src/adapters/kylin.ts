@@ -78,7 +78,7 @@ class KylinBalanceAdapter extends BalanceAdapter {
 
     const tokenId = SUPPORTED_TOKENS[token];
 
-    if (!tokenId) {
+    if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 
@@ -159,7 +159,7 @@ class BaseKylinAdapter extends BaseCrossChainAdapter {
 
     const tokenId = SUPPORTED_TOKENS[token];
 
-    if (!tokenId) {
+    if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 

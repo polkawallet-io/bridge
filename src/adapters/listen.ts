@@ -16,7 +16,7 @@ const DEST_WEIGHT = '5000000000';
 
 export const listenRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
   { to: 'karura', token: 'LT', xcm: { fee: { token: 'LIT', amount: '93240000000' }, weightLimit: DEST_WEIGHT } },
-  { to: 'karura', token: 'KAR', xcm: { fee: { token: 'KAR', amount: '93240000000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'KAR', xcm: { fee: { token: 'KAR', amount: '9324000000' }, weightLimit: DEST_WEIGHT } },
   { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '5060238106' }, weightLimit: DEST_WEIGHT } },
   { to: 'karura', token: 'LKSM', xcm: { fee: { token: 'LKSM', amount: '700170039' }, weightLimit: DEST_WEIGHT } }
 ];
@@ -77,7 +77,7 @@ class ListenBalanceAdapter extends BalanceAdapter {
 
     const tokenId = SUPPORTED_TOKENS[token];
 
-    if (!tokenId) {
+    if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 
@@ -156,7 +156,7 @@ class BaseListenAdapter extends BaseCrossChainAdapter {
 
     const tokenId = SUPPORTED_TOKENS[token];
 
-    if (!tokenId) {
+    if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 

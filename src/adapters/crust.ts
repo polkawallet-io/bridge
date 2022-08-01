@@ -60,10 +60,6 @@ class CrustBalanceAdapter extends BalanceAdapter {
   public subscribeBalance (token: string, address: string): Observable<BalanceData> {
     const storage = this.storages.balances(address);
 
-    if (token !== this.nativeToken) {
-      throw new CurrencyNotFound(token);
-    }
-
     if (token === this.nativeToken) {
       return storage.observable.pipe(
         map((data) => ({
@@ -77,7 +73,7 @@ class CrustBalanceAdapter extends BalanceAdapter {
 
     const tokenId = SUPPORTED_TOKENS[token];
 
-    if (!tokenId) {
+    if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 

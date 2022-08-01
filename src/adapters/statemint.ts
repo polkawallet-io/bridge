@@ -89,7 +89,7 @@ class StatemintBalanceAdapter extends BalanceAdapter {
 
     const assetId = SUPPORTED_TOKENS[token];
 
-    if (!assetId) {
+    if (assetId === undefined) {
       throw new CurrencyNotFound(token);
     }
 

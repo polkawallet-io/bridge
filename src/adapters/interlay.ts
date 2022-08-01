@@ -64,7 +64,7 @@ class InterlayBalanceAdapter extends BalanceAdapter {
   public subscribeBalance (token: string, address: string): Observable<BalanceData> {
     const tokenId = SUPPORTED_TOKENS[token];
 
-    if (!tokenId) {
+    if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 
@@ -148,7 +148,7 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
 
     const tokenId = SUPPORTED_TOKENS[token];
 
-    if (!tokenId) {
+    if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 
