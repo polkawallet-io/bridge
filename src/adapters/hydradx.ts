@@ -18,7 +18,7 @@ export const basiliskRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
   { to: 'kusama', token: 'KSM', xcm: { fee: { token: 'KSM', amount: '11523248' }, weightLimit: '800000000' } },
   { to: 'karura', token: 'BSX', xcm: { fee: { token: 'BSX', amount: '93240000000' }, weightLimit: DEST_WEIGHT } },
   { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '5060238106' }, weightLimit: DEST_WEIGHT } },
-  { to: 'karura', token: 'KSM', xcm: { fee: { token: 'KSM', amount: '110077336' }, weightLimit: DEST_WEIGHT } }
+  { to: 'karura', token: 'KSM', xcm: { fee: { token: 'KSM', amount: '90741527' }, weightLimit: DEST_WEIGHT } }
 ];
 
 export const basiliskTokensConfig: Record<string, BasicToken> = {

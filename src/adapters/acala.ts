@@ -72,7 +72,7 @@ export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
   { to: 'turing', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '256000000000' }, weightLimit: ACALA_DEST_WEIGHT } },
   { to: 'turing', token: 'LKSM', xcm: { fee: { token: 'LKSM', amount: '6400000000' }, weightLimit: ACALA_DEST_WEIGHT } },
   { to: 'basilisk', token: 'BSX', xcm: { fee: { token: 'BSX', amount: '22000000000000' }, weightLimit: ACALA_DEST_WEIGHT } },
-  { to: 'basilisk', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '488840000' }, weightLimit: ACALA_DEST_WEIGHT } },
+  { to: 'basilisk', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '3150402683' }, weightLimit: ACALA_DEST_WEIGHT } },
   { to: 'listen', token: 'LT', xcm: { fee: { token: 'LT', amount: '6400000000' }, weightLimit: ACALA_DEST_WEIGHT } },
   { to: 'listen', token: 'KAR', xcm: { fee: { token: 'KAR', amount: '6400000000' }, weightLimit: ACALA_DEST_WEIGHT } },
   { to: 'listen', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '6400000000' }, weightLimit: ACALA_DEST_WEIGHT } },
