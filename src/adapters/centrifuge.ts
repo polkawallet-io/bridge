@@ -8,9 +8,21 @@ import { ISubmittableResult } from '@polkadot/types/types';
 
 import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
 import { BaseCrossChainAdapter } from '../base-chain-adapter';
-import { ChainName, chains, routersConfig } from '../configs';
+import { ChainName, chains } from '../configs';
 import { ApiNotFound, CurrencyNotFound } from '../errors';
-import { BalanceData, CrossChainTransferParams } from '../types';
+import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferParams } from '../types';
+
+const DEST_WEIGHT = '5000000000';
+
+const altairRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  { to: 'karura', token: 'AIR', xcm: { fee: { token: 'AIR', amount: '6400000000000000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '3481902463' }, weightLimit: DEST_WEIGHT } }
+];
+
+export const altairTokensConfig: Record<string, BasicToken> = {
+  AIR: { name: 'AIR', symbol: 'AIR', decimals: 18, ed: '1000000000000' },
+  KUSD: { name: 'KUSD', symbol: 'KUSD', decimals: 12, ed: '100000000000' }
+};
 
 const SUPPORTED_TOKENS: Record<string, string> = {
   KUSD: 'KUSD'
@@ -37,8 +49,8 @@ const createBalanceStorages = (api: AnyApi) => {
 class CentrifugeBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
-  constructor ({ api, chain }: BalanceAdapterConfigs) {
-    super({ api, chain });
+  constructor ({ api, chain, tokens }: BalanceAdapterConfigs) {
+    super({ api, chain, tokens });
     this.storages = createBalanceStorages(api);
   }
 
@@ -58,13 +70,13 @@ class CentrifugeBalanceAdapter extends BalanceAdapter {
 
     const tokenId = SUPPORTED_TOKENS[token];
 
-    if (!tokenId) {
+    if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 
     return this.storages.assets(address, tokenId).observable.pipe(
       map((balance) => {
-        const amount = FN.fromInner(balance.free?.toString() || '0', this.getTokenDecimals(tokenId));
+        const amount = FN.fromInner(balance.free?.toString() || '0', this.getToken(tokenId).decimals);
 
         return {
           free: amount,
@@ -85,7 +97,7 @@ class BaseCentrifugeAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.balanceAdapter = new CentrifugeBalanceAdapter({ chain: this.chain.id, api });
+    this.balanceAdapter = new CentrifugeBalanceAdapter({ chain: this.chain.id as ChainName, api, tokens: altairTokensConfig });
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
@@ -114,15 +126,15 @@ class BaseCentrifugeAdapter extends BaseCrossChainAdapter {
             }
           )
           : '0',
-      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getTokenED(token)
+      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available))
     }).pipe(
-      map(({ balance, ed, txFee }) => {
+      map(({ balance, txFee }) => {
+        const tokenMeta = this.balanceAdapter?.getToken(token);
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, this.balanceAdapter?.getTokenDecimals(token)).mul(new FN(feeFactor));
+        const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(new FN(feeFactor));
 
         // always minus ed
-        return balance.minus(fee).minus(ed || FN.ZERO);
+        return balance.minus(fee).minus(FN.fromInner(tokenMeta?.ed || '0', tokenMeta?.decimals));
       })
     );
   }
@@ -158,6 +170,6 @@ class BaseCentrifugeAdapter extends BaseCrossChainAdapter {
 
 export class AltairAdapter extends BaseCentrifugeAdapter {
   constructor () {
-    super(chains.altair, routersConfig.altair);
+    super(chains.altair, altairRoutersConfig, altairTokensConfig);
   }
 }

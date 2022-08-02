@@ -5,11 +5,29 @@ import { combineLatest, map, Observable } from 'rxjs';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { ISubmittableResult } from '@polkadot/types/types';
 
-import { BalanceAdapter } from '../balance-adapter';
+import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
 import { BaseCrossChainAdapter } from '../base-chain-adapter';
-import { ChainName, chains, routersConfig } from '../configs';
+import { ChainName, chains } from '../configs';
 import { ApiNotFound, CurrencyNotFound } from '../errors';
-import { BalanceData, CrossChainTransferParams } from '../types';
+import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferParams } from '../types';
+
+const DEST_WEIGHT = '5000000000';
+
+export const bifrostRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  { to: 'karura', token: 'BNC', xcm: { fee: { token: 'BNC', amount: '5120000000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'VSKSM', xcm: { fee: { token: 'VSKSM', amount: '64000000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'KSM', xcm: { fee: { token: 'KSM', amount: '64000000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'KAR', xcm: { fee: { token: 'KAR', amount: '6400000000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '10011896008' }, weightLimit: DEST_WEIGHT } }
+];
+
+export const bifrostTokensConfig: Record<string, BasicToken> = {
+  BNC: { name: 'BNC', symbol: 'BNC', decimals: 12, ed: '10000000000' },
+  VSKSM: { name: 'VSKSM', symbol: 'VSKSM', decimals: 12, ed: '100000000' },
+  KSM: { name: 'KSM', symbol: 'KSM', decimals: 12, ed: '100000000' },
+  KAR: { name: 'KAR', symbol: 'KAR', decimals: 12, ed: '148000000' },
+  KUSD: { name: 'KUSD', symbol: 'KUSD', decimals: 12, ed: '100000000' }
+};
 
 const SUPPORTED_TOKENS: Record<string, unknown> = {
   KUSD: { Stable: 'KUSD' },
@@ -38,16 +56,11 @@ const createBalanceStorages = (api: AnyApi) => {
   };
 };
 
-interface BifrostBalanceAdapterConfigs {
-  chain: ChainName;
-  api: AnyApi;
-}
-
 class BifrostBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
-  constructor ({ api, chain }: BifrostBalanceAdapterConfigs) {
-    super({ api, chain });
+  constructor ({ api, chain, tokens }: BalanceAdapterConfigs) {
+    super({ api, chain, tokens });
     this.storages = createBalanceStorages(api);
   }
 
@@ -67,13 +80,13 @@ class BifrostBalanceAdapter extends BalanceAdapter {
 
     const tokenId = SUPPORTED_TOKENS[token];
 
-    if (!tokenId) {
+    if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 
     return this.storages.assets(address, tokenId).observable.pipe(
       map((balance) => {
-        const amount = FN.fromInner(balance.free?.toString() || '0', this.getTokenDecimals(token));
+        const amount = FN.fromInner(balance.free?.toString() || '0', this.getToken(token).decimals);
 
         return {
           free: amount,
@@ -94,7 +107,7 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.balanceAdapter = new BifrostBalanceAdapter({ chain: this.chain.id, api });
+    this.balanceAdapter = new BifrostBalanceAdapter({ chain: this.chain.id as ChainName, api, tokens: bifrostTokensConfig });
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
@@ -124,15 +137,15 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
 
           )
           : '0',
-      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getTokenED(token)
+      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available))
     }).pipe(
-      map(({ balance, ed, txFee }) => {
+      map(({ balance, txFee }) => {
+        const tokenMeta = this.balanceAdapter?.getToken(token);
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, this.balanceAdapter?.getTokenDecimals(token)).mul(new FN(feeFactor));
+        const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(new FN(feeFactor));
 
         // always minus ed
-        return balance.minus(fee).minus(ed || FN.ZERO);
+        return balance.minus(fee).minus(FN.fromInner(tokenMeta?.ed || '0', tokenMeta?.decimals));
       })
     );
   }
@@ -149,7 +162,7 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
 
     const tokenId = SUPPORTED_TOKENS[token];
 
-    if (!tokenId) {
+    if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 
@@ -168,6 +181,6 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
 
 export class BifrostAdapter extends BaseBifrostAdapter {
   constructor () {
-    super(chains.bifrost, routersConfig.bifrost);
+    super(chains.bifrost, bifrostRoutersConfig, bifrostTokensConfig);
   }
 }

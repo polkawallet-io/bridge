@@ -5,25 +5,25 @@ import { catchError, map } from 'rxjs/operators';
 import { ApiRx } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { ISubmittableResult } from '@polkadot/types/types';
-import { BN } from '@polkadot/util';
 
-import { multiChainTokensConfig } from './configs/tokens';
 import { ChainName, chains } from './configs';
-import { RouterConfigNotFound, TokenConfigItemNotFound, TokenConfigNotFound } from './errors';
-import { BalanceChangedStatus, BalanceData, Chain, CrossChainBalanceChangedConfigs, CrossChainInputConfigs, CrossChainRouterConfigs, CrossChainTransferParams, TokenBalance } from './types';
+import { AdapterNotFound, RouterConfigNotFound, TokenConfigNotFound } from './errors';
+import { BalanceChangedStatus, BalanceData, BasicToken, Chain, CrossChainBalanceChangedConfigs, CrossChainInputConfigs, CrossChainRouterConfigs, CrossChainTransferParams, TokenBalance } from './types';
 
 const DEFAULT_TX_CHECKING_TIMEOUT = 2 * 60 * 1000;
 
 export abstract class BaseCrossChainAdapter {
   protected routers: Omit<CrossChainRouterConfigs, 'from'>[];
+  protected tokens: Record<string, BasicToken>;
   protected api?: AnyApi;
   readonly chain: Chain;
   // @ts-ignore
   private findAdapter!: (chain: Chain | ChainName) => BaseCrossChainAdapter;
 
-  constructor (chain: Chain, routers: Omit<CrossChainRouterConfigs, 'from'>[]) {
+  constructor (chain: Chain, routers: Omit<CrossChainRouterConfigs, 'from'>[], tokens: Record<string, BasicToken>) {
     this.chain = chain;
     this.routers = routers;
+    this.tokens = tokens;
   }
 
   public async setApi (api: AnyApi) {
@@ -41,7 +41,7 @@ export abstract class BaseCrossChainAdapter {
   }
 
   public getRouters (): CrossChainRouterConfigs[] {
-    return this.routers.map((i) => ({ ...i, from: this.chain.id }));
+    return this.routers.map((i) => ({ ...i, from: this.chain.id as ChainName }));
   }
 
   public getSS58Prefix (): number {
@@ -81,45 +81,34 @@ export abstract class BaseCrossChainAdapter {
     return of(this.getDestED(token, to).balance.add(destFee.token === token ? destFee.balance : FN.ZERO));
   }
 
-  public getTokenDecimals (token: string, destChain: ChainName): number {
-    const tokenConfig = multiChainTokensConfig[token];
+  public getToken (token: string, chain: ChainName): BasicToken {
+    let tokenConfig: BasicToken;
+
+    if (chain === this.chain.id) {
+      tokenConfig = this.tokens[token];
+    } else {
+      const destAdapter = this.findAdapter(chain);
+
+      if (!destAdapter) {
+        throw new AdapterNotFound(token);
+      }
+
+      tokenConfig = destAdapter.tokens[token];
+    }
 
     if (!tokenConfig) {
-      throw new TokenConfigNotFound(token);
+      throw new TokenConfigNotFound(token, chain);
     }
 
-    if (typeof tokenConfig.decimals === 'number') {
-      return tokenConfig.decimals;
-    }
-
-    if (tokenConfig.decimals[destChain] === undefined) {
-      throw new TokenConfigItemNotFound(token, 'decimals', destChain);
-    }
-
-    return tokenConfig.decimals[destChain] || 18;
+    return tokenConfig;
   }
 
   public getDestED (token: string, destChain: ChainName): TokenBalance {
-    const tokenConfig = multiChainTokensConfig[token];
-
-    if (!tokenConfig) {
-      throw new TokenConfigNotFound(token);
-    }
-
-    if (tokenConfig.ed instanceof BN) {
-      return {
-        token,
-        balance: FN.fromInner(tokenConfig.ed.toString(), this.getTokenDecimals(token, destChain))
-      };
-    }
-
-    if (tokenConfig.ed[destChain] === undefined) {
-      throw new TokenConfigItemNotFound(token, 'ed', destChain);
-    }
+    const tokenConfig = this.getToken(token, destChain);
 
     return {
       token,
-      balance: FN.fromInner(tokenConfig.ed[destChain]?.toString() || '0', this.getTokenDecimals(token, destChain))
+      balance: FN.fromInner(tokenConfig.ed, tokenConfig.decimals)
     };
   }
 
@@ -130,10 +119,12 @@ export abstract class BaseCrossChainAdapter {
       throw new RouterConfigNotFound(token, destChain, this.chain.id);
     }
 
-    return router.xcm?.fee || { token, balance: new FN(0) };
+    const feeToken = router.xcm?.fee?.token || token;
+
+    return { token: feeToken, balance: FN.fromInner(router.xcm?.fee?.amount || 0, this.getToken(feeToken, destChain).decimals) };
   }
 
-  public getDestWeight (token: string, destChain: ChainName): BN | 'Unlimited' | 'Limited' | undefined {
+  public getDestWeight (token: string, destChain: ChainName): string | 'Unlimited' | 'Limited' | undefined {
     const router = this.routers.find((e) => e.to === destChain && e.token === token);
 
     if (!router) {

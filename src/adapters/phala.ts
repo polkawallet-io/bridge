@@ -6,11 +6,25 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { DeriveBalancesAll } from '@polkadot/api-derive/balances/types';
 import { ISubmittableResult } from '@polkadot/types/types';
 
-import { BalanceAdapter } from '../balance-adapter';
+import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
 import { BaseCrossChainAdapter } from '../base-chain-adapter';
-import { ChainName, chains, routersConfig } from '../configs';
+import { ChainName, chains } from '../configs';
 import { ApiNotFound, CurrencyNotFound } from '../errors';
-import { BalanceData, CrossChainTransferParams } from '../types';
+import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferParams } from '../types';
+
+const DEST_WEIGHT = '5000000000';
+
+export const khalaRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  { to: 'karura', token: 'PHA', xcm: { fee: { token: 'PHA', amount: '51200000000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '4616667257' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'KAR', xcm: { fee: { token: 'KAR', amount: '6400000000' }, weightLimit: DEST_WEIGHT } }
+];
+
+export const khalaTokensConfig: Record<string, BasicToken> = {
+  PHA: { name: 'PHA', symbol: 'PHA', decimals: 12, ed: '40000000000' },
+  KAR: { name: 'KAR', symbol: 'KAR', decimals: 12, ed: '10000000000' },
+  KUSD: { name: 'KUSD', symbol: 'KUSD', decimals: 12, ed: '10000000000' }
+};
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const createBalanceStorages = (api: AnyApi) => {
@@ -30,16 +44,11 @@ const createBalanceStorages = (api: AnyApi) => {
   };
 };
 
-interface PhalaBalanceAdapterConfigs {
-  chain: ChainName;
-  api: AnyApi;
-}
-
 class PhalaBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
-  constructor ({ api, chain }: PhalaBalanceAdapterConfigs) {
-    super({ api, chain });
+  constructor ({ api, chain, tokens }: BalanceAdapterConfigs) {
+    super({ api, chain, tokens });
     this.storages = createBalanceStorages(api);
   }
 
@@ -63,13 +72,13 @@ class PhalaBalanceAdapter extends BalanceAdapter {
     };
     const tokenId = SUPPORTED_TOKENS[token];
 
-    if (!tokenId) {
+    if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 
     return this.storages.assets(tokenId, address).observable.pipe(
       map((balance) => {
-        const amount = FN.fromInner(balance.unwrapOrDefault()?.balance?.toString() || '0', this.getTokenDecimals(token));
+        const amount = FN.fromInner(balance.unwrapOrDefault()?.balance?.toString() || '0', this.getToken(token).decimals);
 
         return {
           free: amount,
@@ -90,7 +99,7 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.balanceAdapter = new PhalaBalanceAdapter({ chain: this.chain.id, api });
+    this.balanceAdapter = new PhalaBalanceAdapter({ chain: this.chain.id as ChainName, api, tokens: khalaTokensConfig });
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
@@ -120,15 +129,15 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
 
           )
           : '0',
-      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getTokenED(token)
+      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available))
     }).pipe(
-      map(({ balance, ed, txFee }) => {
+      map(({ balance, txFee }) => {
+        const tokenMeta = this.balanceAdapter?.getToken(token);
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, this.balanceAdapter?.getTokenDecimals(token)).mul(new FN(feeFactor));
+        const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(new FN(feeFactor));
 
         // always minus ed
-        return balance.minus(fee).minus(ed || FN.ZERO);
+        return balance.minus(fee).minus(FN.fromInner(tokenMeta?.ed || '0', tokenMeta?.decimals));
       })
     );
   }
@@ -160,7 +169,7 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
 
       const tokenId = tokenIds[token];
 
-      if (!tokenId) {
+      if (tokenId === undefined) {
         throw new CurrencyNotFound(token);
       }
 
@@ -179,6 +188,6 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
 
 export class KhalaAdapter extends BasePhalaAdapter {
   constructor () {
-    super(chains.khala, routersConfig.khala);
+    super(chains.khala, khalaRoutersConfig, khalaTokensConfig);
   }
 }

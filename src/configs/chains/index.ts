@@ -9,4 +9,4 @@ export const rawChains = {
 
 export type ChainName = keyof typeof rawChains;
 
-export const chains = rawChains as Record<ChainName, Chain>;
+export const chains: Record<ChainName, Chain> = rawChains;

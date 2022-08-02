@@ -5,16 +5,40 @@ import { combineLatest, map, Observable } from 'rxjs';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { ISubmittableResult } from '@polkadot/types/types';
 
-import { BalanceAdapter } from '../balance-adapter';
+import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
 import { BaseCrossChainAdapter } from '../base-chain-adapter';
-import { ChainName, chains, routersConfig } from '../configs';
+import { ChainName, chains } from '../configs';
 import { ApiNotFound, CurrencyNotFound } from '../errors';
-import { BalanceData, CrossChainTransferParams } from '../types';
+import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferParams } from '../types';
+
+const DEST_WEIGHT = '5000000000';
+
+export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  { to: 'acala', token: 'INTR', xcm: { fee: { token: 'INTR', amount: '93240000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'acala', token: 'IBTC', xcm: { fee: { token: 'IBTC', amount: '9' }, weightLimit: DEST_WEIGHT } }
+];
+
+export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  { to: 'karura', token: 'KINT', xcm: { fee: { token: 'KINT', amount: '170666666' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'KBTC', xcm: { fee: { token: 'KBTC', amount: '85' }, weightLimit: DEST_WEIGHT } }
+];
+
+export const interlayTokensConfig: Record<string, Record<string, BasicToken>> = {
+  interlay: {
+    INTR: { name: 'INTR', symbol: 'INTR', decimals: 10, ed: '0' },
+    IBCT: { name: 'IBCT', symbol: 'IBCT', decimals: 8, ed: '0' }
+  },
+  kintsugi: {
+    KINT: { name: 'KINT', symbol: 'KINT', decimals: 12, ed: '0' },
+    KBTC: { name: 'KBTC', symbol: 'KBTC', decimals: 8, ed: '0' }
+  }
+};
 
 const SUPPORTED_TOKENS: Record<string, unknown> = {
   KINT: { Token: 'KINT' },
   KBTC: { Token: 'KBTC' },
-  INTR: { Token: 'INTR' }
+  INTR: { Token: 'INTR' },
+  IBTC: { Token: 'IBTC' }
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -29,29 +53,24 @@ const createBalanceStorages = (api: AnyApi) => {
   };
 };
 
-interface InterlayBalanceAdapterConfigs {
-  chain: ChainName;
-  api: AnyApi;
-}
-
 class InterlayBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
-  constructor ({ api, chain }: InterlayBalanceAdapterConfigs) {
-    super({ api, chain });
+  constructor ({ api, chain, tokens }: BalanceAdapterConfigs) {
+    super({ api, chain, tokens });
     this.storages = createBalanceStorages(api);
   }
 
   public subscribeBalance (token: string, address: string): Observable<BalanceData> {
     const tokenId = SUPPORTED_TOKENS[token];
 
-    if (!tokenId) {
+    if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 
     return this.storages.assets(address, tokenId).observable.pipe(
       map((balance) => {
-        const amount = FN.fromInner(balance.free?.toString() || '0', this.getTokenDecimals(token));
+        const amount = FN.fromInner(balance.free?.toString() || '0', this.getToken(token).decimals);
 
         return {
           free: amount,
@@ -72,7 +91,9 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.balanceAdapter = new InterlayBalanceAdapter({ chain: this.chain.id, api });
+    const chain = this.chain.id as ChainName;
+
+    this.balanceAdapter = new InterlayBalanceAdapter({ chain, api, tokens: interlayTokensConfig[chain] });
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
@@ -102,15 +123,15 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
 
           )
           : '0',
-      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getTokenED(token)
+      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available))
     }).pipe(
-      map(({ balance, ed, txFee }) => {
+      map(({ balance, txFee }) => {
+        const tokenMeta = this.balanceAdapter?.getToken(token);
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, this.balanceAdapter?.getTokenDecimals(token)).mul(new FN(feeFactor));
+        const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(new FN(feeFactor));
 
         // always minus ed
-        return balance.minus(fee).minus(ed || FN.ZERO);
+        return balance.minus(fee).minus(FN.fromInner(tokenMeta?.ed || '0', tokenMeta?.decimals));
       })
     );
   }
@@ -127,7 +148,7 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
 
     const tokenId = SUPPORTED_TOKENS[token];
 
-    if (!tokenId) {
+    if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 
@@ -146,12 +167,12 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
 
 export class InterlayAdapter extends BaseInterlayAdapter {
   constructor () {
-    super(chains.interlay, routersConfig.interlay);
+    super(chains.interlay, interlayRoutersConfig, interlayTokensConfig.interlay);
   }
 }
 
 export class KintsugiAdapter extends BaseInterlayAdapter {
   constructor () {
-    super(chains.kintsugi, routersConfig.kintsugi);
+    super(chains.kintsugi, kintsugiRoutersConfig, interlayTokensConfig.kintsugi);
   }
 }

@@ -5,6 +5,7 @@ import { ApiProvider } from '../api-provider';
 import { chains, ChainName } from '../configs';
 import { Bridge } from '..';
 import { KaruraAdapter } from './acala';
+import { KusamaAdapter } from './polkadot';
 
 describe.skip('acala-adapter should work', () => {
   jest.setTimeout(30000);
@@ -12,27 +13,29 @@ describe.skip('acala-adapter should work', () => {
   const testAccount = '5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN';
   const provider = new ApiProvider();
 
-  async function connect (chain: ChainName) {
+  async function connect (chains: ChainName[]) {
     // return firstValueFrom(provider.connectFromChain([chain], { karura: ["wss://crosschain-dev.polkawallet.io:9907"] }));
-    return firstValueFrom(provider.connectFromChain([chain], undefined));
+    return firstValueFrom(provider.connectFromChain(chains, undefined));
   }
 
   test('connect karura to do xcm', async () => {
-    const fromChain = 'karura';
+    const fromChains = ['karura', 'kusama'] as ChainName[];
 
-    await connect(fromChain);
+    await connect(fromChains);
 
     const karura = new KaruraAdapter();
+    const kusama = new KusamaAdapter();
 
-    await karura.setApi(provider.getApi(fromChain));
+    await karura.setApi(provider.getApi(fromChains[0]));
+    await kusama.setApi(provider.getApi(fromChains[1]));
 
     const bridge = new Bridge({
-      adapters: [karura]
+      adapters: [karura, kusama]
     });
 
     expect(bridge.router.getDestiantionsChains({ from: chains.karura, token: 'KSM' }).length).toEqual(1);
 
-    const adapter = bridge.findAdapter(fromChain);
+    const adapter = bridge.findAdapter(fromChains[0]);
 
     async function runMyTestSuit (to: ChainName, token: string) {
       if (adapter) {
@@ -74,7 +77,7 @@ describe.skip('acala-adapter should work', () => {
       }
     }
 
-    await runMyTestSuit('statemine', 'RMRK');
+    // await runMyTestSuit('statemine', 'RMRK');
     await runMyTestSuit("kusama", "KSM");
     // await runMyTestSuit("bifrost", "KAR");
     // await runMyTestSuit("bifrost", "KUSD");

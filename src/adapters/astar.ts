@@ -8,9 +8,19 @@ import { ISubmittableResult } from '@polkadot/types/types';
 
 import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
 import { BaseCrossChainAdapter } from '../base-chain-adapter';
-import { ChainName, chains, routersConfig } from '../configs';
+import { ChainName, chains } from '../configs';
 import { ApiNotFound, CurrencyNotFound } from '../errors';
-import { BalanceData, CrossChainTransferParams } from '../types';
+import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferParams } from '../types';
+
+export const shidenRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  { to: 'karura', token: 'SDN', xcm: { fee: { token: 'SDN', amount: '932400000000000' }, weightLimit: 'Unlimited' } },
+  { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '3826597686' }, weightLimit: 'Unlimited' } }
+];
+
+export const shidenTokensConfig: Record<string, BasicToken> = {
+  SDN: { name: 'SDN', symbol: 'SDN', decimals: 18, ed: '1000000' },
+  KUSD: { name: 'KUSD', symbol: 'KUSD', decimals: 12, ed: '1' }
+};
 
 const SUPPORTED_TOKENS: Record<string, string> = {
   KUSD: '18446744073709551616'
@@ -37,8 +47,8 @@ const createBalanceStorages = (api: AnyApi) => {
 class AstarBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
-  constructor ({ api, chain }: BalanceAdapterConfigs) {
-    super({ api, chain });
+  constructor ({ api, chain, tokens }: BalanceAdapterConfigs) {
+    super({ api, chain, tokens });
     this.storages = createBalanceStorages(api);
   }
 
@@ -58,13 +68,13 @@ class AstarBalanceAdapter extends BalanceAdapter {
 
     const tokenId = SUPPORTED_TOKENS[token];
 
-    if (!tokenId) {
+    if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 
     return this.storages.assets(tokenId, address).observable.pipe(
       map((balance) => {
-        const amount = FN.fromInner(balance.unwrapOrDefault()?.balance?.toString() || '0', this.getTokenDecimals(token));
+        const amount = FN.fromInner(balance.unwrapOrDefault()?.balance?.toString() || '0', this.getToken(token).decimals);
 
         return {
           free: amount,
@@ -85,7 +95,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.balanceAdapter = new AstarBalanceAdapter({ chain: this.chain.id, api });
+    this.balanceAdapter = new AstarBalanceAdapter({ chain: this.chain.id as ChainName, api, tokens: shidenTokensConfig });
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
@@ -114,15 +124,15 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
             }
           )
           : '0',
-      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getTokenED(token)
+      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available))
     }).pipe(
-      map(({ balance, ed, txFee }) => {
+      map(({ balance, txFee }) => {
+        const tokenMeta = this.balanceAdapter?.getToken(token);
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, this.balanceAdapter?.getTokenDecimals(token)).mul(new FN(feeFactor));
+        const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(new FN(feeFactor));
 
         // always minus ed
-        return balance.minus(fee).minus(ed || FN.ZERO);
+        return balance.minus(fee).minus(FN.fromInner(tokenMeta?.ed || '0', tokenMeta?.decimals));
       })
     );
   }
@@ -151,7 +161,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
 
     const tokenId = tokenIds[token];
 
-    if (!tokenId) {
+    if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 
@@ -173,6 +183,6 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
 
 export class ShidenAdapter extends BaseAstarAdapter {
   constructor () {
-    super(chains.shiden, routersConfig.shiden);
+    super(chains.shiden, shidenRoutersConfig, shidenTokensConfig);
   }
 }

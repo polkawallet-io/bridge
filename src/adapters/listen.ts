@@ -14,21 +14,25 @@ import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferPar
 
 const DEST_WEIGHT = '5000000000';
 
-const shadowRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
-  { to: 'karura', token: 'CSM', xcm: { fee: { token: 'CSM', amount: '64000000000' }, weightLimit: DEST_WEIGHT } },
+export const listenRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  { to: 'karura', token: 'LT', xcm: { fee: { token: 'LT', amount: '93240000000' }, weightLimit: DEST_WEIGHT } },
   { to: 'karura', token: 'KAR', xcm: { fee: { token: 'KAR', amount: '9324000000' }, weightLimit: DEST_WEIGHT } },
-  { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '5693632140' }, weightLimit: DEST_WEIGHT } }
+  { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '5060238106' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'LKSM', xcm: { fee: { token: 'LKSM', amount: '700170039' }, weightLimit: DEST_WEIGHT } }
 ];
 
-export const shadowTokensConfig: Record<string, BasicToken> = {
-  CSM: { name: 'CSM', symbol: 'CSM', decimals: 12, ed: '100000000000' },
-  KAR: { name: 'KAR', symbol: 'KAR', decimals: 12, ed: '1' },
-  KUSD: { name: 'KUSD', symbol: 'KUSD', decimals: 12, ed: '1' }
+export const listenTokensConfig: Record<string, BasicToken> = {
+  LT: { name: 'LT', symbol: 'LT', decimals: 12, ed: '500000000000' },
+  KAR: { name: 'KAR', symbol: 'KAR', decimals: 12, ed: '100000000000' },
+  KUSD: { name: 'KUSD', symbol: 'KUSD', decimals: 12, ed: '10000000000' },
+  LKSM: { name: 'LKSM', symbol: 'LKSM', decimals: 12, ed: '500000000' }
 };
 
-const SUPPORTED_TOKENS: Record<string, string> = {
-  KAR: '10810581592933651521121702237638664357',
-  KUSD: '214920334981412447805621250067209749032'
+const SUPPORTED_TOKENS: Record<string, number> = {
+  LT: 0,
+  KAR: 128,
+  KUSD: 129,
+  LKSM: 131
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -40,16 +44,16 @@ const createBalanceStorages = (api: AnyApi) => {
         path: 'derive.balances.all',
         params: [address]
       }),
-    assets: (tokenId: string, address: string) =>
+    assets: (tokenId: number, address: string) =>
       Storage.create<any>({
         api,
-        path: 'query.assets.account',
-        params: [tokenId, address]
+        path: 'query.tokens.accounts',
+        params: [address, tokenId]
       })
   };
 };
 
-class CrustBalanceAdapter extends BalanceAdapter {
+class ListenBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
   constructor ({ api, chain, tokens }: BalanceAdapterConfigs) {
@@ -79,7 +83,7 @@ class CrustBalanceAdapter extends BalanceAdapter {
 
     return this.storages.assets(tokenId, address).observable.pipe(
       map((balance) => {
-        const amount = FN.fromInner(balance.unwrapOrDefault()?.balance?.toString() || '0', this.getToken(token).decimals);
+        const amount = FN.fromInner(balance.free?.toString() || '0', this.getToken(token).decimals);
 
         return {
           free: amount,
@@ -92,15 +96,15 @@ class CrustBalanceAdapter extends BalanceAdapter {
   }
 }
 
-class BaseCrustAdapter extends BaseCrossChainAdapter {
-  private balanceAdapter?: CrustBalanceAdapter;
+class BaseListenAdapter extends BaseCrossChainAdapter {
+  private balanceAdapter?: ListenBalanceAdapter;
 
   public override async setApi (api: AnyApi) {
     this.api = api;
 
     await api.isReady;
 
-    this.balanceAdapter = new CrustBalanceAdapter({ chain: this.chain.id as ChainName, api, tokens: shadowTokensConfig });
+    this.balanceAdapter = new ListenBalanceAdapter({ chain: this.chain.id as ChainName, api, tokens: listenTokensConfig });
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
@@ -149,32 +153,26 @@ class BaseCrustAdapter extends BaseCrossChainAdapter {
     }
 
     const { address, amount, to, token } = params;
-    const toChain = chains[to];
-
-    let ass: any;
-
-    if (token === this.balanceAdapter?.nativeToken) {
-      ass = 'SelfReserve';
-    }
 
     const tokenId = SUPPORTED_TOKENS[token];
 
     if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
-    } else {
-      ass = { OtherReserve: tokenId };
     }
 
+    const toChain = chains[to];
     const accountId = this.api?.createType('AccountId32', address).toHex();
+    const dst = {
+      parents: 1,
+      interior: { X2: [{ Parachain: toChain.paraChainId }, { AccountId32: { id: accountId, network: 'Any' } }] }
+    };
 
-    const dst = { parents: 1, interior: { X2: [{ ParaChain: toChain.paraChainId }, { AccountId32: { id: accountId, network: 'Any' } }] } };
-
-    return this.api?.tx.xTokens.transfer(ass, amount.toChainData(), { V1: dst }, this.getDestWeight(token, to)?.toString());
+    return this.api?.tx.xTokens.transfer(tokenId, amount.toChainData(), { V1: dst }, this.getDestWeight(token, to)?.toString());
   }
 }
 
-export class ShadowAdapter extends BaseCrustAdapter {
+export class ListenAdapter extends BaseListenAdapter {
   constructor () {
-    super(chains.shadow, shadowRoutersConfig, shadowTokensConfig);
+    super(chains.listen, listenRoutersConfig, listenTokensConfig);
   }
 }

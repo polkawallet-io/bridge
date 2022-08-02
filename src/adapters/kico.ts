@@ -6,11 +6,25 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { DeriveBalancesAll } from '@polkadot/api-derive/balances/types';
 import { ISubmittableResult } from '@polkadot/types/types';
 
-import { BalanceAdapter } from '../balance-adapter';
+import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
 import { BaseCrossChainAdapter } from '../base-chain-adapter';
-import { ChainName, chains, routersConfig } from '../configs';
+import { ChainName, chains } from '../configs';
 import { ApiNotFound, CurrencyNotFound } from '../errors';
-import { BalanceData, CrossChainTransferParams } from '../types';
+import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferParams } from '../types';
+
+const DEST_WEIGHT = '5000000000';
+
+export const kicoRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  { to: 'karura', token: 'KICO', xcm: { fee: { token: 'KICO', amount: '6400000000000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'KAR', xcm: { fee: { token: 'KAR', amount: '6400000000' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '10011896008' }, weightLimit: DEST_WEIGHT } }
+];
+
+export const kicoTokensConfig: Record<string, BasicToken> = {
+  KICO: { name: 'KICO', symbol: 'KICO', decimals: 14, ed: '100000000000000' },
+  KAR: { name: 'KAR', symbol: 'KAR', decimals: 12, ed: '0' },
+  KUSD: { name: 'KUSD', symbol: 'KUSD', decimals: 12, ed: '0' }
+};
 
 const SUPPORTED_TOKENS: Record<string, number> = {
   KICO: 0,
@@ -36,16 +50,11 @@ const createBalanceStorages = (api: AnyApi) => {
   };
 };
 
-interface KicoBalanceAdapterConfigs {
-  chain: ChainName;
-  api: AnyApi;
-}
-
 class KicoBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
-  constructor ({ api, chain }: KicoBalanceAdapterConfigs) {
-    super({ api, chain });
+  constructor ({ api, chain, tokens }: BalanceAdapterConfigs) {
+    super({ api, chain, tokens });
     this.storages = createBalanceStorages(api);
   }
 
@@ -65,13 +74,13 @@ class KicoBalanceAdapter extends BalanceAdapter {
 
     const tokenId = SUPPORTED_TOKENS[token];
 
-    if (!tokenId) {
+    if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 
     return this.storages.assets(address, tokenId).observable.pipe(
       map((balance) => {
-        const amount = FN.fromInner(balance.free?.toString() || '0', this.getTokenDecimals(token));
+        const amount = FN.fromInner(balance.free?.toString() || '0', this.getToken(token).decimals);
 
         return {
           free: amount,
@@ -92,7 +101,7 @@ class BaseKicoAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.balanceAdapter = new KicoBalanceAdapter({ chain: this.chain.id, api });
+    this.balanceAdapter = new KicoBalanceAdapter({ chain: this.chain.id as ChainName, api, tokens: kicoTokensConfig });
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
@@ -122,15 +131,15 @@ class BaseKicoAdapter extends BaseCrossChainAdapter {
 
           )
           : '0',
-      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available)),
-      ed: this.balanceAdapter?.getTokenED(token)
+      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available))
     }).pipe(
-      map(({ balance, ed, txFee }) => {
+      map(({ balance, txFee }) => {
+        const tokenMeta = this.balanceAdapter?.getToken(token);
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, this.balanceAdapter?.getTokenDecimals(token)).mul(new FN(feeFactor));
+        const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(new FN(feeFactor));
 
         // always minus ed
-        return balance.minus(fee).minus(ed || FN.ZERO);
+        return balance.minus(fee).minus(FN.fromInner(tokenMeta?.ed || '0', tokenMeta?.decimals));
       })
     );
   }
@@ -166,6 +175,6 @@ class BaseKicoAdapter extends BaseCrossChainAdapter {
 
 export class KicoAdapter extends BaseKicoAdapter {
   constructor () {
-    super(chains.kico, routersConfig.kico);
+    super(chains.kico, kicoRoutersConfig, kicoTokensConfig);
   }
 }

@@ -17,10 +17,10 @@ export class Bridge implements BaseSDK {
 
   public isReady$: BehaviorSubject<boolean>;
 
-  constructor ({ adapters }: BridgeConfigs) {
+  constructor ({ adapters, routersDisabled }: BridgeConfigs) {
     this.isReady$ = new BehaviorSubject<boolean>(false);
     this.adapters = adapters;
-    this.router = new BridgeRouterManager({ adapters });
+    this.router = new BridgeRouterManager({ adapters, routersDisabled });
     this.init();
   }
 
@@ -28,7 +28,11 @@ export class Bridge implements BaseSDK {
     this.adapters.forEach((i) => this.router.addRouters(i.getRouters()));
     this.adapters.forEach((i) => i.injectFindAdapter(this.findAdapter));
 
-    this.router.updateDisabledRouters().then(() => this.isReady$.next(true));
+    if (this.router.routersDisabled.length === 0) {
+      this.router.updateDisabledRouters().then(() => this.isReady$.next(true));
+    } else {
+      this.isReady$.next(true);
+    }
   }
 
   public get isReady (): Promise<boolean> {
@@ -50,5 +54,4 @@ export * from './cross-chain-router';
 export * from './api-provider';
 export * from './adapters';
 export * from './configs/index';
-export * from './configs/routers';
 export * from './types';
