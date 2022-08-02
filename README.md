@@ -45,7 +45,7 @@ Kusama:
 | karura | turing | TUR KAR AUSD LKSM |
 | karura | quartz | QTZ |
 | karura | basilisk | BSX AUSD |
-| karura | listen | LIT KAR AUSD LKSM |
+| karura | listen | LT KAR AUSD LKSM |
 | bifrost | karura | BNC KAR AUSD KSM VSKSM |
 | shiden | karura | SDN AUSD |
 | altair | karura | AIR AUSD |
@@ -63,7 +63,7 @@ Kusama:
 | quartz | karura | QTZ |
 | basilisk | kusama | KSM |
 | basilisk | karura | BSX AUSD KSM |
-| listen | karura | LIT KAR AUSD LKSM |
+| listen | karura | LT KAR AUSD LKSM |
 
 ## Usage
 
