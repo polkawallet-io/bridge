@@ -1,11 +1,11 @@
 import { BaseSDK } from '@acala-network/sdk';
-import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { BehaviorSubject, filter, firstValueFrom } from 'rxjs';
 
 import { ChainName } from './configs/index';
 import { BaseCrossChainAdapter } from './base-chain-adapter';
 import { BridgeRouterManager } from './cross-chain-router';
 import { NoCrossChainAdapterFound } from './errors';
-import { BridgeConfigs, Chain } from './types';
+import { BridgeConfigs, Chain, RouterFilter } from './types';
 
 export class Bridge implements BaseSDK {
   readonly router: BridgeRouterManager;
@@ -21,14 +21,14 @@ export class Bridge implements BaseSDK {
     this.isReady$ = new BehaviorSubject<boolean>(false);
     this.adapters = adapters;
     this.router = new BridgeRouterManager({ adapters, routersDisabled });
-    this.init();
+    this.init(routersDisabled);
   }
 
-  public init (): void {
+  public init (routersDisabled?: RouterFilter[]): void {
     this.adapters.forEach((i) => this.router.addRouters(i.getRouters()));
     this.adapters.forEach((i) => i.injectFindAdapter(this.findAdapter));
 
-    if (this.router.routersDisabled.length === 0) {
+    if (routersDisabled === undefined) {
       this.router.updateDisabledRouters().then(() => this.isReady$.next(true));
     } else {
       this.isReady$.next(true);
@@ -36,7 +36,7 @@ export class Bridge implements BaseSDK {
   }
 
   public get isReady (): Promise<boolean> {
-    return firstValueFrom(this.isReady$.asObservable().pipe((i) => i));
+    return firstValueFrom(this.isReady$.asObservable().pipe(filter((i) => i === true)));
   }
 
   public findAdapter = (chain: ChainName | Chain): BaseCrossChainAdapter => {

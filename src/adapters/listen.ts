@@ -17,8 +17,8 @@ const DEST_WEIGHT = '5000000000';
 export const listenRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
   { to: 'karura', token: 'LT', xcm: { fee: { token: 'LT', amount: '93240000000' }, weightLimit: DEST_WEIGHT } },
   { to: 'karura', token: 'KAR', xcm: { fee: { token: 'KAR', amount: '9324000000' }, weightLimit: DEST_WEIGHT } },
-  { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '5060238106' }, weightLimit: DEST_WEIGHT } },
-  { to: 'karura', token: 'LKSM', xcm: { fee: { token: 'LKSM', amount: '700170039' }, weightLimit: DEST_WEIGHT } }
+  { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '5693632140' }, weightLimit: DEST_WEIGHT } },
+  { to: 'karura', token: 'LKSM', xcm: { fee: { token: 'LKSM', amount: '739331668' }, weightLimit: DEST_WEIGHT } }
 ];
 
 export const listenTokensConfig: Record<string, BasicToken> = {
