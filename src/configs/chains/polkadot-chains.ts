@@ -8,7 +8,7 @@ export const polkadotChains = {
     id: 'polkadot',
     display: 'Polkadot',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/polkadot.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fpolkadot.png&w=96&q=75',
     paraChainId: -1,
     ss58Prefix: 0
   },
@@ -16,7 +16,7 @@ export const polkadotChains = {
     id: 'statemint',
     display: 'Statemint',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/statemine.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fstatemine.png&w=96&q=75',
     paraChainId: 1000,
     ss58Prefix: 0
   },
@@ -24,7 +24,7 @@ export const polkadotChains = {
     id: 'acala',
     display: 'Acala',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/acala.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Facala.png&w=96&q=75',
     paraChainId: 2000,
     ss58Prefix: 10
   },
@@ -32,7 +32,7 @@ export const polkadotChains = {
     id: 'parallel',
     display: 'Parallel',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/parallel.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fparallel.png&w=96&q=75',
     paraChainId: 2012,
     ss58Prefix: 172
   },
@@ -40,7 +40,7 @@ export const polkadotChains = {
     id: 'moonbeam',
     display: 'Moonbeam',
     type: typeEthereum,
-    icon: 'https://resources.acala.network/networks/moonbeam.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fmoonbeam.png&w=96&q=75',
     paraChainId: 2004,
     ss58Prefix: 1284
   },
@@ -48,7 +48,7 @@ export const polkadotChains = {
     id: 'interlay',
     display: 'Interlay',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/interlay.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Finterlay.png&w=96&q=75',
     paraChainId: 2032,
     ss58Prefix: 2032
   }
