@@ -85,7 +85,7 @@ export const acalaTokensConfig: Record<string, BasicToken> = {
   AUSD: { name: 'AUSD', symbol: 'AUSD', decimals: 12, ed: '100000000000' },
   LDOT: { name: 'LDOT', symbol: 'LDOT', decimals: 10, ed: '500000000' },
   INTR: { name: 'INTR', symbol: 'INTR', decimals: 10, ed: '1000000000' },
-  IBCT: { name: 'IBCT', symbol: 'IBCT', decimals: 8, ed: '100' },
+  IBTC: { name: 'IBTC', symbol: 'IBTC', decimals: 8, ed: '100' },
   GLMR: { name: 'GLMR', symbol: 'GLMR', decimals: 18, ed: '100000000000000000' },
   PARA: { name: 'PARA', symbol: 'PARA', decimals: 12, ed: '100000000000' },
   DOT: { name: 'DOT', symbol: 'DOT', decimals: 10, ed: '100000000' }
