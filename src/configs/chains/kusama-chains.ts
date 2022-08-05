@@ -8,7 +8,7 @@ export const kusamaChains = {
     id: 'kusama',
     display: 'Kusama',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/kusama.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fkusama.png&w=96&q=75',
     paraChainId: -1,
     ss58Prefix: 2
   },
@@ -16,7 +16,7 @@ export const kusamaChains = {
     id: 'statemine',
     display: 'Statemine',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/statemine.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fstatemine.png&w=96&q=75',
     paraChainId: 1000,
     ss58Prefix: 2
   },
@@ -24,7 +24,7 @@ export const kusamaChains = {
     id: 'karura',
     display: 'Karura',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/karura.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fkarura.png&w=96&q=75',
     paraChainId: 2000,
     ss58Prefix: 8
   },
@@ -32,7 +32,7 @@ export const kusamaChains = {
     id: 'quartz',
     display: 'Quartz',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/quartz.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fquartz.png&w=96&q=75',
     paraChainId: 2095,
     ss58Prefix: 255
   },
@@ -40,7 +40,7 @@ export const kusamaChains = {
     id: 'bifrost',
     display: 'Bifrost',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/bifrost.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fbifrost.png&w=96&q=75',
     paraChainId: 2001,
     ss58Prefix: 6
   },
@@ -48,7 +48,7 @@ export const kusamaChains = {
     id: 'khala',
     display: 'Khala',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/khala.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fkhala.png&w=96&q=75',
     paraChainId: 2004,
     ss58Prefix: 30
   },
@@ -56,7 +56,7 @@ export const kusamaChains = {
     id: 'kintsugi',
     display: 'Kintsugi',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/kintsugi.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fkintsugi.png&w=96&q=75',
     paraChainId: 2092,
     ss58Prefix: 2092
   },
@@ -64,7 +64,7 @@ export const kusamaChains = {
     id: 'moonriver',
     display: 'Moonriver',
     type: typeEthereum,
-    icon: 'https://resources.acala.network/networks/moonriver.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fmoonriver.png&w=96&q=75',
     paraChainId: 2023,
     ss58Prefix: 1285
   },
@@ -72,7 +72,7 @@ export const kusamaChains = {
     id: 'heiko',
     display: 'Parallel Heiko',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/parallel.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fparallel.png&w=96&q=75',
     paraChainId: 2085,
     ss58Prefix: 110
   },
@@ -80,7 +80,7 @@ export const kusamaChains = {
     id: 'kico',
     display: 'KICO',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/kico.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fkico.png&w=96&q=75',
     paraChainId: 2107,
     ss58Prefix: 42
   },
@@ -88,7 +88,7 @@ export const kusamaChains = {
     id: 'shadow',
     display: 'Crust Shadow',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/crust shadow.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fcrust%20shadow.png&w=96&q=75',
     paraChainId: 2012,
     ss58Prefix: 66
   },
@@ -96,7 +96,7 @@ export const kusamaChains = {
     id: 'calamari',
     display: 'Calamari',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/calamari.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fcalamari.png&w=96&q=75',
     paraChainId: 2084,
     ss58Prefix: 78
   },
@@ -104,7 +104,7 @@ export const kusamaChains = {
     id: 'integritee',
     display: 'Integritee',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/integritee.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fintegritee.png&w=96&q=75',
     paraChainId: 2015,
     ss58Prefix: 13
   },
@@ -112,7 +112,7 @@ export const kusamaChains = {
     id: 'altair',
     display: 'Altair',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/altair.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Faltair.png&w=96&q=75',
     paraChainId: 2088,
     ss58Prefix: 136
   },
@@ -120,7 +120,7 @@ export const kusamaChains = {
     id: 'crab',
     display: 'Darwinia Crab',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/crab.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fcrab.png&w=96&q=75',
     paraChainId: 2105,
     ss58Prefix: 42
   },
@@ -128,7 +128,7 @@ export const kusamaChains = {
     id: 'turing',
     display: 'Turing',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/turing.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fturing.png&w=96&q=75',
     paraChainId: 2114,
     ss58Prefix: 51
   },
@@ -136,7 +136,7 @@ export const kusamaChains = {
     id: 'shiden',
     display: 'Shiden',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/shiden.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fshiden.png&w=96&q=75',
     paraChainId: 2007,
     ss58Prefix: 5
   },
@@ -144,7 +144,7 @@ export const kusamaChains = {
     id: 'pichiu',
     display: 'Pichiu',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/pichiu.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fpichiu.png&w=96&q=75',
     paraChainId: 2102,
     ss58Prefix: 42
   },
@@ -152,7 +152,7 @@ export const kusamaChains = {
     id: 'basilisk',
     display: 'Basilisk',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/basilisk.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fbasilisk.png&w=96&q=75',
     paraChainId: 2090,
     ss58Prefix: 10041
   },
@@ -160,7 +160,7 @@ export const kusamaChains = {
     id: 'listen',
     display: 'Listen',
     type: typeSubstrate,
-    icon: 'https://resources.acala.network/networks/listen.png',
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Flisten.png&w=96&q=75',
     paraChainId: 2118,
     ss58Prefix: 42
   }

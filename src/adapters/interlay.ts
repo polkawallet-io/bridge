@@ -26,7 +26,7 @@ export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
 export const interlayTokensConfig: Record<string, Record<string, BasicToken>> = {
   interlay: {
     INTR: { name: 'INTR', symbol: 'INTR', decimals: 10, ed: '0' },
-    IBCT: { name: 'IBCT', symbol: 'IBCT', decimals: 8, ed: '0' }
+    IBTC: { name: 'IBTC', symbol: 'IBTC', decimals: 8, ed: '0' }
   },
   kintsugi: {
     KINT: { name: 'KINT', symbol: 'KINT', decimals: 12, ed: '0' },

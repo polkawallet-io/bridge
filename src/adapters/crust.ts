@@ -155,14 +155,14 @@ class BaseCrustAdapter extends BaseCrossChainAdapter {
 
     if (token === this.balanceAdapter?.nativeToken) {
       ass = 'SelfReserve';
-    }
-
-    const tokenId = SUPPORTED_TOKENS[token];
-
-    if (tokenId === undefined) {
-      throw new CurrencyNotFound(token);
     } else {
-      ass = { OtherReserve: tokenId };
+      const tokenId = SUPPORTED_TOKENS[token];
+
+      if (tokenId === undefined) {
+        throw new CurrencyNotFound(token);
+      } else {
+        ass = { OtherReserve: tokenId };
+      }
     }
 
     const accountId = this.api?.createType('AccountId32', address).toHex();
