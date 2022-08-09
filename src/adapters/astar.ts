@@ -12,18 +12,38 @@ import { ChainName, chains } from '../configs';
 import { ApiNotFound, CurrencyNotFound } from '../errors';
 import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferParams } from '../types';
 
+export const astarRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+  { to: 'acala', token: 'ASTR', xcm: { fee: { token: 'ASTR', amount: '9269600000000000' }, weightLimit: 'Unlimited' } },
+  { to: 'acala', token: 'ACA', xcm: { fee: { token: 'ACA', amount: '9269600000' }, weightLimit: 'Unlimited' } },
+  { to: 'acala', token: 'AUSD', xcm: { fee: { token: 'AUSD', amount: '2719002596' }, weightLimit: 'Unlimited' } },
+  { to: 'acala', token: 'LDOT', xcm: { fee: { token: 'LDOT', amount: '31449750' }, weightLimit: 'Unlimited' } }
+];
+
 export const shidenRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
   { to: 'karura', token: 'SDN', xcm: { fee: { token: 'SDN', amount: '932400000000000' }, weightLimit: 'Unlimited' } },
   { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '3826597686' }, weightLimit: 'Unlimited' } }
 ];
 
-export const shidenTokensConfig: Record<string, BasicToken> = {
-  SDN: { name: 'SDN', symbol: 'SDN', decimals: 18, ed: '1000000' },
-  KUSD: { name: 'KUSD', symbol: 'KUSD', decimals: 12, ed: '1' }
+export const astarTokensConfig: Record<string, Record<string, BasicToken>> = {
+  astar: {
+    ASTR: { name: 'ASTR', symbol: 'ASTR', decimals: 18, ed: '1000000' },
+    ACA: { name: 'ACA', symbol: 'ACA', decimals: 12, ed: '1' },
+    AUSD: { name: 'AUSD', symbol: 'AUSD', decimals: 12, ed: '1' },
+    LDOT: { name: 'LDOT', symbol: 'LDOT', decimals: 10, ed: '1' }
+  },
+  shiden: {
+    SDN: { name: 'SDN', symbol: 'SDN', decimals: 18, ed: '1000000' },
+    KUSD: { name: 'KUSD', symbol: 'KUSD', decimals: 12, ed: '1' }
+  }
 };
 
 const SUPPORTED_TOKENS: Record<string, string> = {
-  KUSD: '18446744073709551616'
+  // to karura
+  KUSD: '18446744073709551616',
+  // to acala
+  ACA: '18446744073709551616',
+  AUSD: '18446744073709551617',
+  LDOT: '18446744073709551618'
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -95,7 +115,9 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.balanceAdapter = new AstarBalanceAdapter({ chain: this.chain.id as ChainName, api, tokens: shidenTokensConfig });
+    const chain = this.chain.id as ChainName;
+
+    this.balanceAdapter = new AstarBalanceAdapter({ chain, api, tokens: astarTokensConfig[chain] });
   }
 
   public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
@@ -156,7 +178,12 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
     }
 
     const tokenIds: Record<string, string> = {
-      KUSD: '0x0081'
+      // to karura
+      KUSD: '0x0081',
+      // to acala
+      ACA: '0x0000',
+      AUSD: '0x0001',
+      LDOT: '0x0003'
     };
 
     const tokenId = tokenIds[token];
@@ -181,8 +208,14 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
   }
 }
 
+export class AstarAdapter extends BaseAstarAdapter {
+  constructor () {
+    super(chains.astar, astarRoutersConfig, astarTokensConfig.astar);
+  }
+}
+
 export class ShidenAdapter extends BaseAstarAdapter {
   constructor () {
-    super(chains.shiden, shidenRoutersConfig, shidenTokensConfig);
+    super(chains.shiden, shidenRoutersConfig, astarTokensConfig.shiden);
   }
 }

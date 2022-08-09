@@ -51,5 +51,13 @@ export const polkadotChains = {
     icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Finterlay.png&w=96&q=75',
     paraChainId: 2032,
     ss58Prefix: 2032
+  },
+  astar: {
+    id: 'astar',
+    display: 'Astar',
+    type: typeSubstrate,
+    icon: 'https://resources.acala.network/_next/image?url=%2Fnetworks%2Fastar.png&w=96&q=75',
+    paraChainId: 2006,
+    ss58Prefix: 5
   }
 };
