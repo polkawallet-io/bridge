@@ -15,7 +15,7 @@ import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferPar
 export const astarRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
   { to: 'acala', token: 'ASTR', xcm: { fee: { token: 'ASTR', amount: '9269600000000000' }, weightLimit: 'Unlimited' } },
   { to: 'acala', token: 'ACA', xcm: { fee: { token: 'ACA', amount: '9269600000' }, weightLimit: 'Unlimited' } },
-  { to: 'acala', token: 'AUSD', xcm: { fee: { token: 'AUSD', amount: '2719002596' }, weightLimit: 'Unlimited' } },
+  { to: 'acala', token: 'AUSD', xcm: { fee: { token: 'AUSD', amount: '2931921869' }, weightLimit: 'Unlimited' } },
   { to: 'acala', token: 'LDOT', xcm: { fee: { token: 'LDOT', amount: '31449750' }, weightLimit: 'Unlimited' } }
 ];
 
