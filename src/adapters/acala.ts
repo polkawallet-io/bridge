@@ -23,6 +23,10 @@ export const acalaRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
   { to: 'parallel', token: 'ACA', xcm: { fee: { token: 'ACA', amount: '1920000000' }, weightLimit: ACALA_DEST_WEIGHT } },
   { to: 'parallel', token: 'AUSD', xcm: { fee: { token: 'AUSD', amount: '2880000000' }, weightLimit: ACALA_DEST_WEIGHT } },
   { to: 'parallel', token: 'LDOT', xcm: { fee: { token: 'LDOT', amount: '96000000' }, weightLimit: ACALA_DEST_WEIGHT } },
+  { to: 'astar', token: 'ASTR', xcm: { fee: { token: 'ASTR', amount: '4635101624603120' }, weightLimit: ACALA_DEST_WEIGHT } },
+  { to: 'astar', token: 'ACA', xcm: { fee: { token: 'ACA', amount: '1108000000' }, weightLimit: ACALA_DEST_WEIGHT } },
+  { to: 'astar', token: 'AUSD', xcm: { fee: { token: 'AUSD', amount: '252800000' }, weightLimit: ACALA_DEST_WEIGHT } },
+  { to: 'astar', token: 'LDOT', xcm: { fee: { token: 'LDOT', amount: '3692000' }, weightLimit: ACALA_DEST_WEIGHT } },
   { to: 'interlay', token: 'INTR', xcm: { fee: { token: 'INTR', amount: '21787589' }, weightLimit: ACALA_DEST_WEIGHT } },
   { to: 'interlay', token: 'IBTC', xcm: { fee: { token: 'IBTC', amount: '72' }, weightLimit: ACALA_DEST_WEIGHT } }
 ];
@@ -88,6 +92,7 @@ export const acalaTokensConfig: Record<string, BasicToken> = {
   IBTC: { name: 'IBTC', symbol: 'IBTC', decimals: 8, ed: '100' },
   GLMR: { name: 'GLMR', symbol: 'GLMR', decimals: 18, ed: '100000000000000000' },
   PARA: { name: 'PARA', symbol: 'PARA', decimals: 12, ed: '100000000000' },
+  ASTR: { name: 'ASTR', symbol: 'ASTR', decimals: 18, ed: '100000000000000000' },
   DOT: { name: 'DOT', symbol: 'DOT', decimals: 10, ed: '100000000' }
 };
 
