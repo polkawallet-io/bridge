@@ -37,7 +37,7 @@
     "lodash": "^4.17.20"
   },
   "devDependencies": {
-    "@polkadot/dev": "^0.67.3",
+    "@open-web3/dev-config": "^0.2.3",
     "@types/jest": "^28.1.1",
     "@types/lodash": "^4.14.161",
     "eslint-plugin-unused-imports": "^2.0.0",
