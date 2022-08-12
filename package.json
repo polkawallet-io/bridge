@@ -1,6 +1,6 @@
 {
   "name": "@polkawallet/bridge",
-  "version": "0.0.3-2",
+  "version": "0.0.3-3-x",
   "description": "polkawallet bridge sdk",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -16,7 +16,11 @@
     "build": "tsc",
     "test": "jest",
     "prepare": "yarn run build",
-    "lint": "polkadot-dev-run-lint"
+    "lint": "polkadot-dev-run-lint",
+    "build:release": "polkadot-ci-ghact-build"
+  },
+  "peerDependencies": {
+    "@polkadot/api": ">8"
   },
   "dependencies": {
     "@acala-network/api": "4.1.6-23",
@@ -39,5 +43,8 @@
   },
   "files": [
     "build/**/*"
-  ]
+  ],
+  "versions": {
+    "git": "0.0.3-3-x"
+  }
 }
