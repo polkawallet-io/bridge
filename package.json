@@ -2,8 +2,8 @@
   "name": "@polkawallet/bridge",
   "version": "0.0.5-4",
   "description": "polkawallet bridge sdk",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "index.js",
+  "types": "index.d.ts",
   "author": "Polkawallet developers <hello@polkawallet.io>",
   "license": "Apache-2.0",
   "engines": {
@@ -44,9 +44,6 @@
     "jest": "^28.1.1",
     "typescript": "^4.7.4"
   },
-  "files": [
-    "build/**/*"
-  ],
   "versions": {
     "git": "0.0.5-4",
     "npm": "0.0.5-4"
