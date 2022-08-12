@@ -1,1 +1,1 @@
-module.exports = require("@polkadot/dev/config/babel-config-cjs.cjs");
+module.exports = require('@open-web3/dev-config/config/babel-config-cjs.cjs');
