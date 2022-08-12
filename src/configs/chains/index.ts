@@ -1,10 +1,10 @@
-import { Chain } from '../../types';
-import { kusamaChains } from './kusama-chains';
-import { polkadotChains } from './polkadot-chains';
+import { Chain } from "../../types";
+import { kusamaChains } from "./kusama-chains";
+import { polkadotChains } from "./polkadot-chains";
 
 export const rawChains = {
   ...kusamaChains,
-  ...polkadotChains
+  ...polkadotChains,
 };
 
 export type ChainName = keyof typeof rawChains;

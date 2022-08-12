@@ -1,42 +1,58 @@
-import { options } from '@acala-network/api';
-import { combineLatest, map, Observable, race } from 'rxjs';
+import { options } from "@acala-network/api";
+import { combineLatest, map, Observable, race } from "rxjs";
 
-import { ApiPromise, ApiRx, WsProvider } from '@polkadot/api';
-import { prodParasKusama, prodParasKusamaCommon, prodParasPolkadot, prodRelayKusama, prodRelayPolkadot } from '@polkadot/apps-config/endpoints';
+import { ApiPromise, ApiRx, WsProvider } from "@polkadot/api";
+import {
+  prodParasKusama,
+  prodParasKusamaCommon,
+  prodParasPolkadot,
+  prodRelayKusama,
+  prodRelayPolkadot,
+} from "@polkadot/apps-config/endpoints";
 
-import { isChainEqual } from './utils/is-chain-equal';
-import { ChainName } from './configs';
+import { isChainEqual } from "./utils/is-chain-equal";
+import { ChainName } from "./configs";
 
 export class ApiProvider {
   protected apis: Record<string, ApiRx> = {};
   protected promiseApis: Record<string, ApiPromise> = {};
 
-  public getApi (chainName: string) {
+  public getApi(chainName: string) {
     return this.apis[chainName];
   }
 
-  public getApiPromise (chainName: string) {
+  public getApiPromise(chainName: string) {
     return this.promiseApis[chainName];
   }
 
-  public connectFromChain (chainName: ChainName[], nodeList: Partial<Record<ChainName, string[]>> | undefined) {
+  public connectFromChain(
+    chainName: ChainName[],
+    nodeList: Partial<Record<ChainName, string[]>> | undefined
+  ) {
     return combineLatest(
       chainName.map((chain) => {
         let nodes = (nodeList || {})[chain];
 
         if (!nodes) {
-          if (isChainEqual(chain, 'kusama')) {
-            nodes = Object.values(prodRelayKusama.providers).filter((e) => e.startsWith('wss://'));
-          } else if (chain === 'polkadot') {
-            nodes = Object.values(prodRelayPolkadot.providers).filter((e) => e.startsWith('wss://'));
-          } else if (chain === 'statemine') {
-            nodes = Object.values(prodParasKusamaCommon.find((e) => e.info === chain)?.providers || {}).filter((e) =>
-              e.startsWith('wss://')
+          if (isChainEqual(chain, "kusama")) {
+            nodes = Object.values(prodRelayKusama.providers).filter((e) =>
+              e.startsWith("wss://")
             );
+          } else if (chain === "polkadot") {
+            nodes = Object.values(prodRelayPolkadot.providers).filter((e) =>
+              e.startsWith("wss://")
+            );
+          } else if (chain === "statemine") {
+            nodes = Object.values(
+              prodParasKusamaCommon.find((e) => e.info === chain)?.providers ||
+                {}
+            ).filter((e) => e.startsWith("wss://"));
           } else {
-            nodes = Object.values([...prodParasKusama, ...prodParasPolkadot].find((e) => e.info === chain)?.providers || {}).filter((e) =>
-              e.startsWith('wss://')
-            );
+            nodes = Object.values(
+              [...prodParasKusama, ...prodParasPolkadot].find(
+                (e) => e.info === chain
+              )?.providers || {}
+            ).filter((e) => e.startsWith("wss://"));
           }
         }
 
@@ -49,7 +65,10 @@ export class ApiProvider {
     );
   }
 
-  public connect (nodes: string[], chainName: ChainName): Observable<ChainName | null> {
+  public connect(
+    nodes: string[],
+    chainName: ChainName
+  ): Observable<ChainName | null> {
     if (this.apis[chainName]) {
       this.apis[chainName].disconnect();
       delete this.apis[chainName];
@@ -62,14 +81,14 @@ export class ApiProvider {
 
     const wsProvider = new WsProvider(nodes);
 
-    const isAcala = chainName === 'acala' || chainName === 'karura';
+    const isAcala = chainName === "acala" || chainName === "karura";
     const option = isAcala
       ? options({
-        provider: wsProvider
-      })
+          provider: wsProvider,
+        })
       : {
-        provider: wsProvider
-      };
+          provider: wsProvider,
+        };
     const promiseApi = ApiPromise.create(option);
 
     return ApiRx.create(option).pipe(
@@ -98,7 +117,7 @@ export class ApiProvider {
     );
   }
 
-  public disconnect (chainName: ChainName) {
+  public disconnect(chainName: ChainName) {
     if (this.apis[chainName]) {
       this.apis[chainName].disconnect();
       delete this.apis[chainName];

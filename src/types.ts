@@ -1,11 +1,11 @@
-import { FixedPointNumber } from '@acala-network/sdk-core';
+import { FixedPointNumber } from "@acala-network/sdk-core";
 
-import { BaseCrossChainAdapter } from './base-chain-adapter';
-import { ChainName } from './configs';
+import { BaseCrossChainAdapter } from "./base-chain-adapter";
+import { ChainName } from "./configs";
 
-export { FixedPointNumber as FN } from '@acala-network/sdk-core';
+export { FixedPointNumber as FN } from "@acala-network/sdk-core";
 
-export type ChainType = 'substrate' | 'ethereum';
+export type ChainType = "substrate" | "ethereum";
 
 export interface Chain {
   // unique chain id
@@ -53,7 +53,7 @@ export interface CrossChainRouter {
 
 export interface XCMTransferConfigs {
   // XCM transfer weight limit
-  weightLimit: string | 'Unlimited' | 'Limited';
+  weightLimit: string | "Unlimited" | "Limited";
   // XCM transfer fee charged by `to chain`
   fee: {
     token: string;
@@ -103,10 +103,10 @@ export interface CrossChainBalanceChangedConfigs {
 }
 
 export enum BalanceChangedStatus {
-  'CHECKING',
-  'SUCCESS',
-  'TIMEOUT',
-  'UNKNOWN_ERROR',
+  "CHECKING",
+  "SUCCESS",
+  "TIMEOUT",
+  "UNKNOWN_ERROR",
 }
 
 export interface TokenBalance<T = FixedPointNumber> {

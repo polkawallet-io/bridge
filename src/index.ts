@@ -1,11 +1,11 @@
-import { BaseSDK } from '@acala-network/sdk';
-import { BehaviorSubject, filter, firstValueFrom } from 'rxjs';
+import { BaseSDK } from "@acala-network/sdk";
+import { BehaviorSubject, filter, firstValueFrom } from "rxjs";
 
-import { ChainName } from './configs/index';
-import { BaseCrossChainAdapter } from './base-chain-adapter';
-import { BridgeRouterManager } from './cross-chain-router';
-import { NoCrossChainAdapterFound } from './errors';
-import { BridgeConfigs, Chain, RouterFilter } from './types';
+import { ChainName } from "./configs/index";
+import { BaseCrossChainAdapter } from "./base-chain-adapter";
+import { BridgeRouterManager } from "./cross-chain-router";
+import { NoCrossChainAdapterFound } from "./errors";
+import { BridgeConfigs, Chain, RouterFilter } from "./types";
 
 export class Bridge implements BaseSDK {
   readonly router: BridgeRouterManager;
@@ -17,14 +17,14 @@ export class Bridge implements BaseSDK {
 
   public isReady$: BehaviorSubject<boolean>;
 
-  constructor ({ adapters, routersDisabled }: BridgeConfigs) {
+  constructor({ adapters, routersDisabled }: BridgeConfigs) {
     this.isReady$ = new BehaviorSubject<boolean>(false);
     this.adapters = adapters;
     this.router = new BridgeRouterManager({ adapters, routersDisabled });
     this.init(routersDisabled);
   }
 
-  public init (routersDisabled?: RouterFilter[]): void {
+  public init(routersDisabled?: RouterFilter[]): void {
     this.adapters.forEach((i) => this.router.addRouters(i.getRouters()));
     this.adapters.forEach((i) => i.injectFindAdapter(this.findAdapter));
 
@@ -35,8 +35,10 @@ export class Bridge implements BaseSDK {
     }
   }
 
-  public get isReady (): Promise<boolean> {
-    return firstValueFrom(this.isReady$.asObservable().pipe(filter((i) => i === true)));
+  public get isReady(): Promise<boolean> {
+    return firstValueFrom(
+      this.isReady$.asObservable().pipe(filter((i) => i === true))
+    );
   }
 
   public findAdapter = (chain: ChainName | Chain): BaseCrossChainAdapter => {
@@ -50,8 +52,8 @@ export class Bridge implements BaseSDK {
   };
 }
 
-export * from './cross-chain-router';
-export * from './api-provider';
-export * from './adapters';
-export * from './configs/index';
-export * from './types';
+export * from "./cross-chain-router";
+export * from "./api-provider";
+export * from "./adapters";
+export * from "./configs/index";
+export * from "./types";

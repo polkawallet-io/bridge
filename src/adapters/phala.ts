@@ -1,29 +1,55 @@
-import { Storage } from '@acala-network/sdk/utils/storage';
-import { AnyApi, FixedPointNumber as FN } from '@acala-network/sdk-core';
-import { combineLatest, map, Observable } from 'rxjs';
+import { Storage } from "@acala-network/sdk/utils/storage";
+import { AnyApi, FixedPointNumber as FN } from "@acala-network/sdk-core";
+import { combineLatest, map, Observable } from "rxjs";
 
-import { SubmittableExtrinsic } from '@polkadot/api/types';
-import { DeriveBalancesAll } from '@polkadot/api-derive/balances/types';
-import { ISubmittableResult } from '@polkadot/types/types';
+import { SubmittableExtrinsic } from "@polkadot/api/types";
+import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
+import { ISubmittableResult } from "@polkadot/types/types";
 
-import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
-import { BaseCrossChainAdapter } from '../base-chain-adapter';
-import { ChainName, chains } from '../configs';
-import { ApiNotFound, CurrencyNotFound } from '../errors';
-import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferParams } from '../types';
+import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
+import { BaseCrossChainAdapter } from "../base-chain-adapter";
+import { ChainName, chains } from "../configs";
+import { ApiNotFound, CurrencyNotFound } from "../errors";
+import {
+  BalanceData,
+  BasicToken,
+  CrossChainRouterConfigs,
+  CrossChainTransferParams,
+} from "../types";
 
-const DEST_WEIGHT = '5000000000';
+const DEST_WEIGHT = "5000000000";
 
-export const khalaRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
-  { to: 'karura', token: 'PHA', xcm: { fee: { token: 'PHA', amount: '51200000000' }, weightLimit: DEST_WEIGHT } },
-  { to: 'karura', token: 'KUSD', xcm: { fee: { token: 'KUSD', amount: '4616667257' }, weightLimit: DEST_WEIGHT } },
-  { to: 'karura', token: 'KAR', xcm: { fee: { token: 'KAR', amount: '6400000000' }, weightLimit: DEST_WEIGHT } }
+export const khalaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+  {
+    to: "karura",
+    token: "PHA",
+    xcm: {
+      fee: { token: "PHA", amount: "51200000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "karura",
+    token: "KUSD",
+    xcm: {
+      fee: { token: "KUSD", amount: "4616667257" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "karura",
+    token: "KAR",
+    xcm: {
+      fee: { token: "KAR", amount: "6400000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
 ];
 
 export const khalaTokensConfig: Record<string, BasicToken> = {
-  PHA: { name: 'PHA', symbol: 'PHA', decimals: 12, ed: '40000000000' },
-  KAR: { name: 'KAR', symbol: 'KAR', decimals: 12, ed: '10000000000' },
-  KUSD: { name: 'KUSD', symbol: 'KUSD', decimals: 12, ed: '10000000000' }
+  PHA: { name: "PHA", symbol: "PHA", decimals: 12, ed: "40000000000" },
+  KAR: { name: "KAR", symbol: "KAR", decimals: 12, ed: "10000000000" },
+  KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "10000000000" },
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -32,27 +58,30 @@ const createBalanceStorages = (api: AnyApi) => {
     balances: (address: string) =>
       Storage.create<DeriveBalancesAll>({
         api,
-        path: 'derive.balances.all',
-        params: [address]
+        path: "derive.balances.all",
+        params: [address],
       }),
     assets: (tokenId: number, address: string) =>
       Storage.create<any>({
         api,
-        path: 'query.assets.account',
-        params: [tokenId, address]
-      })
+        path: "query.assets.account",
+        params: [tokenId, address],
+      }),
   };
 };
 
 class PhalaBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
-  constructor ({ api, chain, tokens }: BalanceAdapterConfigs) {
+  constructor({ api, chain, tokens }: BalanceAdapterConfigs) {
     super({ api, chain, tokens });
     this.storages = createBalanceStorages(api);
   }
 
-  public subscribeBalance (token: string, address: string): Observable<BalanceData> {
+  public subscribeBalance(
+    token: string,
+    address: string
+  ): Observable<BalanceData> {
     const storage = this.storages.balances(address);
 
     if (token === this.nativeToken) {
@@ -60,15 +89,21 @@ class PhalaBalanceAdapter extends BalanceAdapter {
         map((data) => ({
           free: FN.fromInner(data.freeBalance.toString(), this.decimals),
           locked: FN.fromInner(data.lockedBalance.toString(), this.decimals),
-          reserved: FN.fromInner(data.reservedBalance.toString(), this.decimals),
-          available: FN.fromInner(data.availableBalance.toString(), this.decimals)
+          reserved: FN.fromInner(
+            data.reservedBalance.toString(),
+            this.decimals
+          ),
+          available: FN.fromInner(
+            data.availableBalance.toString(),
+            this.decimals
+          ),
         }))
       );
     }
 
     const SUPPORTED_TOKENS: Record<string, number> = {
       KAR: 1,
-      KUSD: 4
+      KUSD: 4,
     };
     const tokenId = SUPPORTED_TOKENS[token];
 
@@ -78,13 +113,16 @@ class PhalaBalanceAdapter extends BalanceAdapter {
 
     return this.storages.assets(tokenId, address).observable.pipe(
       map((balance) => {
-        const amount = FN.fromInner(balance.unwrapOrDefault()?.balance?.toString() || '0', this.getToken(token).decimals);
+        const amount = FN.fromInner(
+          balance.unwrapOrDefault()?.balance?.toString() || "0",
+          this.getToken(token).decimals
+        );
 
         return {
           free: amount,
           locked: new FN(0),
           reserved: new FN(0),
-          available: amount
+          available: amount,
         };
       })
     );
@@ -94,15 +132,22 @@ class PhalaBalanceAdapter extends BalanceAdapter {
 class BasePhalaAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: PhalaBalanceAdapter;
 
-  public override async setApi (api: AnyApi) {
+  public override async setApi(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
 
-    this.balanceAdapter = new PhalaBalanceAdapter({ chain: this.chain.id as ChainName, api, tokens: khalaTokensConfig });
+    this.balanceAdapter = new PhalaBalanceAdapter({
+      chain: this.chain.id as ChainName,
+      api,
+      tokens: khalaTokensConfig,
+    });
   }
 
-  public subscribeTokenBalance (token: string, address: string): Observable<BalanceData> {
+  public subscribeTokenBalance(
+    token: string,
+    address: string
+  ): Observable<BalanceData> {
     if (!this.balanceAdapter) {
       throw new ApiNotFound(this.chain.id);
     }
@@ -110,7 +155,11 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
     return this.balanceAdapter.subscribeBalance(token, address);
   }
 
-  public subscribeMaxInput (token: string, address: string, to: ChainName): Observable<FN> {
+  public subscribeMaxInput(
+    token: string,
+    address: string,
+    to: ChainName
+  ): Observable<FN> {
     if (!this.balanceAdapter) {
       throw new ApiNotFound(this.chain.id);
     }
@@ -118,31 +167,38 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
     return combineLatest({
       txFee:
         token === this.balanceAdapter?.nativeToken
-          ? this.estimateTxFee(
-            {
+          ? this.estimateTxFee({
               amount: FN.ZERO,
               to,
               token,
               address,
-              signer: address
-            }
-
-          )
-          : '0',
-      balance: this.balanceAdapter.subscribeBalance(token, address).pipe(map((i) => i.available))
+              signer: address,
+            })
+          : "0",
+      balance: this.balanceAdapter
+        .subscribeBalance(token, address)
+        .pipe(map((i) => i.available)),
     }).pipe(
       map(({ balance, txFee }) => {
         const tokenMeta = this.balanceAdapter?.getToken(token);
         const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(new FN(feeFactor));
+        const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(
+          new FN(feeFactor)
+        );
 
         // always minus ed
-        return balance.minus(fee).minus(FN.fromInner(tokenMeta?.ed || '0', tokenMeta?.decimals));
+        return balance
+          .minus(fee)
+          .minus(FN.fromInner(tokenMeta?.ed || "0", tokenMeta?.decimals));
       })
     );
   }
 
-  public createTx (params: CrossChainTransferParams): SubmittableExtrinsic<'promise', ISubmittableResult> | SubmittableExtrinsic<'rxjs', ISubmittableResult> {
+  public createTx(
+    params: CrossChainTransferParams
+  ):
+    | SubmittableExtrinsic<"promise", ISubmittableResult>
+    | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
     if (this.api === undefined) {
       throw new ApiNotFound(this.chain.id);
     }
@@ -150,21 +206,26 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
     const { address, amount, to, token } = params;
     const toChain = chains[to];
 
-    const accountId = this.api?.createType('AccountId32', address).toHex();
+    const accountId = this.api?.createType("AccountId32", address).toHex();
 
     const dst = {
       parents: 1,
-      interior: { X2: [{ Parachain: toChain.paraChainId }, { AccountId32: { id: accountId, network: 'Any' } }] }
+      interior: {
+        X2: [
+          { Parachain: toChain.paraChainId },
+          { AccountId32: { id: accountId, network: "Any" } },
+        ],
+      },
     };
     let asset: any = {
-      id: { Concrete: { parents: 0, interior: 'Here' } },
-      fun: { Fungible: amount.toChainData() }
+      id: { Concrete: { parents: 0, interior: "Here" } },
+      fun: { Fungible: amount.toChainData() },
     };
 
     if (token !== this.balanceAdapter?.nativeToken) {
       const tokenIds: Record<string, string> = {
-        KUSD: '0x0081',
-        KAR: '0x0080'
+        KUSD: "0x0081",
+        KAR: "0x0080",
       };
 
       const tokenId = tokenIds[token];
@@ -174,20 +235,28 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
       }
 
       asset = {
-        id: { Concrete: { parents: 1, interior: { X2: [{ Parachain: toChain.paraChainId }, { GeneralKey: tokenId }] } } },
-        fun: { Fungible: amount.toChainData() }
+        id: {
+          Concrete: {
+            parents: 1,
+            interior: {
+              X2: [{ Parachain: toChain.paraChainId }, { GeneralKey: tokenId }],
+            },
+          },
+        },
+        fun: { Fungible: amount.toChainData() },
       };
     }
 
     return this.api.tx.xTransfer.transfer(
       asset,
       dst,
-      this.getDestWeight(token, to)?.toString());
+      this.getDestWeight(token, to)?.toString()
+    );
   }
 }
 
 export class KhalaAdapter extends BasePhalaAdapter {
-  constructor () {
+  constructor() {
     super(chains.khala, khalaRoutersConfig, khalaTokensConfig);
   }
 }

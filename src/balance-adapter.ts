@@ -1,10 +1,10 @@
-import { AnyApi } from '@acala-network/sdk-core';
+import { AnyApi } from "@acala-network/sdk-core";
 
-import { Observable } from '@polkadot/types/types';
+import { Observable } from "@polkadot/types/types";
 
-import { ChainName } from './configs';
-import { TokenConfigNotFound } from './errors';
-import { BalanceData, BasicToken, FN } from './types';
+import { ChainName } from "./configs";
+import { TokenConfigNotFound } from "./errors";
+import { BalanceData, BasicToken, FN } from "./types";
 
 export interface BalanceAdapterConfigs {
   chain: ChainName;
@@ -19,15 +19,18 @@ export abstract class BalanceAdapter {
   readonly nativeToken: string;
   readonly tokens: Record<string, BasicToken>;
 
-  constructor ({ api, chain, tokens }: BalanceAdapterConfigs) {
+  constructor({ api, chain, tokens }: BalanceAdapterConfigs) {
     this.chain = chain;
     this.decimals = api.registry.chainDecimals[0];
-    this.ed = FN.fromInner(api.consts.balances?.existentialDeposit?.toString() || '0', this.decimals);
+    this.ed = FN.fromInner(
+      api.consts.balances?.existentialDeposit?.toString() || "0",
+      this.decimals
+    );
     this.nativeToken = api.registry.chainTokens[0];
     this.tokens = tokens;
   }
 
-  public getToken (token: string): BasicToken {
+  public getToken(token: string): BasicToken {
     const tokenConfig = this.tokens[token];
 
     if (!tokenConfig) {
@@ -37,5 +40,8 @@ export abstract class BalanceAdapter {
     return tokenConfig;
   }
 
-  public abstract subscribeBalance(token: string, address: string): Observable<BalanceData>;
+  public abstract subscribeBalance(
+    token: string,
+    address: string
+  ): Observable<BalanceData>;
 }
