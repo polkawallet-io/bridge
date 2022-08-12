@@ -18,7 +18,6 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "prepare": "yarn run build",
     "lint": "polkadot-dev-run-lint",
     "build:release": "polkadot-ci-ghact-build"
   },
