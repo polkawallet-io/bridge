@@ -110,8 +110,6 @@ describe("Bridge sdk usage", () => {
     expect(balance.free.toNumber()).toBeGreaterThanOrEqual(0);
     expect(balance.available.toNumber()).toBeGreaterThanOrEqual(0);
 
-    console.log(availableAdapters[chain]);
-
     const available = availableAdapters[chain].subscribeInputConfigs({
       to: toChain,
       token,
@@ -119,26 +117,22 @@ describe("Bridge sdk usage", () => {
       signer: testAddress,
     });
 
-    console.log("available", available);
-
     const inputConfig = await firstValueFrom(available);
 
-    // expect(BigInt(inputConfig.estimateFee)).toBeGreaterThanOrEqual(BigInt(0));
-    // expect(inputConfig.minInput.toNumber()).toBeGreaterThan(0);
-    // expect(inputConfig.maxInput.toNumber()).toBeLessThanOrEqual(
-    //   balance.available.toNumber()
-    // );
+    expect(BigInt(inputConfig.estimateFee)).toBeGreaterThanOrEqual(BigInt(0));
+    expect(inputConfig.minInput.toNumber()).toBeGreaterThan(0);
+    expect(inputConfig.maxInput.toNumber()).toBeLessThanOrEqual(
+      balance.available.toNumber()
+    );
 
-    // const tx = availableAdapters[chain].createTx({
-    //   to: toChain,
-    //   token,
-    //   amount: FN.fromInner("10000000000", 10),
-    //   address: testAddress,
-    //   signer: testAddress,
-    // });
+    const tx = availableAdapters[chain].createTx({
+      to: toChain,
+      token,
+      amount: FN.fromInner("10000000000", 10),
+      address: testAddress,
+      signer: testAddress,
+    });
 
-    // console.log("tx", tx);
-
-    // expect(tx.args.length).toBeGreaterThan(1);
+    expect(tx.args.length).toBeGreaterThan(1);
   });
 });
