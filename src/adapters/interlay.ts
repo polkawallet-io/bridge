@@ -32,6 +32,11 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     token: "IBTC",
     xcm: { fee: { token: "IBTC", amount: "9" }, weightLimit: DEST_WEIGHT },
   },
+  {
+    to: "polkadot",
+    token: "DOT",
+    xcm: { fee: { token: "DOT", amount: "0" }, weightLimit: DEST_WEIGHT },
+  },
 ];
 
 export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
@@ -57,6 +62,7 @@ export const interlayTokensConfig: Record<
   interlay: {
     INTR: { name: "INTR", symbol: "INTR", decimals: 10, ed: "0" },
     IBTC: { name: "IBTC", symbol: "IBTC", decimals: 8, ed: "0" },
+    DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "100000000" },
   },
   kintsugi: {
     KINT: { name: "KINT", symbol: "KINT", decimals: 12, ed: "0" },
@@ -69,6 +75,7 @@ const SUPPORTED_TOKENS: Record<string, unknown> = {
   KBTC: { Token: "KBTC" },
   INTR: { Token: "INTR" },
   IBTC: { Token: "IBTC" },
+  DOT: { Token: "DOT" },
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
