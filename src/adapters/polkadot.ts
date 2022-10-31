@@ -23,6 +23,11 @@ export const polkadotRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     token: "DOT",
     xcm: { fee: { token: "DOT", amount: "3549633" }, weightLimit: "Unlimited" },
   },
+  {
+    to: "interlay",
+    token: "DOT",
+    xcm: { fee: { token: "DOT", amount: "3549633" }, weightLimit: "Unlimited" },
+  },
 ];
 export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
@@ -53,6 +58,9 @@ export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
 
 const polkadotTokensConfig: Record<string, Record<string, BasicToken>> = {
   polkadot: {
+    DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "10000000000" },
+  },
+  interlay: {
     DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "10000000000" },
   },
   kusama: {
