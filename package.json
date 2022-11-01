@@ -1,7 +1,7 @@
 {
-  "name": "@polkawallet/bridge",
-  "version": "0.0.5-5",
-  "description": "polkawallet bridge sdk",
+  "name": "@interlay/bridge",
+  "version": "0.0.1",
+  "description": "interlay fork of polkawallet bridge sdk",
   "main": "index.js",
   "types": "index.d.ts",
   "author": "Polkawallet developers <hello@polkawallet.io>",

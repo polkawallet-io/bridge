@@ -35,6 +35,7 @@ export class ApiProvider {
     chainName: ChainName[],
     nodeList: Partial<Record<ChainName, string[]>> | undefined
   ) {
+    console.log(this.network);
     return combineLatest(
       chainName.map((chain) => {
         let nodes = (nodeList || {})[chain];
