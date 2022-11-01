@@ -165,3 +165,14 @@ export const kusamaChains = {
     ss58Prefix: 42,
   },
 };
+
+export const kusamaTestnetChains = {
+  kintsugi: {
+    id: "kintsugi",
+    display: "Kintsugi",
+    type: typeSubstrate,
+    icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fkintsugi.png&w=96&q=75",
+    paraChainId: 2121,
+    ss58Prefix: 2121,
+  },
+};
