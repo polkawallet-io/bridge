@@ -13,8 +13,8 @@
     "access": "public",
     "registry": "https://registry.npmjs.org"
   },
-  "repository": "https://github.com/polkawallet-io/bridge.git",
-  "homepage": "https://github.com/polkawallet-io/bridge",
+  "repository": "https://github.com/interlay/bridge.git",
+  "homepage": "https://github.com/interlay/bridge",
   "scripts": {
     "build": "tsc",
     "test": "jest",
