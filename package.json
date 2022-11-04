@@ -1,5 +1,5 @@
 {
-  "name": "@polkawallet/bridge",
+  "name": "@interlay/bridge",
   "version": "0.0.5-5",
   "description": "polkawallet bridge sdk",
   "main": "index.js",
