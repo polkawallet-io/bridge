@@ -2798,6 +2798,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@interlay/bridge@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@interlay/bridge@workspace:."
+  dependencies:
+    "@acala-network/api": 4.1.6-23
+    "@acala-network/sdk": 4.1.6-23
+    "@acala-network/sdk-core": 4.1.6-23
+    "@open-web3/dev-config": ^0.2.3
+    "@polkadot/api": ^8.11.1
+    "@polkadot/apps-config": ^0.116.1
+    "@polkadot/types": ^8.11.1
+    "@polkadot/types-augment": ^8.11.1
+    "@types/jest": ^28.1.1
+    "@types/lodash": ^4.14.161
+    axios: ^0.27.2
+    eslint-plugin-unused-imports: ^2.0.0
+    jest: ^28.1.1
+    lodash: ^4.17.20
+    typescript: ^4.7.4
+  peerDependencies:
+    "@polkadot/api": ">8"
+  languageName: unknown
+  linkType: soft
+
 "@interlay/interbtc-types@npm:1.6.0":
   version: 1.6.0
   resolution: "@interlay/interbtc-types@npm:1.6.0"
@@ -5412,30 +5436,6 @@ __metadata:
   checksum: 0eebb36f601d00f1275abb4085507fd6cea220c3eeed4172102405ea60b1c2e85c4a35536516c49bb95b9f285924fd5489ead9c1a2438d4dd6a8bf8c22e4cfec
   languageName: node
   linkType: hard
-
-"@polkawallet/bridge@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "@polkawallet/bridge@workspace:."
-  dependencies:
-    "@acala-network/api": 4.1.6-23
-    "@acala-network/sdk": 4.1.6-23
-    "@acala-network/sdk-core": 4.1.6-23
-    "@open-web3/dev-config": ^0.2.3
-    "@polkadot/api": ^8.11.1
-    "@polkadot/apps-config": ^0.116.1
-    "@polkadot/types": ^8.11.1
-    "@polkadot/types-augment": ^8.11.1
-    "@types/jest": ^28.1.1
-    "@types/lodash": ^4.14.161
-    axios: ^0.27.2
-    eslint-plugin-unused-imports: ^2.0.0
-    jest: ^28.1.1
-    lodash: ^4.17.20
-    typescript: ^4.7.4
-  peerDependencies:
-    "@polkadot/api": ">8"
-  languageName: unknown
-  linkType: soft
 
 "@polymathnetwork/polymesh-types@npm:0.0.2":
   version: 0.0.2
