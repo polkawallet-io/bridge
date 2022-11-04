@@ -6,16 +6,11 @@ on:
 
 jobs:
   master:
-    strategy:
-      matrix:
-        step: ["build:release"]
-    name: ${{ matrix.step }}
-    if: "! startsWith(github.event.head_commit.message, '[CI Skip]')"
+    name: build
     runs-on: [self-hosted, linux]
     steps:
       - uses: actions/checkout@v3
-      - name: ${{ matrix.step }}
+      - name: yarn
         run: |
-          yarn install --immutable | grep -v 'YN0013'
-          yarn ${{ matrix.step }}
-
+          yarn install --immutable
+          yarn build
