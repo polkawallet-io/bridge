@@ -8,9 +8,21 @@ jobs:
   master:
     name: build
     runs-on: [self-hosted, linux]
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: "https://npm.pkg.github.com"
       - name: yarn
         run: |
           yarn install --immutable
           yarn build
+      - name: publish
+        run: |
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
