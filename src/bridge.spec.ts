@@ -11,7 +11,7 @@ import { PolkadotAdapter } from "./adapters/polkadot";
 describe.skip("Bridge sdk usage", () => {
   jest.setTimeout(30000);
 
-  const provider = new ApiProvider("mainnet");
+  const provider = new ApiProvider("testnet");
 
   const availableAdapters: Record<string, BaseCrossChainAdapter> = {
     acala: new AcalaAdapter(),

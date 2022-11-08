@@ -1,23 +1,22 @@
+import { firstValueFrom } from "rxjs";
 
-import { firstValueFrom } from 'rxjs';
+import { ApiProvider } from "../api-provider";
+import { ChainName } from "../configs";
+import { Bridge } from "..";
+import { ShidenAdapter } from "./astar";
 
-import { ApiProvider } from '../api-provider';
-import {  ChainName } from '../configs';
-import { Bridge } from '..';
-import { ShidenAdapter } from './astar';
-
-describe.skip('acala-adapter should work', () => {
+describe.skip("acala-adapter should work", () => {
   jest.setTimeout(30000);
 
-  const testAccount = '5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN';
-  const provider = new ApiProvider();
+  const testAccount = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
+  const provider = new ApiProvider("testnet");
 
-  async function connect (chain: ChainName) {
+  async function connect(chain: ChainName) {
     return firstValueFrom(provider.connectFromChain([chain], undefined));
   }
 
-  test('connect karura to do xcm', async () => {
-    const fromChain = 'shiden';
+  test("connect karura to do xcm", async () => {
+    const fromChain = "shiden";
 
     await connect(fromChain);
 
@@ -26,16 +25,18 @@ describe.skip('acala-adapter should work', () => {
     await shiden.setApi(provider.getApi(fromChain));
 
     const bridge = new Bridge({
-      adapters: [shiden]
+      adapters: [shiden],
     });
 
     // expect(bridge.router.getDestiantionsChains({ from: chains.karura, token: 'KSM' }).length).toEqual(1);
 
     const adapter = bridge.findAdapter(fromChain);
 
-    async function runMyTestSuit (to: ChainName, token: string) {
+    async function runMyTestSuit(to: ChainName, token: string) {
       if (adapter) {
-        const balance = await firstValueFrom(adapter.subscribeTokenBalance(token, testAccount));
+        const balance = await firstValueFrom(
+          adapter.subscribeTokenBalance(token, testAccount)
+        );
 
         console.log(
           `balance ${token}: free-${balance.free.toNumber()} locked-${balance.locked.toNumber()} available-${balance.available.toNumber()}`
