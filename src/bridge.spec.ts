@@ -8,10 +8,10 @@ import { Bridge } from "./index";
 import { InterlayAdapter } from "./adapters/interlay";
 import { FN } from "./types";
 import { PolkadotAdapter } from "./adapters/polkadot";
-describe("Bridge sdk usage", () => {
+describe.skip("Bridge sdk usage", () => {
   jest.setTimeout(30000);
 
-  const provider = new ApiProvider();
+  const provider = new ApiProvider("mainnet");
 
   const availableAdapters: Record<string, BaseCrossChainAdapter> = {
     acala: new AcalaAdapter(),
