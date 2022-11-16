@@ -13,10 +13,13 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Read .nvmrc
+        run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
+        id: nvm
+      - name: Use Node.js (.nvmrc)
+        uses: actions/setup-node@v1
         with:
-          node-version: 18
-          registry-url: "https://npm.pkg.github.com"
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
       - name: yarn
         run: |
           yarn install --immutable
