@@ -43,6 +43,32 @@
     "jest": "^28.1.1",
     "typescript": "^4.7.4"
   },
+  "resolutions": {
+    "@polkadot/api": "^8.11.1",
+    "@polkadot/api-augment": "^8.11.1",
+    "@polkadot/api-base": "^8.11.1",
+    "@polkadot/api-contract": "^8.11.1",
+    "@polkadot/api-derive": "^8.11.1",
+    "@polkadot/hw-ledger": "^10.1.12",
+    "@polkadot/keyring": "^10.1.12",
+    "@polkadot/networks": "^10.1.12",
+    "@polkadot/phishing": "^0.18.10",
+    "@polkadot/rpc-augment": "^8.11.1",
+    "@polkadot/rpc-core": "^8.11.1",
+    "@polkadot/rpc-provider": "^8.11.1",
+    "@polkadot/types": "^8.11.1",
+    "@polkadot/types-augment": "^8.11.1",
+    "@polkadot/types-codec": "^8.11.1",
+    "@polkadot/types-create": "^8.11.1",
+    "@polkadot/types-known": "^8.11.1",
+    "@polkadot/types-support": "^8.11.1",
+    "@polkadot/util": "^10.1.12",
+    "@polkadot/util-crypto": "^10.1.12",
+    "@polkadot/wasm-crypto": "^6.3.1",
+    "babel-core": "^7.0.0-bridge.0",
+    "styled-components": "^5.3.1",
+    "typescript": "^4.8.4"
+  },
   "versions": {
     "git": "0.0.5-4",
     "npm": "0.0.5-4"
