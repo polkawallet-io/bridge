@@ -25,6 +25,8 @@ export const moonriverTokensConfig: Record<string, BasicToken> = {
   MOVR: { name: "MOVR", symbol: "MOVR", decimals: 18, ed: "1000000000000000" },
   KAR: { name: "KAR", symbol: "KAR", decimals: 12, ed: "0" },
   KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "0" },
+  KINT: { name: "KINT", symbol: "KINT", decimals: 12, ed: "0" },
+  KBTC: { name: "KBTC", symbol: "KBTC", decimals: 8, ed: "0" },
 };
 
 class BaseMoonbeamAdapter extends BaseCrossChainAdapter {
