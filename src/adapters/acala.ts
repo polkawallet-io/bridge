@@ -546,7 +546,7 @@ export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     token: "QTZ",
     xcm: { fee: { token: "QTZ", amount: "0" }, weightLimit: ACALA_DEST_WEIGHT },
   },
-  {   
+  {
     to: "kintsugi",
     token: "LKSM",
     xcm: {

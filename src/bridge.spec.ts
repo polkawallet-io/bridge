@@ -2,37 +2,51 @@ import { firstValueFrom } from "rxjs";
 
 import { ApiProvider } from "./api-provider";
 import { BaseCrossChainAdapter } from "./base-chain-adapter";
-import { AcalaAdapter } from "./adapters/acala";
+import { KaruraAdapter, AcalaAdapter } from "./adapters/acala";
 import { ChainName } from "./configs";
 import { Bridge } from "./index";
-import { InterlayAdapter } from "./adapters/interlay";
+import { KintsugiAdapter, InterlayAdapter } from "./adapters/interlay";
+import { StatemineAdapter } from "./adapters/statemint";
 import { FN } from "./types";
-import { PolkadotAdapter } from "./adapters/polkadot";
-describe.skip("Bridge sdk usage", () => {
+import { KusamaAdapter, PolkadotAdapter } from "./adapters/polkadot";
+import { MoonriverAdapter } from "./adapters/moonbeam";
+describe("Bridge sdk usage", () => {
   jest.setTimeout(30000);
 
   const provider = new ApiProvider("testnet");
 
   const availableAdapters: Record<string, BaseCrossChainAdapter> = {
     acala: new AcalaAdapter(),
+    karura: new KaruraAdapter(),
     polkadot: new PolkadotAdapter(),
-    // kusama: new KusamaAdapter(),
+    kusama: new KusamaAdapter(),
     interlay: new InterlayAdapter(),
-    // karura: new KaruraAdapter(),
-    // statemine: new StatemineAdapter(),
-    // altair: new AltairAdapter(),
-    // shiden: new ShidenAdapter(),
-    // bifrost: new BifrostAdapter(),
-    // calamari: new CalamariAdapter(),
-    // shadow: new ShadowAdapter(),
-    // crab: new CrabAdapter(),
-    // integritee: new IntegriteeAdapter(),
-    // quartz: new QuartzAdapter(),
+    kintsugi: new KintsugiAdapter(),
+    moonriver: new MoonriverAdapter(),
+    statemine: new StatemineAdapter(),
   };
 
   const bridge = new Bridge({
     adapters: Object.values(availableAdapters),
   });
+
+  function printTx(fromChain: any, toChain: any, token: any) {
+    const testAddress = "23M5ttkmR6Kco7bReRDve6bQUSAcwqebatp3fWGJYb4hDSDJ";
+
+    const tx = availableAdapters[fromChain].createTx({
+      to: toChain,
+      token,
+      amount: FN.fromInner("10000000000", 10),
+      address: testAddress,
+      signer: testAddress,
+    });
+    console.log("transfer", token, "from", fromChain, "to", toChain + ": " + tx.method.toHex()); 
+  }
+
+  function printBidirectionalTxs(chainA: any, chainB: any, token: any) {
+    printTx(chainA, chainB, token);
+    printTx(chainB, chainA, token);
+  }
 
   test("1. bridge init should be ok", async () => {
     expect(bridge.router.getRouters().length).toBeGreaterThanOrEqual(
@@ -134,5 +148,13 @@ describe.skip("Bridge sdk usage", () => {
     });
 
     expect(tx.args.length).toBeGreaterThan(1);
+  });
+  
+  test("4. all transfer tx should be constructable", async () => {
+    printBidirectionalTxs("kintsugi", "karura", "KINT");
+    printBidirectionalTxs("kintsugi", "karura", "KBTC");
+    printBidirectionalTxs("kintsugi", "karura", "LKSM");
+    printBidirectionalTxs("kintsugi", "kusama", "KSM");
+    printBidirectionalTxs("kintsugi", "statemine", "USDT");
   });
 });
