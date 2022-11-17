@@ -1,6 +1,6 @@
 {
   "name": "@interlay/bridge",
-  "version": "0.0.5-6",
+  "version": "0.1.0",
   "description": "polkawallet bridge sdk",
   "main": "index.js",
   "types": "index.d.ts",
@@ -22,7 +22,7 @@
     "build:release": "polkadot-ci-ghact-build"
   },
   "peerDependencies": {
-    "@polkadot/api": ">8"
+    "@polkadot/api": ">9"
   },
   "dependencies": {
     "@acala-network/api": "4.1.6-23",
