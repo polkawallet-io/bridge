@@ -10,7 +10,7 @@ import { StatemineAdapter } from "./adapters/statemint";
 import { FN } from "./types";
 import { KusamaAdapter, PolkadotAdapter } from "./adapters/polkadot";
 import { MoonriverAdapter } from "./adapters/moonbeam";
-describe("Bridge sdk usage", () => {
+describe.skip("Bridge sdk usage", () => {
   jest.setTimeout(30000);
 
   const provider = new ApiProvider("testnet");
