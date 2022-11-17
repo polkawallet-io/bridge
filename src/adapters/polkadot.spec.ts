@@ -29,7 +29,7 @@ describe.skip('polkadot-adapter should work', () => {
       adapters: [kusama]
     });
 
-    expect(bridge.router.getDestiantionsChains({ from: chains.kusama, token: 'KSM' }).length).toEqual(1);
+    expect(bridge.router.getDestinationChains({ from: chains.kusama, token: 'KSM' }).length).toEqual(1);
 
     const kusamaAdapter = bridge.findAdapter(fromChain);
 

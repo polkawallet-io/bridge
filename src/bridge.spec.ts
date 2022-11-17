@@ -36,7 +36,7 @@ describe.skip('Bridge sdk usage', () => {
 
   test('1. bridge init should be ok', async () => {
     expect(bridge.router.getRouters().length).toBeGreaterThanOrEqual(Object.keys(availableAdapters).length);
-    expect(bridge.router.getDestiantionsChains({from: 'acala'}).length).toBeGreaterThanOrEqual(0);
+    expect(bridge.router.getDestinationChains({from: 'acala'}).length).toBeGreaterThanOrEqual(0);
     expect(bridge.router.getAvailableTokens({from: 'acala', to: 'polkadot'}).length).toBeGreaterThanOrEqual(0);
   });
 
