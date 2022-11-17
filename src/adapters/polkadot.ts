@@ -230,7 +230,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     }
 
     // to karura/acala
-    if (to === "acala" || to === "karura") {
+    if (to === "acala" || to === "karura" || to === "kintsugi") {
       const dst = { X1: { Parachain: toChain.paraChainId } };
       const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
       const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
