@@ -48,6 +48,11 @@ export const statemineRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     token: "USDT",
     xcm: { fee: { token: "USDT", amount: "640" }, weightLimit: "Unlimited" },
   },
+  {
+    to: "kintsugi",
+    token: "USDT",
+    xcm: { fee: { token: "USDT", amount: "640" }, weightLimit: "Unlimited" },
+  },
 ];
 
 export const statemineTokensConfig: Record<
@@ -266,9 +271,8 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
 
     // to karura/acala
     const assetId = SUPPORTED_TOKENS[token];
-
     if (
-      (to !== "acala" && to !== "karura") ||
+      (to !== "acala" && to !== "karura" && to !== "kintsugi") ||
       token === this.balanceAdapter?.nativeToken ||
       !assetId
     ) {
