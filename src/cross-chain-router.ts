@@ -101,7 +101,7 @@ export class BridgeRouterManager {
     );
   }
 
-  public getDestiantionsChains(params: Omit<RouterFilter, "to">): Chain[] {
+  public getDestinationChains(params: Omit<RouterFilter, "to">): Chain[] {
     if (isEmpty(params)) {
       return [];
     }
