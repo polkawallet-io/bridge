@@ -83,7 +83,7 @@ describe.skip('cross-chain-router-manager', () => {
   });
 
   test('get* should be ok', async () => {
-    const r1 = manager.getDestiantionsChains({ from: 'karura' });
+    const r1 = manager.getDestinationChains({ from: 'karura' });
     const r2 = manager.getFromChains({ to: 'karura' });
 
     expect(r1.length).toEqual(2);
