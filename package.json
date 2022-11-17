@@ -22,7 +22,7 @@
     "build:release": "polkadot-ci-ghact-build"
   },
   "peerDependencies": {
-    "@polkadot/api": ">8"
+    "@polkadot/api": ">9"
   },
   "dependencies": {
     "@acala-network/api": "4.1.6-23",
