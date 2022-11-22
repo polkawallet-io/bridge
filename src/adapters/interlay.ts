@@ -110,15 +110,26 @@ export const interlayTokensConfig: Record<
   },
 };
 
-const SUPPORTED_TOKENS: Record<string, unknown> = {
+const KINT_SUPPORTED_TOKENS: Record<string, unknown> = {
   KINT: { Token: "KINT" },
   KBTC: { Token: "KBTC" },
-  INTR: { Token: "INTR" },
-  IBTC: { Token: "IBTC" },
-  DOT: { Token: "DOT" },
   KSM: { Token: "KSM" },
   LKSM: { ForeignAsset: 2 },
   USDT: { ForeignAsset: 3 },
+};
+
+const INTR_SUPPORTED_TOKENS: Record<string, unknown> = {
+  INTR: { Token: "INTR" },
+  IBTC: { Token: "IBTC" },
+  DOT: { Token: "DOT" },
+  LDOT: { ForeignAsset: 1 },
+  USDT: { ForeignAsset: 2 },
+};
+
+const getSupportedTokens = (chainname: string): Record<string, unknown> => {
+  return chainname === "interlay"
+    ? INTR_SUPPORTED_TOKENS
+    : KINT_SUPPORTED_TOKENS;
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -145,7 +156,7 @@ class InterlayBalanceAdapter extends BalanceAdapter {
     token: string,
     address: string
   ): Observable<BalanceData> {
-    const tokenId = SUPPORTED_TOKENS[token];
+    const tokenId = getSupportedTokens(this.chain)[token];
 
     if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
@@ -250,7 +261,7 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    const tokenId = SUPPORTED_TOKENS[token];
+    const tokenId = getSupportedTokens(this.chain.id)[token];
 
     if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
