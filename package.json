@@ -18,8 +18,7 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "lint": "polkadot-dev-run-lint",
-    "build:release": "polkadot-ci-ghact-build"
+    "lint": "polkadot-dev-run-lint"
   },
   "peerDependencies": {
     "@polkadot/api": ">9"
