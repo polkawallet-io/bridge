@@ -149,15 +149,14 @@ describe("Bridge sdk usage", () => {
   });
   
   test("4. all transfer tx should be constructable", async () => {
-    // testnet
+    // kintsugi
     printBidirectionalTxs("kintsugi", "karura", "KINT");
     printBidirectionalTxs("kintsugi", "karura", "KBTC");
     printBidirectionalTxs("kintsugi", "karura", "LKSM");
     printBidirectionalTxs("kintsugi", "kusama", "KSM");
     printBidirectionalTxs("kintsugi", "statemine", "USDT");
 
-    // mainnet
+    // interlay
     printBidirectionalTxs("interlay", "statemint", "USDT");
-    printBidirectionalTxs("statemint", "interlay", "USDT");
   });
 });
