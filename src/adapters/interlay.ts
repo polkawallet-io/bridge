@@ -110,7 +110,7 @@ export const interlayTokensConfig: Record<
   },
 };
 
-const KINT_SUPPORTED_TOKENS: Record<string, unknown> = {
+const KINTSUGI_SUPPORTED_TOKENS: Record<string, unknown> = {
   KINT: { Token: "KINT" },
   KBTC: { Token: "KBTC" },
   KSM: { Token: "KSM" },
@@ -118,7 +118,7 @@ const KINT_SUPPORTED_TOKENS: Record<string, unknown> = {
   USDT: { ForeignAsset: 3 },
 };
 
-const INTR_SUPPORTED_TOKENS: Record<string, unknown> = {
+const INTERLAY_SUPPORTED_TOKENS: Record<string, unknown> = {
   INTR: { Token: "INTR" },
   IBTC: { Token: "IBTC" },
   DOT: { Token: "DOT" },
@@ -128,8 +128,8 @@ const INTR_SUPPORTED_TOKENS: Record<string, unknown> = {
 
 const getSupportedTokens = (chainname: string): Record<string, unknown> => {
   return chainname === "interlay"
-    ? INTR_SUPPORTED_TOKENS
-    : KINT_SUPPORTED_TOKENS;
+    ? INTERLAY_SUPPORTED_TOKENS
+    : KINTSUGI_SUPPORTED_TOKENS;
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
