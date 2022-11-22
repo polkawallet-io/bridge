@@ -38,6 +38,12 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     token: "DOT",
     xcm: { fee: { token: "DOT", amount: "0" }, weightLimit: DEST_WEIGHT },
   },
+  {
+    to: "statemint",
+    token: "USDT",
+    // todo: determine fee amount - current value is a placeholder
+    xcm: { fee: { token: "USDT", amount: "10" }, weightLimit: DEST_WEIGHT },
+  },
 ];
 
 export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
