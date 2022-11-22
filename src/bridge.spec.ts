@@ -13,10 +13,12 @@ import { MoonriverAdapter } from "./adapters/moonbeam";
 describe("Bridge sdk usage", () => {
   jest.setTimeout(30000);
 
-  // @ts-ignore
-  const testnetProvider = new ApiProvider("testnet");
-  // @ts-ignore
-  const testnetAvailableAdapters: Record<string, BaseCrossChainAdapter> = {
+  // for testing against mainnet
+  const provider = new ApiProvider("mainnet");
+  // for testing against testnet
+  // const provider = new ApiProvider("testnet");;
+
+  const availableAdapters: Record<string, BaseCrossChainAdapter> = {
     acala: new AcalaAdapter(),
     karura: new KaruraAdapter(),
     polkadot: new PolkadotAdapter(),
@@ -25,24 +27,8 @@ describe("Bridge sdk usage", () => {
     kintsugi: new KintsugiAdapter(),
     moonriver: new MoonriverAdapter(),
     statemine: new StatemineAdapter(),
-  };
-    
-  // @ts-ignore
-  const mainnetProvider = new ApiProvider("mainnet");
-  // @ts-ignore
-  const mainnetAvailableAdapters: Record<string, BaseCrossChainAdapter> = {
-    polkadot: new PolkadotAdapter(),
-    interlay: new InterlayAdapter(),
     statemint: new StatemintAdapter(),
   };
-
-  // for testing against mainnet
-  const provider = mainnetProvider;
-  const availableAdapters = mainnetAvailableAdapters;
-  // for testing against testnet
-  // const provider = testnetProvider;
-  // const availableAdapters = testAvailableAdapters;
-  
 
   const bridge = new Bridge({
     adapters: Object.values(availableAdapters),
@@ -164,11 +150,11 @@ describe("Bridge sdk usage", () => {
   
   test("4. all transfer tx should be constructable", async () => {
     // testnet
-    // printBidirectionalTxs("kintsugi", "karura", "KINT");
-    // printBidirectionalTxs("kintsugi", "karura", "KBTC");
-    // printBidirectionalTxs("kintsugi", "karura", "LKSM");
-    // printBidirectionalTxs("kintsugi", "kusama", "KSM");
-    // printBidirectionalTxs("kintsugi", "statemine", "USDT");
+    printBidirectionalTxs("kintsugi", "karura", "KINT");
+    printBidirectionalTxs("kintsugi", "karura", "KBTC");
+    printBidirectionalTxs("kintsugi", "karura", "LKSM");
+    printBidirectionalTxs("kintsugi", "kusama", "KSM");
+    printBidirectionalTxs("kintsugi", "statemine", "USDT");
 
     // mainnet
     printBidirectionalTxs("interlay", "statemint", "USDT");

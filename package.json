@@ -18,6 +18,7 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
+    "test:ci": "jest --forceExit",
     "lint": "polkadot-dev-run-lint"
   },
   "peerDependencies": {
