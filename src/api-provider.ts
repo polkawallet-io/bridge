@@ -57,8 +57,8 @@ export class ApiProvider {
             ).filter((e) => e.startsWith("wss://"));
           } else if (chain === "statemint") {
             nodes = Object.values(
-              prodParasPolkadotCommon.find((e) => e.info === chain)?.providers ||
-                {}
+              prodParasPolkadotCommon.find((e) => e.info === chain)
+                ?.providers || {}
             ).filter((e) => e.startsWith("wss://"));
           } else {
             nodes = Object.values(
