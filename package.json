@@ -4,6 +4,7 @@
   "description": "polkawallet bridge sdk",
   "main": "build/src/index.js",
   "typings": "build/src/index.d.ts",
+  "author": "Polkawallet developers <hello@polkawallet.io>",
   "license": "Apache-2.0",
   "engines": {
     "yarn": "^1.10.1"
