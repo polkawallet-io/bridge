@@ -1,6 +1,6 @@
 {
   "name": "@interlay/bridge",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "polkawallet bridge sdk",
   "main": "build/src/index.js",
   "typings": "build/src/index.d.ts",
@@ -18,8 +18,8 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "lint": "polkadot-dev-run-lint",
-    "build:release": "polkadot-ci-ghact-build"
+    "test:ci": "jest --forceExit",
+    "lint": "polkadot-dev-run-lint"
   },
   "peerDependencies": {
     "@polkadot/api": ">9"

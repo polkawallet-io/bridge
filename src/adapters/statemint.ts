@@ -18,6 +18,23 @@ import {
   CrossChainTransferParams,
 } from "../types";
 
+export const statemintRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+  {
+    to: "polkadot",
+    token: "DOT",
+    xcm: {
+      // TODO: fee might need tweaking, to be checked in tests
+      fee: { token: "DOT", amount: "3549633" },
+      weightLimit: "Unlimited",
+    },
+  },
+  {
+    to: "interlay",
+    token: "USDT",
+    xcm: { fee: { token: "USDT", amount: "640" }, weightLimit: "Unlimited" },
+  },
+];
+
 export const statemineRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
     to: "kusama",
@@ -60,9 +77,13 @@ export const statemineTokensConfig: Record<
   Record<string, BasicToken>
 > = {
   statemine: {
-    KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "79999999" },
+    KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "3333333" },
     RMRK: { name: "RMRK", symbol: "RMRK", decimals: 10, ed: "100000000" },
     ARIS: { name: "ARIS", symbol: "ARIS", decimals: 8, ed: "10000000" },
+    USDT: { name: "USDT", symbol: "USDT", decimals: 8, ed: "1000" },
+  },
+  statemint: {
+    DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "1000000000" },
     USDT: { name: "USDT", symbol: "USDT", decimals: 8, ed: "1000" },
   },
 };
@@ -272,7 +293,10 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
     // to karura/acala
     const assetId = SUPPORTED_TOKENS[token];
     if (
-      (to !== "acala" && to !== "karura" && to !== "kintsugi") ||
+      (to !== "acala" &&
+        to !== "karura" &&
+        to !== "kintsugi" &&
+        to !== "interlay") ||
       token === this.balanceAdapter?.nativeToken ||
       !assetId
     ) {
@@ -296,6 +320,16 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       { V0: ass },
       0,
       this.getDestWeight(token, to)?.toString()
+    );
+  }
+}
+
+export class StatemintAdapter extends BaseStatemintAdapter {
+  constructor() {
+    super(
+      chains.statemint,
+      statemintRoutersConfig,
+      statemineTokensConfig.statemint
     );
   }
 }

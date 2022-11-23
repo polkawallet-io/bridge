@@ -6,6 +6,7 @@ import {
   prodParasKusama,
   prodParasKusamaCommon,
   prodParasPolkadot,
+  prodParasPolkadotCommon,
   prodRelayKusama,
   prodRelayPolkadot,
 } from "@polkadot/apps-config/endpoints";
@@ -53,6 +54,11 @@ export class ApiProvider {
             nodes = Object.values(
               prodParasKusamaCommon.find((e) => e.info === chain)?.providers ||
                 {}
+            ).filter((e) => e.startsWith("wss://"));
+          } else if (chain === "statemint") {
+            nodes = Object.values(
+              prodParasPolkadotCommon.find((e) => e.info === chain)
+                ?.providers || {}
             ).filter((e) => e.startsWith("wss://"));
           } else {
             nodes = Object.values(

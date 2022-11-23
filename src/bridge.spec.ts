@@ -6,14 +6,17 @@ import { KaruraAdapter, AcalaAdapter } from "./adapters/acala";
 import { ChainName } from "./configs";
 import { Bridge } from "./index";
 import { KintsugiAdapter, InterlayAdapter } from "./adapters/interlay";
-import { StatemineAdapter } from "./adapters/statemint";
+import { StatemineAdapter, StatemintAdapter } from "./adapters/statemint";
 import { FN } from "./types";
 import { KusamaAdapter, PolkadotAdapter } from "./adapters/polkadot";
 import { MoonriverAdapter } from "./adapters/moonbeam";
-describe.skip("Bridge sdk usage", () => {
+describe("Bridge sdk usage", () => {
   jest.setTimeout(30000);
 
-  const provider = new ApiProvider("testnet");
+  // for testing against mainnet
+  const provider = new ApiProvider("mainnet");
+  // for testing against testnet
+  // const provider = new ApiProvider("testnet");;
 
   const availableAdapters: Record<string, BaseCrossChainAdapter> = {
     acala: new AcalaAdapter(),
@@ -24,6 +27,7 @@ describe.skip("Bridge sdk usage", () => {
     kintsugi: new KintsugiAdapter(),
     moonriver: new MoonriverAdapter(),
     statemine: new StatemineAdapter(),
+    statemint: new StatemintAdapter(),
   };
 
   const bridge = new Bridge({
@@ -145,10 +149,14 @@ describe.skip("Bridge sdk usage", () => {
   });
   
   test("4. all transfer tx should be constructable", async () => {
+    // kintsugi
     printBidirectionalTxs("kintsugi", "karura", "KINT");
     printBidirectionalTxs("kintsugi", "karura", "KBTC");
     printBidirectionalTxs("kintsugi", "karura", "LKSM");
     printBidirectionalTxs("kintsugi", "kusama", "KSM");
     printBidirectionalTxs("kintsugi", "statemine", "USDT");
+
+    // interlay
+    printBidirectionalTxs("interlay", "statemint", "USDT");
   });
 });

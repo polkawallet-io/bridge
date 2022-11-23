@@ -38,6 +38,12 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     token: "DOT",
     xcm: { fee: { token: "DOT", amount: "0" }, weightLimit: DEST_WEIGHT },
   },
+  {
+    to: "statemint",
+    token: "USDT",
+    // todo: determine fee amount - current value is a placeholder
+    xcm: { fee: { token: "USDT", amount: "10" }, weightLimit: DEST_WEIGHT },
+  },
 ];
 
 export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
@@ -104,15 +110,26 @@ export const interlayTokensConfig: Record<
   },
 };
 
-const SUPPORTED_TOKENS: Record<string, unknown> = {
+const KINTSUGI_SUPPORTED_TOKENS: Record<string, unknown> = {
   KINT: { Token: "KINT" },
   KBTC: { Token: "KBTC" },
-  INTR: { Token: "INTR" },
-  IBTC: { Token: "IBTC" },
-  DOT: { Token: "DOT" },
   KSM: { Token: "KSM" },
   LKSM: { ForeignAsset: 2 },
   USDT: { ForeignAsset: 3 },
+};
+
+const INTERLAY_SUPPORTED_TOKENS: Record<string, unknown> = {
+  INTR: { Token: "INTR" },
+  IBTC: { Token: "IBTC" },
+  DOT: { Token: "DOT" },
+  LDOT: { ForeignAsset: 1 },
+  USDT: { ForeignAsset: 2 },
+};
+
+const getSupportedTokens = (chainname: string): Record<string, unknown> => {
+  return chainname === "interlay"
+    ? INTERLAY_SUPPORTED_TOKENS
+    : KINTSUGI_SUPPORTED_TOKENS;
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -139,7 +156,7 @@ class InterlayBalanceAdapter extends BalanceAdapter {
     token: string,
     address: string
   ): Observable<BalanceData> {
-    const tokenId = SUPPORTED_TOKENS[token];
+    const tokenId = getSupportedTokens(this.chain)[token];
 
     if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
@@ -244,7 +261,7 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    const tokenId = SUPPORTED_TOKENS[token];
+    const tokenId = getSupportedTokens(this.chain.id)[token];
 
     if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
