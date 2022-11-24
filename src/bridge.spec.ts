@@ -158,5 +158,8 @@ describe("Bridge sdk usage", () => {
 
     // interlay
     printBidirectionalTxs("interlay", "statemint", "USDT");
+    // no adapter available for tx originating from moonbeam (yet?)
+    printTx("interlay", "moonbeam", "INTR");
+    printTx("interlay", "moonbeam", "IBTC");
   });
 });
