@@ -19,6 +19,8 @@ export const moonbeamTokensConfig: Record<string, BasicToken> = {
   ACA: { name: "ACA", symbol: "ACA", decimals: 12, ed: "100000000000" },
   AUSD: { name: "AUSD", symbol: "AUSD", decimals: 12, ed: "100000000000" },
   LDOT: { name: "LDOT", symbol: "LDOT", decimals: 10, ed: "500000000" },
+  INTR: { name: "INTR", symbol: "INTR", decimals: 10, ed: "1000000000" },
+  IBTC: { name: "IBTC", symbol: "IBTC", decimals: 8, ed: "100" },
 };
 
 export const moonriverTokensConfig: Record<string, BasicToken> = {

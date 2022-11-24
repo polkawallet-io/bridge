@@ -39,6 +39,21 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     xcm: { fee: { token: "DOT", amount: "0" }, weightLimit: DEST_WEIGHT },
   },
   {
+    to: "moonbeam",
+    token: "INTR",
+    // todo: determine fee amount - current value is a copied value / best guess
+    xcm: {
+      fee: { token: "INTR", amount: "93240000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "moonbeam",
+    token: "IBTC",
+    // todo: determine fee amount - current value is a copied value / best guess
+    xcm: { fee: { token: "IBTC", amount: "9" }, weightLimit: DEST_WEIGHT },
+  },
+  {
     to: "statemint",
     token: "USDT",
     // todo: determine fee amount - current value is a placeholder
