@@ -120,3 +120,10 @@ export interface BalanceData {
   reserved: FixedPointNumber;
   available: FixedPointNumber;
 }
+
+// TODO: This is copied from the UI. Can the type be shared?
+export enum BitcoinNetwork {
+  Mainnet = "mainnet",
+  Testnet = "testnet",
+  Regtest = "regtest",
+}

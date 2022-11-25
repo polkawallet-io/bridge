@@ -3,7 +3,7 @@ import { firstValueFrom } from "rxjs";
 
 import { ApiProvider } from "../api-provider";
 import { chains, ChainName } from "../configs";
-import { Bridge } from "..";
+import { BitcoinNetwork, Bridge } from "..";
 import { KaruraAdapter } from "./acala";
 import { KusamaAdapter } from "./polkadot";
 
@@ -11,7 +11,7 @@ describe.skip("acala-adapter should work", () => {
   jest.setTimeout(30000);
 
   const testAccount = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
-  const provider = new ApiProvider("testnet");
+  const provider = new ApiProvider(BitcoinNetwork.Testnet);
 
   async function connect(chains: ChainName[]) {
     // return firstValueFrom(provider.connectFromChain([chain], { karura: ["wss://crosschain-dev.polkawallet.io:9907"] }));
@@ -33,7 +33,10 @@ describe.skip("acala-adapter should work", () => {
       adapters: [karura, kusama],
     });
 
-    expect(bridge.router.getDestinationChains({ from: chains.karura, token: 'KSM' }).length).toEqual(1);
+    expect(
+      bridge.router.getDestinationChains({ from: chains.karura, token: "KSM" })
+        .length
+    ).toEqual(1);
 
     const adapter = bridge.findAdapter(fromChains[0]);
 

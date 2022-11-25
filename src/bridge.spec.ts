@@ -7,14 +7,14 @@ import { ChainName } from "./configs";
 import { Bridge } from "./index";
 import { KintsugiAdapter, InterlayAdapter } from "./adapters/interlay";
 import { StatemineAdapter, StatemintAdapter } from "./adapters/statemint";
-import { FN } from "./types";
+import { BitcoinNetwork, FN } from "./types";
 import { KusamaAdapter, PolkadotAdapter } from "./adapters/polkadot";
 import { MoonriverAdapter } from "./adapters/moonbeam";
 describe("Bridge sdk usage", () => {
   jest.setTimeout(30000);
 
   // for testing against mainnet
-  const provider = new ApiProvider("mainnet");
+  const provider = new ApiProvider(BitcoinNetwork.Mainnet);
   // for testing against testnet
   // const provider = new ApiProvider("testnet");;
 
@@ -44,7 +44,14 @@ describe("Bridge sdk usage", () => {
       address: testAddress,
       signer: testAddress,
     });
-    console.log("transfer", token, "from", fromChain, "to", toChain + ": " + tx.method.toHex()); 
+    console.log(
+      "transfer",
+      token,
+      "from",
+      fromChain,
+      "to",
+      toChain + ": " + tx.method.toHex()
+    );
   }
 
   function printBidirectionalTxs(chainA: any, chainB: any, token: any) {
@@ -52,11 +59,16 @@ describe("Bridge sdk usage", () => {
     printTx(chainB, chainA, token);
   }
 
-  test('1. bridge init should be ok', async () => {
-    expect(bridge.router.getRouters().length).toBeGreaterThanOrEqual(Object.keys(availableAdapters).length);
-    expect(bridge.router.getDestinationChains({from: 'acala'}).length).toBeGreaterThanOrEqual(0);
-    expect(bridge.router.getAvailableTokens({from: 'acala', to: 'polkadot'}).length).toBeGreaterThanOrEqual(0);
-
+  test("1. bridge init should be ok", async () => {
+    expect(bridge.router.getRouters().length).toBeGreaterThanOrEqual(
+      Object.keys(availableAdapters).length
+    );
+    expect(
+      bridge.router.getDestinationChains({ from: "acala" }).length
+    ).toBeGreaterThanOrEqual(0);
+    expect(
+      bridge.router.getAvailableTokens({ from: "acala", to: "polkadot" }).length
+    ).toBeGreaterThanOrEqual(0);
   });
 
   test("2. connect fromChain should be ok", async () => {
@@ -147,7 +159,7 @@ describe("Bridge sdk usage", () => {
 
     expect(tx.args.length).toBeGreaterThan(1);
   });
-  
+
   test("4. all transfer tx should be constructable", async () => {
     // kintsugi
     printBidirectionalTxs("kintsugi", "karura", "KINT");

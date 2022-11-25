@@ -1,12 +1,13 @@
 // import { firstValueFrom } from "rxjs";
 
 import { ApiProvider } from "./api-provider";
+import { BitcoinNetwork } from "./types";
 // import { ChainName } from "./configs";
 
 describe("api-provider", () => {
   jest.setTimeout(30000);
 
-  const provider = new ApiProvider("mainnet");
+  const provider = new ApiProvider(BitcoinNetwork.Mainnet);
 
   test("connectFromChain should be ok", async () => {
     console.log(provider);

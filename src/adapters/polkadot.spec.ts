@@ -3,14 +3,14 @@ import { firstValueFrom } from "rxjs";
 
 import { ApiProvider } from "../api-provider";
 import { chains, ChainName } from "../configs";
-import { Bridge } from "..";
+import { BitcoinNetwork, Bridge } from "..";
 import { KusamaAdapter } from "./polkadot";
 
 describe.skip("polkadot-adapter should work", () => {
   jest.setTimeout(30000);
 
   const testAccount = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
-  const provider = new ApiProvider("testnet");
+  const provider = new ApiProvider(BitcoinNetwork.Testnet);
 
   async function connect(chain: ChainName) {
     return firstValueFrom(provider.connectFromChain([chain], undefined));
@@ -29,7 +29,10 @@ describe.skip("polkadot-adapter should work", () => {
       adapters: [kusama],
     });
 
-    expect(bridge.router.getDestinationChains({ from: chains.kusama, token: 'KSM' }).length).toEqual(1);
+    expect(
+      bridge.router.getDestinationChains({ from: chains.kusama, token: "KSM" })
+        .length
+    ).toEqual(1);
 
     const kusamaAdapter = bridge.findAdapter(fromChain);
 
