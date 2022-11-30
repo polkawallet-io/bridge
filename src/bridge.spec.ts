@@ -7,14 +7,14 @@ import { ChainName } from "./configs";
 import { Bridge } from "./index";
 import { KintsugiAdapter, InterlayAdapter } from "./adapters/interlay";
 import { StatemineAdapter, StatemintAdapter } from "./adapters/statemint";
-import { BitcoinNetwork, FN } from "./types";
+import { FN } from "./types";
 import { KusamaAdapter, PolkadotAdapter } from "./adapters/polkadot";
 import { MoonriverAdapter } from "./adapters/moonbeam";
 describe("Bridge sdk usage", () => {
   jest.setTimeout(30000);
 
   // for testing against mainnet
-  const provider = new ApiProvider(BitcoinNetwork.Mainnet);
+  const provider = new ApiProvider("mainnet");
   // for testing against testnet
   // const provider = new ApiProvider("testnet");;
 

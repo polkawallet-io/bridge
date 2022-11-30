@@ -3,14 +3,14 @@ import { firstValueFrom } from "rxjs";
 
 import { ApiProvider } from "../api-provider";
 import { chains, ChainName } from "../configs";
-import { BitcoinNetwork, Bridge } from "..";
+import { Bridge } from "..";
 import { KusamaAdapter } from "./polkadot";
 
 describe.skip("polkadot-adapter should work", () => {
   jest.setTimeout(30000);
 
   const testAccount = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
-  const provider = new ApiProvider(BitcoinNetwork.Testnet);
+  const provider = new ApiProvider("testnet");
 
   async function connect(chain: ChainName) {
     return firstValueFrom(provider.connectFromChain([chain], undefined));

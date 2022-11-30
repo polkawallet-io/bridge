@@ -13,12 +13,11 @@ import {
 
 import { isChainEqual } from "./utils/is-chain-equal";
 import { ChainName } from "./configs";
-import { BitcoinNetwork } from "./types";
 
 export class ApiProvider {
-  protected network: BitcoinNetwork;
+  protected network: "mainnet" | "testnet";
 
-  constructor(network: BitcoinNetwork) {
+  constructor(network: "mainnet" | "testnet") {
     this.network = network;
   }
 
