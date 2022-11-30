@@ -162,16 +162,11 @@ describe("Bridge sdk usage", () => {
 
   test("4. all transfer tx should be constructable", async () => {
     // kintsugi
-    printBidirectionalTxs("kintsugi", "karura", "KINT");
-    printBidirectionalTxs("kintsugi", "karura", "KBTC");
-    printBidirectionalTxs("kintsugi", "karura", "LKSM");
     printBidirectionalTxs("kintsugi", "kusama", "KSM");
-    printBidirectionalTxs("kintsugi", "statemine", "USDT");
+    // printBidirectionalTxs("kintsugi", "statemine", "USDT");
 
     // interlay
     printBidirectionalTxs("interlay", "statemint", "USDT");
     // no adapter available for tx originating from moonbeam (yet?)
-    printTx("interlay", "moonbeam", "INTR");
-    printTx("interlay", "moonbeam", "IBTC");
   });
 });
