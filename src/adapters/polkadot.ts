@@ -18,11 +18,11 @@ import {
 } from "../types";
 
 export const polkadotRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
-  {
-    to: "acala",
-    token: "DOT",
-    xcm: { fee: { token: "DOT", amount: "3549633" }, weightLimit: "Unlimited" },
-  },
+  // {
+  //   to: "acala",
+  //   token: "DOT",
+  //   xcm: { fee: { token: "DOT", amount: "3549633" }, weightLimit: "Unlimited" },
+  // },
   {
     to: "interlay",
     token: "DOT",
@@ -30,14 +30,14 @@ export const polkadotRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   },
 ];
 export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
-  {
-    to: "karura",
-    token: "KSM",
-    xcm: {
-      fee: { token: "KSM", amount: "64000000" },
-      weightLimit: "Unlimited",
-    },
-  },
+  // {
+  //   to: "karura",
+  //   token: "KSM",
+  //   xcm: {
+  //     fee: { token: "KSM", amount: "64000000" },
+  //     weightLimit: "Unlimited",
+  //   },
+  // },
   {
     to: "kintsugi",
     token: "KSM",
@@ -46,22 +46,22 @@ export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: "Unlimited",
     },
   },
-  {
-    to: "basilisk",
-    token: "KSM",
-    xcm: {
-      fee: { token: "KSM", amount: "51618187" },
-      weightLimit: "Unlimited",
-    },
-  },
-  {
-    to: "statemine",
-    token: "KSM",
-    xcm: {
-      fee: { token: "KSM", amount: "4000000000" },
-      weightLimit: "Unlimited",
-    },
-  },
+  // {
+  //   to: "basilisk",
+  //   token: "KSM",
+  //   xcm: {
+  //     fee: { token: "KSM", amount: "51618187" },
+  //     weightLimit: "Unlimited",
+  //   },
+  // },
+  // {
+  //   to: "statemine",
+  //   token: "KSM",
+  //   xcm: {
+  //     fee: { token: "KSM", amount: "4000000000" },
+  //     weightLimit: "Unlimited",
+  //   },
+  // },
 ];
 
 const polkadotTokensConfig: Record<string, Record<string, BasicToken>> = {
