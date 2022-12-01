@@ -44,7 +44,14 @@ describe("Bridge sdk usage", () => {
       address: testAddress,
       signer: testAddress,
     });
-    console.log("transfer", token, "from", fromChain, "to", toChain + ": " + tx.method.toHex()); 
+    console.log(
+      "transfer",
+      token,
+      "from",
+      fromChain,
+      "to",
+      toChain + ": " + tx.method.toHex()
+    );
   }
 
   function printBidirectionalTxs(chainA: any, chainB: any, token: any) {
@@ -52,11 +59,16 @@ describe("Bridge sdk usage", () => {
     printTx(chainB, chainA, token);
   }
 
-  test('1. bridge init should be ok', async () => {
-    expect(bridge.router.getRouters().length).toBeGreaterThanOrEqual(Object.keys(availableAdapters).length);
-    expect(bridge.router.getDestinationChains({from: 'acala'}).length).toBeGreaterThanOrEqual(0);
-    expect(bridge.router.getAvailableTokens({from: 'acala', to: 'polkadot'}).length).toBeGreaterThanOrEqual(0);
-
+  test("1. bridge init should be ok", async () => {
+    expect(bridge.router.getRouters().length).toBeGreaterThanOrEqual(
+      Object.keys(availableAdapters).length
+    );
+    expect(
+      bridge.router.getDestinationChains({ from: "acala" }).length
+    ).toBeGreaterThanOrEqual(0);
+    expect(
+      bridge.router.getAvailableTokens({ from: "acala", to: "polkadot" }).length
+    ).toBeGreaterThanOrEqual(0);
   });
 
   test("2. connect fromChain should be ok", async () => {
@@ -147,19 +159,14 @@ describe("Bridge sdk usage", () => {
 
     expect(tx.args.length).toBeGreaterThan(1);
   });
-  
+
   test("4. all transfer tx should be constructable", async () => {
     // kintsugi
-    printBidirectionalTxs("kintsugi", "karura", "KINT");
-    printBidirectionalTxs("kintsugi", "karura", "KBTC");
-    printBidirectionalTxs("kintsugi", "karura", "LKSM");
     printBidirectionalTxs("kintsugi", "kusama", "KSM");
-    printBidirectionalTxs("kintsugi", "statemine", "USDT");
+    // printBidirectionalTxs("kintsugi", "statemine", "USDT");
 
     // interlay
-    printBidirectionalTxs("interlay", "statemint", "USDT");
+    // printBidirectionalTxs("interlay", "statemint", "USDT");
     // no adapter available for tx originating from moonbeam (yet?)
-    printTx("interlay", "moonbeam", "INTR");
-    printTx("interlay", "moonbeam", "IBTC");
   });
 });

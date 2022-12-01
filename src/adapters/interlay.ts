@@ -21,90 +21,31 @@ const DEST_WEIGHT = "5000000000";
 
 export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
-    to: "acala",
-    token: "INTR",
-    xcm: {
-      fee: { token: "INTR", amount: "93240000" },
-      weightLimit: DEST_WEIGHT,
-    },
-  },
-  {
-    to: "acala",
-    token: "IBTC",
-    xcm: { fee: { token: "IBTC", amount: "9" }, weightLimit: DEST_WEIGHT },
-  },
-  {
     to: "polkadot",
     token: "DOT",
     xcm: { fee: { token: "DOT", amount: "0" }, weightLimit: DEST_WEIGHT },
   },
-  {
-    to: "moonbeam",
-    token: "INTR",
-    // todo: determine fee amount - current value is a copied value / best guess
-    xcm: {
-      fee: { token: "INTR", amount: "93240000" },
-      weightLimit: DEST_WEIGHT,
-    },
-  },
-  {
-    to: "moonbeam",
-    token: "IBTC",
-    // todo: determine fee amount - current value is a copied value / best guess
-    xcm: { fee: { token: "IBTC", amount: "9" }, weightLimit: DEST_WEIGHT },
-  },
-  {
-    to: "statemint",
-    token: "USDT",
-    // todo: determine fee amount - current value is a placeholder
-    xcm: { fee: { token: "USDT", amount: "10" }, weightLimit: DEST_WEIGHT },
-  },
+  // {
+  //   to: "statemint",
+  //   token: "USDT",
+  //   // todo: determine fee amount - current value is a placeholder
+  //   xcm: { fee: { token: "USDT", amount: "10" }, weightLimit: DEST_WEIGHT },
+  // },
 ];
 
 export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
-  {
-    to: "karura",
-    token: "KINT",
-    xcm: {
-      fee: { token: "KINT", amount: "170666666" },
-      weightLimit: DEST_WEIGHT,
-    },
-  },
-  {
-    to: "karura",
-    token: "KBTC",
-    xcm: { fee: { token: "KBTC", amount: "85" }, weightLimit: DEST_WEIGHT },
-  },
-  {
-    to: "karura",
-    token: "LKSM",
-    // todo: determine fee amount - current value is a placeholder
-    xcm: { fee: { token: "LKSM", amount: "10" }, weightLimit: DEST_WEIGHT },
-  },
   {
     to: "kusama",
     token: "KSM",
     // todo: determine fee amount - current value is a placeholder
     xcm: { fee: { token: "KSM", amount: "10" }, weightLimit: DEST_WEIGHT },
   },
-  {
-    to: "moonriver",
-    token: "KINT",
-    // todo: determine fee amount - current value is a placeholder
-    xcm: { fee: { token: "KSM", amount: "10" }, weightLimit: DEST_WEIGHT },
-  },
-  {
-    to: "moonriver",
-    token: "KBTC",
-    // todo: determine fee amount - current value is a placeholder
-    xcm: { fee: { token: "KSM", amount: "10" }, weightLimit: DEST_WEIGHT },
-  },
-  {
-    to: "statemine",
-    token: "USDT",
-    // todo: determine fee amount - current value is a placeholder
-    xcm: { fee: { token: "USDT", amount: "10" }, weightLimit: DEST_WEIGHT },
-  },
+  // {
+  //   to: "statemine",
+  //   token: "USDT",
+  //   // todo: determine fee amount - current value is a placeholder
+  //   xcm: { fee: { token: "USDT", amount: "10" }, weightLimit: DEST_WEIGHT },
+  // },
 ];
 
 export const interlayTokensConfig: Record<
@@ -112,32 +53,22 @@ export const interlayTokensConfig: Record<
   Record<string, BasicToken>
 > = {
   interlay: {
-    INTR: { name: "INTR", symbol: "INTR", decimals: 10, ed: "0" },
-    IBTC: { name: "IBTC", symbol: "IBTC", decimals: 8, ed: "0" },
     DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "0" },
+    // USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
   },
   kintsugi: {
-    KINT: { name: "KINT", symbol: "KINT", decimals: 12, ed: "0" },
-    KBTC: { name: "KBTC", symbol: "KBTC", decimals: 8, ed: "0" },
     KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "0" },
-    USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
-    LKSM: { name: "LKSM", symbol: "LKSM", decimals: 12, ed: "0" },
+    // USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
   },
 };
 
 const KINTSUGI_SUPPORTED_TOKENS: Record<string, unknown> = {
-  KINT: { Token: "KINT" },
-  KBTC: { Token: "KBTC" },
   KSM: { Token: "KSM" },
-  LKSM: { ForeignAsset: 2 },
   USDT: { ForeignAsset: 3 },
 };
 
 const INTERLAY_SUPPORTED_TOKENS: Record<string, unknown> = {
-  INTR: { Token: "INTR" },
-  IBTC: { Token: "IBTC" },
   DOT: { Token: "DOT" },
-  LDOT: { ForeignAsset: 1 },
   USDT: { ForeignAsset: 2 },
 };
 

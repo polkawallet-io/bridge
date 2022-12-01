@@ -33,7 +33,10 @@ describe.skip("acala-adapter should work", () => {
       adapters: [karura, kusama],
     });
 
-    expect(bridge.router.getDestinationChains({ from: chains.karura, token: 'KSM' }).length).toEqual(1);
+    expect(
+      bridge.router.getDestinationChains({ from: chains.karura, token: "KSM" })
+        .length
+    ).toEqual(1);
 
     const adapter = bridge.findAdapter(fromChains[0]);
 
