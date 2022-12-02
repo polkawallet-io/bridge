@@ -25,12 +25,12 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     token: "DOT",
     xcm: { fee: { token: "DOT", amount: "0" }, weightLimit: DEST_WEIGHT },
   },
-  // {
-  //   to: "statemint",
-  //   token: "USDT",
-  //   // todo: determine fee amount - current value is a placeholder
-  //   xcm: { fee: { token: "USDT", amount: "10" }, weightLimit: DEST_WEIGHT },
-  // },
+  {
+    to: "statemint",
+    token: "USDT",
+    // todo: determine fee amount - current value is a placeholder
+    xcm: { fee: { token: "USDT", amount: "10" }, weightLimit: DEST_WEIGHT },
+  },
 ];
 
 export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
@@ -40,12 +40,12 @@ export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     // todo: determine fee amount - current value is a placeholder
     xcm: { fee: { token: "KSM", amount: "10" }, weightLimit: DEST_WEIGHT },
   },
-  // {
-  //   to: "statemine",
-  //   token: "USDT",
-  //   // todo: determine fee amount - current value is a placeholder
-  //   xcm: { fee: { token: "USDT", amount: "10" }, weightLimit: DEST_WEIGHT },
-  // },
+  {
+    to: "statemine",
+    token: "USDT",
+    // todo: determine fee amount - current value is a placeholder
+    xcm: { fee: { token: "USDT", amount: "10" }, weightLimit: DEST_WEIGHT },
+  },
 ];
 
 export const interlayTokensConfig: Record<
@@ -54,11 +54,11 @@ export const interlayTokensConfig: Record<
 > = {
   interlay: {
     DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "0" },
-    // USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
+    USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
   },
   kintsugi: {
     KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "0" },
-    // USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
+    USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
   },
 };
 
