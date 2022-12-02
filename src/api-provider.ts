@@ -36,7 +36,6 @@ export class ApiProvider {
     chainName: ChainName[],
     nodeList: Partial<Record<ChainName, string[]>> | undefined
   ) {
-    console.log(this.network);
     return combineLatest(
       chainName.map((chain) => {
         let nodes = (nodeList || {})[chain];
@@ -94,17 +93,13 @@ export class ApiProvider {
 
     const wsProvider = new WsProvider(nodes);
 
-    const isAcala = chainName === "acala" || chainName === "karura";
-    const option = isAcala
-      ? options({
-          provider: wsProvider,
-        })
-      : {
-          provider: wsProvider,
-        };
-    const promiseApi = ApiPromise.create(option);
+    const apiOptions = options({
+      provider: wsProvider,
+      noInitWarn: true,
+    });
+    const promiseApi = ApiPromise.create(apiOptions);
 
-    return ApiRx.create(option).pipe(
+    return ApiRx.create(apiOptions).pipe(
       map((api) => {
         // connect success
         if (api) {
