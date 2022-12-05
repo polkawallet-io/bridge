@@ -28,8 +28,10 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
     to: "statemint",
     token: "USDT",
-    // todo: determine fee amount - current value is a placeholder
-    xcm: { fee: { token: "USDT", amount: "10" }, weightLimit: DEST_WEIGHT },
+    xcm: {
+      fee: { token: "DOT", amount: "1000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
   },
 ];
 
@@ -230,6 +232,25 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
         interior: { X1: { AccountId32: { id: accountId, network: "Any" } } },
         parents: 1,
       };
+    }
+
+    if (
+      isChainEqual(toChain, "statemine") ||
+      isChainEqual(toChain, "statemint")
+    ) {
+      const destFee = this.getCrossChainFee(token, to);
+      const destWeight = this.getDestWeight(token, to);
+
+      // do the needful, use multi currencies
+      return this.api.tx.xTokens.transferMulticurrencies(
+        [
+          [tokenId, amount.toChainData()],
+          [{ Token: destFee.token }, destFee.balance.toChainData()],
+        ],
+        1,
+        { V1: dst },
+        destWeight?.toString()
+      );
     }
 
     return this.api.tx.xTokens.transfer(
