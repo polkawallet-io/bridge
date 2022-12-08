@@ -39,9 +39,11 @@ export const statemineTokensConfig: Record<
   Record<string, BasicToken>
 > = {
   statemine: {
+    KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "3333333" },
     USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "1000" },
   },
   statemint: {
+    DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "1000000000" },
     USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "1000" },
   },
 };
