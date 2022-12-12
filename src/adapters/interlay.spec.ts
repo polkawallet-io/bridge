@@ -8,7 +8,7 @@ import { PolkadotAdapter } from "./polkadot";
 import { InterlayAdapter } from "./interlay";
 // import { StatemintAdapter } from "./statemint";
 
-describe("interlay-adapter should work", () => {
+describe.skip("interlay-adapter should work", () => {
   jest.setTimeout(30000);
 
   const testAccount = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
