@@ -9,6 +9,7 @@ import {
   of,
 } from "rxjs";
 
+import "@acala-network/types/argument/api-tx";
 import { ApiRx } from "@polkadot/api";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
@@ -718,11 +719,13 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
 
     const { address, amount, to, token } = params;
 
-    const tokenFormSDK = this.wallet?.__getToken(token);
+    const tokenFormSDK = this.wallet?.getToken(token);
     const toChain = chains[to];
-
     const destFee = this.getCrossChainFee(token, to);
-    const destWeight = this.getDestWeight(token, to);
+    const oldDestWeight = this.getDestWeight(token, to);
+    const useNewDestWeight =
+      this.api.tx.xTokens.transfer.meta.args[3].type.toString() ===
+      "XcmV2WeightLimit";
 
     // to moonriver/moonbeam
     if (
@@ -749,7 +752,7 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
             tokenFormSDK?.toChainData() as any,
             amount.toChainData(),
             { V1: dst },
-            destWeight?.toString()
+            (useNewDestWeight ? "Unlimited" : oldDestWeight?.toString()) as any
           )
         : this.api.tx.xTokens.transferMulticurrencies(
             [
@@ -758,7 +761,7 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
             ],
             1,
             { V1: dst },
-            destWeight?.toString()
+            (useNewDestWeight ? "Unlimited" : oldDestWeight?.toString()) as any
           );
     }
 
@@ -791,13 +794,13 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
           ],
           1,
           { V1: dst },
-          destWeight?.toString()
+          (useNewDestWeight ? "Unlimited" : oldDestWeight?.toString()) as any
         )
       : this.api.tx.xTokens.transfer(
           tokenFormSDK?.toChainData() as any,
           amount.toChainData(),
           { V1: dst },
-          destWeight?.toString()
+          (useNewDestWeight ? "Unlimited" : oldDestWeight?.toString()) as any
         );
   }
 }

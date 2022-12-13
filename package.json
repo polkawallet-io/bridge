@@ -22,16 +22,19 @@
     "build:release": "polkadot-ci-ghact-build"
   },
   "peerDependencies": {
-    "@polkadot/api": ">8"
+    "@polkadot/api": ">9"
+  },
+  "resolutions": {
+    "rxjs": "^7.5.7"
   },
   "dependencies": {
-    "@acala-network/api": "4.1.6-23",
-    "@acala-network/sdk": "4.1.6-23",
-    "@acala-network/sdk-core": "4.1.6-23",
-    "@polkadot/api": "^8.11.1",
+    "@acala-network/api": "4.1.8-7",
+    "@acala-network/sdk": "4.1.8-7",
+    "@acala-network/sdk-core": "4.1.8-7",
+    "@polkadot/api": "^9.9.1",
     "@polkadot/apps-config": "^0.116.1",
-    "@polkadot/types": "^8.11.1",
-    "@polkadot/types-augment": "^8.11.1",
+    "@polkadot/types": "^9.9.1",
+    "@polkadot/types-augment": "^9.9.1",
     "axios": "^0.27.2",
     "lodash": "^4.17.20"
   },
@@ -46,6 +49,5 @@
   "versions": {
     "git": "0.0.5-4",
     "npm": "0.0.5-4"
-  },
-  "stableVersion": "0.0.5-6"
+  }
 }
