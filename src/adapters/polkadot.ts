@@ -29,7 +29,7 @@ export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "karura",
     token: "KSM",
     xcm: {
-      fee: { token: "KSM", amount: "64000000" },
+      fee: { token: "KSM", amount: "71927964" },
       weightLimit: "Unlimited",
     },
   },

@@ -295,6 +295,14 @@ export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     },
   },
   {
+    to: "kintsugi",
+    token: "LKSM",
+    xcm: {
+      fee: { token: "LKSM", amount: "186480000" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
     to: "khala",
     token: "PHA",
     xcm: {
