@@ -240,7 +240,8 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
       tokenId,
       amount.toChainData(),
       { V1: dst },
-      this.getDestWeight(token, to)?.toString()
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.getDestWeight(token, to)!.toString()
     );
   }
 }

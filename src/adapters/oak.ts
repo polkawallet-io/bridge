@@ -241,7 +241,8 @@ class BaseOakAdapter extends BaseCrossChainAdapter {
           },
         },
       },
-      this.getDestWeight(token, to)?.toString()
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.getDestWeight(token, to)!.toString()
     );
   }
 }
