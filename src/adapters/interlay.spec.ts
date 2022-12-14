@@ -15,7 +15,6 @@ describe.skip("interlay-adapter should work", () => {
   const provider = new ApiProvider("mainnet");
 
   async function connect(chains: ChainName[]) {
-    // return firstValueFrom(provider.connectFromChain([chain], { karura: ["wss://crosschain-dev.polkawallet.io:9907"] }));
     return firstValueFrom(provider.connectFromChain(chains, undefined));
   }
 
@@ -84,7 +83,7 @@ describe.skip("interlay-adapter should work", () => {
         console.log(
           `inputConfig: min-${inputConfig.minInput.toNumber()} max-${inputConfig.maxInput.toNumber()} ss58-${
             inputConfig.ss58Prefix
-          }`
+          } estimateFee-${inputConfig.estimateFee}`
         );
         expect(inputConfig.minInput.toNumber()).toBeGreaterThan(0);
         expect(inputConfig.maxInput.toNumber()).toBeLessThanOrEqual(

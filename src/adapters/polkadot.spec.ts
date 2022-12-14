@@ -5,11 +5,12 @@ import { ApiProvider } from "../api-provider";
 import { chains, ChainName } from "../configs";
 import { Bridge } from "..";
 import { KusamaAdapter } from "./polkadot";
+import { KintsugiAdapter } from "./interlay";
 
 describe.skip("polkadot-adapter should work", () => {
   jest.setTimeout(30000);
 
-  const testAccount = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
+  const testAccount = "DmSjv9MtU1Zcj2tW2HpNq8bZgsX56G4NE35jVKLDSAZC5D8";
   const provider = new ApiProvider("testnet");
 
   async function connect(chain: ChainName) {
@@ -22,11 +23,12 @@ describe.skip("polkadot-adapter should work", () => {
     await connect(fromChain);
 
     const kusama = new KusamaAdapter();
+    const kintsugi = new KintsugiAdapter();
 
     await kusama.setApi(provider.getApi(fromChain));
 
     const bridge = new Bridge({
-      adapters: [kusama],
+      adapters: [kusama, kintsugi],
     });
 
     expect(
@@ -54,7 +56,7 @@ describe.skip("polkadot-adapter should work", () => {
 
       const inputConfig = await firstValueFrom(
         kusamaAdapter.subscribeInputConfigs({
-          to: "karura",
+          to: "kintsugi",
           token: "KSM",
           address: testAccount,
           signer: testAccount,
@@ -64,14 +66,14 @@ describe.skip("polkadot-adapter should work", () => {
       console.log(
         `inputConfig: min-${inputConfig.minInput.toNumber()} max-${inputConfig.maxInput.toNumber()} ss58-${
           inputConfig.ss58Prefix
-        }`
+        } estimateFee-${inputConfig.estimateFee}`
       );
       expect(inputConfig.minInput.toNumber()).toBeGreaterThan(0);
       expect(inputConfig.maxInput.toNumber()).toBeLessThanOrEqual(
         balance.available.toNumber()
       );
 
-      const destFee = kusamaAdapter.getCrossChainFee("KSM", "karura");
+      const destFee = kusamaAdapter.getCrossChainFee("KSM", "kintsugi");
 
       console.log(`destFee: ${destFee.balance.toNumber()} ${destFee.token}`);
       expect(destFee.balance.toNumber()).toBeGreaterThan(0);
