@@ -2,14 +2,14 @@ import { firstValueFrom } from "rxjs";
 
 import { ApiProvider } from "./api-provider";
 import { BaseCrossChainAdapter } from "./base-chain-adapter";
-import { KaruraAdapter, AcalaAdapter } from "./adapters/acala";
+// import { KaruraAdapter, AcalaAdapter } from "./adapters/acala";
 import { ChainName } from "./configs";
 import { Bridge } from "./index";
 import { KintsugiAdapter, InterlayAdapter } from "./adapters/interlay";
-import { StatemineAdapter, StatemintAdapter } from "./adapters/statemint";
+// import { StatemineAdapter, StatemintAdapter } from "./adapters/statemint";
 import { FN } from "./types";
 import { KusamaAdapter, PolkadotAdapter } from "./adapters/polkadot";
-import { MoonriverAdapter } from "./adapters/moonbeam";
+// import { MoonriverAdapter } from "./adapters/moonbeam";
 describe("Bridge sdk usage", () => {
   jest.setTimeout(30000);
 
@@ -19,15 +19,15 @@ describe("Bridge sdk usage", () => {
   // const provider = new ApiProvider("testnet");;
 
   const availableAdapters: Record<string, BaseCrossChainAdapter> = {
-    acala: new AcalaAdapter(),
-    karura: new KaruraAdapter(),
+    // acala: new AcalaAdapter(),
+    // karura: new KaruraAdapter(),
     polkadot: new PolkadotAdapter(),
     kusama: new KusamaAdapter(),
     interlay: new InterlayAdapter(),
     kintsugi: new KintsugiAdapter(),
-    moonriver: new MoonriverAdapter(),
-    statemine: new StatemineAdapter(),
-    statemint: new StatemintAdapter(),
+    // moonriver: new MoonriverAdapter(),
+    // statemine: new StatemineAdapter(),
+    // statemint: new StatemintAdapter(),
   };
 
   const bridge = new Bridge({
@@ -166,6 +166,7 @@ describe("Bridge sdk usage", () => {
     // printBidirectionalTxs("kintsugi", "statemine", "USDT");
 
     // interlay
+    printBidirectionalTxs("interlay", "polkadot", "DOT");
     // printBidirectionalTxs("interlay", "statemint", "USDT");
     // no adapter available for tx originating from moonbeam (yet?)
   });

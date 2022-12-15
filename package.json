@@ -41,7 +41,7 @@
     "@acala-network/sdk": "4.1.6-23",
     "@acala-network/sdk-core": "4.1.6-23",
     "@polkadot/api": "^9.8.1",
-    "@polkadot/apps-config": "^0.116.1",
+    "@polkadot/apps-config": "^0.122.2",
     "@polkadot/types": "^9.8.1",
     "@polkadot/types-augment": "^9.8.1",
     "axios": "^0.27.2",
