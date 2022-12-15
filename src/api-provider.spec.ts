@@ -8,15 +8,13 @@ describe("api-provider", () => {
   const provider = new ApiProvider("mainnet");
 
   test("connectFromChain should be ok", async () => {
-      const chains: ChainName[] = ["kusama", "karura", "polkadot", "acala"];
+      const chains: ChainName[] = ["kusama", "kintsugi", "polkadot", "interlay"];
 
       expect(provider.getApi(chains[0])).toEqual(undefined);
       expect(provider.getApi(chains[1])).toEqual(undefined);
 
       const res = await firstValueFrom(
-        provider.connectFromChain(chains, {
-          karura: ["wss://karura.polkawallet.io"],
-        })
+        provider.connectFromChain(chains, undefined)
       );
 
       expect(res.length).toEqual(chains.length);
