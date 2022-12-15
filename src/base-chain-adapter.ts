@@ -8,7 +8,7 @@ import {
   timeout,
   TimeoutError,
 } from "rxjs";
-import { catchError, map } from "rxjs/operators";
+import { catchError, map, mergeMap } from "rxjs/operators";
 
 import { ApiRx } from "@polkadot/api";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
@@ -82,12 +82,25 @@ export abstract class BaseCrossChainAdapter {
   public subscribeInputConfigs(
     params: Omit<CrossChainTransferParams, "amount">
   ): Observable<CrossChainInputConfigs> {
-    const { signer, to, token } = params;
+    const { signer, to, token, address } = params;
 
     const destFee = this.getCrossChainFee(token, to);
 
     // subscribe destination min receive
-    const minInput$ = this.subscribeMinInput(token, to);
+    const minInput$ = this.findAdapter(to)
+      .subscribeTokenBalance(token, address)
+      .pipe(
+        map((destBalance) =>
+          destBalance.free
+            .add(destBalance.locked)
+            .gt(this.getDestED(token, to).balance)
+        ),
+        mergeMap((hasExistentialDeposit) => {
+          const includeED = !hasExistentialDeposit;
+          return this.subscribeMinInput(token, to, includeED);
+        })
+      );
+
     const maxInput$ = this.subscribeMaxInput(token, signer, to);
     const estimateFee$ = this.estimateTxFee({
       ...params,
@@ -111,12 +124,18 @@ export abstract class BaseCrossChainAdapter {
     );
   }
 
-  public subscribeMinInput(token: string, to: ChainName): Observable<FN> {
+  public subscribeMinInput(
+    token: string,
+    to: ChainName,
+    includeExistentialDeposit = true
+  ): Observable<FN> {
     const destFee = this.getCrossChainFee(token, to);
+    const destFeeAmountForToken =
+      destFee.token === token ? destFee.balance : FN.ZERO;
 
     return of(
-      this.getDestED(token, to).balance.add(
-        destFee.token === token ? destFee.balance : FN.ZERO
+      destFeeAmountForToken.add(
+        includeExistentialDeposit ? this.getDestED(token, to).balance : FN.ZERO
       )
     );
   }
