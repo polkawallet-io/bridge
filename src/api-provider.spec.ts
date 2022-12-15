@@ -2,7 +2,7 @@ import { firstValueFrom } from "rxjs";
 import { ApiProvider } from "./api-provider";
 import { ChainName } from "./configs";
 
-describe("api-provider", () => {
+describe.skip("api-provider", () => {
   jest.setTimeout(30000);
 
   const provider = new ApiProvider("mainnet");
