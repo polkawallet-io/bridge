@@ -11,7 +11,8 @@ import { InterlayAdapter } from "./interlay";
 describe.skip("interlay-adapter should work", () => {
   jest.setTimeout(30000);
 
-  const testAccount = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
+  // const testAccount = "wd93QFMT7icy97uVQWjQXXEBvUH3JdDxB27JtD56yJKnJMMkF";
+  const testAccount = "wd8h1Mu8rsZhiKN5zZUWuz2gtr51JajTDCtbdkzoXbMZiQAut";
   const provider = new ApiProvider("mainnet");
 
   async function connect(chains: ChainName[]) {
@@ -69,6 +70,14 @@ describe.skip("interlay-adapter should work", () => {
         );
         expect(balance.free.toNumber()).toEqual(
           balance.locked.add(balance.available).toNumber()
+        );
+
+        const toAdapter = bridge.findAdapter(to);
+        const toBalance = await firstValueFrom(
+          toAdapter.subscribeTokenBalance(token, testAccount)
+        );
+        console.log(
+          `balance at destination ${token}: free-${toBalance.free.toNumber()} locked-${toBalance.locked.toNumber()} available-${toBalance.available.toNumber()}`
         );
 
         const inputConfig = await firstValueFrom(
