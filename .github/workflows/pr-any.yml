@@ -6,7 +6,7 @@ jobs:
   pr:
     strategy:
       matrix:
-        step: ['lint', 'build', 'test:ci']
+        step: ['lint', 'test:ci']
     name: ${{ matrix.step }}
     runs-on: ubuntu-latest
     steps:
@@ -18,6 +18,6 @@ jobs:
           always-auth: true
     - name: ${{ matrix.step }}
       run: |
-        yarn install
+        yarn install --immutable | grep -v 'YN0013'
         yarn ${{ matrix.step }}
 
