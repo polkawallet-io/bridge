@@ -6,7 +6,7 @@ jobs:
   pr:
     strategy:
       matrix:
-        step: ['install', 'lint', 'build', 'test:ci']
+        step: ['lint', 'build', 'test:ci']
     name: ${{ matrix.step }}
     runs-on: ubuntu-latest
     steps:
@@ -18,5 +18,6 @@ jobs:
           always-auth: true
     - name: ${{ matrix.step }}
       run: |
+        yarn install
         yarn ${{ matrix.step }}
 
