@@ -20,7 +20,10 @@ export const polkadotRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
     to: "interlay",
     token: "DOT",
-    xcm: { fee: { token: "DOT", amount: "3549633" }, weightLimit: "Unlimited" },
+    xcm: {
+      fee: { token: "DOT", amount: "1000000000" },
+      weightLimit: "Unlimited",
+    },
   },
 ];
 export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
@@ -28,7 +31,7 @@ export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "kintsugi",
     token: "KSM",
     xcm: {
-      fee: { token: "KSM", amount: "64000000" },
+      fee: { token: "KSM", amount: "1000000000" },
       weightLimit: "Unlimited",
     },
   },

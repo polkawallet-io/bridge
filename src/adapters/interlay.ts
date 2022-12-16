@@ -42,8 +42,10 @@ export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
     to: "kusama",
     token: "KSM",
-    // todo: determine fee amount - current value is a placeholder
-    xcm: { fee: { token: "KSM", amount: "10" }, weightLimit: DEST_WEIGHT },
+    xcm: {
+      fee: { token: "KSM", amount: "1000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
   },
   // {
   //   to: "statemine",
