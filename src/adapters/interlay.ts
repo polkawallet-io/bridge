@@ -23,7 +23,7 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "acala",
     token: "INTR",
     xcm: {
-      fee: { token: "INTR", amount: "93240000" },
+      fee: { token: "INTR", amount: "92696000" },
       weightLimit: DEST_WEIGHT,
     },
   },
