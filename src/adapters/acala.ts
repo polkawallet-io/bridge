@@ -614,7 +614,7 @@ export const karuraTokensConfig: Record<string, BasicToken> = {
   KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "100000000" },
   RMRK: { name: "RMRK", symbol: "RMRK", decimals: 10, ed: "100000000" },
   ARIS: { name: "ARIS", symbol: "ARIS", decimals: 8, ed: "1000000000000" },
-  USDT: { name: "USDT", symbol: "USDT", decimals: 8, ed: "1000" },
+  USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "10000" },
   QTZ: { name: "QTZ", symbol: "QTZ", decimals: 18, ed: "40000000000" },
 };
 
