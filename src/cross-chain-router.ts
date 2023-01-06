@@ -20,16 +20,16 @@ export class BridgeRouterManager {
   private routers: CrossChainRouter[];
   private adapters: BaseCrossChainAdapter[];
   public disabledRouters: RouterFilter[] = [];
-  private configs: BridgeRouterManagerConfigs;
+  private configs?: BridgeRouterManagerConfigs;
 
-  constructor(configs: BridgeRouterManagerConfigs) {
+  constructor(configs?: BridgeRouterManagerConfigs) {
     this.routers = [];
-    this.adapters = configs.adapters || [];
+    this.adapters = configs?.adapters || [];
     this.configs = configs;
   }
 
   public async init() {
-    if (this.configs.disabledRouters) {
+    if (this.configs?.disabledRouters) {
       try {
         const disabledRouters = await fetchConfigFromApiOrLocal(
           this.configs.disabledRouters
