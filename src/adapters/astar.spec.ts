@@ -3,7 +3,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { ApiProvider } from '../api-provider';
 import {  ChainName } from '../configs';
-import { Bridge } from '..';
+import { Bridge } from '../bridge';
 import { ShidenAdapter } from './astar';
 
 describe.skip('acala-adapter should work', () => {

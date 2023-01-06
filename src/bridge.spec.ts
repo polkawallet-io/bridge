@@ -5,7 +5,7 @@ import { ApiProvider } from './api-provider';
 import { BaseCrossChainAdapter } from './base-chain-adapter';
 import { PolkadotAdapter } from './adapters/polkadot';
 import { ChainName } from './configs';
-import { Bridge } from './index';
+import { Bridge } from './bridge';
 import { AcalaAdapter } from './adapters/acala';
 import { FN } from './types';
 

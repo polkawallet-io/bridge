@@ -91,7 +91,7 @@ export interface RouterFilter {
 
 export interface BridgeConfigs {
   adapters: BaseCrossChainAdapter[];
-  routersDisabled?: RouterFilter[];
+  disabledRouters?: RouterFilter[] | string;
 }
 
 export interface CrossChainBalanceChangedConfigs {
