@@ -3,7 +3,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { ApiProvider } from '../api-provider';
 import { chains, ChainName } from '../configs';
-import { Bridge } from '..';
+import { Bridge } from '../bridge';
 import { KaruraAdapter } from './acala';
 import { KusamaAdapter } from './polkadot';
 

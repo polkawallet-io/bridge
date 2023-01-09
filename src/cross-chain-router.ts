@@ -1,4 +1,3 @@
-import axios from "axios";
 import { isEmpty, overEvery, uniqWith } from "lodash";
 
 import { isChainEqual } from "./utils/is-chain-equal";
@@ -10,32 +9,38 @@ import {
   CrossChainRouterConfigs,
   RouterFilter,
 } from "./types";
-
-const CONFIG_URL =
-  "https://api.polkawallet.io/devConfiguration/config/bridge.json";
+import { fetchConfigFromApiOrLocal } from "./utils";
 
 interface BridgeRouterManagerConfigs {
   adapters: BaseCrossChainAdapter[];
-  routersDisabled?: RouterFilter[];
+  disabledRouters?: RouterFilter[] | string;
 }
 
 export class BridgeRouterManager {
   private routers: CrossChainRouter[];
   private adapters: BaseCrossChainAdapter[];
-
-  public routersDisabled: RouterFilter[];
+  public disabledRouters: RouterFilter[] = [];
+  private configs?: BridgeRouterManagerConfigs;
 
   constructor(configs?: BridgeRouterManagerConfigs) {
     this.routers = [];
     this.adapters = configs?.adapters || [];
-
-    this.routersDisabled = configs?.routersDisabled || [];
+    this.configs = configs;
   }
 
-  public async updateDisabledRouters() {
-    const { data } = await axios.get(CONFIG_URL);
+  public async init() {
+    if (this.configs?.disabledRouters) {
+      try {
+        const disabledRouters = await fetchConfigFromApiOrLocal(
+          this.configs.disabledRouters
+        );
+        this.disabledRouters = disabledRouters;
+      } catch (e) {
+        return false;
+      }
+    }
 
-    this.routersDisabled = data.disabledRoute as RouterFilter[];
+    return true;
   }
 
   public findAdapterByName(
@@ -92,7 +97,7 @@ export class BridgeRouterManager {
   public getAvailableRouters(): CrossChainRouter[] {
     return this.routers.filter(
       (e) =>
-        !this.routersDisabled.find(
+        !this.disabledRouters.find(
           (i) =>
             i.from === e.from.id &&
             i.to === e.to.id &&

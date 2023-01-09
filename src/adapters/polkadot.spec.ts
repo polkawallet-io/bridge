@@ -3,7 +3,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { ApiProvider } from '../api-provider';
 import { chains, ChainName } from '../configs';
-import { Bridge } from '..';
+import { Bridge } from '../bridge';
 import { KusamaAdapter } from './polkadot';
 
 describe.skip('polkadot-adapter should work', () => {

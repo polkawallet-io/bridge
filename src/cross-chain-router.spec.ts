@@ -7,7 +7,7 @@ import { WsProvider } from '@polkadot/rpc-provider';
 import { isChainEqual } from './utils/is-chain-equal';
 import { chains } from './configs';
 import { BridgeRouterManager } from './cross-chain-router';
-import { CrossChainRouterConfigs } from 'src';
+import { CrossChainRouterConfigs } from './types';
 
 describe.skip('cross-chain-router-manager', () => {
   let manager: BridgeRouterManager;
