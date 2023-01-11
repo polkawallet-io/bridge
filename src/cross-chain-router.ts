@@ -32,7 +32,8 @@ export class BridgeRouterManager {
     if (this.configs?.disabledRouters) {
       try {
         const disabledRouters = await fetchConfigFromApiOrLocal(
-          this.configs.disabledRouters
+          this.configs.disabledRouters,
+          (i: any) => i.disabledRoute
         );
         this.disabledRouters = disabledRouters;
       } catch (e) {
