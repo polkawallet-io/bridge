@@ -16,7 +16,7 @@ import {
   CrossChainTransferParams,
 } from "../types";
 
-const DEST_WEIGHT = "5000000000";
+const DEST_WEIGHT = "Unlimited";
 
 export const bifrostRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
