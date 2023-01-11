@@ -17,7 +17,7 @@ import {
 } from "../types";
 import { isChainEqual } from "../utils/is-chain-equal";
 
-const DEST_WEIGHT = "5000000000";
+const DEST_WEIGHT = "180000000000";
 
 export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
@@ -28,14 +28,14 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
-  // {
-  //   to: "statemint",
-  //   token: "USDT",
-  //   xcm: {
-  //     fee: { token: "DOT", amount: "1000000000" },
-  //     weightLimit: DEST_WEIGHT,
-  //   },
-  // },
+  {
+    to: "statemint",
+    token: "USDT",
+    xcm: {
+      fee: { token: "DOT", amount: "1000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
 ];
 
 export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
@@ -47,12 +47,15 @@ export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
-  // {
-  //   to: "statemine",
-  //   token: "USDT",
-  //   // todo: determine fee amount - current value is a placeholder
-  //   xcm: { fee: { token: "USDT", amount: "10" }, weightLimit: DEST_WEIGHT },
-  // },
+  {
+    to: "statemine",
+    token: "USDT",
+    // todo: determine fee amount - current value is a placeholder
+    xcm: {
+      fee: { token: "KSM", amount: "1500000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
 ];
 
 export const interlayTokensConfig: Record<
@@ -61,22 +64,22 @@ export const interlayTokensConfig: Record<
 > = {
   interlay: {
     DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "0" },
-    // USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
+    USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
   },
   kintsugi: {
     KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "0" },
-    // USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
+    USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
   },
 };
 
 const KINTSUGI_SUPPORTED_TOKENS: Record<string, unknown> = {
   KSM: { Token: "KSM" },
-  // USDT: { ForeignAsset: 3 },
+  USDT: { ForeignAsset: 3 },
 };
 
 const INTERLAY_SUPPORTED_TOKENS: Record<string, unknown> = {
   DOT: { Token: "DOT" },
-  // USDT: { ForeignAsset: 2 },
+  USDT: { ForeignAsset: 2 },
 };
 
 const getSupportedTokens = (chainname: string): Record<string, unknown> => {
