@@ -156,6 +156,13 @@ class BaseIntegriteeAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
+    const useNewDestWeight =
+      this.api.tx.xTokens.transfer.meta.args[3].type.toString() ===
+      "XcmV2WeightLimit";
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const oldDestWeight = this.getDestWeight(token, to)!.toString();
+    const destWeight = useNewDestWeight ? "Unlimited" : oldDestWeight;
+
     return this.api?.tx.xTokens.transfer(
       token,
       amount.toChainData(),
@@ -171,7 +178,7 @@ class BaseIntegriteeAdapter extends BaseCrossChainAdapter {
         },
       },
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.getDestWeight(token, to)!
+      destWeight
     );
   }
 }
