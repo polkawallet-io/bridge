@@ -1,6 +1,6 @@
 {
   "name": "@interlay/bridge",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "polkawallet bridge sdk",
   "main": "build/index.js",
   "typings": "build/index.d.ts",
@@ -88,8 +88,8 @@
   "stableVersion": "0.0.5-4",
   "jest": {
     "testPathIgnorePatterns": [
-      "<rootDir>/dist/", 
-      "<rootDir>/build/", 
+      "<rootDir>/dist/",
+      "<rootDir>/build/",
       "<rootDir>/node_modules/"
     ]
   }

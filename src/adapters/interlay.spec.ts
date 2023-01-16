@@ -6,7 +6,7 @@ import { chains, ChainName } from "../configs";
 import { Bridge } from "..";
 import { PolkadotAdapter } from "./polkadot";
 import { InterlayAdapter } from "./interlay";
-// import { StatemintAdapter } from "./statemint";
+import { StatemintAdapter } from "./statemint";
 
 describe.skip("interlay-adapter should work", () => {
   jest.setTimeout(30000);
@@ -20,25 +20,20 @@ describe.skip("interlay-adapter should work", () => {
   }
 
   test("connect interlay to do xcm", async () => {
-    // const fromChains = ["interlay", "polkadot", "statemint"] as ChainName[];
-    const fromChains = ["interlay", "polkadot"] as ChainName[];
+    const fromChains = ["interlay", "polkadot", "statemint"] as ChainName[];
 
     await connect(fromChains);
 
     const interlay = new InterlayAdapter();
     const polkadot = new PolkadotAdapter();
-    // const statemint = new StatemintAdapter();
+    const statemint = new StatemintAdapter();
 
     await interlay.setApi(provider.getApi(fromChains[0]));
     await polkadot.setApi(provider.getApi(fromChains[1]));
-    // await statemint.setApi(provider.getApi(fromChains[2]));
-
-    // const bridge = new Bridge({
-    //   adapters: [interlay, polkadot, statemint],
-    // });
+    await statemint.setApi(provider.getApi(fromChains[2]));
 
     const bridge = new Bridge({
-      adapters: [interlay, polkadot],
+      adapters: [interlay, polkadot, statemint],
     });
 
     expect(
@@ -48,10 +43,12 @@ describe.skip("interlay-adapter should work", () => {
       }).length
     ).toEqual(1);
 
-    // expect(
-    //   bridge.router.getDestinationChains({ from: chains.interlay, token: "USDT" })
-    //     .length
-    // ).toEqual(1);
+    expect(
+      bridge.router.getDestinationChains({
+        from: chains.interlay,
+        token: "USDT",
+      }).length
+    ).toEqual(1);
 
     const adapter = bridge.findAdapter(fromChains[0]);
 
@@ -119,12 +116,12 @@ describe.skip("interlay-adapter should work", () => {
         });
 
         expect(tx.method.section).toEqual("xTokens");
-        // expect(tx.args.length).toEqual(4);
-        // if (to === "statemint") {
-        //   expect(tx.method.method).toEqual("transferMulticurrencies");
-        // } else {
-        //   expect(tx.method.method).toEqual("transfer");
-        // }
+        expect(tx.args.length).toEqual(4);
+        if (to === "statemint") {
+          expect(tx.method.method).toEqual("transferMulticurrencies");
+        } else {
+          expect(tx.method.method).toEqual("transfer");
+        }
 
         expect(tx.args.length).toEqual(4);
         expect(tx.method.method).toEqual("transfer");
@@ -132,6 +129,6 @@ describe.skip("interlay-adapter should work", () => {
     }
 
     await runMyTestSuit("polkadot", "DOT");
-    // await runMyTestSuit("statemint", "USDT");
+    await runMyTestSuit("statemint", "USDT");
   });
 });
