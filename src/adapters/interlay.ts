@@ -241,25 +241,6 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
       };
     }
 
-    if (
-      isChainEqual(toChain, "statemine") ||
-      isChainEqual(toChain, "statemint")
-    ) {
-      const destFee = this.getCrossChainFee(token, to);
-      const destWeight = this.getDestWeight(token, to);
-
-      // do the needful, use multi currencies
-      return this.api.tx.xTokens.transferMulticurrencies(
-        [
-          [tokenId, amount.toChainData()],
-          [{ Token: destFee.token }, destFee.balance.toChainData()],
-        ],
-        1,
-        { V1: dst },
-        destWeight?.toString()
-      );
-    }
-
     return this.api.tx.xTokens.transfer(
       tokenId,
       amount.toChainData(),
