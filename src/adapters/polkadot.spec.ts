@@ -80,7 +80,7 @@ describe.skip("polkadot-adapter should work", () => {
 
       const tx = kusamaAdapter.createTx({
         amount: FixedPointNumber.fromInner("10000000000", 10),
-        to: "karura",
+        to: "kusama",
         token: "KSM",
         address: testAccount,
         signer: testAccount,

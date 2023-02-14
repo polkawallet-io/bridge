@@ -19,15 +19,10 @@ describe.skip("Bridge sdk usage", () => {
   // const provider = new ApiProvider("testnet");;
 
   const availableAdapters: Record<string, BaseCrossChainAdapter> = {
-    // acala: new AcalaAdapter(),
-    // karura: new KaruraAdapter(),
     polkadot: new PolkadotAdapter(),
     kusama: new KusamaAdapter(),
     interlay: new InterlayAdapter(),
     kintsugi: new KintsugiAdapter(),
-    // moonriver: new MoonriverAdapter(),
-    // statemine: new StatemineAdapter(),
-    // statemint: new StatemintAdapter(),
   };
 
   const bridge = new Bridge({
@@ -64,10 +59,10 @@ describe.skip("Bridge sdk usage", () => {
       Object.keys(availableAdapters).length
     );
     expect(
-      bridge.router.getDestinationChains({ from: "acala" }).length
+      bridge.router.getDestinationChains({ from: "interlay" }).length
     ).toBeGreaterThanOrEqual(0);
     expect(
-      bridge.router.getAvailableTokens({ from: "acala", to: "polkadot" }).length
+      bridge.router.getAvailableTokens({ from: "interlay", to: "polkadot" }).length
     ).toBeGreaterThanOrEqual(0);
   });
 

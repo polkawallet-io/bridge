@@ -250,13 +250,10 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       );
     }
 
-    // to karura/acala
+    // to kintsugi/interlay
     const assetId = SUPPORTED_TOKENS[token];
     if (
-      (to !== "acala" &&
-        to !== "karura" &&
-        to !== "kintsugi" &&
-        to !== "interlay") ||
+      (to !== "kintsugi" && to !== "interlay") ||
       token === this.balanceAdapter?.nativeToken ||
       !assetId
     ) {
