@@ -2,14 +2,11 @@ import { firstValueFrom } from "rxjs";
 
 import { ApiProvider } from "./api-provider";
 import { BaseCrossChainAdapter } from "./base-chain-adapter";
-// import { KaruraAdapter, AcalaAdapter } from "./adapters/acala";
 import { ChainName } from "./configs";
 import { Bridge } from "./index";
 import { KintsugiAdapter, InterlayAdapter } from "./adapters/interlay";
-// import { StatemineAdapter, StatemintAdapter } from "./adapters/statemint";
 import { FN } from "./types";
 import { KusamaAdapter, PolkadotAdapter } from "./adapters/polkadot";
-// import { MoonriverAdapter } from "./adapters/moonbeam";
 describe.skip("Bridge sdk usage", () => {
   jest.setTimeout(30000);
 
