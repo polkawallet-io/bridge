@@ -1,4 +1,4 @@
-import { ChainType } from "src/types";
+import { ChainType } from "../../types";
 
 const typeSubstrate: ChainType = "substrate";
 // commented for now. We will use eth chain types soon™
