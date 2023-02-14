@@ -117,11 +117,7 @@ describe.skip("interlay-adapter should work", () => {
 
         expect(tx.method.section).toEqual("xTokens");
         expect(tx.args.length).toEqual(4);
-        if (to === "statemint") {
-          expect(tx.method.method).toEqual("transferMulticurrencies");
-        } else {
-          expect(tx.method.method).toEqual("transfer");
-        }
+        expect(tx.method.method).toEqual("transfer");
 
         expect(tx.args.length).toEqual(4);
         expect(tx.method.method).toEqual("transfer");
