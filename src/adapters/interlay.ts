@@ -119,6 +119,14 @@ export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
+  {
+    to: "bifrost",
+    token: "VKSM",
+    xcm: {
+      fee: { token: "VKSM", amount: "64000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
 ];
 
 export const interlayTokensConfig: Record<
@@ -135,6 +143,7 @@ export const interlayTokensConfig: Record<
     KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "0" },
     LKSM: { name: "LKSM", symbol: "LKSM", decimals: 12, ed: "0" },
     USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
+    VKSM: { name: "VKSM", symbol: "VKSM", decimals: 12, ed: "0" },
   },
 };
 
@@ -144,6 +153,7 @@ const KINTSUGI_SUPPORTED_TOKENS: Record<string, unknown> = {
   KSM: { Token: "KSM" },
   LKSM: { ForeignAsset: 2 },
   USDT: { ForeignAsset: 3 },
+  VKSM: { ForeignAsset: 5 },
 };
 
 const INTERLAY_SUPPORTED_TOKENS: Record<string, unknown> = {
