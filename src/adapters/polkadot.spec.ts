@@ -11,7 +11,7 @@ describe.skip("polkadot-adapter should work", () => {
   jest.setTimeout(30000);
 
   const testAccount = "DmSjv9MtU1Zcj2tW2HpNq8bZgsX56G4NE35jVKLDSAZC5D8";
-  const provider = new ApiProvider("testnet");
+  const provider = new ApiProvider("mainnet");
 
   async function connect(chain: ChainName) {
     return firstValueFrom(provider.connectFromChain([chain], undefined));
@@ -20,12 +20,18 @@ describe.skip("polkadot-adapter should work", () => {
   test("connect kusama to do xcm", async () => {
     const fromChain = "kusama";
 
-    await connect(fromChain);
+    await Promise.all([
+      connect(fromChain),
+      connect("kintsugi")
+    ]);
 
     const kusama = new KusamaAdapter();
     const kintsugi = new KintsugiAdapter();
 
-    await kusama.setApi(provider.getApi(fromChain));
+    const kusamaApi = provider.getApi(fromChain);
+    const kintsugiApi = provider.getApi("kintsugi");
+    await kusama.setApi(kusamaApi);
+    await kintsugi.setApi(kintsugiApi);
 
     const bridge = new Bridge({
       adapters: [kusama, kintsugi],
@@ -80,7 +86,7 @@ describe.skip("polkadot-adapter should work", () => {
 
       const tx = kusamaAdapter.createTx({
         amount: FixedPointNumber.fromInner("10000000000", 10),
-        to: "karura",
+        to: "kintsugi",
         token: "KSM",
         address: testAccount,
         signer: testAccount,

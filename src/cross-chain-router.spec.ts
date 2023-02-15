@@ -7,7 +7,7 @@ import { WsProvider } from '@polkadot/rpc-provider';
 import { isChainEqual } from './utils/is-chain-equal';
 import { chains } from './configs';
 import { BridgeRouterManager } from './cross-chain-router';
-import { CrossChainRouterConfigs } from 'src';
+import { CrossChainRouterConfigs } from './';
 
 describe.skip('cross-chain-router-manager', () => {
   let manager: BridgeRouterManager;
@@ -21,7 +21,7 @@ describe.skip('cross-chain-router-manager', () => {
       return manager;
     }
 
-    const endpoint = 'wss://karura.api.onfinality.io/public-ws';
+    const endpoint = 'wss://kintsugi.api.onfinality.io/public-ws';
     const provider = new WsProvider(endpoint) as any;
 
     api = await ApiPromise.create(options({ provider }));
@@ -36,15 +36,10 @@ describe.skip('cross-chain-router-manager', () => {
 
     await manager.addRouters(
       [
-        { from: chains.karura.id, to: chains.kusama.id, token: 'KSM' },
-        { from: chains.karura.id, to: chains.khala.id, token: 'KSM' },
-        { from: chains.karura.id, to: chains.khala.id, token: 'AUSD' },
-        { from: chains.karura.id, to: chains.khala.id, token: 'LKSM' },
-        { from: chains.khala.id, to: chains.karura.id, token: 'KSM' },
-        { from: chains.khala.id, to: chains.karura.id, token: 'AUSD' },
-        { from: chains.khala.id, to: chains.karura.id, token: 'LKSM' },
-        { from: chains.kusama.id, to: chains.karura.id, token: 'KSM' },
-        { from: chains.statemine.id, to: chains.karura.id, token: 'RMRK' }
+        { from: chains.kintsugi.id, to: chains.kusama.id, token: 'KSM' },
+        { from: chains.kusama.id, to: chains.kintsugi.id, token: 'KSM' },
+        { from: chains.statemine.id, to: chains.kintsugi.id, token: 'USDT' },
+        { from: chains.kintsugi.id, to: chains.statemine.id, token: 'USDT' }
       ] as CrossChainRouterConfigs[],
       false
     );
@@ -53,46 +48,41 @@ describe.skip('cross-chain-router-manager', () => {
   };
 
   test('isChainEqual should be ok', () => {
-    expect(isChainEqual(chains.karura, chains.karura)).toBe(true);
-    expect(isChainEqual(chains.karura, 'karura')).toBe(true);
-    expect(isChainEqual(chains.karura, 'kusama')).toBe(false);
-    expect(isChainEqual('karura', chains.karura)).toBe(true);
-    expect(isChainEqual('kusama', chains.karura)).toBe(false);
+    expect(isChainEqual(chains.kintsugi, chains.kintsugi)).toBe(true);
+    expect(isChainEqual(chains.kintsugi, 'kintsugi')).toBe(true);
+    expect(isChainEqual(chains.kintsugi, 'kusama')).toBe(false);
+    expect(isChainEqual('kintsugi', chains.kintsugi)).toBe(true);
+    expect(isChainEqual('kusama', chains.kintsugi)).toBe(false);
   });
 
   test('getRouter should be ok', async () => {
-    const r1 = manager.getRouters({ from: 'karura' });
-    // const r2 = manager.getRouters({ from: "khala" });
-    const r3 = manager.getRouters({ from: 'karura', to: 'khala' });
-    const r4 = manager.getRouters({ from: 'karura', to: 'khala', token: 'AUSD' });
-    const r5 = manager.getRouters({ to: 'karura' });
-    const r6 = manager.getRouters({ to: 'karura', token: 'AUSD' });
-    const r7 = manager.getRouters({ token: 'AUSD' });
-    const r8 = manager.getRouters({ token: 'RMRK' });
+    const r1 = manager.getRouters({ from: 'kintsugi' });
+    const r2 = manager.getRouters({ from: 'kusama' });
+    const r3 = manager.getRouters({ from: 'kintsugi', to: 'kusama' });
+    const r4 = manager.getRouters({ from: 'kintsugi', to: 'kusama', token: 'KSM' });
+    const r5 = manager.getRouters({ to: 'kintsugi' });
+    const r6 = manager.getRouters({ to: 'kintsugi', token: 'USDT' });
+    const r7 = manager.getRouters({ token: 'KSM' });
+    const r8 = manager.getRouters({ token: 'USDT' });
     const r9 = manager.getRouters();
 
-    expect(r1.length).toEqual(4);
-    // expect(r2.length).toEqual(3);
-    expect(r3.length).toEqual(3);
+    expect(r1.length).toEqual(2);
+    expect(r2.length).toEqual(1);
+    expect(r3.length).toEqual(1);
     expect(r4.length).toEqual(1);
-    expect(r5.length).toEqual(5);
+    expect(r5.length).toEqual(2);
     expect(r6.length).toEqual(1);
     expect(r7.length).toEqual(2);
-    expect(r8.length).toEqual(1);
-    expect(r9.length).toEqual(9);
+    expect(r8.length).toEqual(2);
+    expect(r9.length).toEqual(4);
   });
 
   test('get* should be ok', async () => {
-    const r1 = manager.getDestinationChains({ from: 'karura' });
-    const r2 = manager.getFromChains({ to: 'karura' });
+    const r1 = manager.getDestinationChains({ from: 'kintsugi' });
+    const r2 = manager.getFromChains({ to: 'kintsugi' });
 
     expect(r1.length).toEqual(2);
-    expect(r1[0].display).toEqual('Kusama');
-    expect(r1[1].display).toEqual('Khala');
-    expect(r2.length).toEqual(3);
-    expect(r2[0].display).toEqual('Khala');
-    expect(r2[1].display).toEqual('Kusama');
-    expect(r2[2].display).toEqual('Statemine');
+    expect(r2.length).toEqual(2);
   });
 
   beforeAll(async () => {

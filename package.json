@@ -1,6 +1,6 @@
 {
   "name": "@interlay/bridge",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "polkawallet bridge sdk",
   "main": "build/index.js",
   "typings": "build/index.d.ts",
@@ -41,9 +41,8 @@
     "@acala-network/sdk": "4.1.8-9",
     "@acala-network/sdk-core": "4.1.8-9",
     "@polkadot/api": "^9.11.1",
-    "@polkadot/apps-config": "^0.122.2",
+    "@polkadot/apps-config": "^0.124.1",
     "@polkadot/types": "^9.11.1",
-    "@polkadot/types-augment": "^9.11.1",
     "axios": "^0.27.2",
     "lodash": "^4.17.20"
   },

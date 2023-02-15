@@ -2,14 +2,11 @@ import { firstValueFrom } from "rxjs";
 
 import { ApiProvider } from "./api-provider";
 import { BaseCrossChainAdapter } from "./base-chain-adapter";
-// import { KaruraAdapter, AcalaAdapter } from "./adapters/acala";
 import { ChainName } from "./configs";
 import { Bridge } from "./index";
 import { KintsugiAdapter, InterlayAdapter } from "./adapters/interlay";
-// import { StatemineAdapter, StatemintAdapter } from "./adapters/statemint";
 import { FN } from "./types";
 import { KusamaAdapter, PolkadotAdapter } from "./adapters/polkadot";
-// import { MoonriverAdapter } from "./adapters/moonbeam";
 describe.skip("Bridge sdk usage", () => {
   jest.setTimeout(30000);
 
@@ -19,15 +16,10 @@ describe.skip("Bridge sdk usage", () => {
   // const provider = new ApiProvider("testnet");;
 
   const availableAdapters: Record<string, BaseCrossChainAdapter> = {
-    // acala: new AcalaAdapter(),
-    // karura: new KaruraAdapter(),
     polkadot: new PolkadotAdapter(),
     kusama: new KusamaAdapter(),
     interlay: new InterlayAdapter(),
     kintsugi: new KintsugiAdapter(),
-    // moonriver: new MoonriverAdapter(),
-    // statemine: new StatemineAdapter(),
-    // statemint: new StatemintAdapter(),
   };
 
   const bridge = new Bridge({
@@ -64,10 +56,10 @@ describe.skip("Bridge sdk usage", () => {
       Object.keys(availableAdapters).length
     );
     expect(
-      bridge.router.getDestinationChains({ from: "acala" }).length
+      bridge.router.getDestinationChains({ from: "interlay" }).length
     ).toBeGreaterThanOrEqual(0);
     expect(
-      bridge.router.getAvailableTokens({ from: "acala", to: "polkadot" }).length
+      bridge.router.getAvailableTokens({ from: "interlay", to: "polkadot" }).length
     ).toBeGreaterThanOrEqual(0);
   });
 
