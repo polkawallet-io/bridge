@@ -57,7 +57,8 @@ export const parallelTokensConfig: Record<
 };
 
 const SUPPORTED_TOKENS: Record<string, number> = {
-  KBTC: 121,
+  // IBTC: 122, // asset id 122
+  KBTC: 121, // asset id 121
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
