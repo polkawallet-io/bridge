@@ -5,8 +5,79 @@ import { ApiProvider } from "../api-provider";
 import { chains, ChainName } from "../configs";
 import { Bridge } from "..";
 import { PolkadotAdapter } from "./polkadot";
-import { InterlayAdapter } from "./interlay";
+import { InterlayAdapter, KintsugiAdapter } from "./interlay";
 import { StatemintAdapter } from "./statemint";
+
+// helper method for getting balances, configs, fees, and constructing xcm extrinsics
+async function runMyTestSuite(testAccount: string, bridge: Bridge, from: ChainName, to: ChainName, token: string) {
+  const adapter = bridge.findAdapter(from);
+  if (adapter) {
+    const balance = await firstValueFrom(
+      adapter.subscribeTokenBalance(token, testAccount)
+    );
+
+    console.log(
+      `balance ${token}: free-${balance.free.toNumber()} locked-${balance.locked.toNumber()} available-${balance.available.toNumber()}`
+    );
+    expect(balance.available.toNumber()).toBeGreaterThanOrEqual(0);
+    expect(balance.free.toNumber()).toBeGreaterThanOrEqual(
+      balance.available.toNumber()
+    );
+    expect(balance.free.toNumber()).toEqual(
+      balance.locked.add(balance.available).toNumber()
+    );
+
+    const toAdapter = bridge.findAdapter(to);
+    const toBalance = await firstValueFrom(
+      toAdapter.subscribeTokenBalance(token, testAccount)
+    );
+    console.log(
+      `balance at destination ${token}: free-${toBalance.free.toNumber()} locked-${toBalance.locked.toNumber()} available-${toBalance.available.toNumber()}`
+    );
+
+    const inputConfig = await firstValueFrom(
+      adapter.subscribeInputConfigs({
+        to,
+        token,
+        address: testAccount,
+        signer: testAccount,
+      })
+    );
+
+    console.log(
+      `inputConfig: min-${inputConfig.minInput.toNumber()} max-${inputConfig.maxInput.toNumber()} ss58-${
+        inputConfig.ss58Prefix
+      } estimateFee-${inputConfig.estimateFee}`
+    );
+    expect(inputConfig.minInput.toNumber()).toBeGreaterThan(0);
+    expect(inputConfig.maxInput.toNumber()).toBeLessThanOrEqual(
+      balance.available.toNumber()
+    );
+
+    const destFee = adapter.getCrossChainFee(token, to);
+
+    console.log(
+      `destFee: fee-${destFee.balance.toNumber()} ${destFee.token}`
+    );
+    if (to === "polkadot") {
+      expect(destFee.balance.toNumber()).toEqual(0.1);
+    } else {
+      expect(destFee.balance.toNumber()).toBeGreaterThan(0);
+    }
+
+    const tx = adapter.createTx({
+      amount: FixedPointNumber.fromInner("10000000000", 10),
+      to,
+      token,
+      address: testAccount,
+      signer: testAccount,
+    });
+
+    expect(tx.method.section).toEqual("xTokens");
+    expect(tx.args.length).toEqual(4);
+    expect(tx.method.method).toEqual("transfer");
+  }
+};
 
 describe.skip("interlay-adapter should work", () => {
   jest.setTimeout(30000);
@@ -18,6 +89,31 @@ describe.skip("interlay-adapter should work", () => {
   async function connect(chains: ChainName[]) {
     return firstValueFrom(provider.connectFromChain(chains, undefined));
   }
+
+  test("connect kintsugi to do xcm", async () => {
+    const fromChains = ["kintsugi"] as ChainName[];
+
+    await connect(fromChains);
+
+    const kintsugi = new KintsugiAdapter();
+
+    await kintsugi.setApi(provider.getApi(fromChains[0]));
+
+    const bridge = new Bridge({
+      adapters: [kintsugi],
+    });
+
+    // sample expect
+    // expect(
+    //   bridge.router.getDestinationChains({
+    //     from: chains.kintsugi,
+    //     token: "<token>",
+    //   }).length
+    // ).toEqual(1);
+
+    // run test suite, sample
+    // await runMyTestSuite(testAccount, bridge, "kintsugi", "<otherchain>", "<token>");
+  });
 
   test("connect interlay to do xcm", async () => {
     const fromChains = ["interlay", "polkadot", "statemint"] as ChainName[];
@@ -50,81 +146,7 @@ describe.skip("interlay-adapter should work", () => {
       }).length
     ).toEqual(1);
 
-    const adapter = bridge.findAdapter(fromChains[0]);
-
-    async function runMyTestSuit(to: ChainName, token: string) {
-      if (adapter) {
-        const balance = await firstValueFrom(
-          adapter.subscribeTokenBalance(token, testAccount)
-        );
-
-        console.log(
-          `balance ${token}: free-${balance.free.toNumber()} locked-${balance.locked.toNumber()} available-${balance.available.toNumber()}`
-        );
-        expect(balance.available.toNumber()).toBeGreaterThanOrEqual(0);
-        expect(balance.free.toNumber()).toBeGreaterThanOrEqual(
-          balance.available.toNumber()
-        );
-        expect(balance.free.toNumber()).toEqual(
-          balance.locked.add(balance.available).toNumber()
-        );
-
-        const toAdapter = bridge.findAdapter(to);
-        const toBalance = await firstValueFrom(
-          toAdapter.subscribeTokenBalance(token, testAccount)
-        );
-        console.log(
-          `balance at destination ${token}: free-${toBalance.free.toNumber()} locked-${toBalance.locked.toNumber()} available-${toBalance.available.toNumber()}`
-        );
-
-        const inputConfig = await firstValueFrom(
-          adapter.subscribeInputConfigs({
-            to,
-            token,
-            address: testAccount,
-            signer: testAccount,
-          })
-        );
-
-        console.log(
-          `inputConfig: min-${inputConfig.minInput.toNumber()} max-${inputConfig.maxInput.toNumber()} ss58-${
-            inputConfig.ss58Prefix
-          } estimateFee-${inputConfig.estimateFee}`
-        );
-        expect(inputConfig.minInput.toNumber()).toBeGreaterThan(0);
-        expect(inputConfig.maxInput.toNumber()).toBeLessThanOrEqual(
-          balance.available.toNumber()
-        );
-
-        const destFee = adapter.getCrossChainFee(token, to);
-
-        console.log(
-          `destFee: fee-${destFee.balance.toNumber()} ${destFee.token}`
-        );
-        if (to != "polkadot") {
-          expect(destFee.balance.toNumber()).toBeGreaterThan(0);
-        } else {
-          expect(destFee.balance.toNumber()).toEqual(0.1);
-        }
-
-        const tx = adapter.createTx({
-          amount: FixedPointNumber.fromInner("10000000000", 10),
-          to,
-          token,
-          address: testAccount,
-          signer: testAccount,
-        });
-
-        expect(tx.method.section).toEqual("xTokens");
-        expect(tx.args.length).toEqual(4);
-        expect(tx.method.method).toEqual("transfer");
-
-        expect(tx.args.length).toEqual(4);
-        expect(tx.method.method).toEqual("transfer");
-      }
-    }
-
-    await runMyTestSuit("polkadot", "DOT");
-    await runMyTestSuit("statemint", "USDT");
+    await runMyTestSuite(testAccount, bridge, "interlay", "polkadot", "DOT");
+    await runMyTestSuite(testAccount, bridge, "interlay", "statemint", "USDT");
   });
 });
