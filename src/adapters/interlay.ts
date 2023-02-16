@@ -59,8 +59,13 @@ export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "heiko",
     token: "KBTC",
     xcm: {
-      // fee is best guess, to be confirmed
-      fee: { token: "KBTC", amount: "85" },
+      // estimated fee calculated from:
+      // ksm_per_sec = ~233_100_000_000
+      // kint_per_sec = (ksm_per_second * 4) / 3 = 310_800_000_000
+      // xcm_secs = ~(247_189_333 / kint_per_sec) ... calculated using a recent kint transaction
+      // kbtc_per_sec = ksm_per_sec / 1_500_000 ... see https://github.com/interlay/interbtc/blob/18efc1e9194a8591713b9885799a6deb6c0392f2/parachain/runtime/kintsugi/src/xcm_config.rs#L104
+      // estimated kbtc fee = kbtc_per_sec * xcm_secs = ~123.6
+      fee: { token: "KBTC", amount: "200" },
       weightLimit: DEST_WEIGHT,
     },
   },
