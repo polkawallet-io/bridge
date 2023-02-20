@@ -8,7 +8,11 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainName, chains } from "../configs";
-import { ApiNotFound, CurrencyNotFound } from "../errors";
+import {
+  ApiNotFound,
+  CurrencyNotFound,
+  DestinationWeightNotFound,
+} from "../errors";
 import {
   BalanceData,
   BasicToken,
@@ -20,6 +24,19 @@ import { isChainEqual } from "../utils/is-chain-equal";
 const DEST_WEIGHT = "180000000000";
 
 export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+  // {
+  //   to: "acala",
+  //   token: "INTR",
+  //   xcm: {
+  //     fee: { token: "INTR", amount: "92696000" },
+  //     weightLimit: DEST_WEIGHT,
+  //   },
+  // },
+  // {
+  //   to: "acala",
+  //   token: "IBTC",
+  //   xcm: { fee: { token: "IBTC", amount: "9" }, weightLimit: DEST_WEIGHT },
+  // },
   {
     to: "polkadot",
     token: "DOT",
@@ -39,6 +56,30 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
 ];
 
 export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+  {
+    to: "karura",
+    token: "KINT",
+    xcm: {
+      fee: { token: "KINT", amount: "170666666" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "karura",
+    token: "KBTC",
+    xcm: {
+      fee: { token: "KBTC", amount: "200" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  // {
+  //   to: "karura",
+  //   token: "LKSM",
+  //   xcm: {
+  //     fee: { token: "LKSM", amount: "647055467" },
+  //     weightLimit: DEST_WEIGHT,
+  //   },
+  // },
   {
     to: "kusama",
     token: "KSM",
@@ -66,12 +107,16 @@ export const interlayTokensConfig: Record<
     USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
   },
   kintsugi: {
+    KBTC: { name: "KBTC", symbol: "KBTC", decimals: 8, ed: "0" },
+    KINT: { name: "KINT", symbol: "KINT", decimals: 12, ed: "0" },
     KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "0" },
     USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
   },
 };
 
 const KINTSUGI_SUPPORTED_TOKENS: Record<string, unknown> = {
+  KBTC: { Token: "KBTC" },
+  KINT: { Token: "KINT" },
   KSM: { Token: "KSM" },
   USDT: { ForeignAsset: 3 },
 };
@@ -241,13 +286,18 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
       };
     }
 
+    const destWeight = this.getDestWeight(token, to);
+    if (destWeight === undefined) {
+      throw new DestinationWeightNotFound(this.chain.id, to, token);
+    }
+
     return this.api.tx.xTokens.transfer(
       tokenId,
       amount.toChainData(),
       {
         V1: dst,
       },
-      this.getDestWeight(token, to)?.toString()
+      destWeight
     );
   }
 }

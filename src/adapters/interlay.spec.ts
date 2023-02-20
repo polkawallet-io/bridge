@@ -7,6 +7,7 @@ import { Bridge } from "..";
 import { PolkadotAdapter } from "./polkadot";
 import { InterlayAdapter, KintsugiAdapter } from "./interlay";
 import { StatemintAdapter } from "./statemint";
+import { KaruraAdapter } from "./acala";
 
 // helper method for getting balances, configs, fees, and constructing xcm extrinsics
 async function runMyTestSuite(testAccount: string, bridge: Bridge, from: ChainName, to: ChainName, token: string) {
@@ -91,28 +92,29 @@ describe.skip("interlay-adapter should work", () => {
   }
 
   test("connect kintsugi to do xcm", async () => {
-    const fromChains = ["kintsugi"] as ChainName[];
+    const fromChains = ["kintsugi", "karura"] as ChainName[];
 
     await connect(fromChains);
 
     const kintsugi = new KintsugiAdapter();
+    const karura = new KaruraAdapter();
 
     await kintsugi.setApi(provider.getApi(fromChains[0]));
+    await karura.setApi(provider.getApi(fromChains[1]));
 
     const bridge = new Bridge({
-      adapters: [kintsugi],
+      adapters: [kintsugi, karura],
     });
 
-    // sample expect
-    // expect(
-    //   bridge.router.getDestinationChains({
-    //     from: chains.kintsugi,
-    //     token: "<token>",
-    //   }).length
-    // ).toEqual(1);
+    expect(
+      bridge.router.getDestinationChains({
+        from: chains.kintsugi,
+        token: "KINT",
+      }).length
+    ).toEqual(1);
 
-    // run test suite, sample
-    // await runMyTestSuite(testAccount, bridge, "kintsugi", "<otherchain>", "<token>");
+    await runMyTestSuite(testAccount, bridge, "kintsugi", "karura", "KINT");
+    await runMyTestSuite(testAccount, bridge, "kintsugi", "karura", "KBTC");
   });
 
   test("connect interlay to do xcm", async () => {
