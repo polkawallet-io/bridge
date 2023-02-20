@@ -1,5 +1,3 @@
-
-
 import { FixedPointNumber } from '@acala-network/sdk-core';
 import { firstValueFrom } from 'rxjs';
 
@@ -16,7 +14,6 @@ describe.skip('acala-adapter should work', () => {
   const provider = new ApiProvider("mainnet");
 
   async function connect (chains: ChainName[]) {
-    // return firstValueFrom(provider.connectFromChain([chain], { karura: ["wss://crosschain-dev.polkawallet.io:9907"] }));
     return firstValueFrom(provider.connectFromChain(chains, undefined));
   }
 

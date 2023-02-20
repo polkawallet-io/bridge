@@ -83,7 +83,6 @@ async function runMyTestSuite(testAccount: string, bridge: Bridge, from: ChainNa
 describe.skip("interlay-adapter should work", () => {
   jest.setTimeout(30000);
 
-  // const testAccount = "wd93QFMT7icy97uVQWjQXXEBvUH3JdDxB27JtD56yJKnJMMkF";
   const testAccount = "wd8h1Mu8rsZhiKN5zZUWuz2gtr51JajTDCtbdkzoXbMZiQAut";
   const provider = new ApiProvider("mainnet");
 

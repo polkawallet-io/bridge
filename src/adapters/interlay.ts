@@ -58,17 +58,17 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
 export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
     to: "karura",
-    token: "KINT",
+    token: "KBTC",
     xcm: {
-      fee: { token: "KINT", amount: "170666666" },
+      fee: { token: "KBTC", amount: "200" },
       weightLimit: DEST_WEIGHT,
     },
   },
   {
     to: "karura",
-    token: "KBTC",
+    token: "KINT",
     xcm: {
-      fee: { token: "KBTC", amount: "200" },
+      fee: { token: "KINT", amount: "170666666" },
       weightLimit: DEST_WEIGHT,
     },
   },
