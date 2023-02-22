@@ -60,7 +60,7 @@ export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "karura",
     token: "KBTC",
     xcm: {
-      fee: { token: "KBTC", amount: "200" },
+      fee: { token: "KBTC", amount: "100" },
       weightLimit: DEST_WEIGHT,
     },
   },
@@ -68,7 +68,7 @@ export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "karura",
     token: "KINT",
     xcm: {
-      fee: { token: "KINT", amount: "170666666" },
+      fee: { token: "KINT", amount: "300000000" },
       weightLimit: DEST_WEIGHT,
     },
   },

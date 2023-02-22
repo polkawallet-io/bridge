@@ -50,7 +50,7 @@ export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "kintsugi",
     token: "KINT",
     xcm: {
-      fee: { token: "KINT", amount: "170666666" },
+      fee: { token: "KINT", amount: "300000000" },
       weightLimit: ACALA_DEST_WEIGHT,
     },
   },
@@ -58,7 +58,7 @@ export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "kintsugi",
     token: "KBTC",
     xcm: {
-      fee: { token: "KBTC", amount: "85" },
+      fee: { token: "KBTC", amount: "200" },
       weightLimit: ACALA_DEST_WEIGHT,
     },
   },
