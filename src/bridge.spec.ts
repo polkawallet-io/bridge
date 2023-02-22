@@ -30,7 +30,9 @@ describe.skip("Bridge sdk usage", () => {
   });
 
   function printTx(fromChain: any, toChain: any, token: any) {
-    const testAddress = "wd8h1Mu8rsZhiKN5zZUWuz2gtr51JajTDCtbdkzoXbMZiQAut";
+    // const testAddress = "23M5ttkmR6Kco7bReRDve6bQUSAcwqebatp3fWGJYb4hDSDJ";
+    // Alice test address
+    const testAddress = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
 
     const tx = availableAdapters[fromChain].createTx({
       to: toChain,
