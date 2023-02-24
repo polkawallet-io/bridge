@@ -233,6 +233,13 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
       throw new CurrencyNotFound(token);
     }
 
+    const useNewDestWeight =
+      this.api.tx.xTokens.transfer.meta.args[3].type.toString() ===
+      "XcmV2WeightLimit";
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const oldDestWeight = this.getDestWeight(token, to)!.toString();
+    const destWeight = useNewDestWeight ? "Unlimited" : oldDestWeight;
+
     return this.api.tx.xTokens.transfer(
       tokenId,
       amount.toChainData(),
@@ -248,7 +255,7 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
         },
       },
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.getDestWeight(token, to)!.toString()
+      destWeight
     );
   }
 }
