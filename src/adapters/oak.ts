@@ -128,7 +128,7 @@ class OakBalanceAdapter extends BalanceAdapter {
       map((balance) => {
         const amount = FN.fromInner(
           balance.free?.toString() || "0",
-          this.getToken(tokenId).decimals
+          this.getToken(token).decimals
         );
 
         return {
