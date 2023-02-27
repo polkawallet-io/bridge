@@ -213,8 +213,30 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
       );
     }
 
-    // to karura/acala
-    if (to === "acala" || to === "karura") {
+    // to karura
+    if (to === "karura") {
+      const dst = { parents: 0, X1: { Parachain: toChain.paraChainId } };
+      const acc = {
+        parents: 0,
+        X1: { AccountId32: { id: accountId } },
+      };
+      const ass = [
+        {
+          Concrete: { parents: 0, interior: "Here" },
+          Fungible: amount.toChainData(),
+        },
+      ];
+
+      return this.api?.tx.xcmPallet.reserveTransferAssets(
+        { V3: dst },
+        { V3: acc },
+        { V3: ass },
+        0
+      );
+    }
+
+    // to acala
+    if (to === "acala") {
       const dst = { X1: { Parachain: toChain.paraChainId } };
       const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
       const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
