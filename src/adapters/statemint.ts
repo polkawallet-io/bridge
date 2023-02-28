@@ -44,7 +44,8 @@ export const statemineTokensConfig: Record<
   },
   statemint: {
     DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "1000000000" },
-    USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "1000" },
+    // ED set according to minBalance value of assets.asset(1984)
+    USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "700000" },
   },
 };
 
