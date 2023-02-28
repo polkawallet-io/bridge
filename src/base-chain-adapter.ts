@@ -1,4 +1,8 @@
-import { AnyApi, FixedPointNumber as FN } from "@acala-network/sdk-core";
+import {
+  AnyApi,
+  FixedPointNumber,
+  FixedPointNumber as FN,
+} from "@acala-network/sdk-core";
 import {
   combineLatest,
   firstValueFrom,
@@ -188,7 +192,11 @@ export abstract class BaseCrossChainAdapter {
   }
 
   public estimateTxFee(params: CrossChainTransferParams) {
-    let tx = this.createTx({ ...params });
+    let tx = this.createTx({
+      ...params,
+      // overwrite amount just for estimating fee
+      amount: FixedPointNumber.fromInner("1"),
+    });
 
     if (this.api?.type === "rxjs") {
       tx = tx as SubmittableExtrinsic<"rxjs", ISubmittableResult>;
@@ -196,6 +204,11 @@ export abstract class BaseCrossChainAdapter {
       return tx.paymentInfo(params.signer).pipe(
         map((feeData) => {
           return feeData.partialFee.toString();
+        }),
+        catchError((e) => {
+          console.debug(`fetch payment info failed, ${e}`);
+
+          return "0";
         })
       );
     }
