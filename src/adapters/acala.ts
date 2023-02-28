@@ -50,6 +50,7 @@ export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "kintsugi",
     token: "KINT",
     xcm: {
+      // local tests in chopsticks indicate fees are around 250k (atomic units)
       fee: { token: "KINT", amount: "300000000" },
       weightLimit: ACALA_DEST_WEIGHT,
     },
@@ -58,6 +59,7 @@ export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "kintsugi",
     token: "KBTC",
     xcm: {
+      // local tests in chopsticks indicate fees are around 123 (atomic units)
       fee: { token: "KBTC", amount: "200" },
       weightLimit: ACALA_DEST_WEIGHT,
     },
