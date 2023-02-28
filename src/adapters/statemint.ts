@@ -40,6 +40,7 @@ export const statemineTokensConfig: Record<
 > = {
   statemine: {
     KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "3333333" },
+    // ED set according to minBalance value of assets.asset(1984)
     USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "1000" },
   },
   statemint: {
