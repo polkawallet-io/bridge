@@ -77,6 +77,7 @@ export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
 //   IBTC: { name: "IBTC", symbol: "IBTC", decimals: 8, ed: "100" },
 // };
 
+// Config values taken from [polkawallet-io/bridge](https://github.com/polkawallet-io/bridge/blob/356e5413337ab00d7e405e5ad5d3af2e13150c16/src/adapters/acala.ts#L599-L600)
 export const karuraTokensConfig: Record<string, BasicToken> = {
   //   LKSM: { name: "LKSM", symbol: "LKSM", decimals: 12, ed: "500000000" },
   KINT: { name: "KINT", symbol: "KINT", decimals: 12, ed: "133330000" },
