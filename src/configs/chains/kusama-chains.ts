@@ -53,14 +53,14 @@ export const kusamaChains = {
   //   paraChainId: 2023,
   //   ss58Prefix: 1285,
   // },
-  // heiko: {
-  //   id: "heiko",
-  //   display: "Parallel Heiko",
-  //   type: typeSubstrate,
-  //   icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fparallel.png&w=96&q=75",
-  //   paraChainId: 2085,
-  //   ss58Prefix: 110,
-  // },
+  heiko: {
+    id: "heiko",
+    display: "Parallel Heiko",
+    type: typeSubstrate,
+    icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fparallel.png&w=96&q=75",
+    paraChainId: 2085,
+    ss58Prefix: 110,
+  },
 };
 
 export const kusamaTestnetChains = {
@@ -112,12 +112,12 @@ export const kusamaTestnetChains = {
   //   paraChainId: 2023,
   //   ss58Prefix: 1285,
   // },
-  // heiko: {
-  //   id: "heiko",
-  //   display: "Parallel Heiko",
-  //   type: typeSubstrate,
-  //   icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fparallel.png&w=96&q=75",
-  //   paraChainId: 2085,
-  //   ss58Prefix: 110,
-  // },
+  heiko: {
+    id: "heiko",
+    display: "Parallel Heiko",
+    type: typeSubstrate,
+    icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fparallel.png&w=96&q=75",
+    paraChainId: 2085,
+    ss58Prefix: 110,
+  },
 };
