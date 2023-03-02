@@ -7,7 +7,9 @@ import { Bridge } from "./index";
 import { KintsugiAdapter, InterlayAdapter } from "./adapters/interlay";
 import { FN } from "./types";
 import { KusamaAdapter, PolkadotAdapter } from "./adapters/polkadot";
+import { HeikoAdapter } from "./adapters/parallel";
 import { KaruraAdapter } from "./adapters/acala";
+
 describe.skip("Bridge sdk usage", () => {
   jest.setTimeout(30000);
 
@@ -22,6 +24,7 @@ describe.skip("Bridge sdk usage", () => {
     interlay: new InterlayAdapter(),
     kintsugi: new KintsugiAdapter(),
     karura: new KaruraAdapter(),
+    heiko: new HeikoAdapter(),
   };
 
   const bridge = new Bridge({
@@ -29,7 +32,6 @@ describe.skip("Bridge sdk usage", () => {
   });
 
   function printTx(fromChain: any, toChain: any, token: any) {
-    // const testAddress = "23M5ttkmR6Kco7bReRDve6bQUSAcwqebatp3fWGJYb4hDSDJ";
     // Alice test address
     const testAddress = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
 
@@ -160,6 +162,7 @@ describe.skip("Bridge sdk usage", () => {
     // kintsugi
     // printBidirectionalTxs("kintsugi", "kusama", "KSM");
     // printBidirectionalTxs("kintsugi", "statemine", "USDT");
+    // printBidirectionalTxs("kintsugi", "heiko", "KBTC");
     printBidirectionalTxs("kintsugi", "karura", "KINT");
     printBidirectionalTxs("kintsugi", "karura", "KBTC");
 

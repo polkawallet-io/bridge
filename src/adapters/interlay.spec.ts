@@ -1,4 +1,3 @@
-import { FixedPointNumber } from "@acala-network/sdk-core";
 import { firstValueFrom } from "rxjs";
 
 import { ApiProvider } from "../api-provider";
@@ -8,76 +7,55 @@ import { PolkadotAdapter } from "./polkadot";
 import { InterlayAdapter, KintsugiAdapter } from "./interlay";
 import { StatemintAdapter } from "./statemint";
 import { KaruraAdapter } from "./acala";
+import { HeikoAdapter } from "./parallel";
+import { buildTestTxWithConfigData } from "../utils/shared-spec-methods";
 
 // helper method for getting balances, configs, fees, and constructing xcm extrinsics
 async function runMyTestSuite(testAccount: string, bridge: Bridge, from: ChainName, to: ChainName, token: string) {
-  const adapter = bridge.findAdapter(from);
-  if (adapter) {
-    const balance = await firstValueFrom(
-      adapter.subscribeTokenBalance(token, testAccount)
-    );
+  const {fromBalance, toBalance, inputConfig, destFee, tx} = await buildTestTxWithConfigData(testAccount, bridge, from, to, token);
 
-    console.log(
-      `balance ${token}: free-${balance.free.toNumber()} locked-${balance.locked.toNumber()} available-${balance.available.toNumber()}`
-    );
-    expect(balance.available.toNumber()).toBeGreaterThanOrEqual(0);
-    expect(balance.free.toNumber()).toBeGreaterThanOrEqual(
-      balance.available.toNumber()
-    );
-    expect(balance.free.toNumber()).toEqual(
-      balance.locked.add(balance.available).toNumber()
-    );
+  // from balance prints/checks
+  console.log(
+    `balance ${token}: free-${fromBalance.free.toNumber()} locked-${fromBalance.locked.toNumber()} available-${fromBalance.available.toNumber()}`
+  );
+  expect(fromBalance.available.toNumber()).toBeGreaterThanOrEqual(0);
+  expect(fromBalance.free.toNumber()).toBeGreaterThanOrEqual(
+    fromBalance.available.toNumber()
+  );
+  expect(fromBalance.free.toNumber()).toEqual(
+    fromBalance.locked.add(fromBalance.available).toNumber()
+  );
+  
+  // toBalance prints/checks
+  console.log(
+    `balance at destination ${token}: free-${toBalance.free.toNumber()} locked-${toBalance.locked.toNumber()} available-${toBalance.available.toNumber()}`
+  );
 
-    const toAdapter = bridge.findAdapter(to);
-    const toBalance = await firstValueFrom(
-      toAdapter.subscribeTokenBalance(token, testAccount)
-    );
-    console.log(
-      `balance at destination ${token}: free-${toBalance.free.toNumber()} locked-${toBalance.locked.toNumber()} available-${toBalance.available.toNumber()}`
-    );
+  // inputConfig prints/checks
+  console.log(
+    `inputConfig: min-${inputConfig.minInput.toNumber()} max-${inputConfig.maxInput.toNumber()} ss58-${
+      inputConfig.ss58Prefix
+    } estimateFee-${inputConfig.estimateFee}`
+  );
+  expect(inputConfig.minInput.toNumber()).toBeGreaterThan(0);
+  expect(inputConfig.maxInput.toNumber()).toBeLessThanOrEqual(
+    fromBalance.available.toNumber()
+  );
 
-    const inputConfig = await firstValueFrom(
-      adapter.subscribeInputConfigs({
-        to,
-        token,
-        address: testAccount,
-        signer: testAccount,
-      })
-    );
-
-    console.log(
-      `inputConfig: min-${inputConfig.minInput.toNumber()} max-${inputConfig.maxInput.toNumber()} ss58-${
-        inputConfig.ss58Prefix
-      } estimateFee-${inputConfig.estimateFee}`
-    );
-    expect(inputConfig.minInput.toNumber()).toBeGreaterThan(0);
-    expect(inputConfig.maxInput.toNumber()).toBeLessThanOrEqual(
-      balance.available.toNumber()
-    );
-
-    const destFee = adapter.getCrossChainFee(token, to);
-
-    console.log(
-      `destFee: fee-${destFee.balance.toNumber()} ${destFee.token}`
-    );
-    if (to === "polkadot") {
-      expect(destFee.balance.toNumber()).toEqual(0.1);
-    } else {
-      expect(destFee.balance.toNumber()).toBeGreaterThan(0);
-    }
-
-    const tx = adapter.createTx({
-      amount: FixedPointNumber.fromInner("10000000000", 10),
-      to,
-      token,
-      address: testAccount,
-      signer: testAccount,
-    });
-
-    expect(tx.method.section).toEqual("xTokens");
-    expect(tx.args.length).toEqual(4);
-    expect(tx.method.method).toEqual("transfer");
+  // destFee prints/checks
+  console.log(
+    `destFee: fee-${destFee.balance.toNumber()} ${destFee.token}`
+  );
+  if (to === "polkadot") {
+    expect(destFee.balance.toNumber()).toEqual(0.1);
+  } else {
+    expect(destFee.balance.toNumber()).toBeGreaterThan(0);
   }
+
+  // tx method & params checks
+  expect(tx.method.section).toEqual("xTokens");
+  expect(tx.args.length).toEqual(4);
+  expect(tx.method.method).toEqual("transfer");
 };
 
 describe.skip("interlay-adapter should work", () => {
@@ -91,20 +69,23 @@ describe.skip("interlay-adapter should work", () => {
   }
 
   test("connect kintsugi to do xcm", async () => {
-    const fromChains = ["kintsugi", "karura"] as ChainName[];
+    const fromChains = ["kintsugi", "karura", "heiko"] as ChainName[];
 
     await connect(fromChains);
 
     const kintsugi = new KintsugiAdapter();
     const karura = new KaruraAdapter();
+    const heiko = new HeikoAdapter();
 
     await kintsugi.setApi(provider.getApi(fromChains[0]));
     await karura.setApi(provider.getApi(fromChains[1]));
+    await heiko.setApi(provider.getApi(fromChains[2]));
 
     const bridge = new Bridge({
-      adapters: [kintsugi, karura],
+      adapters: [kintsugi, karura, heiko],
     });
 
+    // expected destinations: 1 (karura)
     expect(
       bridge.router.getDestinationChains({
         from: chains.kintsugi,
@@ -112,6 +93,15 @@ describe.skip("interlay-adapter should work", () => {
       }).length
     ).toEqual(1);
 
+    // expected destinations: 2 (heiko and karura)
+    expect(
+      bridge.router.getDestinationChains({
+        from: chains.kintsugi,
+        token: "KBTC",
+      }).length
+    ).toEqual(2);
+
+    await runMyTestSuite(testAccount, bridge, "kintsugi", "heiko", "KBTC");
     await runMyTestSuite(testAccount, bridge, "kintsugi", "karura", "KINT");
     await runMyTestSuite(testAccount, bridge, "kintsugi", "karura", "KBTC");
   });
