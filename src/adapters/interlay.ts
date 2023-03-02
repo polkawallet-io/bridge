@@ -70,7 +70,8 @@ export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     token: "KINT",
     xcm: {
       // local tests in chopsticks indicate fees are around 250k (atomic units)
-      fee: { token: "KINT", amount: "300000000" },
+      // use value rounded up * 10 to account for KINT price fluctations
+      fee: { token: "KINT", amount: "3000000000" },
       weightLimit: DEST_WEIGHT,
     },
   },
