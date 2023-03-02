@@ -300,7 +300,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
       },
     ];
 
-    return this.api?.tx.polkadotXcm.reserveTransferAssets(
+    return this.api?.tx.polkadotXcm.reserveWithdrawAssets(
       { V1: dst },
       { V1: acc },
       { V1: ass },

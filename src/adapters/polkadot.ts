@@ -24,6 +24,8 @@ export const polkadotRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     xcm: { fee: { token: "DOT", amount: "3549633" }, weightLimit: "Unlimited" },
   },
 ];
+
+// TODO: should remove after kusama upgrade
 export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
     to: "karura",
@@ -46,6 +48,33 @@ export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     token: "KSM",
     xcm: {
       fee: { token: "KSM", amount: "4000000000" },
+      weightLimit: "Unlimited",
+    },
+  },
+];
+
+export const V3KusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+  {
+    to: "karura",
+    token: "KSM",
+    xcm: {
+      fee: { token: "KSM", amount: "44163610" },
+      weightLimit: "Unlimited",
+    },
+  },
+  {
+    to: "basilisk",
+    token: "KSM",
+    xcm: {
+      fee: { token: "KSM", amount: "72711796" },
+      weightLimit: "Unlimited",
+    },
+  },
+  {
+    to: "statemine",
+    token: "KSM",
+    xcm: {
+      fee: { token: "KSM", amount: "34368318" },
       weightLimit: "Unlimited",
     },
   },
@@ -120,6 +149,12 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
       api,
       tokens: polkadotTokensConfig[chain],
     });
+
+    // TODO: should remove after kusama upgrade
+    // update routers config when the chain is not support V0, V1 xcm message
+    if (!this.isV0V1 && chain === "kusama") {
+      this.routers = V3KusamaRoutersConfig;
+    }
   }
 
   public subscribeTokenBalance(
@@ -169,6 +204,20 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     );
   }
 
+  // TODO: should remove after kusama upgrade
+  private get isV0V1() {
+    try {
+      const keys = (this.api?.createType("XcmVersionedMultiLocation") as any)
+        .defKeys as string[];
+
+      return keys.includes("V0");
+    } catch (e) {
+      // ignore error
+    }
+
+    return false;
+  }
+
   public createTx(
     params: CrossChainTransferParams
   ):
@@ -185,17 +234,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
       throw new CurrencyNotFound(token);
     }
 
-    let isV0V1Support = false;
-
-    try {
-      const keys = (this.api?.createType("XcmVersionedMultiLocation") as any)
-        .defKeys as string[];
-
-      isV0V1Support = keys.includes("V0");
-    } catch (e) {
-      // ignore error
-    }
-
+    const isV0V1Support = this.isV0V1;
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
     // to statemine
