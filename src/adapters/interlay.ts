@@ -8,7 +8,11 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainName, chains } from "../configs";
-import { ApiNotFound, CurrencyNotFound } from "../errors";
+import {
+  ApiNotFound,
+  CurrencyNotFound,
+  DestinationWeightNotFound,
+} from "../errors";
 import {
   BalanceData,
   BasicToken,
@@ -20,6 +24,19 @@ import { isChainEqual } from "../utils/is-chain-equal";
 const DEST_WEIGHT = "180000000000";
 
 export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+  // {
+  //   to: "acala",
+  //   token: "INTR",
+  //   xcm: {
+  //     fee: { token: "INTR", amount: "92696000" },
+  //     weightLimit: DEST_WEIGHT,
+  //   },
+  // },
+  // {
+  //   to: "acala",
+  //   token: "IBTC",
+  //   xcm: { fee: { token: "IBTC", amount: "9" }, weightLimit: DEST_WEIGHT },
+  // },
   {
     to: "polkadot",
     token: "DOT",
@@ -40,6 +57,34 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
 ];
 
 export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+  {
+    to: "karura",
+    token: "KBTC",
+    xcm: {
+      // local tests in chopsticks indicate fees are around 21 (atomic units)
+      fee: { token: "KBTC", amount: "100" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "karura",
+    token: "KINT",
+    xcm: {
+      // local tests in chopsticks indicate fees are around 250k (atomic units)
+      // use value rounded up * 10 to account for KINT price fluctations
+      fee: { token: "KINT", amount: "3000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "karura",
+    token: "LKSM",
+    xcm: {
+      // fees in chopsticks tests: 463_749_148
+      fee: { token: "LKSM", amount: "1000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
   {
     to: "kusama",
     token: "KSM",
@@ -76,15 +121,19 @@ export const interlayTokensConfig: Record<
     USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
   },
   kintsugi: {
-    KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "0" },
-    USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
     KBTC: { name: "KBTC", symbol: "KBTC", decimals: 8, ed: "0" },
+    KINT: { name: "KINT", symbol: "KINT", decimals: 12, ed: "0" },
+    KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "0" },
+    LKSM: { name: "LKSM", symbol: "LKSM", decimals: 12, ed: "0" },
+    USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
   },
 };
 
 const KINTSUGI_SUPPORTED_TOKENS: Record<string, unknown> = {
-  KSM: { Token: "KSM" },
   KBTC: { Token: "KBTC" },
+  KINT: { Token: "KINT" },
+  KSM: { Token: "KSM" },
+  LKSM: { ForeignAsset: 2 },
   USDT: { ForeignAsset: 3 },
 };
 
@@ -253,13 +302,24 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
       };
     }
 
+    // use "Unlimited" if the xToken.transfer's fourth parameter version supports it
+    const destWeight =
+      this.api.tx.xTokens.transfer.meta.args[3].type.toString() ===
+      "XcmV2WeightLimit"
+        ? "Unlimited"
+        : this.getDestWeight(token, to);
+
+    if (destWeight === undefined) {
+      throw new DestinationWeightNotFound(this.chain.id, to, token);
+    }
+
     return this.api.tx.xTokens.transfer(
       tokenId,
       amount.toChainData(),
       {
         V1: dst,
       },
-      this.getDestWeight(token, to)?.toString()
+      destWeight
     );
   }
 }

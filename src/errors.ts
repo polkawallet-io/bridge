@@ -51,3 +51,12 @@ export class NoCrossChainAdapterFound extends Error {
     this.name = "NoCrossChainAdapterFound";
   }
 }
+
+export class DestinationWeightNotFound extends Error {
+  constructor(source: string, destination: string, token: string) {
+    super();
+
+    this.message = `Can't find ${source} addapter's destination weight for ${destination} destination sending ${token} token.`;
+    this.name = "DestinationWeightNotFound";
+  }
+}

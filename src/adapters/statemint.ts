@@ -10,7 +10,11 @@ import { BN } from "@polkadot/util";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainName, chains } from "../configs";
-import { ApiNotFound, CurrencyNotFound } from "../errors";
+import {
+  ApiNotFound,
+  CurrencyNotFound,
+  DestinationWeightNotFound,
+} from "../errors";
 import {
   BalanceData,
   BasicToken,
@@ -226,6 +230,11 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
+    const destWeight = this.getDestWeight(token, to);
+    if (destWeight === undefined) {
+      throw new DestinationWeightNotFound(this.chain.id, to, token);
+    }
+
     // to relay chain
     if (to === "kusama" || to === "polkadot") {
       if (token !== this.balanceAdapter?.nativeToken) {
@@ -249,7 +258,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
         { V1: acc },
         { V1: ass },
         0,
-        this.getDestWeight(token, to)?.toString()
+        destWeight
       );
     }
 
@@ -279,7 +288,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       { V0: acc },
       { V0: ass },
       0,
-      this.getDestWeight(token, to)?.toString()
+      destWeight
     );
   }
 }

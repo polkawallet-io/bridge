@@ -6,6 +6,7 @@ import { Bridge } from "..";
 import { PolkadotAdapter } from "./polkadot";
 import { InterlayAdapter, KintsugiAdapter } from "./interlay";
 import { StatemintAdapter } from "./statemint";
+import { KaruraAdapter } from "./acala";
 import { HeikoAdapter } from "./parallel";
 import { buildTestTxWithConfigData } from "../utils/shared-spec-methods";
 
@@ -60,7 +61,6 @@ async function runMyTestSuite(testAccount: string, bridge: Bridge, from: ChainNa
 describe.skip("interlay-adapter should work", () => {
   jest.setTimeout(30000);
 
-  // const testAccount = "wd93QFMT7icy97uVQWjQXXEBvUH3JdDxB27JtD56yJKnJMMkF";
   const testAccount = "wd8h1Mu8rsZhiKN5zZUWuz2gtr51JajTDCtbdkzoXbMZiQAut";
   const provider = new ApiProvider("mainnet");
 
@@ -69,28 +69,49 @@ describe.skip("interlay-adapter should work", () => {
   }
 
   test("connect kintsugi to do xcm", async () => {
-    const fromChains = ["kintsugi", "heiko"] as ChainName[];
+    const fromChains = ["kintsugi", "karura", "heiko"] as ChainName[];
 
     await connect(fromChains);
 
     const kintsugi = new KintsugiAdapter();
+    const karura = new KaruraAdapter();
     const heiko = new HeikoAdapter();
 
     await kintsugi.setApi(provider.getApi(fromChains[0]));
-    await heiko.setApi(provider.getApi(fromChains[1]));
+    await karura.setApi(provider.getApi(fromChains[1]));
+    await heiko.setApi(provider.getApi(fromChains[2]));
 
     const bridge = new Bridge({
-      adapters: [kintsugi, heiko],
+      adapters: [kintsugi, karura, heiko],
     });
 
+    // expected destinations: 1 (karura)
+    expect(
+      bridge.router.getDestinationChains({
+        from: chains.kintsugi,
+        token: "KINT",
+      }).length
+    ).toEqual(1);
+
+    // expected destinations: 2 (heiko and karura)
     expect(
       bridge.router.getDestinationChains({
         from: chains.kintsugi,
         token: "KBTC",
       }).length
+    ).toEqual(2);
+
+    expect(
+      bridge.router.getDestinationChains({
+        from: chains.kintsugi,
+        token: "LKSM",
+      }).length
     ).toEqual(1);
 
     await runMyTestSuite(testAccount, bridge, "kintsugi", "heiko", "KBTC");
+    await runMyTestSuite(testAccount, bridge, "kintsugi", "karura", "KINT");
+    await runMyTestSuite(testAccount, bridge, "kintsugi", "karura", "KBTC");
+    await runMyTestSuite(testAccount, bridge, "kintsugi", "karura", "LKSM");
   });
 
   test("connect interlay to do xcm", async () => {

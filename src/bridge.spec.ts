@@ -9,6 +9,7 @@ import { FN } from "./types";
 import { KusamaAdapter, PolkadotAdapter } from "./adapters/polkadot";
 import { StatemintAdapter } from "./adapters/statemint";
 import { HeikoAdapter } from "./adapters/parallel";
+import { KaruraAdapter } from "./adapters/acala";
 
 describe.skip("Bridge sdk usage", () => {
   jest.setTimeout(30000);
@@ -23,6 +24,7 @@ describe.skip("Bridge sdk usage", () => {
     kusama: new KusamaAdapter(),
     interlay: new InterlayAdapter(),
     kintsugi: new KintsugiAdapter(),
+    karura: new KaruraAdapter(),
     statemint: new StatemintAdapter(),
     heiko: new HeikoAdapter(),
   };
@@ -161,12 +163,15 @@ describe.skip("Bridge sdk usage", () => {
   test("4. all transfer tx should be constructable", async () => {
     // kintsugi
     // printBidirectionalTxs("kintsugi", "kusama", "KSM");
-    // printBidirectionalTxs("kintsugi", "heiko", "KBTC");
     // printBidirectionalTxs("kintsugi", "statemine", "USDT");
+    // printBidirectionalTxs("kintsugi", "heiko", "KBTC");
+    printBidirectionalTxs("kintsugi", "karura", "KINT");
+    printBidirectionalTxs("kintsugi", "karura", "KBTC");
+    printBidirectionalTxs("kintsugi", "karura", "LKSM");
 
     // interlay
     // printBidirectionalTxs("interlay", "polkadot", "DOT");
-    printBidirectionalTxs("interlay", "statemint", "USDT");
+    // printBidirectionalTxs("interlay", "statemint", "USDT");
     // no adapter available for tx originating from moonbeam (yet?)
   });
 });
