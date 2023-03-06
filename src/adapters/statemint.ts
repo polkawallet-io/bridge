@@ -30,7 +30,8 @@ export const statemineRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
     to: "kintsugi",
     token: "USDT",
-    xcm: { fee: { token: "USDT", amount: "640" }, weightLimit: "Unlimited" },
+    // fees from tests on chopsticks: 9_510 atomic units
+    xcm: { fee: { token: "USDT", amount: "15000" }, weightLimit: "Unlimited" },
   },
 ];
 
@@ -40,11 +41,13 @@ export const statemineTokensConfig: Record<
 > = {
   statemine: {
     KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "3333333" },
+    // ED set according to minBalance value of assets.asset(1984)
     USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "1000" },
   },
   statemint: {
     DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "1000000000" },
-    USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "1000" },
+    // ED set according to minBalance value of assets.asset(1984)
+    USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "700000" },
   },
 };
 
