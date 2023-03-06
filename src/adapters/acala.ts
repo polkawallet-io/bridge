@@ -70,7 +70,7 @@ export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     token: "LKSM",
     xcm: {
       // fees in chopsticks tests: 186_480_000
-      fee: { token: "LKSM", amount: "200000000" },
+      fee: { token: "LKSM", amount: "2000000000" },
       weightLimit: ACALA_DEST_WEIGHT,
     },
   },
