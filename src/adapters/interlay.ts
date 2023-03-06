@@ -75,14 +75,15 @@ export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
-  // {
-  //   to: "karura",
-  //   token: "LKSM",
-  //   xcm: {
-  //     fee: { token: "LKSM", amount: "647055467" },
-  //     weightLimit: DEST_WEIGHT,
-  //   },
-  // },
+  {
+    to: "karura",
+    token: "LKSM",
+    xcm: {
+      // fees in chopsticks tests: 463_749_148
+      fee: { token: "LKSM", amount: "1000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
   {
     to: "kusama",
     token: "KSM",
@@ -122,6 +123,7 @@ export const interlayTokensConfig: Record<
     KBTC: { name: "KBTC", symbol: "KBTC", decimals: 8, ed: "0" },
     KINT: { name: "KINT", symbol: "KINT", decimals: 12, ed: "0" },
     KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "0" },
+    LKSM: { name: "LKSM", symbol: "LKSM", decimals: 12, ed: "0" },
     USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
   },
 };
@@ -130,6 +132,7 @@ const KINTSUGI_SUPPORTED_TOKENS: Record<string, unknown> = {
   KBTC: { Token: "KBTC" },
   KINT: { Token: "KINT" },
   KSM: { Token: "KSM" },
+  LKSM: { ForeignAsset: 2 },
   USDT: { ForeignAsset: 3 },
 };
 

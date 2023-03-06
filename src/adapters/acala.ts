@@ -65,14 +65,15 @@ export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: ACALA_DEST_WEIGHT,
     },
   },
-  //   {
-  //     to: "kintsugi",
-  //     token: "LKSM",
-  //     xcm: {
-  //       fee: { token: "LKSM", amount: "186480000" },
-  //       weightLimit: ACALA_DEST_WEIGHT,
-  //     },
-  //   },
+  {
+    to: "kintsugi",
+    token: "LKSM",
+    xcm: {
+      // fees in chopsticks tests: 186_480_000
+      fee: { token: "LKSM", amount: "200000000" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
 ];
 
 // export const acalaTokensConfig: Record<string, BasicToken> = {
@@ -80,9 +81,9 @@ export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
 //   IBTC: { name: "IBTC", symbol: "IBTC", decimals: 8, ed: "100" },
 // };
 
-// Config values taken from [polkawallet-io/bridge](https://github.com/polkawallet-io/bridge/blob/356e5413337ab00d7e405e5ad5d3af2e13150c16/src/adapters/acala.ts#L599-L600)
+// Config values taken from querying assetRegistry.assetMetadatas
 export const karuraTokensConfig: Record<string, BasicToken> = {
-  //   LKSM: { name: "LKSM", symbol: "LKSM", decimals: 12, ed: "500000000" },
+  LKSM: { name: "LKSM", symbol: "LKSM", decimals: 12, ed: "500000000" },
   KINT: { name: "KINT", symbol: "KINT", decimals: 12, ed: "133330000" },
   KBTC: { name: "KBTC", symbol: "KBTC", decimals: 8, ed: "66" },
 };

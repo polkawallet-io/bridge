@@ -165,6 +165,7 @@ describe.skip("Bridge sdk usage", () => {
     // printBidirectionalTxs("kintsugi", "heiko", "KBTC");
     printBidirectionalTxs("kintsugi", "karura", "KINT");
     printBidirectionalTxs("kintsugi", "karura", "KBTC");
+    printBidirectionalTxs("kintsugi", "karura", "LKSM");
 
     // interlay
     // printBidirectionalTxs("interlay", "polkadot", "DOT");

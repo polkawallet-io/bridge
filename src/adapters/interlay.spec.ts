@@ -101,9 +101,17 @@ describe.skip("interlay-adapter should work", () => {
       }).length
     ).toEqual(2);
 
+    expect(
+      bridge.router.getDestinationChains({
+        from: chains.kintsugi,
+        token: "LKSM",
+      }).length
+    ).toEqual(1);
+
     await runMyTestSuite(testAccount, bridge, "kintsugi", "heiko", "KBTC");
     await runMyTestSuite(testAccount, bridge, "kintsugi", "karura", "KINT");
     await runMyTestSuite(testAccount, bridge, "kintsugi", "karura", "KBTC");
+    await runMyTestSuite(testAccount, bridge, "kintsugi", "karura", "LKSM");
   });
 
   test("connect interlay to do xcm", async () => {
