@@ -3,6 +3,7 @@ import { AnyApi, FixedPointNumber as FN } from "@acala-network/sdk-core";
 import { combineLatest, map, Observable } from "rxjs";
 
 import { SubmittableExtrinsic } from "@polkadot/api/types";
+import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
@@ -15,103 +16,77 @@ import {
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
-import { isChainEqual } from "../utils/is-chain-equal";
 
-const DEST_WEIGHT = "180000000000";
+const DEST_WEIGHT = "Unlimited";
 
-export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
-  {
-    to: "polkadot",
-    token: "DOT",
-    xcm: {
-      fee: { token: "DOT", amount: "1000000000" },
-      weightLimit: DEST_WEIGHT,
-    },
-  },
-  {
-    to: "statemint",
-    token: "USDT",
-    xcm: {
-      // fees from tests with chopsticks: 700_000 atomic units
-      fee: { token: "USDT", amount: "1000000" },
-      weightLimit: DEST_WEIGHT,
-    },
-  },
-];
+// To be enabled later.
+// export const parallelRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+//   {
+//     to: "interlay",
+//     token: "IBTC",
+//     xcm: {
+//       fee: { token: "IBTC", amount: "72" },
+//       weightLimit: DEST_WEIGHT,
+//     },
+//   },
+// ];
 
-export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const heikoRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
-    to: "kusama",
-    token: "KSM",
-    xcm: {
-      fee: { token: "KSM", amount: "1000000000" },
-      weightLimit: DEST_WEIGHT,
-    },
-  },
-  {
-    to: "statemine",
-    token: "USDT",
-    xcm: {
-      fee: { token: "USDT", amount: "10000" },
-      weightLimit: DEST_WEIGHT,
-    },
-  },
-  {
-    to: "heiko",
+    to: "kintsugi",
     token: "KBTC",
     xcm: {
-      // from local tests on choptsicks: actual fees sat around 103
+      // estimated fee calculated from:
+      // ksm_per_sec = ~233_100_000_000
+      // kint_per_sec = (ksm_per_second * 4) / 3 = 310_800_000_000
+      // xcm_secs = ~(247_189_333 / kint_per_sec) ... calculated using a recent kint transaction
+      // kbtc_per_sec = ksm_per_sec / 1_500_000 ... see https://github.com/interlay/interbtc/blob/18efc1e9194a8591713b9885799a6deb6c0392f2/parachain/runtime/kintsugi/src/xcm_config.rs#L104
+      // estimated kbtc fee = kbtc_per_sec * xcm_secs = ~123.6
+      // local tests with chopsticks confirmed that value
       fee: { token: "KBTC", amount: "200" },
       weightLimit: DEST_WEIGHT,
     },
   },
 ];
 
-export const interlayTokensConfig: Record<
+export const parallelTokensConfig: Record<
   string,
   Record<string, BasicToken>
 > = {
-  interlay: {
-    DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "0" },
-    USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
+  parallel: {
+    // ed is a guess, to be confirmed
+    // IBTC: { name: "IBTC", symbol: "IBTC", decimals: 8, ed: "100" },
   },
-  kintsugi: {
-    KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "0" },
-    USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
+  heiko: {
+    // ed to be confirmed
     KBTC: { name: "KBTC", symbol: "KBTC", decimals: 8, ed: "0" },
   },
 };
 
-const KINTSUGI_SUPPORTED_TOKENS: Record<string, unknown> = {
-  KSM: { Token: "KSM" },
-  KBTC: { Token: "KBTC" },
-  USDT: { ForeignAsset: 3 },
-};
-
-const INTERLAY_SUPPORTED_TOKENS: Record<string, unknown> = {
-  DOT: { Token: "DOT" },
-  USDT: { ForeignAsset: 2 },
-};
-
-const getSupportedTokens = (chainname: string): Record<string, unknown> => {
-  return chainname === "interlay"
-    ? INTERLAY_SUPPORTED_TOKENS
-    : KINTSUGI_SUPPORTED_TOKENS;
+const SUPPORTED_TOKENS: Record<string, number> = {
+  // IBTC: 122, // asset id 122
+  KBTC: 121, // asset id 121
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const createBalanceStorages = (api: AnyApi) => {
   return {
-    assets: (address: string, token: unknown) =>
+    balances: (address: string) =>
+      Storage.create<DeriveBalancesAll>({
+        api,
+        path: "derive.balances.all",
+        params: [address],
+      }),
+    assets: (tokenId: number, address: string) =>
       Storage.create<any>({
         api,
-        path: "query.tokens.accounts",
-        params: [address, token],
+        path: "query.assets.account",
+        params: [tokenId, address],
       }),
   };
 };
 
-class InterlayBalanceAdapter extends BalanceAdapter {
+class ParallelBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
   constructor({ api, chain, tokens }: BalanceAdapterConfigs) {
@@ -123,16 +98,35 @@ class InterlayBalanceAdapter extends BalanceAdapter {
     token: string,
     address: string
   ): Observable<BalanceData> {
-    const tokenId = getSupportedTokens(this.chain)[token];
+    const storage = this.storages.balances(address);
+
+    if (token === this.nativeToken) {
+      return storage.observable.pipe(
+        map((data) => ({
+          free: FN.fromInner(data.freeBalance.toString(), this.decimals),
+          locked: FN.fromInner(data.lockedBalance.toString(), this.decimals),
+          reserved: FN.fromInner(
+            data.reservedBalance.toString(),
+            this.decimals
+          ),
+          available: FN.fromInner(
+            data.availableBalance.toString(),
+            this.decimals
+          ),
+        }))
+      );
+    }
+
+    const tokenId = SUPPORTED_TOKENS[token];
 
     if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 
-    return this.storages.assets(address, tokenId).observable.pipe(
+    return this.storages.assets(tokenId, address).observable.pipe(
       map((balance) => {
         const amount = FN.fromInner(
-          balance.free?.toString() || "0",
+          balance.unwrapOrDefault()?.balance?.toString() || "0",
           this.getToken(token).decimals
         );
 
@@ -147,8 +141,8 @@ class InterlayBalanceAdapter extends BalanceAdapter {
   }
 }
 
-class BaseInterlayAdapter extends BaseCrossChainAdapter {
-  private balanceAdapter?: InterlayBalanceAdapter;
+class BaseParallelAdapter extends BaseCrossChainAdapter {
+  private balanceAdapter?: ParallelBalanceAdapter;
 
   public override async setApi(api: AnyApi) {
     this.api = api;
@@ -157,10 +151,10 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
 
     const chain = this.chain.id as ChainName;
 
-    this.balanceAdapter = new InterlayBalanceAdapter({
+    this.balanceAdapter = new ParallelBalanceAdapter({
       chain,
       api,
-      tokens: interlayTokensConfig[chain],
+      tokens: parallelTokensConfig[chain],
     });
   }
 
@@ -228,58 +222,45 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    const tokenId = getSupportedTokens(this.chain.id)[token];
+    const tokenId = SUPPORTED_TOKENS[token];
 
     if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
-    }
-
-    // to other parachains
-    let dst: any = {
-      parents: 1,
-      interior: {
-        X2: [
-          { Parachain: toChain.paraChainId },
-          { AccountId32: { id: accountId, network: "Any" } },
-        ],
-      },
-    };
-
-    // to relay-chain
-    if (isChainEqual(toChain, "kusama") || isChainEqual(toChain, "polkadot")) {
-      dst = {
-        interior: { X1: { AccountId32: { id: accountId, network: "Any" } } },
-        parents: 1,
-      };
     }
 
     return this.api.tx.xTokens.transfer(
       tokenId,
       amount.toChainData(),
       {
-        V1: dst,
+        V1: {
+          parents: 1,
+          interior: {
+            X2: [
+              { Parachain: toChain.paraChainId },
+              { AccountId32: { id: accountId, network: "Any" } },
+            ],
+          },
+        },
       },
-      this.getDestWeight(token, to)?.toString()
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.getDestWeight(token, to)!.toString()
     );
   }
 }
 
-export class InterlayAdapter extends BaseInterlayAdapter {
+export class HeikoAdapter extends BaseParallelAdapter {
   constructor() {
-    super(
-      chains.interlay,
-      interlayRoutersConfig,
-      interlayTokensConfig.interlay
-    );
+    super(chains.heiko, heikoRoutersConfig, parallelTokensConfig.heiko);
   }
 }
 
-export class KintsugiAdapter extends BaseInterlayAdapter {
-  constructor() {
-    super(
-      chains.kintsugi,
-      kintsugiRoutersConfig,
-      interlayTokensConfig.kintsugi
-    );
-  }
-}
+// To be added/enabled later.
+// export class ParallelAdapter extends BaseParallelAdapter {
+//   constructor() {
+//     super(
+//       chains.parallel,
+//       parallelRoutersConfig,
+//       parallelTokensConfig.parallel
+//     );
+//   }
+// }

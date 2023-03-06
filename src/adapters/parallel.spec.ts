@@ -3,9 +3,7 @@ import { firstValueFrom } from "rxjs";
 import { ApiProvider } from "../api-provider";
 import { chains, ChainName } from "../configs";
 import { Bridge } from "..";
-import { PolkadotAdapter } from "./polkadot";
-import { InterlayAdapter, KintsugiAdapter } from "./interlay";
-import { StatemintAdapter } from "./statemint";
+import { KintsugiAdapter } from "./interlay";
 import { HeikoAdapter } from "./parallel";
 import { buildTestTxWithConfigData } from "../utils/shared-spec-methods";
 
@@ -45,11 +43,7 @@ async function runMyTestSuite(testAccount: string, bridge: Bridge, from: ChainNa
   console.log(
     `destFee: fee-${destFee.balance.toNumber()} ${destFee.token}`
   );
-  if (to === "polkadot") {
-    expect(destFee.balance.toNumber()).toEqual(0.1);
-  } else {
-    expect(destFee.balance.toNumber()).toBeGreaterThan(0);
-  }
+  expect(destFee.balance.toNumber()).toBeGreaterThan(0);
 
   // tx method & params checks
   expect(tx.method.section).toEqual("xTokens");
@@ -57,74 +51,65 @@ async function runMyTestSuite(testAccount: string, bridge: Bridge, from: ChainNa
   expect(tx.method.method).toEqual("transfer");
 };
 
-describe.skip("interlay-adapter should work", () => {
+describe.skip("parallel-adapter should work", () => {
   jest.setTimeout(30000);
 
-  // const testAccount = "wd93QFMT7icy97uVQWjQXXEBvUH3JdDxB27JtD56yJKnJMMkF";
-  const testAccount = "wd8h1Mu8rsZhiKN5zZUWuz2gtr51JajTDCtbdkzoXbMZiQAut";
+  // alice
+  const testAccount = "hJKzPoi3MQnSLvbShxeDmzbtHncrMXe5zwS3Wa36P6kXeNpcv";
   const provider = new ApiProvider("mainnet");
 
   async function connect(chains: ChainName[]) {
     return firstValueFrom(provider.connectFromChain(chains, undefined));
   }
 
-  test("connect kintsugi to do xcm", async () => {
-    const fromChains = ["kintsugi", "heiko"] as ChainName[];
+  test("connect parallel-heiko to do xcm", async () => {
+    const fromChains = ["heiko", "kintsugi"] as ChainName[];
 
     await connect(fromChains);
 
-    const kintsugi = new KintsugiAdapter();
     const heiko = new HeikoAdapter();
+    const kintsugi = new KintsugiAdapter();
 
-    await kintsugi.setApi(provider.getApi(fromChains[0]));
-    await heiko.setApi(provider.getApi(fromChains[1]));
+    await heiko.setApi(provider.getApi(fromChains[0]));
+    await kintsugi.setApi(provider.getApi(fromChains[1]));
 
     const bridge = new Bridge({
-      adapters: [kintsugi, heiko],
+      adapters: [heiko, kintsugi],
     });
 
     expect(
       bridge.router.getDestinationChains({
-        from: chains.kintsugi,
+        from: chains.heiko,
         token: "KBTC",
       }).length
     ).toEqual(1);
 
-    await runMyTestSuite(testAccount, bridge, "kintsugi", "heiko", "KBTC");
+    await runMyTestSuite(testAccount, bridge, "heiko", "kintsugi", "KBTC");
   });
 
-  test("connect interlay to do xcm", async () => {
-    const fromChains = ["interlay", "polkadot", "statemint"] as ChainName[];
+  // in preparation for later addition of parallel <-> interlay XCM
+  // test("connect parallel to do xcm", async () => {
+  //   const fromChains = ["parallel", "interlay"] as ChainName[];
 
-    await connect(fromChains);
+  //   await connect(fromChains);
 
-    const interlay = new InterlayAdapter();
-    const polkadot = new PolkadotAdapter();
-    const statemint = new StatemintAdapter();
+  //   const parallel = new ParallelAdapter();
+  //   const interlay = new InterlayAdapter();
 
-    await interlay.setApi(provider.getApi(fromChains[0]));
-    await polkadot.setApi(provider.getApi(fromChains[1]));
-    await statemint.setApi(provider.getApi(fromChains[2]));
+  //   await parallel.setApi(provider.getApi(fromChains[0]));
+  //   await interlay.setApi(provider.getApi(fromChains[1]));
 
-    const bridge = new Bridge({
-      adapters: [interlay, polkadot, statemint],
-    });
+  //   const bridge = new Bridge({
+  //     adapters: [parallel, interlay],
+  //   });
 
-    expect(
-      bridge.router.getDestinationChains({
-        from: chains.interlay,
-        token: "DOT",
-      }).length
-    ).toEqual(1);
+  //   expect(
+  //     bridge.router.getDestinationChains({
+  //       from: chains.interlay,
+  //       token: "IBTC",
+  //     }).length
+  //   ).toEqual(1);
 
-    expect(
-      bridge.router.getDestinationChains({
-        from: chains.interlay,
-        token: "USDT",
-      }).length
-    ).toEqual(1);
-
-    await runMyTestSuite(testAccount, bridge, "interlay", "polkadot", "DOT");
-    await runMyTestSuite(testAccount, bridge, "interlay", "statemint", "USDT");
-  });
+  //   await runMyTestSuite(testAccount, bridge, "parallel", "interlay", "IBTC");
+  // });
 });
