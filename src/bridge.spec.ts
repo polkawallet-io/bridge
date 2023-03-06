@@ -7,6 +7,7 @@ import { Bridge } from "./index";
 import { KintsugiAdapter, InterlayAdapter } from "./adapters/interlay";
 import { FN } from "./types";
 import { KusamaAdapter, PolkadotAdapter } from "./adapters/polkadot";
+import { StatemintAdapter } from "./adapters/statemint";
 import { HeikoAdapter } from "./adapters/parallel";
 import { KaruraAdapter } from "./adapters/acala";
 
@@ -24,6 +25,7 @@ describe.skip("Bridge sdk usage", () => {
     interlay: new InterlayAdapter(),
     kintsugi: new KintsugiAdapter(),
     karura: new KaruraAdapter(),
+    statemint: new StatemintAdapter(),
     heiko: new HeikoAdapter(),
   };
 
