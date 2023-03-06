@@ -32,6 +32,7 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "statemint",
     token: "USDT",
     xcm: {
+      // fees from tests with chopsticks: 700_000 atomic units
       fee: { token: "USDT", amount: "1000000" },
       weightLimit: DEST_WEIGHT,
     },
