@@ -47,6 +47,14 @@ export const heikoRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
+  {
+    to: "kintsugi",
+    token: "KINT",
+    xcm: {
+      fee: { token: "KINT", amount: "2471893330" }, // 247189333 fee in recent chopsticks test. Added 10x margin
+      weightLimit: DEST_WEIGHT,
+    },
+  },
 ];
 
 export const parallelTokensConfig: Record<
@@ -60,12 +68,14 @@ export const parallelTokensConfig: Record<
   heiko: {
     // ed to be confirmed
     KBTC: { name: "KBTC", symbol: "KBTC", decimals: 8, ed: "0" },
+    KINT: { name: "Kintsugi", symbol: "KINT", decimals: 12, ed: "0" },
   },
 };
 
 const SUPPORTED_TOKENS: Record<string, number> = {
   // IBTC: 122, // asset id 122
   KBTC: 121, // asset id 121
+  KINT: 119, // asset id 119
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

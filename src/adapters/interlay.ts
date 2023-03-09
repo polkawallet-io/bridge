@@ -110,6 +110,15 @@ export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
+  {
+    to: "heiko",
+    token: "KINT",
+    xcm: {
+      // recent fee during chopsticks test: fee = 16634783331. Added 10x margin
+      fee: { token: "KINT", amount: "166347833310" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
 ];
 
 export const interlayTokensConfig: Record<
