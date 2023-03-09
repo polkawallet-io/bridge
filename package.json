@@ -31,7 +31,8 @@
     "build": "tsc",
     "test": "jest",
     "test:ci": "jest --forceExit",
-    "lint": "polkadot-dev-run-lint"
+    "lint": "polkadot-dev-run-lint",
+    "chopsticks-test": "ts-node scripts/chopsticks-test"
   },
   "peerDependencies": {
     "@polkadot/api": ">9"
