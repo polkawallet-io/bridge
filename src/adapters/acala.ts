@@ -23,7 +23,7 @@ import {
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
-import { supportsUnlimitedDestWeight } from "src/utils/xtokens-dest-weight";
+import { supportsUnlimitedDestWeight } from "../utils/xtokens-dest-weight";
 
 const ACALA_DEST_WEIGHT = "5000000000";
 

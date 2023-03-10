@@ -20,7 +20,7 @@ import {
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
-import { supportsUnlimitedDestWeight } from "src/utils/xtokens-dest-weight";
+import { supportsUnlimitedDestWeight } from "../utils/xtokens-dest-weight";
 
 const DEST_WEIGHT = "Unlimited";
 

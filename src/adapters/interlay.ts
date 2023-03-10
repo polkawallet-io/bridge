@@ -20,7 +20,7 @@ import {
   CrossChainTransferParams,
 } from "../types";
 import { isChainEqual } from "../utils/is-chain-equal";
-import { supportsUnlimitedDestWeight } from "src/utils/xtokens-dest-weight";
+import { supportsUnlimitedDestWeight } from "../utils/xtokens-dest-weight";
 
 const DEST_WEIGHT = "180000000000";
 
