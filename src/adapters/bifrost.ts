@@ -23,8 +23,8 @@ export const bifrostRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "kintsugi",
     token: "VKSM",
     xcm: {
-      // TODO: random guess, to be checked in tests
-      fee: { token: "VKSM", amount: "64000000" },
+      // tested in chopsticks: fees were 166_363_195. Add 10x margin
+      fee: { token: "VKSM", amount: "1663631950" },
       weightLimit: DEST_WEIGHT,
     },
   },

@@ -123,7 +123,8 @@ export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "bifrost",
     token: "VKSM",
     xcm: {
-      fee: { token: "VKSM", amount: "64000000" },
+      // during chopsticks test: fee = 80_824_000. Add 10x margin
+      fee: { token: "VKSM", amount: "808240000" },
       weightLimit: DEST_WEIGHT,
     },
   },
