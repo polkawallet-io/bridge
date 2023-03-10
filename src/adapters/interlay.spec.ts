@@ -88,13 +88,13 @@ describe.skip("interlay-adapter should work", () => {
       adapters: [kintsugi, karura, heiko, bifrost],
     });
 
-    // expected destinations: 1 (karura)
+    // expected destinations: 1 (heiko, karura)
     expect(
       bridge.router.getDestinationChains({
         from: chains.kintsugi,
         token: "KINT",
       }).length
-    ).toEqual(1);
+    ).toEqual(2);
 
     // expected destinations: 2 (heiko and karura)
     expect(
