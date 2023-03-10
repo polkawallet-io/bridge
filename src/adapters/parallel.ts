@@ -9,13 +9,18 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainName, chains } from "../configs";
-import { ApiNotFound, CurrencyNotFound } from "../errors";
+import {
+  ApiNotFound,
+  CurrencyNotFound,
+  DestinationWeightNotFound,
+} from "../errors";
 import {
   BalanceData,
   BasicToken,
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
+import { supportsUnlimitedDestWeight } from "src/utils/xtokens-dest-weight";
 
 const DEST_WEIGHT = "Unlimited";
 
@@ -238,6 +243,15 @@ class BaseParallelAdapter extends BaseCrossChainAdapter {
       throw new CurrencyNotFound(token);
     }
 
+    // use "Unlimited" if the xToken.transfer's fourth parameter version supports it
+    const destWeight = supportsUnlimitedDestWeight(this.api)
+      ? "Unlimited"
+      : this.getDestWeight(token, to);
+
+    if (destWeight === undefined) {
+      throw new DestinationWeightNotFound(this.chain.id, to, token);
+    }
+
     return this.api.tx.xTokens.transfer(
       tokenId,
       amount.toChainData(),
@@ -252,8 +266,7 @@ class BaseParallelAdapter extends BaseCrossChainAdapter {
           },
         },
       },
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.getDestWeight(token, to)!.toString()
+      destWeight
     );
   }
 }
