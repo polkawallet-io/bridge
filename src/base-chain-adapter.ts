@@ -35,6 +35,7 @@ import {
   CrossChainTransferParams,
   TokenBalance,
 } from "./types";
+import { formatNumStr } from "./utils/formt-num-str";
 
 const DEFAULT_TX_CHECKING_TIMEOUT = 2 * 60 * 1000;
 
@@ -152,7 +153,7 @@ export abstract class BaseCrossChainAdapter {
 
     return {
       token,
-      balance: FN.fromInner(tokenConfig.ed, tokenConfig.decimals),
+      balance: FN.fromInner(formatNumStr(tokenConfig.ed), tokenConfig.decimals),
     };
   }
 
@@ -170,7 +171,7 @@ export abstract class BaseCrossChainAdapter {
     return {
       token: feeToken,
       balance: FN.fromInner(
-        router.xcm?.fee?.amount || 0,
+        formatNumStr(router.xcm?.fee?.amount || 0),
         this.getToken(feeToken, destChain).decimals
       ),
     };

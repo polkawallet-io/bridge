@@ -519,6 +519,22 @@ export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     },
   },
   {
+    to: "basilisk",
+    token: "DAI",
+    xcm: {
+      fee: { token: "DAI", amount: "4,400,000,000,000,000" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
+    to: "basilisk",
+    token: "USDCet",
+    xcm: {
+      fee: { token: "USDCet", amount: "926" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
     to: "listen",
     token: "LT",
     xcm: {
@@ -616,6 +632,18 @@ export const karuraTokensConfig: Record<string, BasicToken> = {
   ARIS: { name: "ARIS", symbol: "ARIS", decimals: 8, ed: "1000000000000" },
   USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "10000" },
   QTZ: { name: "QTZ", symbol: "QTZ", decimals: 18, ed: "1000000000000000000" },
+  DAI: {
+    name: "DAI",
+    symbol: "DAI",
+    decimals: 18,
+    ed: "10,000,000,000,000,000",
+  },
+  USDC: {
+    name: "USDCet",
+    symbol: "USDCet",
+    decimals: 6,
+    ed: "10000",
+  },
 };
 
 class BaseAcalaAdapter extends BaseCrossChainAdapter {
