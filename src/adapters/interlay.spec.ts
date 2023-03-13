@@ -9,6 +9,7 @@ import { StatemintAdapter } from "./statemint";
 import { KaruraAdapter } from "./acala";
 import { HeikoAdapter } from "./parallel";
 import { buildTestTxWithConfigData } from "../utils/shared-spec-methods";
+import { BifrostAdapter } from "./bifrost";
 
 // helper method for getting balances, configs, fees, and constructing xcm extrinsics
 async function runMyTestSuite(testAccount: string, bridge: Bridge, from: ChainName, to: ChainName, token: string) {
@@ -69,29 +70,31 @@ describe.skip("interlay-adapter should work", () => {
   }
 
   test("connect kintsugi to do xcm", async () => {
-    const fromChains = ["kintsugi", "karura", "heiko"] as ChainName[];
+    const fromChains = ["kintsugi", "karura", "heiko", "bifrost"] as ChainName[];
 
     await connect(fromChains);
 
     const kintsugi = new KintsugiAdapter();
     const karura = new KaruraAdapter();
     const heiko = new HeikoAdapter();
+    const bifrost = new BifrostAdapter();
 
     await kintsugi.setApi(provider.getApi(fromChains[0]));
     await karura.setApi(provider.getApi(fromChains[1]));
     await heiko.setApi(provider.getApi(fromChains[2]));
+    await bifrost.setApi(provider.getApi(fromChains[3]));
 
     const bridge = new Bridge({
-      adapters: [kintsugi, karura, heiko],
+      adapters: [kintsugi, karura, heiko, bifrost],
     });
 
-    // expected destinations: 1 (karura)
+    // expected destinations: 1 (heiko, karura)
     expect(
       bridge.router.getDestinationChains({
         from: chains.kintsugi,
         token: "KINT",
       }).length
-    ).toEqual(1);
+    ).toEqual(2);
 
     // expected destinations: 2 (heiko and karura)
     expect(
@@ -108,10 +111,19 @@ describe.skip("interlay-adapter should work", () => {
       }).length
     ).toEqual(1);
 
+    expect(
+      bridge.router.getDestinationChains({
+        from: chains.kintsugi,
+        token: "VKSM",
+      }).length
+    ).toEqual(1);
+
+    
     await runMyTestSuite(testAccount, bridge, "kintsugi", "heiko", "KBTC");
     await runMyTestSuite(testAccount, bridge, "kintsugi", "karura", "KINT");
     await runMyTestSuite(testAccount, bridge, "kintsugi", "karura", "KBTC");
     await runMyTestSuite(testAccount, bridge, "kintsugi", "karura", "LKSM");
+    await runMyTestSuite(testAccount, bridge, "kintsugi", "bifrost", "VKSM");
   });
 
   test("connect interlay to do xcm", async () => {

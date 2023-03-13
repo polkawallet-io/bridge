@@ -10,6 +10,7 @@ import { KusamaAdapter, PolkadotAdapter } from "./adapters/polkadot";
 import { StatemintAdapter } from "./adapters/statemint";
 import { HeikoAdapter } from "./adapters/parallel";
 import { KaruraAdapter } from "./adapters/acala";
+import { BifrostAdapter } from "./adapters/bifrost";
 
 describe.skip("Bridge sdk usage", () => {
   jest.setTimeout(30000);
@@ -27,6 +28,7 @@ describe.skip("Bridge sdk usage", () => {
     karura: new KaruraAdapter(),
     statemint: new StatemintAdapter(),
     heiko: new HeikoAdapter(),
+    bifrost: new BifrostAdapter(),
   };
 
   const bridge = new Bridge({
@@ -165,9 +167,10 @@ describe.skip("Bridge sdk usage", () => {
     // printBidirectionalTxs("kintsugi", "kusama", "KSM");
     // printBidirectionalTxs("kintsugi", "statemine", "USDT");
     // printBidirectionalTxs("kintsugi", "heiko", "KBTC");
-    printBidirectionalTxs("kintsugi", "karura", "KINT");
-    printBidirectionalTxs("kintsugi", "karura", "KBTC");
-    printBidirectionalTxs("kintsugi", "karura", "LKSM");
+    // printBidirectionalTxs("kintsugi", "karura", "KINT");
+    // printBidirectionalTxs("kintsugi", "karura", "KBTC");
+    // printBidirectionalTxs("kintsugi", "karura", "LKSM");
+    printBidirectionalTxs("kintsugi", "bifrost", "VKSM");
 
     // interlay
     // printBidirectionalTxs("interlay", "polkadot", "DOT");
