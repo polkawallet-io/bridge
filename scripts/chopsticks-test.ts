@@ -171,7 +171,7 @@ async function main(): Promise<void> {
     });
     const chains = Object.keys(availableAdapters) as ChainName[];
 
-    const provider = new ApiProvider("mainnet"); // we overwrite endpoints, so not really mainnet
+    const provider = new ApiProvider(); // we overwrite endpoints, so not really mainnet
     const endpoints = {
         kintsugi: ['ws://127.0.0.1:8000'],
         statemine: ['ws://127.0.0.1:8001'],
