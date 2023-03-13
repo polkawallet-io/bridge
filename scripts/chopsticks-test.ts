@@ -8,6 +8,7 @@ import { BaseCrossChainAdapter } from "../src/base-chain-adapter";
 import { ChainName } from "../src/configs";
 import { Bridge } from "../src/index";
 import { KintsugiAdapter } from "../src/adapters/interlay";
+import { BifrostAdapter } from "../src/adapters/bifrost";
 import { FN } from "../src/types";
 import { KusamaAdapter } from "../src/adapters/polkadot";
 import { StatemineAdapter } from "../src/adapters/statemint";
@@ -162,6 +163,7 @@ async function main(): Promise<void> {
         kintsugi: new KintsugiAdapter(),
         karura: new KaruraAdapter(),
         heiko: new HeikoAdapter(),
+        bifrost: new BifrostAdapter(),
     };
 
     const bridge = new Bridge({
@@ -171,11 +173,12 @@ async function main(): Promise<void> {
 
     const provider = new ApiProvider("mainnet"); // we overwrite endpoints, so not really mainnet
     const endpoints = {
-        kusama: ['ws://127.0.0.1:8004'],
         kintsugi: ['ws://127.0.0.1:8000'],
         statemine: ['ws://127.0.0.1:8001'],
         karura: ['ws://127.0.0.1:8002'],
         heiko: ['ws://127.0.0.1:8003'],
+        bifrost: ['ws://127.0.0.1:8004'],
+        kusama: ['ws://127.0.0.1:8005'],
     };
 
     // connect all adapters
@@ -191,6 +194,7 @@ async function main(): Promise<void> {
     );
 
     let testcases = [
+        ["bifrost", "VKSM"],
         ["kusama", "KSM"],
         ["karura", "KBTC"],
         ["karura", "KINT"],
