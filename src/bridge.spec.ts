@@ -15,10 +15,7 @@ import { BifrostAdapter } from "./adapters/bifrost";
 describe.skip("Bridge sdk usage", () => {
   jest.setTimeout(30000);
 
-  // for testing against mainnet
-  const provider = new ApiProvider("mainnet");
-  // for testing against testnet
-  // const provider = new ApiProvider("testnet");;
+  const provider = new ApiProvider();
 
   const availableAdapters: Record<string, BaseCrossChainAdapter> = {
     polkadot: new PolkadotAdapter(),

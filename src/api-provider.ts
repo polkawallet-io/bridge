@@ -15,12 +15,6 @@ import { isChainEqual } from "./utils/is-chain-equal";
 import { ChainName } from "./configs";
 
 export class ApiProvider {
-  protected network: "mainnet" | "testnet";
-
-  constructor(network: "mainnet" | "testnet") {
-    this.network = network;
-  }
-
   protected apis: Record<string, ApiRx> = {};
   protected promiseApis: Record<string, ApiPromise> = {};
 

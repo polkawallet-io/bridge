@@ -112,7 +112,7 @@ or you can use your own apiProvider.
 ```typescript
 import { ApiProvider } from "./api-provider";
 
-const provider = new ApiProvider("testnet");
+const provider = new ApiProvider();
 ```
 
 Connect network and pass the `ApiPromise | ApiRx` into the adapters.

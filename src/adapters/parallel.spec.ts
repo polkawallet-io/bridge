@@ -56,7 +56,7 @@ describe.skip("parallel-adapter should work", () => {
 
   // alice
   const testAccount = "hJKzPoi3MQnSLvbShxeDmzbtHncrMXe5zwS3Wa36P6kXeNpcv";
-  const provider = new ApiProvider("mainnet");
+  const provider = new ApiProvider();
 
   async function connect(chains: ChainName[]) {
     return firstValueFrom(provider.connectFromChain(chains, undefined));

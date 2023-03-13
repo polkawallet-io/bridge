@@ -1,5 +1,4 @@
 import { options } from '@acala-network/api';
-import { Wallet } from '@acala-network/sdk/wallet';
 
 import { ApiPromise } from '@polkadot/api';
 import { WsProvider } from '@polkadot/rpc-provider';
@@ -12,7 +11,6 @@ import { CrossChainRouterConfigs } from './';
 describe.skip('cross-chain-router-manager', () => {
   let manager: BridgeRouterManager;
   let api: ApiPromise;
-  let wallet: Wallet;
 
   jest.setTimeout(30000);
 
@@ -27,10 +25,6 @@ describe.skip('cross-chain-router-manager', () => {
     api = await ApiPromise.create(options({ provider }));
 
     await api.isReady;
-
-    wallet = new Wallet(api);
-
-    await wallet.isReady;
 
     manager = new BridgeRouterManager();
 

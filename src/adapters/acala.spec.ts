@@ -11,7 +11,7 @@ describe.skip('acala-adapter should work', () => {
   jest.setTimeout(30000);
 
   const testAccount = '5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN';
-  const provider = new ApiProvider("mainnet");
+  const provider = new ApiProvider();
 
   async function connect (chains: ChainName[]) {
     return firstValueFrom(provider.connectFromChain(chains, undefined));
