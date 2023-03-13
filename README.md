@@ -46,7 +46,7 @@ Kusama:
 | karura | pichiu | PCHU KAR AUSD LKSM |
 | karura | turing | TUR KAR AUSD LKSM |
 | karura | quartz | QTZ |
-| karura | basilisk | BSX AUSD |
+| karura | basilisk | BSX AUSD DAI USDCet |
 | karura | listen | LT KAR AUSD LKSM |
 | bifrost | karura | BNC KAR AUSD KSM VSKSM |
 | shiden | karura | SDN AUSD |
