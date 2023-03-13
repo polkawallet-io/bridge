@@ -11,7 +11,7 @@ describe.skip("polkadot-adapter should work", () => {
   jest.setTimeout(30000);
 
   const testAccount = "DmSjv9MtU1Zcj2tW2HpNq8bZgsX56G4NE35jVKLDSAZC5D8";
-  const provider = new ApiProvider("mainnet");
+  const provider = new ApiProvider();
 
   async function connect(chain: ChainName) {
     return firstValueFrom(provider.connectFromChain([chain], undefined));

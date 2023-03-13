@@ -63,7 +63,7 @@ describe.skip("interlay-adapter should work", () => {
   jest.setTimeout(30000);
 
   const testAccount = "wd8h1Mu8rsZhiKN5zZUWuz2gtr51JajTDCtbdkzoXbMZiQAut";
-  const provider = new ApiProvider("mainnet");
+  const provider = new ApiProvider();
 
   async function connect(chains: ChainName[]) {
     return firstValueFrom(provider.connectFromChain(chains, undefined));
