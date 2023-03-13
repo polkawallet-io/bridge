@@ -107,7 +107,7 @@ export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     token: "KBTC",
     xcm: {
       // from local tests on choptsicks: actual fees sat around 103
-      fee: { token: "KBTC", amount: "200" },
+      fee: { token: "KBTC", amount: "1030" },
       weightLimit: DEST_WEIGHT,
     },
   },
