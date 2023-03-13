@@ -252,8 +252,7 @@ class BaseParallelAdapter extends BaseCrossChainAdapter {
           },
         },
       },
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.getDestWeight(token, to)!.toString()
+      this.getDestWeight(token, to) || "Unlimited"
     );
   }
 }
