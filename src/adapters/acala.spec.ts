@@ -26,8 +26,8 @@ describe.skip('acala-adapter should work', () => {
     const karura = new KaruraAdapter();
     const kusama = new KusamaAdapter();
 
-    await karura.setApi(provider.getApi(fromChains[0]));
-    await kusama.setApi(provider.getApi(fromChains[1]));
+    await karura.init(provider.getApi(fromChains[0]));
+    await kusama.init(provider.getApi(fromChains[1]));
 
     const bridge = new Bridge({
       adapters: [karura, kusama]
@@ -48,7 +48,7 @@ describe.skip('acala-adapter should work', () => {
         expect(balance.free.toNumber()).toBeGreaterThanOrEqual(balance.available.toNumber());
         expect(balance.free.toNumber()).toEqual(balance.locked.add(balance.available).toNumber());
 
-        const inputConfig = await firstValueFrom(adapter.subscribeInputConfigs({ to, token, address: testAccount, signer: testAccount }));
+        const inputConfig = await firstValueFrom(adapter.subscribeInputConfig({ to, token, address: testAccount, signer: testAccount }));
 
         console.log(
           `inputConfig: min-${inputConfig.minInput.toNumber()} max-${inputConfig.maxInput.toNumber()} ss58-${inputConfig.ss58Prefix}`

@@ -14,11 +14,11 @@ import { ApiNotFound, CurrencyNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
-  CrossChainRouterConfigs,
-  CrossChainTransferParams,
+  RouteConfigs,
+  TransferParams,
 } from "../types";
 
-export const statemineRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const statemineRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "kusama",
     token: "KSM",
@@ -159,7 +159,7 @@ class StatemintBalanceAdapter extends BalanceAdapter {
 class BaseStatemintAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: StatemintBalanceAdapter;
 
-  public override async setApi(api: AnyApi) {
+  public async init(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
@@ -224,7 +224,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
   }
 
   public createTx(
-    params: CrossChainTransferParams
+    params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {

@@ -13,11 +13,11 @@ import { ApiNotFound, CurrencyNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
-  CrossChainRouterConfigs,
-  CrossChainTransferParams,
+  RouteConfigs,
+  TransferParams,
 } from "../types";
 
-export const astarRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const astarRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "acala",
     token: "ASTR",
@@ -52,7 +52,7 @@ export const astarRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   },
 ];
 
-export const shidenRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const shidenRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "karura",
     token: "SDN",
@@ -169,7 +169,7 @@ class AstarBalanceAdapter extends BalanceAdapter {
 class BaseAstarAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: AstarBalanceAdapter;
 
-  public override async setApi(api: AnyApi) {
+  public async init(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
@@ -234,7 +234,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
   }
 
   public createTx(
-    params: CrossChainTransferParams
+    params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {

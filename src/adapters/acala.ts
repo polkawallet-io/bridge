@@ -20,14 +20,14 @@ import { ApiNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
-  CrossChainRouterConfigs,
-  CrossChainTransferParams,
+  RouteConfigs,
+  TransferParams,
 } from "../types";
 import { isChainEqual } from "../utils/is-chain-equal";
 
 const ACALA_DEST_WEIGHT = "5000000000";
 
-export const acalaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "polkadot",
     token: "DOT",
@@ -141,7 +141,7 @@ export const acalaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     },
   },
 ];
-export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "kusama",
     token: "KSM",
@@ -522,7 +522,7 @@ export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "basilisk",
     token: "DAI",
     xcm: {
-      fee: { token: "DAI", amount: "4,400,000,000,000,000" },
+      fee: { token: "DAI", amount: "4400000000000000" },
       weightLimit: ACALA_DEST_WEIGHT,
     },
   },
@@ -636,9 +636,9 @@ export const karuraTokensConfig: Record<string, BasicToken> = {
     name: "DAI",
     symbol: "DAI",
     decimals: 18,
-    ed: "10,000,000,000,000,000",
+    ed: "10000000000000000",
   },
-  USDC: {
+  USDCet: {
     name: "USDCet",
     symbol: "USDCet",
     decimals: 6,
@@ -649,7 +649,7 @@ export const karuraTokensConfig: Record<string, BasicToken> = {
 class BaseAcalaAdapter extends BaseCrossChainAdapter {
   private wallet?: Wallet;
 
-  public override async setApi(api: AnyApi) {
+  public async init(api: AnyApi, wallet?: Wallet) {
     this.api = api;
 
     if (this.api?.type === "rxjs") {
@@ -658,7 +658,12 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.wallet = new Wallet(api);
+    // use custom wallet or create a new one
+    if (wallet) {
+      this.wallet = wallet;
+    } else {
+      this.wallet = new Wallet(api);
+    }
 
     await this.wallet.isReady;
   }
@@ -745,7 +750,7 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
   }
 
   public createTx(
-    params: CrossChainTransferParams
+    params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {

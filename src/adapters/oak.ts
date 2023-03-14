@@ -13,13 +13,13 @@ import { ApiNotFound, CurrencyNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
-  CrossChainRouterConfigs,
-  CrossChainTransferParams,
+  RouteConfigs,
+  TransferParams,
 } from "../types";
 
 const DEST_WEIGHT = "5000000000";
 
-export const turingRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const turingRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "karura",
     token: "TUR",
@@ -145,7 +145,7 @@ class OakBalanceAdapter extends BalanceAdapter {
 class BaseOakAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: OakBalanceAdapter;
 
-  public override async setApi(api: AnyApi) {
+  public async init(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
@@ -208,7 +208,7 @@ class BaseOakAdapter extends BaseCrossChainAdapter {
   }
 
   public createTx(
-    params: CrossChainTransferParams
+    params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {

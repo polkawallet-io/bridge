@@ -6,7 +6,7 @@ import { ChainName, chains } from "./configs";
 import {
   Chain,
   CrossChainRouter,
-  CrossChainRouterConfigs,
+  RouteConfigs,
   RouterFilter,
 } from "./types";
 import { fetchConfigFromApiOrLocal } from "./utils";
@@ -50,7 +50,7 @@ export class BridgeRouterManager {
     return this.adapters.find((i) => isChainEqual(chain, i.chain));
   }
 
-  public addRouter(router: CrossChainRouterConfigs, checkAdapter = true) {
+  public addRouter(router: RouteConfigs, checkAdapter = true) {
     const { token, xcm } = router;
     const from =
       typeof router.from === "string" ? chains[router.from] : router.from;
@@ -62,7 +62,7 @@ export class BridgeRouterManager {
     }
   }
 
-  public addRouters(routers: CrossChainRouterConfigs[], checkAdapter = true) {
+  public addRouters(routers: RouteConfigs[], checkAdapter = true) {
     routers.map((i) => this.addRouter(i, checkAdapter));
   }
 

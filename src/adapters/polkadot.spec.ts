@@ -23,7 +23,7 @@ describe.skip('polkadot-adapter should work', () => {
 
     const kusama = new KusamaAdapter();
 
-    await kusama.setApi(provider.getApi(fromChain));
+    await kusama.init(provider.getApi(fromChain));
 
     const bridge = new Bridge({
       adapters: [kusama]
@@ -41,7 +41,7 @@ describe.skip('polkadot-adapter should work', () => {
       expect(balance.free.toNumber()).toBeGreaterThanOrEqual(balance.available.toNumber());
       expect(balance.free.toNumber()).toEqual(balance.locked.add(balance.available).toNumber());
 
-      const inputConfig = await firstValueFrom(kusamaAdapter.subscribeInputConfigs({ to: 'karura', token: 'KSM', address: testAccount, signer: testAccount }));
+      const inputConfig = await firstValueFrom(kusamaAdapter.subscribeInputConfig({ to: 'karura', token: 'KSM', address: testAccount, signer: testAccount }));
 
       console.log(
         `inputConfig: min-${inputConfig.minInput.toNumber()} max-${inputConfig.maxInput.toNumber()} ss58-${inputConfig.ss58Prefix}`

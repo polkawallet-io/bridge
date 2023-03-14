@@ -16,13 +16,13 @@ import {
 import {
   BalanceData,
   BasicToken,
-  CrossChainRouterConfigs,
-  CrossChainTransferParams,
+  RouteConfigs,
+  TransferParams,
 } from "../types";
 
 const DEST_WEIGHT = "5000000000";
 
-export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const interlayRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "acala",
     token: "INTR",
@@ -38,7 +38,7 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   },
 ];
 
-export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const kintsugiRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "karura",
     token: "KINT",
@@ -136,7 +136,7 @@ class InterlayBalanceAdapter extends BalanceAdapter {
 class BaseInterlayAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: InterlayBalanceAdapter;
 
-  public override async setApi(api: AnyApi) {
+  public async init(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
@@ -201,7 +201,7 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
   }
 
   public createTx(
-    params: CrossChainTransferParams
+    params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {

@@ -49,7 +49,7 @@ describe.skip('Bridge sdk usage', () => {
     // connect all adapters
     const connected = await firstValueFrom(provider.connectFromChain(chains, undefined));
     // and set apiProvider for each adapter
-    await Promise.all(chains.map((chain) => availableAdapters[chain].setApi(provider.getApi(chain))));
+    await Promise.all(chains.map((chain) => availableAdapters[chain].init(provider.getApi(chain))));
 
     expect(connected.length).toEqual(chains.length);
 
@@ -79,7 +79,7 @@ describe.skip('Bridge sdk usage', () => {
     expect(balance.free.toNumber()).toBeGreaterThanOrEqual(0);
     expect(balance.available.toNumber()).toBeGreaterThanOrEqual(0);
 
-    const inputConfig = await firstValueFrom(availableAdapters[chain].subscribeInputConfigs({to: toChain, token, address:testAddress, signer: testAddress}));
+    const inputConfig = await firstValueFrom(availableAdapters[chain].subscribeInputConfig({to: toChain, token, address:testAddress, signer: testAddress}));
 
     expect(BigInt(inputConfig.estimateFee)).toBeGreaterThanOrEqual(BigInt(0));
     expect(inputConfig.minInput.toNumber()).toBeGreaterThan(0);
