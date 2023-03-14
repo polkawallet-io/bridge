@@ -3,12 +3,7 @@ import { isEmpty, overEvery, uniqWith } from "lodash";
 import { isChainEqual } from "./utils/is-chain-equal";
 import { BaseCrossChainAdapter } from "./base-chain-adapter";
 import { ChainName, chains } from "./configs";
-import {
-  Chain,
-  CrossChainRouter,
-  RouteConfigs,
-  RouterFilter,
-} from "./types";
+import { Chain, CrossChainRouter, RouteConfigs, RouterFilter } from "./types";
 import { fetchConfigFromApiOrLocal } from "./utils";
 
 interface BridgeRouterManagerConfigs {
