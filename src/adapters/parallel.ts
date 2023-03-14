@@ -13,13 +13,13 @@ import { ApiNotFound, CurrencyNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
-  CrossChainRouterConfigs,
-  CrossChainTransferParams,
+  RouteConfigs,
+  TransferParams,
 } from "../types";
 
 const DEST_WEIGHT = "Unlimited";
 
-export const parallelRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const parallelRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "acala",
     token: "PARA",
@@ -54,7 +54,7 @@ export const parallelRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   },
 ];
 
-export const heikoRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const heikoRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "karura",
     token: "HKO",
@@ -194,7 +194,7 @@ class ParallelBalanceAdapter extends BalanceAdapter {
 class BaseParallelAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: ParallelBalanceAdapter;
 
-  public override async setApi(api: AnyApi) {
+  public async init(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
@@ -259,7 +259,7 @@ class BaseParallelAdapter extends BaseCrossChainAdapter {
   }
 
   public createTx(
-    params: CrossChainTransferParams
+    params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {

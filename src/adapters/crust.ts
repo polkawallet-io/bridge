@@ -13,13 +13,13 @@ import { ApiNotFound, CurrencyNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
-  CrossChainRouterConfigs,
-  CrossChainTransferParams,
+  RouteConfigs,
+  TransferParams,
 } from "../types";
 
 const DEST_WEIGHT = "5000000000";
 
-const shadowRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+const shadowRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "karura",
     token: "CSM",
@@ -133,7 +133,7 @@ class CrustBalanceAdapter extends BalanceAdapter {
 class BaseCrustAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: CrustBalanceAdapter;
 
-  public override async setApi(api: AnyApi) {
+  public async init(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
@@ -196,7 +196,7 @@ class BaseCrustAdapter extends BaseCrossChainAdapter {
   }
 
   public createTx(
-    params: CrossChainTransferParams
+    params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {

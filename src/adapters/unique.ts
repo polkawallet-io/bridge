@@ -13,11 +13,11 @@ import { ApiNotFound, CurrencyNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
-  CrossChainRouterConfigs,
-  CrossChainTransferParams,
+  RouteConfigs,
+  TransferParams,
 } from "../types";
 
-export const quartzRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const quartzRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "karura",
     token: "QTZ",
@@ -79,7 +79,7 @@ class UniqueBalanceAdapter extends BalanceAdapter {
 class BaseUniqueAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: UniqueBalanceAdapter;
 
-  public override async setApi(api: AnyApi) {
+  public async init(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
@@ -142,7 +142,7 @@ class BaseUniqueAdapter extends BaseCrossChainAdapter {
   }
 
   public createTx(
-    params: CrossChainTransferParams
+    params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {

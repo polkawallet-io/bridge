@@ -12,13 +12,13 @@ import { ApiNotFound, CurrencyNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
-  CrossChainRouterConfigs,
-  CrossChainTransferParams,
+  RouteConfigs,
+  TransferParams,
 } from "../types";
 
 const DEST_WEIGHT = "Unlimited";
 
-export const bifrostRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const bifrostRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "karura",
     token: "BNC",
@@ -151,7 +151,7 @@ class BifrostBalanceAdapter extends BalanceAdapter {
 class BaseBifrostAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: BifrostBalanceAdapter;
 
-  public override async setApi(api: AnyApi) {
+  public async init(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
@@ -214,7 +214,7 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
   }
 
   public createTx(
-    params: CrossChainTransferParams
+    params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {

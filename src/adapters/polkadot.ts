@@ -13,11 +13,11 @@ import { ApiNotFound, CurrencyNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
-  CrossChainRouterConfigs,
-  CrossChainTransferParams,
+  RouteConfigs,
+  TransferParams,
 } from "../types";
 
-export const polkadotRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const polkadotRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "acala",
     token: "DOT",
@@ -26,7 +26,7 @@ export const polkadotRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
 ];
 
 // TODO: should remove after kusama upgrade
-export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const kusamaRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "karura",
     token: "KSM",
@@ -53,7 +53,7 @@ export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   },
 ];
 
-export const V3KusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const V3KusamaRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "karura",
     token: "KSM",
@@ -137,7 +137,7 @@ class PolkadotBalanceAdapter extends BalanceAdapter {
 class BasePolkadotAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: PolkadotBalanceAdapter;
 
-  public override async setApi(api: AnyApi) {
+  public async init(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
@@ -219,7 +219,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
   }
 
   public createTx(
-    params: CrossChainTransferParams
+    params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {

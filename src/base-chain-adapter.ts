@@ -4,8 +4,8 @@ import {
   FixedPointNumber as FN,
 } from "@acala-network/sdk-core";
 import {
-  combineLatest,
   firstValueFrom,
+  combineLatest,
   from,
   Observable,
   of,
@@ -14,7 +14,6 @@ import {
 } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 
-import { ApiRx } from "@polkadot/api";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 
@@ -25,21 +24,21 @@ import {
   TokenConfigNotFound,
 } from "./errors";
 import {
-  BalanceChangedStatus,
+  BalanceChangeStatue,
   BalanceData,
   BasicToken,
   Chain,
-  CrossChainBalanceChangedConfigs,
-  CrossChainInputConfigs,
-  CrossChainRouterConfigs,
-  CrossChainTransferParams,
+  BalanceChangeConfig,
+  InputConfig,
+  RouteConfigs,
+  TransferParams,
   TokenBalance,
 } from "./types";
 
 const DEFAULT_TX_CHECKING_TIMEOUT = 2 * 60 * 1000;
 
 export abstract class BaseCrossChainAdapter {
-  protected routers: Omit<CrossChainRouterConfigs, "from">[];
+  protected routers: Omit<RouteConfigs, "from">[];
   protected tokens: Record<string, BasicToken>;
   protected api?: AnyApi;
   readonly chain: Chain;
@@ -48,7 +47,7 @@ export abstract class BaseCrossChainAdapter {
 
   constructor(
     chain: Chain,
-    routers: Omit<CrossChainRouterConfigs, "from">[],
+    routers: Omit<RouteConfigs, "from">[],
     tokens: Record<string, BasicToken>
   ) {
     this.chain = chain;
@@ -56,15 +55,7 @@ export abstract class BaseCrossChainAdapter {
     this.tokens = tokens;
   }
 
-  public async setApi(api: AnyApi) {
-    this.api = api;
-
-    if (this.api?.type === "rxjs") {
-      await firstValueFrom(api.isReady as Observable<ApiRx>);
-    }
-
-    await api.isReady;
-  }
+  public abstract init(api: AnyApi, ...others: any[]): Promise<void>;
 
   public injectFindAdapter(
     func: (chain: ChainName | Chain) => BaseCrossChainAdapter
@@ -72,7 +63,7 @@ export abstract class BaseCrossChainAdapter {
     this.findAdapter = func;
   }
 
-  public getRouters(): CrossChainRouterConfigs[] {
+  public getRouters(): RouteConfigs[] {
     return this.routers.map((i) => ({
       ...i,
       from: this.chain.id as ChainName,
@@ -83,9 +74,9 @@ export abstract class BaseCrossChainAdapter {
     return Number(this.api?.registry.chainSS58?.toString());
   }
 
-  public subscribeInputConfigs(
-    params: Omit<CrossChainTransferParams, "amount">
-  ): Observable<CrossChainInputConfigs> {
+  public subscribeInputConfig(
+    params: Omit<TransferParams, "amount">
+  ): Observable<InputConfig> {
     const { signer, to, token } = params;
 
     const destFee = this.getCrossChainFee(token, to);
@@ -115,6 +106,10 @@ export abstract class BaseCrossChainAdapter {
     );
   }
 
+  public getInputConfig(params: Omit<TransferParams, "amount">) {
+    return firstValueFrom(this.subscribeInputConfig(params));
+  }
+
   public subscribeMinInput(token: string, to: ChainName): Observable<FN> {
     const destFee = this.getCrossChainFee(token, to);
 
@@ -123,6 +118,10 @@ export abstract class BaseCrossChainAdapter {
         destFee.token === token ? destFee.balance : FN.ZERO
       )
     );
+  }
+
+  public getMinInput(token: string, to: ChainName) {
+    return firstValueFrom(this.subscribeMinInput(token, to));
   }
 
   public getToken(token: string, chain: ChainName): BasicToken {
@@ -191,7 +190,7 @@ export abstract class BaseCrossChainAdapter {
     return router.xcm?.weightLimit;
   }
 
-  public estimateTxFee(params: CrossChainTransferParams) {
+  public estimateTxFee(params: TransferParams) {
     let tx = this.createTx({
       ...params,
       // overwrite amount just for estimating fee
@@ -225,9 +224,13 @@ export abstract class BaseCrossChainAdapter {
     );
   }
 
-  public subscribeBalanceChanged(
-    configs: CrossChainBalanceChangedConfigs
-  ): Observable<BalanceChangedStatus> {
+  public getEstimateTxFee(params: TransferParams) {
+    return firstValueFrom(this.estimateTxFee(params));
+  }
+
+  public subscribeBalanceChange(
+    configs: BalanceChangeConfig
+  ): Observable<BalanceChangeStatue> {
     const { address, amount, token, tolerance } = configs;
     // allow 1% tolerance as default
     const target = amount.mul(new FN(1 - (tolerance || 0.01)));
@@ -244,19 +247,31 @@ export abstract class BaseCrossChainAdapter {
         const diff = balance.available.minus(savedBalance);
 
         if (savedBalance && diff.gte(target)) {
-          return BalanceChangedStatus.SUCCESS;
+          return BalanceChangeStatue.SUCCESS;
         }
 
-        return BalanceChangedStatus.CHECKING;
+        return BalanceChangeStatue.CHECKING;
       }),
       catchError((e: Error) => {
         if (e instanceof TimeoutError) {
-          return of(BalanceChangedStatus.TIMEOUT);
+          return of(BalanceChangeStatue.TIMEOUT);
         }
 
-        return of(BalanceChangedStatus.UNKNOWN_ERROR);
+        return of(BalanceChangeStatue.UNKNOWN_ERROR);
       })
     );
+  }
+
+  public watchBalanceChange(
+    config: BalanceChangeConfig,
+    callback: (error?: Error, status?: BalanceChangeStatue) => void
+  ) {
+    const subscriber = this.subscribeBalanceChange(config).subscribe({
+      next: (status) => callback(undefined, status),
+      error: (e) => callback(e, undefined),
+    });
+
+    return subscriber.unsubscribe;
   }
 
   public abstract subscribeTokenBalance(
@@ -264,14 +279,26 @@ export abstract class BaseCrossChainAdapter {
     address: string
   ): Observable<BalanceData>;
 
+  public getTokenBalance(token: string, address: string): Promise<BalanceData> {
+    return firstValueFrom(this.subscribeTokenBalance(token, address));
+  }
+
   public abstract subscribeMaxInput(
     token: string,
     address: string,
     to: ChainName
   ): Observable<FN>;
 
+  public getMaxInput(
+    token: string,
+    address: string,
+    to: ChainName
+  ): Promise<FN> {
+    return firstValueFrom(this.subscribeMaxInput(token, address, to));
+  }
+
   public abstract createTx(
-    params: CrossChainTransferParams
+    params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult>;

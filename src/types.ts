@@ -16,7 +16,7 @@ export interface Chain {
   readonly type: ChainType;
   // chain icon resource path
   readonly icon: string;
-  // set id to -1 if the chain is para chain
+  // set id to -1 when the chain is para chain
   readonly paraChainId: number;
   // the chain SS58 Prefix
   readonly ss58Prefix: number;
@@ -29,7 +29,7 @@ export interface BasicToken {
   ed: string;
 }
 
-export interface CrossChainRouterConfigs {
+export interface RouteConfigs {
   // from chain name
   from: ChainName;
   // to chain name
@@ -67,7 +67,7 @@ export interface NetworkProps {
   tokenSymbol: string[];
 }
 
-export interface CrossChainTransferParams {
+export interface TransferParams {
   signer: string;
   address: string;
   amount: FixedPointNumber;
@@ -75,7 +75,7 @@ export interface CrossChainTransferParams {
   token: string;
 }
 
-export interface CrossChainInputConfigs {
+export interface InputConfig {
   minInput: FixedPointNumber;
   maxInput: FixedPointNumber;
   ss58Prefix: number;
@@ -94,7 +94,7 @@ export interface BridgeConfigs {
   disabledRouters?: RouterFilter[] | string;
 }
 
-export interface CrossChainBalanceChangedConfigs {
+export interface BalanceChangeConfig {
   token: string;
   address: string;
   amount: FixedPointNumber;
@@ -102,7 +102,7 @@ export interface CrossChainBalanceChangedConfigs {
   timeout?: number;
 }
 
-export enum BalanceChangedStatus {
+export enum BalanceChangeStatue {
   "CHECKING",
   "SUCCESS",
   "TIMEOUT",

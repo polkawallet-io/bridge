@@ -13,21 +13,20 @@ import { ApiNotFound, CurrencyNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
-  CrossChainRouterConfigs,
-  CrossChainTransferParams,
+  RouteConfigs,
+  TransferParams,
 } from "../types";
 
-export const integriteeRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] =
-  [
-    {
-      to: "karura",
-      token: "TEER",
-      xcm: {
-        fee: { token: "TEER", amount: "6400000000" },
-        weightLimit: "5000000000",
-      },
+export const integriteeRoutersConfig: Omit<RouteConfigs, "from">[] = [
+  {
+    to: "karura",
+    token: "TEER",
+    xcm: {
+      fee: { token: "TEER", amount: "6400000000" },
+      weightLimit: "5000000000",
     },
-  ];
+  },
+];
 
 export const integriteeTokensConfig: Record<string, BasicToken> = {
   TEER: { name: "TEER", symbol: "TEER", decimals: 12, ed: "100000000000" },
@@ -80,7 +79,7 @@ class IntegriteeBalanceAdapter extends BalanceAdapter {
 class BaseIntegriteeAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: IntegriteeBalanceAdapter;
 
-  public override async setApi(api: AnyApi) {
+  public async init(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
@@ -143,7 +142,7 @@ class BaseIntegriteeAdapter extends BaseCrossChainAdapter {
   }
 
   public createTx(
-    params: CrossChainTransferParams
+    params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {

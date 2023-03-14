@@ -1,4 +1,4 @@
-import { FixedPointNumber as FN } from "@acala-network/sdk-core";
+import { AnyApi, FixedPointNumber as FN } from "@acala-network/sdk-core";
 import { Observable } from "rxjs";
 
 import { SubmittableExtrinsic } from "@polkadot/api/types";
@@ -7,7 +7,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainName, chains } from "../configs";
 import { ApiNotFound } from "../errors";
-import { BalanceData, BasicToken, CrossChainTransferParams } from "../types";
+import { BalanceData, BasicToken, TransferParams } from "../types";
 
 export const moonbeamTokensConfig: Record<string, BasicToken> = {
   GLMR: {
@@ -32,6 +32,10 @@ class BaseMoonbeamAdapter extends BaseCrossChainAdapter {
     throw new ApiNotFound(this.chain.id);
   }
 
+  public async init(api: AnyApi) {
+    this.api = api;
+  }
+
   public subscribeMaxInput(
     _: string,
     __: string,
@@ -41,7 +45,7 @@ class BaseMoonbeamAdapter extends BaseCrossChainAdapter {
   }
 
   public createTx(
-    _: CrossChainTransferParams
+    _: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {

@@ -13,13 +13,13 @@ import { ApiNotFound, CurrencyNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
-  CrossChainRouterConfigs,
-  CrossChainTransferParams,
+  RouteConfigs,
+  TransferParams,
 } from "../types";
 
 const DEST_WEIGHT = "5000000000";
 
-export const listenRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const listenRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "karura",
     token: "LT",
@@ -144,7 +144,7 @@ class ListenBalanceAdapter extends BalanceAdapter {
 class BaseListenAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: ListenBalanceAdapter;
 
-  public override async setApi(api: AnyApi) {
+  public async init(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
@@ -207,7 +207,7 @@ class BaseListenAdapter extends BaseCrossChainAdapter {
   }
 
   public createTx(
-    params: CrossChainTransferParams
+    params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {

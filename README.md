@@ -46,7 +46,7 @@ Kusama:
 | karura | pichiu | PCHU KAR AUSD LKSM |
 | karura | turing | TUR KAR AUSD LKSM |
 | karura | quartz | QTZ |
-| karura | basilisk | BSX AUSD |
+| karura | basilisk | BSX AUSD DAI USDCet |
 | karura | listen | LT KAR AUSD LKSM |
 | bifrost | karura | BNC KAR AUSD KSM VSKSM |
 | shiden | karura | SDN AUSD |
@@ -182,7 +182,7 @@ export const bifrostTokensConfig: Record<string, MultiChainToken> = {
   VSKSM: { name: 'VSKSM', symbol: 'VSKSM', decimals: 12, ed: '100000000' },
   /// ...other tokens
 };
-export const bifrostRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+export const bifrostRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
   /// router for token `BNC` from `bifrost` to `karura`,
   /// `xcm.fee` defines the XCM-Fee on karura,
   /// `xcm.weightLimit` defines the weightLimit value used creating Extrinsic.
@@ -274,7 +274,7 @@ Implement the `createTx` method so the bridge can create the cross-chain transfe
 ```typescript
 /// maxInput = availableBalance - estimatedFee - existentialDeposit
 class BaseBifrostAdapter extends BaseCrossChainAdapter {
-  public createTx (params: CrossChainTransferParams): SubmittableExtrinsic<'promise', ISubmittableResult> | SubmittableExtrinsic<'rxjs', ISubmittableResult> {
+  public createTx (params: TransferParams): SubmittableExtrinsic<'promise', ISubmittableResult> | SubmittableExtrinsic<'rxjs', ISubmittableResult> {
     const { address, amount, to, token } = params;
     const toChain = chains[to];
 

@@ -22,7 +22,7 @@ describe.skip("oak-adapter should work", () => {
 
     const turing = new TuringAdapter();
 
-    await turing.setApi(provider.getApi(fromChain));
+    await turing.init(provider.getApi(fromChain));
 
     const bridge = new Bridge({
       adapters: [turing],

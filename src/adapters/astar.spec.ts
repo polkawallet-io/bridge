@@ -23,7 +23,7 @@ describe.skip('acala-adapter should work', () => {
 
     const shiden = new ShidenAdapter();
 
-    await shiden.setApi(provider.getApi(fromChain));
+    await shiden.init(provider.getApi(fromChain));
 
     const bridge = new Bridge({
       adapters: [shiden]

@@ -13,13 +13,13 @@ import { ApiNotFound, CurrencyNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
-  CrossChainRouterConfigs,
-  CrossChainTransferParams,
+  RouteConfigs,
+  TransferParams,
 } from "../types";
 
 const DEST_WEIGHT = "5000000000";
 
-export const basiliskRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const basiliskRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "kusama",
     token: "KSM",
@@ -52,18 +52,38 @@ export const basiliskRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
+  {
+    to: "karura",
+    token: "DAI",
+    xcm: {
+      fee: { token: "DAI", amount: "808240000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "karura",
+    token: "USDCet",
+    xcm: {
+      fee: { token: "USDCet", amount: "4400" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
 ];
 
 export const basiliskTokensConfig: Record<string, BasicToken> = {
   BSX: { name: "BSX", symbol: "BSX", decimals: 12, ed: "1000000000000" },
   KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "10000000000" },
   KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "100000000" },
+  DAI: { name: "DAI", symbol: "DAI", decimals: 18, ed: "10000000000" },
+  USDCet: { name: "USDCet", symbol: "USDCet", decimals: 6, ed: "10000" },
 };
 
 const SUPPORTED_TOKENS: Record<string, number> = {
   BSX: 0,
   KUSD: 2,
   KSM: 1,
+  DAI: 13,
+  USDCet: 9,
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -142,7 +162,7 @@ class HydradxBalanceAdapter extends BalanceAdapter {
 class BaseHydradxAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: HydradxBalanceAdapter;
 
-  public override async setApi(api: AnyApi) {
+  public async init(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
@@ -205,7 +225,7 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
   }
 
   public createTx(
-    params: CrossChainTransferParams
+    params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
