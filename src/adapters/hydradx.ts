@@ -8,11 +8,11 @@ import { ISubmittableResult } from "@polkadot/types/types";
 
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { ChainName, chains } from "../configs";
-import { ApiNotFound, CurrencyNotFound } from "../errors";
+import { ChainId, chains } from "../configs";
+import { ApiNotFound, TokenNotFound } from "../errors";
 import {
   BalanceData,
-  BasicToken,
+  ExpandToken,
   RouteConfigs,
   TransferParams,
 } from "../types";
@@ -64,26 +64,69 @@ export const basiliskRoutersConfig: Omit<RouteConfigs, "from">[] = [
     to: "karura",
     token: "USDCet",
     xcm: {
-      fee: { token: "USDCet", amount: "4400" },
+      fee: { token: "USDCet", amount: "808" },
       weightLimit: DEST_WEIGHT,
     },
   },
 ];
 
-export const basiliskTokensConfig: Record<string, BasicToken> = {
-  BSX: { name: "BSX", symbol: "BSX", decimals: 12, ed: "1000000000000" },
-  KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "10000000000" },
-  KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "100000000" },
-  DAI: { name: "DAI", symbol: "DAI", decimals: 18, ed: "10000000000" },
-  USDCet: { name: "USDCet", symbol: "USDCet", decimals: 6, ed: "10000" },
+export const basiliskTokensConfig: Record<string, ExpandToken> = {
+  BSX: {
+    name: "BSX",
+    symbol: "BSX",
+    decimals: 12,
+    ed: "1000000000000",
+    toChainData: () => 0,
+  },
+  KUSD: {
+    name: "KUSD",
+    symbol: "KUSD",
+    decimals: 12,
+    ed: "10000000000",
+    toChainData: () => 2,
+  },
+  KSM: {
+    name: "KSM",
+    symbol: "KSM",
+    decimals: 12,
+    ed: "100000000",
+    toChainData: () => 1,
+  },
+  DAI: {
+    name: "DAI",
+    symbol: "DAI",
+    decimals: 18,
+    ed: "10000000000",
+    toChainData: () => 13,
+  },
+  USDCet: {
+    name: "USDCet",
+    symbol: "USDCet",
+    decimals: 6,
+    ed: "10000",
+    toChainData: () => 9,
+  },
 };
 
-const SUPPORTED_TOKENS: Record<string, number> = {
-  BSX: 0,
-  KUSD: 2,
-  KSM: 1,
-  DAI: 13,
-  USDCet: 9,
+export const hydraRoutersConfig: Omit<RouteConfigs, "from">[] = [
+  {
+    to: "acala",
+    token: "DAI",
+    xcm: {
+      fee: { token: "DAI", amount: "808240000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+];
+
+export const hydraTokensConfig: Record<string, ExpandToken> = {
+  DAI: {
+    name: "DAI",
+    symbol: "DAI",
+    decimals: 18,
+    ed: "10000000000",
+    toChainData: () => 2,
+  },
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -113,12 +156,12 @@ class HydradxBalanceAdapter extends BalanceAdapter {
   }
 
   public subscribeBalance(
-    token: string,
+    tokenName: string,
     address: string
   ): Observable<BalanceData> {
     const storage = this.storages.balances(address);
 
-    if (token === this.nativeToken) {
+    if (tokenName === this.nativeToken) {
       return storage.observable.pipe(
         map((data) => ({
           free: FN.fromInner(data.freeBalance.toString(), this.decimals),
@@ -135,17 +178,13 @@ class HydradxBalanceAdapter extends BalanceAdapter {
       );
     }
 
-    const tokenId = SUPPORTED_TOKENS[token];
+    const token = this.getToken<ExpandToken>(tokenName);
 
-    if (tokenId === undefined) {
-      throw new CurrencyNotFound(token);
-    }
-
-    return this.storages.assets(tokenId, address).observable.pipe(
+    return this.storages.assets(token.toChainData(), address).observable.pipe(
       map((balance) => {
         const amount = FN.fromInner(
           balance.free?.toString() || "0",
-          this.getToken(token).decimals
+          token.decimals
         );
 
         return {
@@ -168,9 +207,9 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
     await api.isReady;
 
     this.balanceAdapter = new HydradxBalanceAdapter({
-      chain: this.chain.id as ChainName,
+      chain: this.chain.id as ChainId,
       api,
-      tokens: basiliskTokensConfig,
+      tokens: this.tokens,
     });
   }
 
@@ -188,7 +227,7 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
   public subscribeMaxInput(
     token: string,
     address: string,
-    to: ChainName
+    to: ChainId
   ): Observable<FN> {
     if (!this.balanceAdapter) {
       throw new ApiNotFound(this.chain.id);
@@ -233,12 +272,12 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
       throw new ApiNotFound(this.chain.id);
     }
 
-    const { address, amount, to, token } = params;
+    const { address, amount, to, token: tokenName } = params;
 
-    const tokenId = SUPPORTED_TOKENS[token];
+    const token = this.getToken<ExpandToken>(tokenName);
 
-    if (tokenId === undefined) {
-      throw new CurrencyNotFound(token);
+    if (!token) {
+      throw new TokenNotFound(token);
     }
 
     const toChain = chains[to];
@@ -257,11 +296,11 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
     };
 
     return this.api?.tx.xTokens.transfer(
-      tokenId,
+      token.toChainData(),
       amount.toChainData(),
       { V1: dst },
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.getDestWeight(token, to)!.toString()
+      this.getDestWeight(tokenName, to)!.toString()
     );
   }
 }
@@ -269,5 +308,11 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
 export class BasiliskAdapter extends BaseHydradxAdapter {
   constructor() {
     super(chains.basilisk, basiliskRoutersConfig, basiliskTokensConfig);
+  }
+}
+
+export class HydraAdapter extends BaseHydradxAdapter {
+  constructor() {
+    super(chains.hydra, hydraRoutersConfig, hydraTokensConfig);
   }
 }

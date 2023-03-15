@@ -1,7 +1,7 @@
 import { BaseSDK } from "@acala-network/sdk";
 import { BehaviorSubject, filter, firstValueFrom } from "rxjs";
 
-import { ChainName } from "./configs/index";
+import { ChainId } from "./configs/index";
 import { BaseCrossChainAdapter } from "./base-chain-adapter";
 import { BridgeRouterManager } from "./cross-chain-router";
 import { NoCrossChainAdapterFound } from "./errors";
@@ -41,7 +41,7 @@ export class Bridge implements BaseSDK {
     );
   }
 
-  public findAdapter = (chain: ChainName | Chain): BaseCrossChainAdapter => {
+  public findAdapter = (chain: ChainId | Chain): BaseCrossChainAdapter => {
     const result = this.router.findAdapterByName(chain);
 
     if (!result) {

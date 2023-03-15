@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { ApiProvider } from './api-provider';
 import { BaseCrossChainAdapter } from './base-chain-adapter';
 import { PolkadotAdapter } from './adapters/polkadot';
-import { ChainName } from './configs';
+import { ChainId } from './configs';
 import { Bridge } from './bridge';
 import { AcalaAdapter } from './adapters/acala';
 import { FN } from './types';
@@ -41,7 +41,7 @@ describe.skip('Bridge sdk usage', () => {
   });
 
   test('2. connect fromChain should be ok', async () => {
-    const chains = Object.keys(availableAdapters) as ChainName[];
+    const chains = Object.keys(availableAdapters) as ChainId[];
 
     expect(provider.getApi(chains[0])).toEqual(undefined);
     expect(provider.getApi(chains[1])).toEqual(undefined);
@@ -69,8 +69,8 @@ describe.skip('Bridge sdk usage', () => {
   });
 
   test('3. token balance query & create tx should be ok', async () => {
-    const chain: ChainName = 'acala';
-    const toChain: ChainName = 'polkadot';
+    const chain: ChainId = 'acala';
+    const toChain: ChainId = 'polkadot';
     const token = 'DOT';
     const testAddress = '23M5ttkmR6Kco7bReRDve6bQUSAcwqebatp3fWGJYb4hDSDJ';
 

@@ -9,8 +9,8 @@ import { BN } from "@polkadot/util";
 
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { ChainName, chains } from "../configs";
-import { ApiNotFound, CurrencyNotFound } from "../errors";
+import { ChainId, chains } from "../configs";
+import { ApiNotFound, TokenNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
@@ -132,7 +132,7 @@ class StatemintBalanceAdapter extends BalanceAdapter {
     const assetId = SUPPORTED_TOKENS[token];
 
     if (assetId === undefined) {
-      throw new CurrencyNotFound(token);
+      throw new TokenNotFound(token);
     }
 
     return combineLatest({
@@ -164,7 +164,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    const chain = this.chain.id as ChainName;
+    const chain = this.chain.id as ChainId;
 
     this.balanceAdapter = new StatemintBalanceAdapter({
       api,
@@ -187,7 +187,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
   public subscribeMaxInput(
     token: string,
     address: string,
-    to: ChainName
+    to: ChainId
   ): Observable<FN> {
     if (!this.balanceAdapter) {
       throw new ApiNotFound(this.chain.id);
@@ -240,7 +240,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
     // to relay chain
     if (to === "kusama" || to === "polkadot") {
       if (token !== this.balanceAdapter?.nativeToken) {
-        throw new CurrencyNotFound(token);
+        throw new TokenNotFound(token);
       }
 
       const dst = { interior: "Here", parents: 1 };
@@ -272,7 +272,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       token === this.balanceAdapter?.nativeToken ||
       !assetId
     ) {
-      throw new CurrencyNotFound(token);
+      throw new TokenNotFound(token);
     }
 
     const dst = { X2: ["Parent", { Parachain: toChain.paraChainId }] };

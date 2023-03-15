@@ -1,7 +1,7 @@
 import { firstValueFrom } from 'rxjs';
 
 import { ApiProvider } from './api-provider';
-import { ChainName } from './configs';
+import { ChainId } from './configs';
 
 describe.skip('api-provider', () => {
   jest.setTimeout(30000);
@@ -9,7 +9,7 @@ describe.skip('api-provider', () => {
   const provider = new ApiProvider();
 
   test('connectFromChain should be ok', async () => {
-    const chains: ChainName[] = ['kusama', 'karura', 'polkadot', 'acala'];
+    const chains: ChainId[] = ['kusama', 'karura', 'polkadot', 'acala'];
 
     expect(provider.getApi(chains[0])).toEqual(undefined);
     expect(provider.getApi(chains[1])).toEqual(undefined);

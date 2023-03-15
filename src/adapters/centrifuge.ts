@@ -8,8 +8,8 @@ import { ISubmittableResult } from "@polkadot/types/types";
 
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { ChainName, chains } from "../configs";
-import { ApiNotFound, CurrencyNotFound } from "../errors";
+import { ChainId, chains } from "../configs";
+import { ApiNotFound, TokenNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
@@ -99,7 +99,7 @@ class CentrifugeBalanceAdapter extends BalanceAdapter {
     const tokenId = SUPPORTED_TOKENS[token];
 
     if (tokenId === undefined) {
-      throw new CurrencyNotFound(token);
+      throw new TokenNotFound(token);
     }
 
     return this.storages.assets(address, tokenId).observable.pipe(
@@ -129,7 +129,7 @@ class BaseCentrifugeAdapter extends BaseCrossChainAdapter {
     await api.isReady;
 
     this.balanceAdapter = new CentrifugeBalanceAdapter({
-      chain: this.chain.id as ChainName,
+      chain: this.chain.id as ChainId,
       api,
       tokens: altairTokensConfig,
     });
@@ -149,7 +149,7 @@ class BaseCentrifugeAdapter extends BaseCrossChainAdapter {
   public subscribeMaxInput(
     token: string,
     address: string,
-    to: ChainName
+    to: ChainId
   ): Observable<FN> {
     if (!this.balanceAdapter) {
       throw new ApiNotFound(this.chain.id);
@@ -202,7 +202,7 @@ class BaseCentrifugeAdapter extends BaseCrossChainAdapter {
     const tokenId = SUPPORTED_TOKENS[token];
 
     if (!tokenId && token !== this.balanceAdapter?.nativeToken) {
-      throw new CurrencyNotFound(token);
+      throw new TokenNotFound(token);
     }
 
     return this.api?.tx.xTokens.transfer(

@@ -7,10 +7,10 @@ import { ISubmittableResult } from "@polkadot/types/types";
 
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { ChainName, chains } from "../configs";
+import { ChainId, chains } from "../configs";
 import {
   ApiNotFound,
-  CurrencyNotFound,
+  TokenNotFound,
   DestinationWeightNotFound,
 } from "../errors";
 import {
@@ -112,7 +112,7 @@ class InterlayBalanceAdapter extends BalanceAdapter {
     const tokenId = SUPPORTED_TOKENS[token];
 
     if (tokenId === undefined) {
-      throw new CurrencyNotFound(token);
+      throw new TokenNotFound(token);
     }
 
     return this.storages.assets(address, tokenId).observable.pipe(
@@ -141,7 +141,7 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    const chain = this.chain.id as ChainName;
+    const chain = this.chain.id as ChainId;
 
     this.balanceAdapter = new InterlayBalanceAdapter({
       chain,
@@ -164,7 +164,7 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
   public subscribeMaxInput(
     token: string,
     address: string,
-    to: ChainName
+    to: ChainId
   ): Observable<FN> {
     if (!this.balanceAdapter) {
       throw new ApiNotFound(this.chain.id);
@@ -217,7 +217,7 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
     const tokenId = SUPPORTED_TOKENS[token];
 
     if (tokenId === undefined) {
-      throw new CurrencyNotFound(token);
+      throw new TokenNotFound(token);
     }
 
     // use "Unlimited" if the xToken.transfer's fourth parameter version supports it
