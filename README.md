@@ -17,9 +17,11 @@ Polkadot:
 | acala | parallel | PARA ACA AUSD LDOT |
 | acala | interlay | INTR IBTC |
 | acala | astar | ASTR ACA AUSD LDOT |
+| acala | hydraDX | DAI |
 | parallel | acala | PARA ACA AUSD LDOT |
 | interlay | acala | INTR IBTC |
 | astar | acala | ASTR ACA AUSD LDOT |
+| hydraDX | acala | DAI |
 
 Kusama:
 
@@ -64,7 +66,7 @@ Kusama:
 | turing | karura | TUR KAR AUSD LKSM |
 | quartz | karura | QTZ |
 | basilisk | kusama | KSM |
-| basilisk | karura | BSX AUSD KSM |
+| basilisk | karura | BSX AUSD KSM DAI |
 | listen | karura | LT KAR AUSD LKSM |
 
 ## Usage
