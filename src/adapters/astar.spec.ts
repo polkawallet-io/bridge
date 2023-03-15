@@ -2,7 +2,7 @@
 import { firstValueFrom } from 'rxjs';
 
 import { ApiProvider } from '../api-provider';
-import {  ChainName } from '../configs';
+import {  ChainId } from '../configs';
 import { Bridge } from '../bridge';
 import { ShidenAdapter } from './astar';
 
@@ -12,7 +12,7 @@ describe.skip('acala-adapter should work', () => {
   const testAccount = '5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN';
   const provider = new ApiProvider();
 
-  async function connect (chain: ChainName) {
+  async function connect (chain: ChainId) {
     return firstValueFrom(provider.connectFromChain([chain], undefined));
   }
 
@@ -33,7 +33,7 @@ describe.skip('acala-adapter should work', () => {
 
     const adapter = bridge.findAdapter(fromChain);
 
-    async function runMyTestSuit (to: ChainName, token: string) {
+    async function runMyTestSuit (to: ChainId, token: string) {
       if (adapter) {
         const balance = await firstValueFrom(adapter.subscribeTokenBalance(token, testAccount));
 

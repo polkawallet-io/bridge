@@ -15,7 +15,7 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { ChainName, chains } from "../configs";
+import { ChainId, chains } from "../configs";
 import { ApiNotFound } from "../errors";
 import {
   BalanceData,
@@ -137,6 +137,14 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "IBTC",
     xcm: {
       fee: { token: "IBTC", amount: "72" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
+    to: "hydra",
+    token: "DAI",
+    xcm: {
+      fee: { token: "DAI", amount: "2926334210356268" },
       weightLimit: ACALA_DEST_WEIGHT,
     },
   },
@@ -530,7 +538,7 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     to: "basilisk",
     token: "USDCet",
     xcm: {
-      fee: { token: "USDCet", amount: "926" },
+      fee: { token: "USDCet", amount: "4400" },
       weightLimit: ACALA_DEST_WEIGHT,
     },
   },
@@ -593,6 +601,12 @@ export const acalaTokensConfig: Record<string, BasicToken> = {
     ed: "100000000000000000",
   },
   DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "100000000" },
+  DAI: {
+    name: "DAI",
+    symbol: "DAI",
+    decimals: 18,
+    ed: "10000000000000000",
+  },
 };
 
 export const karuraTokensConfig: Record<string, BasicToken> = {
@@ -670,7 +684,7 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
 
   public override subscribeMinInput(
     token: string,
-    to: ChainName
+    to: ChainId
   ): Observable<FixedPointNumber> {
     if (!this.wallet) {
       throw new ApiNotFound(this.chain.id);
@@ -710,7 +724,7 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
   public subscribeMaxInput(
     token: string,
     address: string,
-    to: ChainName
+    to: ChainId
   ): Observable<FixedPointNumber> {
     if (!this.wallet) {
       throw new ApiNotFound(this.chain.id);

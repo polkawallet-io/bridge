@@ -17,12 +17,8 @@ import { catchError, map } from "rxjs/operators";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 
-import { ChainName, chains } from "./configs";
-import {
-  AdapterNotFound,
-  RouterConfigNotFound,
-  TokenConfigNotFound,
-} from "./errors";
+import { ChainId, chains } from "./configs";
+import { AdapterNotFound, RouterConfigNotFound, TokenNotFound } from "./errors";
 import {
   BalanceChangeStatue,
   BalanceData,
@@ -43,7 +39,7 @@ export abstract class BaseCrossChainAdapter {
   protected api?: AnyApi;
   readonly chain: Chain;
   // @ts-ignore
-  private findAdapter!: (chain: Chain | ChainName) => BaseCrossChainAdapter;
+  private findAdapter!: (chain: Chain | ChainId) => BaseCrossChainAdapter;
 
   constructor(
     chain: Chain,
@@ -58,7 +54,7 @@ export abstract class BaseCrossChainAdapter {
   public abstract init(api: AnyApi, ...others: any[]): Promise<void>;
 
   public injectFindAdapter(
-    func: (chain: ChainName | Chain) => BaseCrossChainAdapter
+    func: (chain: ChainId | Chain) => BaseCrossChainAdapter
   ): void {
     this.findAdapter = func;
   }
@@ -66,7 +62,7 @@ export abstract class BaseCrossChainAdapter {
   public getRouters(): RouteConfigs[] {
     return this.routers.map((i) => ({
       ...i,
-      from: this.chain.id as ChainName,
+      from: this.chain.id as ChainId,
     }));
   }
 
@@ -110,7 +106,7 @@ export abstract class BaseCrossChainAdapter {
     return firstValueFrom(this.subscribeInputConfig(params));
   }
 
-  public subscribeMinInput(token: string, to: ChainName): Observable<FN> {
+  public subscribeMinInput(token: string, to: ChainId): Observable<FN> {
     const destFee = this.getCrossChainFee(token, to);
 
     return of(
@@ -120,12 +116,17 @@ export abstract class BaseCrossChainAdapter {
     );
   }
 
-  public getMinInput(token: string, to: ChainName) {
+  public getMinInput(token: string, to: ChainId) {
     return firstValueFrom(this.subscribeMinInput(token, to));
   }
 
-  public getToken(token: string, chain: ChainName): BasicToken {
+  public getToken<R extends BasicToken = BasicToken>(
+    token: string,
+    chain?: ChainId
+  ): R {
     let tokenConfig: BasicToken;
+
+    if (!chain) return this.tokens[token] as R;
 
     if (chain === this.chain.id) {
       tokenConfig = this.tokens[token];
@@ -139,14 +140,12 @@ export abstract class BaseCrossChainAdapter {
       tokenConfig = destAdapter.tokens[token];
     }
 
-    if (!tokenConfig) {
-      throw new TokenConfigNotFound(token, chain);
-    }
+    if (!tokenConfig) throw new TokenNotFound(token, chain);
 
-    return tokenConfig;
+    return tokenConfig as R;
   }
 
-  public getDestED(token: string, destChain: ChainName): TokenBalance {
+  public getDestED(token: string, destChain: ChainId): TokenBalance {
     const tokenConfig = this.getToken(token, destChain);
 
     return {
@@ -155,7 +154,7 @@ export abstract class BaseCrossChainAdapter {
     };
   }
 
-  public getCrossChainFee(token: string, destChain: ChainName): TokenBalance {
+  public getCrossChainFee(token: string, destChain: ChainId): TokenBalance {
     const router = this.routers.find(
       (e) => e.to === destChain && e.token === token
     );
@@ -177,7 +176,7 @@ export abstract class BaseCrossChainAdapter {
 
   public getDestWeight(
     token: string,
-    destChain: ChainName
+    destChain: ChainId
   ): string | "Unlimited" | "Limited" | undefined {
     const router = this.routers.find(
       (e) => e.to === destChain && e.token === token
@@ -286,14 +285,10 @@ export abstract class BaseCrossChainAdapter {
   public abstract subscribeMaxInput(
     token: string,
     address: string,
-    to: ChainName
+    to: ChainId
   ): Observable<FN>;
 
-  public getMaxInput(
-    token: string,
-    address: string,
-    to: ChainName
-  ): Promise<FN> {
+  public getMaxInput(token: string, address: string, to: ChainId): Promise<FN> {
     return firstValueFrom(this.subscribeMaxInput(token, address, to));
   }
 

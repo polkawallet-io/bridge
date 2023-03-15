@@ -115,7 +115,7 @@ const provider = new ApiProvider();
 Connect network and pass the `ApiPromise | ApiRx` into the adapters.
 ```typescript
 // list all available from-chains
-const chains = Object.keys(availableAdapters) as ChainName[];
+const chains = Object.keys(availableAdapters) as ChainId[];
 
 // connect all adapters
 const connected = await firstValueFrom(provider.connectFromChain(chains, undefined));
@@ -247,7 +247,7 @@ Implement the `subscribeMaxInput` method so the bridge can set transferable toke
 ```typescript
 /// maxInput = availableBalance - estimatedFee - existentialDeposit
 class BaseBifrostAdapter extends BaseCrossChainAdapter {
-  public subscribeMaxInput (token: string, address: string, to: ChainName): Observable<FN> {
+  public subscribeMaxInput (token: string, address: string, to: ChainId): Observable<FN> {
     return combineLatest({
       txFee:
         token === this.balanceAdapter?.nativeToken
@@ -282,7 +282,7 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
 
     const tokenId = SUPPORTED_TOKENS[token];
     if (!tokenId) {
-      throw new CurrencyNotFound(token);
+      throw new TokenNotFound(token);
     }
 
     return this.api.tx.xTokens.transfer(

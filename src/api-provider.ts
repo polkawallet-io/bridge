@@ -11,26 +11,26 @@ import {
 } from "@polkadot/apps-config/endpoints";
 
 import { isChainEqual } from "./utils/is-chain-equal";
-import { ChainName } from "./configs";
+import { ChainId } from "./configs";
 
 export class ApiProvider {
   protected apis: Record<string, ApiRx> = {};
   protected promiseApis: Record<string, ApiPromise> = {};
 
-  public getApi(chainName: string) {
-    return this.apis[chainName];
+  public getApi(ChainId: string) {
+    return this.apis[ChainId];
   }
 
-  public getApiPromise(chainName: string) {
-    return this.promiseApis[chainName];
+  public getApiPromise(ChainId: string) {
+    return this.promiseApis[ChainId];
   }
 
   public connectFromChain(
-    chainName: ChainName[],
-    nodeList: Partial<Record<ChainName, string[]>> | undefined
+    ChainId: ChainId[],
+    nodeList: Partial<Record<ChainId, string[]>> | undefined
   ) {
     return combineLatest(
-      chainName.map((chain) => {
+      ChainId.map((chain) => {
         let nodes = (nodeList || {})[chain];
 
         if (!nodes) {
@@ -67,21 +67,21 @@ export class ApiProvider {
 
   public connect(
     nodes: string[],
-    chainName: ChainName
-  ): Observable<ChainName | null> {
-    if (this.apis[chainName]) {
-      this.apis[chainName].disconnect();
-      delete this.apis[chainName];
+    ChainId: ChainId
+  ): Observable<ChainId | null> {
+    if (this.apis[ChainId]) {
+      this.apis[ChainId].disconnect();
+      delete this.apis[ChainId];
     }
 
-    if (this.promiseApis[chainName]) {
-      this.promiseApis[chainName].disconnect();
-      delete this.promiseApis[chainName];
+    if (this.promiseApis[ChainId]) {
+      this.promiseApis[ChainId].disconnect();
+      delete this.promiseApis[ChainId];
     }
 
     const wsProvider = new WsProvider(nodes);
 
-    const isAcala = chainName === "acala" || chainName === "karura";
+    const isAcala = ChainId === "acala" || ChainId === "karura";
     const option = isAcala
       ? options({
           provider: wsProvider,
@@ -95,21 +95,21 @@ export class ApiProvider {
       map((api) => {
         // connect success
         if (api) {
-          if (!this.apis[chainName]) {
-            this.apis[chainName] = api;
+          if (!this.apis[ChainId]) {
+            this.apis[ChainId] = api;
           } else {
             api.disconnect();
           }
 
           promiseApi.then((res) => {
-            if (!this.promiseApis[chainName]) {
-              this.promiseApis[chainName] = res;
+            if (!this.promiseApis[ChainId]) {
+              this.promiseApis[ChainId] = res;
             } else {
               res.disconnect();
             }
           });
 
-          return chainName;
+          return ChainId;
         }
 
         return null;
@@ -117,10 +117,10 @@ export class ApiProvider {
     );
   }
 
-  public disconnect(chainName: ChainName) {
-    if (this.apis[chainName]) {
-      this.apis[chainName].disconnect();
-      delete this.apis[chainName];
+  public disconnect(ChainId: ChainId) {
+    if (this.apis[ChainId]) {
+      this.apis[ChainId].disconnect();
+      delete this.apis[ChainId];
     }
   }
 }

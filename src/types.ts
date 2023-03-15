@@ -1,7 +1,7 @@
 import { FixedPointNumber } from "@acala-network/sdk-core";
 
 import { BaseCrossChainAdapter } from "./base-chain-adapter";
-import { ChainName } from "./configs";
+import { ChainId } from "./configs";
 
 export { FixedPointNumber as FN } from "@acala-network/sdk-core";
 
@@ -9,7 +9,7 @@ export type ChainType = "substrate" | "ethereum";
 
 export interface Chain {
   // unique chain id
-  readonly id: string;
+  readonly id: ChainId;
   // chain name for display
   readonly display: string;
   // chain is `substract` or `ethereum` like
@@ -29,11 +29,15 @@ export interface BasicToken {
   ed: string;
 }
 
+export interface ExpandToken extends BasicToken {
+  toChainData: () => any;
+}
+
 export interface RouteConfigs {
   // from chain name
-  from: ChainName;
+  from: ChainId;
   // to chain name
-  to: ChainName;
+  to: ChainId;
   // token name
   token: string;
   // xcm config
@@ -71,7 +75,7 @@ export interface TransferParams {
   signer: string;
   address: string;
   amount: FixedPointNumber;
-  to: ChainName;
+  to: ChainId;
   token: string;
 }
 
@@ -84,8 +88,8 @@ export interface InputConfig {
 }
 
 export interface RouterFilter {
-  from?: Chain | ChainName;
-  to?: Chain | ChainName;
+  from?: Chain | ChainId;
+  to?: Chain | ChainId;
   token?: string;
 }
 

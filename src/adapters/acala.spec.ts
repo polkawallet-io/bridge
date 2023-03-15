@@ -2,7 +2,7 @@ import { FixedPointNumber } from '@acala-network/sdk-core';
 import { firstValueFrom } from 'rxjs';
 
 import { ApiProvider } from '../api-provider';
-import { chains, ChainName } from '../configs';
+import { chains, ChainId } from '../configs';
 import { Bridge } from '../bridge';
 import { KaruraAdapter } from './acala';
 import { KusamaAdapter } from './polkadot';
@@ -13,13 +13,13 @@ describe.skip('acala-adapter should work', () => {
   const testAccount = '5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN';
   const provider = new ApiProvider();
 
-  async function connect (chains: ChainName[]) {
+  async function connect (chains: ChainId[]) {
     // return firstValueFrom(provider.connectFromChain([chain], { karura: ["wss://crosschain-dev.polkawallet.io:9907"] }));
     return firstValueFrom(provider.connectFromChain(chains, undefined));
   }
 
   test('connect karura to do xcm', async () => {
-    const fromChains = ['karura', 'kusama'] as ChainName[];
+    const fromChains = ['karura', 'kusama'] as ChainId[];
 
     await connect(fromChains);
 
@@ -37,7 +37,7 @@ describe.skip('acala-adapter should work', () => {
 
     const adapter = bridge.findAdapter(fromChains[0]);
 
-    async function runMyTestSuit (to: ChainName, token: string) {
+    async function runMyTestSuit (to: ChainId, token: string) {
       if (adapter) {
         const balance = await firstValueFrom(adapter.subscribeTokenBalance(token, testAccount));
 

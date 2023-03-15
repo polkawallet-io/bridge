@@ -25,21 +25,17 @@ export class ApiNotFound extends Error {
   }
 }
 
-export class TokenConfigNotFound extends Error {
-  constructor(token: string, network: string) {
+export class TokenNotFound extends Error {
+  constructor(token: string, network?: string) {
     super();
 
-    this.message = `can't find ${token} config in ${network}`;
-    this.name = "TokenConfigNotFound";
-  }
-}
+    if (network) {
+      this.message = `can't find ${token} in ${network}`;
+    } else {
+      this.message = `can't find ${token} in current network`;
+    }
 
-export class CurrencyNotFound extends Error {
-  constructor(name: string) {
-    super();
-
-    this.message = `can't find ${name} currency in current network`;
-    this.name = "CurrencyNotFound";
+    this.name = "TokenNotFound";
   }
 }
 

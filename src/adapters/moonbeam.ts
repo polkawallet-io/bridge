@@ -5,7 +5,7 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { ChainName, chains } from "../configs";
+import { ChainId, chains } from "../configs";
 import { ApiNotFound } from "../errors";
 import { BalanceData, BasicToken, TransferParams } from "../types";
 
@@ -39,7 +39,7 @@ class BaseMoonbeamAdapter extends BaseCrossChainAdapter {
   public subscribeMaxInput(
     _: string,
     __: string,
-    ___: ChainName
+    ___: ChainId
   ): Observable<FN> {
     throw new ApiNotFound(this.chain.id);
   }

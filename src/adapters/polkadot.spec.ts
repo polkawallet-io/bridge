@@ -2,7 +2,7 @@ import { FixedPointNumber } from '@acala-network/sdk-core';
 import { firstValueFrom } from 'rxjs';
 
 import { ApiProvider } from '../api-provider';
-import { chains, ChainName } from '../configs';
+import { chains, ChainId } from '../configs';
 import { Bridge } from '../bridge';
 import { KusamaAdapter } from './polkadot';
 
@@ -12,7 +12,7 @@ describe.skip('polkadot-adapter should work', () => {
   const testAccount = '5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN';
   const provider = new ApiProvider();
 
-  async function connect (chain: ChainName) {
+  async function connect (chain: ChainId) {
     return firstValueFrom(provider.connectFromChain([chain], undefined));
   }
 
