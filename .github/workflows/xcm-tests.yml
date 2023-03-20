@@ -1,0 +1,34 @@
+---
+name: Daily XCM tests
+on:
+  schedule:
+    - cron: '0 0 * * *' # Run every day at midnight
+
+jobs:
+  chopsticks_test:
+    runs-on: [self-hosted, linux]
+    container:
+      image: ghcr.io/interlay/chopsticks:docker
+    steps:
+      - name: Start XCM
+        run: |
+          yarn start xcm \
+            --relaychain=configs/kusama.yml \
+            --parachain=configs/kintsugi.yml \
+            --parachain=configs/statemine.yml \
+            --parachain=configs/karura.yml \
+            --parachain=configs/parallel-heiko.yml &
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run tests
+        run: |
+          yarn install --frozen-lockfile
+          npx ts-node scripts/chopsticks-test.ts
+
+      - name: Report status to Discord
+        uses: sarisia/actions-status-discord@v1
+        if: failed()
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
