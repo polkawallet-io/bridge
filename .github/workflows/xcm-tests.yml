@@ -33,6 +33,6 @@ jobs:
 
       - name: Report status to Discord
         uses: sarisia/actions-status-discord@v1
-        if: failed()
+        if: failure()
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
