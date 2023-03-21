@@ -15,6 +15,7 @@ jobs:
     steps:
       - name: Start XCM
         run: |
+          cd /app
           yarn start xcm \
             --relaychain=configs/kusama.yml \
             --parachain=configs/kintsugi.yml \
