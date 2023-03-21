@@ -10,10 +10,14 @@ on:
 jobs:
   chopsticks_test:
     runs-on: [self-hosted, linux]
+    timeout-minutes: 30
     container:
       image: ghcr.io/interlay/chopsticks:docker-247f3fb
     steps:
-      - name: Start XCM
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run tests
         run: |
           cd /app
           yarn start xcm \
@@ -23,12 +27,8 @@ jobs:
             --parachain=configs/karura.yml \
             --parachain=configs/parallel-heiko.yml \
             --parachain=configs/bifrost.yml &
+          cd -
 
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Run tests
-        run: |
           yarn install --frozen-lockfile
           npx ts-node scripts/chopsticks-test.ts
 
