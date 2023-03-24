@@ -95,8 +95,8 @@ export class BridgeRouterManager {
       (e) =>
         !this.disabledRouters.find(
           (i) =>
-            i.from === e.from.id &&
-            i.to === e.to.id &&
+            (!i.from || i.from === e.from.id) &&
+            (!i.to || i.to === e.to.id) &&
             (!i.token || i.token === e.token)
         )
     );
