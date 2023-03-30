@@ -29,14 +29,14 @@ export const polkadotChains = {
     paraChainId: 2000,
     ss58Prefix: 10,
   },
-  // parallel: {
-  //   id: "parallel",
-  //   display: "Parallel",
-  //   type: typeSubstrate,
-  //   icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fparallel.png&w=96&q=75",
-  //   paraChainId: 2012,
-  //   ss58Prefix: 172,
-  // },
+  parallel: {
+    id: "parallel",
+    display: "Parallel",
+    type: typeSubstrate,
+    icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fparallel.png&w=96&q=75",
+    paraChainId: 2012,
+    ss58Prefix: 172,
+  },
   // moonbeam: {
   //   id: "moonbeam",
   //   display: "Moonbeam",

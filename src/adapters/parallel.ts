@@ -19,17 +19,26 @@ import {
 
 const DEST_WEIGHT = "Unlimited";
 
-// To be enabled later.
-// export const parallelRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
-//   {
-//     to: "interlay",
-//     token: "IBTC",
-//     xcm: {
-//       fee: { token: "IBTC", amount: "72" },
-//       weightLimit: DEST_WEIGHT,
-//     },
-//   },
-// ];
+export const parallelRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+  {
+    to: "interlay",
+    token: "IBTC",
+    xcm: {
+      // during chopsticks test: fee = 71 Add 10x margin
+      fee: { token: "IBTC", amount: "710" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "interlay",
+    token: "INTR",
+    xcm: {
+      // during chopsticks test: fee = 21_660_472 Add 10x margin
+      fee: { token: "INTR", amount: "216604720" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+];
 
 export const heikoRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
@@ -56,18 +65,20 @@ export const parallelTokensConfig: Record<
   Record<string, BasicToken>
 > = {
   parallel: {
-    // ed is a guess, to be confirmed
-    // IBTC: { name: "IBTC", symbol: "IBTC", decimals: 8, ed: "100" },
+    // ed confirmed via assets.asset(<id>)
+    IBTC: { name: "IBTC", symbol: "IBTC", decimals: 8, ed: "1" },
+    INTR: { name: "INTR", symbol: "INTR", decimals: 10, ed: "1" },
   },
   heiko: {
-    // ed to be confirmed
+    // ed confirmed via assets.asset(<id>)
     KBTC: { name: "KBTC", symbol: "KBTC", decimals: 8, ed: "0" },
     KINT: { name: "Kintsugi", symbol: "KINT", decimals: 12, ed: "0" },
   },
 };
 
 const SUPPORTED_TOKENS: Record<string, number> = {
-  // IBTC: 122, // asset id 122
+  IBTC: 122, // asset id 122
+  INTR: 120, // asset id 120
   KBTC: 121, // asset id 121
   KINT: 119, // asset id 119
 };
@@ -257,13 +268,12 @@ export class HeikoAdapter extends BaseParallelAdapter {
   }
 }
 
-// To be added/enabled later.
-// export class ParallelAdapter extends BaseParallelAdapter {
-//   constructor() {
-//     super(
-//       chains.parallel,
-//       parallelRoutersConfig,
-//       parallelTokensConfig.parallel
-//     );
-//   }
-// }
+export class ParallelAdapter extends BaseParallelAdapter {
+  constructor() {
+    super(
+      chains.parallel,
+      parallelRoutersConfig,
+      parallelTokensConfig.parallel
+    );
+  }
+}

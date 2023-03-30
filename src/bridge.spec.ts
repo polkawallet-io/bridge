@@ -8,7 +8,7 @@ import { KintsugiAdapter, InterlayAdapter } from "./adapters/interlay";
 import { FN } from "./types";
 import { KusamaAdapter, PolkadotAdapter } from "./adapters/polkadot";
 import { StatemineAdapter, StatemintAdapter } from "./adapters/statemint";
-import { HeikoAdapter } from "./adapters/parallel";
+import { HeikoAdapter, ParallelAdapter } from "./adapters/parallel";
 import { AcalaAdapter, KaruraAdapter } from "./adapters/acala";
 import { BifrostAdapter } from "./adapters/bifrost";
 
@@ -28,6 +28,7 @@ describe.skip("Bridge sdk usage", () => {
     heiko: new HeikoAdapter(),
     bifrost: new BifrostAdapter(),
     acala: new AcalaAdapter(),
+    parallel: new ParallelAdapter(),
   };
 
   const bridge = new Bridge({
@@ -174,7 +175,9 @@ describe.skip("Bridge sdk usage", () => {
     // interlay
     // printBidirectionalTxs("interlay", "polkadot", "DOT");
     // printBidirectionalTxs("interlay", "statemint", "USDT");
-    printBidirectionalTxs("interlay", "acala", "INTR");
-    printBidirectionalTxs("interlay", "acala", "IBTC");
+    // printBidirectionalTxs("interlay", "acala", "INTR");
+    // printBidirectionalTxs("interlay", "acala", "IBTC");
+    printBidirectionalTxs("interlay", "parallel", "INTR");
+    printBidirectionalTxs("interlay", "parallel", "IBTC");
   });
 });

@@ -41,6 +41,21 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     xcm: { fee: { token: "IBTC", amount: "80" }, weightLimit: DEST_WEIGHT },
   },
   {
+    to: "parallel",
+    token: "INTR",
+    xcm: {
+      // during chopsticks test: fee = 6_535_947_712 Add 10x margin
+      fee: { token: "INTR", amount: "65359477120" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "parallel",
+    token: "IBTC",
+    // during chopsticks test: fee = 103 Add 10x margin
+    xcm: { fee: { token: "IBTC", amount: "1030" }, weightLimit: DEST_WEIGHT },
+  },
+  {
     to: "polkadot",
     token: "DOT",
     xcm: {
