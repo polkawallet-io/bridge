@@ -27,24 +27,26 @@ import { supportsUnlimitedDestWeight } from "../utils/xtokens-dest-weight";
 
 const ACALA_DEST_WEIGHT = "5000000000";
 
-// export const acalaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
-//   {
-//     to: "interlay",
-//     token: "INTR",
-//     xcm: {
-//       fee: { token: "INTR", amount: "21787589" },
-//       weightLimit: ACALA_DEST_WEIGHT,
-//     },
-//   },
-//   {
-//     to: "interlay",
-//     token: "IBTC",
-//     xcm: {
-//       fee: { token: "IBTC", amount: "72" },
-//       weightLimit: ACALA_DEST_WEIGHT,
-//     },
-//   },
-// ];
+export const acalaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+  {
+    to: "interlay",
+    token: "INTR",
+    xcm: {
+      // during chopsticks test: fee = 21_660_472. Add 10x margin
+      fee: { token: "INTR", amount: "216604720" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
+    to: "interlay",
+    token: "IBTC",
+    xcm: {
+      // during chopsticks test: fee = 71. Add 10x margin
+      fee: { token: "IBTC", amount: "710" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+];
 
 export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
@@ -77,10 +79,10 @@ export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   },
 ];
 
-// export const acalaTokensConfig: Record<string, BasicToken> = {
-//   INTR: { name: "INTR", symbol: "INTR", decimals: 10, ed: "1000000000" },
-//   IBTC: { name: "IBTC", symbol: "IBTC", decimals: 8, ed: "100" },
-// };
+export const acalaTokensConfig: Record<string, BasicToken> = {
+  INTR: { name: "INTR", symbol: "INTR", decimals: 10, ed: "1000000000" },
+  IBTC: { name: "IBTC", symbol: "IBTC", decimals: 8, ed: "100" },
+};
 
 // Config values taken from querying assetRegistry.assetMetadatas
 export const karuraTokensConfig: Record<string, BasicToken> = {
@@ -229,11 +231,11 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
   }
 }
 
-// export class AcalaAdapter extends BaseAcalaAdapter {
-//   constructor() {
-//     super(chains.acala, acalaRoutersConfig, acalaTokensConfig);
-//   }
-// }
+export class AcalaAdapter extends BaseAcalaAdapter {
+  constructor() {
+    super(chains.acala, acalaRoutersConfig, acalaTokensConfig);
+  }
+}
 
 export class KaruraAdapter extends BaseAcalaAdapter {
   constructor() {

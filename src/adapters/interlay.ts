@@ -25,19 +25,21 @@ import { supportsUnlimitedDestWeight } from "../utils/xtokens-dest-weight";
 const DEST_WEIGHT = "180000000000";
 
 export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
-  // {
-  //   to: "acala",
-  //   token: "INTR",
-  //   xcm: {
-  //     fee: { token: "INTR", amount: "92696000" },
-  //     weightLimit: DEST_WEIGHT,
-  //   },
-  // },
-  // {
-  //   to: "acala",
-  //   token: "IBTC",
-  //   xcm: { fee: { token: "IBTC", amount: "9" }, weightLimit: DEST_WEIGHT },
-  // },
+  {
+    to: "acala",
+    token: "INTR",
+    xcm: {
+      // during chopsticks test: fee = 80_824_000. Add 10x margin
+      fee: { token: "INTR", amount: "808240000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "acala",
+    token: "IBTC",
+    // during chopsticks test: fee = 8. Add 10x margin
+    xcm: { fee: { token: "IBTC", amount: "80" }, weightLimit: DEST_WEIGHT },
+  },
   {
     to: "polkadot",
     token: "DOT",
@@ -137,6 +139,8 @@ export const interlayTokensConfig: Record<
 > = {
   interlay: {
     DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "0" },
+    INTR: { name: "INTR", symbol: "INTR", decimals: 10, ed: "0" },
+    IBTC: { name: "IBTC", symbol: "IBTC", decimals: 8, ed: "0" },
     USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
   },
   kintsugi: {
@@ -160,6 +164,8 @@ const KINTSUGI_SUPPORTED_TOKENS: Record<string, unknown> = {
 
 const INTERLAY_SUPPORTED_TOKENS: Record<string, unknown> = {
   DOT: { Token: "DOT" },
+  INTR: { Token: "INTR" },
+  IBTC: { Token: "IBTC" },
   USDT: { ForeignAsset: 2 },
 };
 

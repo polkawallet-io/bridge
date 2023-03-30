@@ -9,7 +9,7 @@ import { FN } from "./types";
 import { KusamaAdapter, PolkadotAdapter } from "./adapters/polkadot";
 import { StatemineAdapter, StatemintAdapter } from "./adapters/statemint";
 import { HeikoAdapter } from "./adapters/parallel";
-import { KaruraAdapter } from "./adapters/acala";
+import { AcalaAdapter, KaruraAdapter } from "./adapters/acala";
 import { BifrostAdapter } from "./adapters/bifrost";
 
 describe.skip("Bridge sdk usage", () => {
@@ -27,6 +27,7 @@ describe.skip("Bridge sdk usage", () => {
     statemine: new StatemineAdapter(),
     heiko: new HeikoAdapter(),
     bifrost: new BifrostAdapter(),
+    acala: new AcalaAdapter(),
   };
 
   const bridge = new Bridge({
@@ -168,11 +169,12 @@ describe.skip("Bridge sdk usage", () => {
     // printBidirectionalTxs("kintsugi", "karura", "KINT");
     // printBidirectionalTxs("kintsugi", "karura", "KBTC");
     // printBidirectionalTxs("kintsugi", "karura", "LKSM");
-    printBidirectionalTxs("kintsugi", "bifrost", "VKSM");
+    // printBidirectionalTxs("kintsugi", "bifrost", "VKSM");
 
     // interlay
     // printBidirectionalTxs("interlay", "polkadot", "DOT");
     // printBidirectionalTxs("interlay", "statemint", "USDT");
-    // no adapter available for tx originating from moonbeam (yet?)
+    printBidirectionalTxs("interlay", "acala", "INTR");
+    printBidirectionalTxs("interlay", "acala", "IBTC");
   });
 });

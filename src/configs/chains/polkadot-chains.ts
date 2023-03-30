@@ -21,14 +21,14 @@ export const polkadotChains = {
     paraChainId: 1000,
     ss58Prefix: 0,
   },
-  // acala: {
-  //   id: "acala",
-  //   display: "Acala",
-  //   type: typeSubstrate,
-  //   icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Facala.png&w=96&q=75",
-  //   paraChainId: 2000,
-  //   ss58Prefix: 10,
-  // },
+  acala: {
+    id: "acala",
+    display: "Acala",
+    type: typeSubstrate,
+    icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Facala.png&w=96&q=75",
+    paraChainId: 2000,
+    ss58Prefix: 10,
+  },
   // parallel: {
   //   id: "parallel",
   //   display: "Parallel",

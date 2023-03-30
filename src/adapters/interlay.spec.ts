@@ -6,7 +6,7 @@ import { Bridge } from "..";
 import { PolkadotAdapter } from "./polkadot";
 import { InterlayAdapter, KintsugiAdapter } from "./interlay";
 import { StatemintAdapter } from "./statemint";
-import { KaruraAdapter } from "./acala";
+import { AcalaAdapter, KaruraAdapter } from "./acala";
 import { HeikoAdapter } from "./parallel";
 import { buildTestTxWithConfigData } from "../utils/shared-spec-methods";
 import { BifrostAdapter } from "./bifrost";
@@ -127,20 +127,22 @@ describe.skip("interlay-adapter should work", () => {
   });
 
   test("connect interlay to do xcm", async () => {
-    const fromChains = ["interlay", "polkadot", "statemint"] as ChainName[];
+    const fromChains = ["interlay", "polkadot", "statemint", "acala"] as ChainName[];
 
     await connect(fromChains);
 
     const interlay = new InterlayAdapter();
     const polkadot = new PolkadotAdapter();
     const statemint = new StatemintAdapter();
+    const acala = new AcalaAdapter();
 
     await interlay.setApi(provider.getApi(fromChains[0]));
     await polkadot.setApi(provider.getApi(fromChains[1]));
     await statemint.setApi(provider.getApi(fromChains[2]));
+    await acala.setApi(provider.getApi(fromChains[3]));
 
     const bridge = new Bridge({
-      adapters: [interlay, polkadot, statemint],
+      adapters: [interlay, polkadot, statemint, acala],
     });
 
     expect(
@@ -157,7 +159,23 @@ describe.skip("interlay-adapter should work", () => {
       }).length
     ).toEqual(1);
 
+    expect(
+      bridge.router.getDestinationChains({
+        from: chains.interlay,
+        token: "IBTC",
+      }).length
+    ).toEqual(1);
+
+    expect(
+      bridge.router.getDestinationChains({
+        from: chains.interlay,
+        token: "INTR",
+      }).length
+    ).toEqual(1);
+
     await runMyTestSuite(testAccount, bridge, "interlay", "polkadot", "DOT");
     await runMyTestSuite(testAccount, bridge, "interlay", "statemint", "USDT");
+    await runMyTestSuite(testAccount, bridge, "interlay", "acala", "IBTC");
+    await runMyTestSuite(testAccount, bridge, "interlay", "acala", "INTR");
   });
 });
