@@ -10,6 +10,7 @@ import { AcalaAdapter, KaruraAdapter } from "./acala";
 import { HeikoAdapter, ParallelAdapter } from "./parallel";
 import { buildTestTxWithConfigData } from "../utils/shared-spec-methods";
 import { BifrostAdapter } from "./bifrost";
+import { AstarAdapter } from "./astar";
 
 // helper method for getting balances, configs, fees, and constructing xcm extrinsics
 async function runMyTestSuite(testAccount: string, bridge: Bridge, from: ChainName, to: ChainName, token: string) {
@@ -127,7 +128,7 @@ describe.skip("interlay-adapter should work", () => {
   });
 
   test("connect interlay to do xcm", async () => {
-    const fromChains = ["interlay", "polkadot", "statemint", "acala", "parallel"] as ChainName[];
+    const fromChains = ["interlay", "polkadot", "statemint", "acala", "parallel", "astar"] as ChainName[];
 
     await connect(fromChains);
 
@@ -136,15 +137,17 @@ describe.skip("interlay-adapter should work", () => {
     const statemint = new StatemintAdapter();
     const acala = new AcalaAdapter();
     const parallel = new ParallelAdapter();
+    const astar = new AstarAdapter();
 
     await interlay.setApi(provider.getApi(fromChains[0]));
     await polkadot.setApi(provider.getApi(fromChains[1]));
     await statemint.setApi(provider.getApi(fromChains[2]));
     await acala.setApi(provider.getApi(fromChains[3]));
     await parallel.setApi(provider.getApi(fromChains[4]));
+    await astar.setApi(provider.getApi(fromChains[5]));
 
     const bridge = new Bridge({
-      adapters: [interlay, polkadot, statemint, acala, parallel],
+      adapters: [interlay, polkadot, statemint, acala, parallel, astar],
     });
 
     expect(
@@ -166,14 +169,14 @@ describe.skip("interlay-adapter should work", () => {
         from: chains.interlay,
         token: "IBTC",
       }).length
-    ).toEqual(2);
+    ).toEqual(3);
 
     expect(
       bridge.router.getDestinationChains({
         from: chains.interlay,
         token: "INTR",
       }).length
-    ).toEqual(2);
+    ).toEqual(3);
 
     await runMyTestSuite(testAccount, bridge, "interlay", "polkadot", "DOT");
     await runMyTestSuite(testAccount, bridge, "interlay", "statemint", "USDT");
@@ -181,5 +184,7 @@ describe.skip("interlay-adapter should work", () => {
     await runMyTestSuite(testAccount, bridge, "interlay", "acala", "INTR");
     await runMyTestSuite(testAccount, bridge, "interlay", "parallel", "IBTC");
     await runMyTestSuite(testAccount, bridge, "interlay", "parallel", "INTR");
+    await runMyTestSuite(testAccount, bridge, "interlay", "astar", "IBTC");
+    await runMyTestSuite(testAccount, bridge, "interlay", "astar", "INTR");
   });
 });

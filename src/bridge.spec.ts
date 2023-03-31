@@ -11,6 +11,7 @@ import { StatemineAdapter, StatemintAdapter } from "./adapters/statemint";
 import { HeikoAdapter, ParallelAdapter } from "./adapters/parallel";
 import { AcalaAdapter, KaruraAdapter } from "./adapters/acala";
 import { BifrostAdapter } from "./adapters/bifrost";
+import { AstarAdapter } from "./adapters/astar";
 
 describe.skip("Bridge sdk usage", () => {
   jest.setTimeout(30000);
@@ -29,6 +30,7 @@ describe.skip("Bridge sdk usage", () => {
     bifrost: new BifrostAdapter(),
     acala: new AcalaAdapter(),
     parallel: new ParallelAdapter(),
+    astar: new AstarAdapter(),
   };
 
   const bridge = new Bridge({
@@ -177,7 +179,9 @@ describe.skip("Bridge sdk usage", () => {
     // printBidirectionalTxs("interlay", "statemint", "USDT");
     // printBidirectionalTxs("interlay", "acala", "INTR");
     // printBidirectionalTxs("interlay", "acala", "IBTC");
-    printBidirectionalTxs("interlay", "parallel", "INTR");
-    printBidirectionalTxs("interlay", "parallel", "IBTC");
+    // printBidirectionalTxs("interlay", "parallel", "INTR");
+    // printBidirectionalTxs("interlay", "parallel", "IBTC");
+    printBidirectionalTxs("interlay", "astar", "INTR");
+    printBidirectionalTxs("interlay", "astar", "IBTC");
   });
 });
