@@ -12,7 +12,7 @@ jobs:
     runs-on: [self-hosted, linux]
     timeout-minutes: 30
     container:
-      image: ghcr.io/interlay/chopsticks:docker-247f3fb
+      image: ghcr.io/interlay/chopsticks:interlay-master-e36deb2
     steps:
       - name: Checkout
         uses: actions/checkout@v3
