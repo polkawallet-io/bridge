@@ -31,7 +31,8 @@ export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "kintsugi",
     token: "KSM",
     xcm: {
-      fee: { token: "KSM", amount: "1000000000" },
+      // fees in chopsticks test: 161_648_000 - add 10x buffer
+      fee: { token: "KSM", amount: "1616480000" },
       weightLimit: "Unlimited",
     },
   },
