@@ -272,21 +272,32 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       throw new CurrencyNotFound(token);
     }
 
-    const dst = { X2: ["Parent", { Parachain: toChain.paraChainId }] };
-    const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
+    const dst = {
+      parents: 1,
+      interior: { X1: { Parachain: toChain.paraChainId } },
+    };
+    const acc = {
+      parents: 0,
+      interior: { X1: { AccountId32: { id: accountId } } },
+    };
     const ass = [
       {
-        ConcreteFungible: {
-          id: { X2: [{ PalletInstance: 50 }, { GeneralIndex: assetId }] },
-          amount: amount.toChainData(),
+        fun: { Fungible: amount.toChainData() },
+        id: {
+          Concrete: {
+            parents: 0,
+            interior: {
+              X2: [{ PalletInstance: 50 }, { GeneralIndex: assetId }],
+            },
+          },
         },
       },
     ];
-
     return this.api?.tx.polkadotXcm.limitedReserveTransferAssets(
-      { V0: dst },
-      { V0: acc },
-      { V0: ass },
+      // TODO: remove "as any" when @acala-network/types has a version that supports V2/V3
+      { V3: dst } as any,
+      { V3: acc } as any,
+      { V3: ass } as any,
       0,
       destWeight
     );

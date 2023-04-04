@@ -222,14 +222,25 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     }
 
     if (to === "kintsugi") {
-      const dst = { X1: { Parachain: toChain.paraChainId } };
-      const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
-      const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
+      const dst = {
+        parents: 0,
+        interior: { X1: { Parachain: toChain.paraChainId } },
+      };
+      const acc = {
+        parents: 0,
+        interior: { X1: { AccountId32: { id: accountId } } },
+      };
+      const ass = [
+        {
+          fun: { Fungible: amount.toChainData() },
+          id: { Concrete: { parents: 0, interior: "Here" } },
+        },
+      ];
 
       return this.api?.tx.xcmPallet.reserveTransferAssets(
-        { V0: dst },
-        { V0: acc },
-        { V0: ass },
+        { V3: dst },
+        { V3: acc },
+        { V3: ass },
         0
       );
     }
