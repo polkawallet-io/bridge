@@ -158,8 +158,12 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
         .pipe(map((i) => i.available)),
     }).pipe(
       map(({ balance }) => {
-        // fixed fee of 1 ksm or DOT until we get paymentinfo to work again
-        const fee = FN.fromInner(Math.pow(10, tokenMeta?.decimals), tokenMeta?.decimals);
+        // fixed fee of 0.05 ksm or DOT until we get paymentinfo to work again
+        const fee = FN.fromInner(
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          0.05 * Math.pow(10, tokenMeta!.decimals),
+          tokenMeta?.decimals
+        );
 
         // always minus ed
         return balance
