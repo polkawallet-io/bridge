@@ -146,7 +146,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
   public subscribeMaxInput(
     token: string,
     address: string,
-    to: ChainName
+    _to: ChainName
   ): Observable<FN> {
     if (!this.balanceAdapter) {
       throw new ApiNotFound(this.chain.id);
@@ -158,6 +158,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
         .pipe(map((i) => i.available)),
     }).pipe(
       map(({ balance }) => {
+        const tokenMeta = this.balanceAdapter?.getToken(token);
         // fixed fee of 0.05 ksm or DOT until we get paymentinfo to work again
         const fee = FN.fromInner(
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
