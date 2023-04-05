@@ -193,15 +193,13 @@ async function main(): Promise<void> {
         )
     );
 
-    // TODO: kusama and statemine tests to be reenabled when xcm fixes are merged
-    // see PR: https://github.com/interlay/bridge/pull/73
     let testcases = [
         ["bifrost", "VKSM"],
-        // ["kusama", "KSM"], 
+        ["kusama", "KSM"], 
         ["karura", "KBTC"],
         ["karura", "KINT"],
         ["karura", "LKSM"],
-        // ["statemine", "USDT"], // TODO: reenable when xcm fixes are merged
+        ["statemine", "USDT"],
         ["heiko", "KINT"],
         ["heiko", "KBTC"],
     ].flatMap(([to, token]) => [["kintsugi", to, token], [to, "kintsugi", token]]); // bidirectional testing

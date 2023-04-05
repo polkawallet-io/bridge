@@ -40,7 +40,7 @@ describe.skip("Bridge sdk usage", () => {
     const tx = availableAdapters[fromChain].createTx({
       to: toChain,
       token,
-      amount: FN.fromInner("10000000000", 10),
+      amount: FN.fromInner("100000", 10),
       address: testAddress,
       signer: testAddress,
     });
@@ -162,13 +162,13 @@ describe.skip("Bridge sdk usage", () => {
 
   test("4. all transfer tx should be constructable", async () => {
     // kintsugi
-    // printBidirectionalTxs("kintsugi", "kusama", "KSM");
-    // printBidirectionalTxs("kintsugi", "statemine", "USDT");
+    printBidirectionalTxs("kintsugi", "kusama", "KSM");
+    printBidirectionalTxs("kintsugi", "statemine", "USDT");
     // printBidirectionalTxs("kintsugi", "heiko", "KBTC");
     // printBidirectionalTxs("kintsugi", "karura", "KINT");
     // printBidirectionalTxs("kintsugi", "karura", "KBTC");
     // printBidirectionalTxs("kintsugi", "karura", "LKSM");
-    printBidirectionalTxs("kintsugi", "bifrost", "VKSM");
+    // printBidirectionalTxs("kintsugi", "bifrost", "VKSM");
 
     // interlay
     // printBidirectionalTxs("interlay", "polkadot", "DOT");
