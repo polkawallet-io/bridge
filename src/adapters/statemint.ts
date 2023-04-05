@@ -276,17 +276,19 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
             },
           } as any,
           {
-            V3: {
-              fun: { Fungible: amount.toChainData() },
-              id: {
-                Concrete: {
-                  parents: 0,
-                  interior: {
-                    X2: [{ PalletInstance: 50 }, { GeneralIndex: assetId }],
+            V3: [
+              {
+                fun: { Fungible: amount.toChainData() },
+                id: {
+                  Concrete: {
+                    parents: 0,
+                    interior: {
+                      X2: [{ PalletInstance: 50 }, { GeneralIndex: assetId }],
+                    },
                   },
                 },
               },
-            },
+            ],
           } as any,
         ];
 

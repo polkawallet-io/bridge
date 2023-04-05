@@ -217,10 +217,12 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
             },
           },
           {
-            V3: {
-              fun: { Fungible: amount.toChainData() },
-              id: { Concrete: { parents: 0, interior: "Here" } },
-            },
+            V3: [
+              {
+                fun: { Fungible: amount.toChainData() },
+                id: { Concrete: { parents: 0, interior: "Here" } },
+              },
+            ],
           },
         ];
 
