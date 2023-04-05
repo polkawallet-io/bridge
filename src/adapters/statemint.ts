@@ -265,7 +265,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       : [
           {
             V3: {
-              parents: 0,
+              parents: 1,
               interior: { X1: { Parachain: toChain.paraChainId } },
             },
           } as any,
