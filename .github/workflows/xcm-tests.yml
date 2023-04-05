@@ -5,7 +5,7 @@ on:
     - cron: '5 * * * *' # Run hourly
   push:
     branches:
-      - xcm-tests
+      - master
 
 jobs:
   chopsticks_test:
