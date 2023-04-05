@@ -5,14 +5,14 @@ on:
     - cron: '5 * * * *' # Run hourly
   push:
     branches:
-      - xcm-tests
+      - master
 
 jobs:
   chopsticks_test:
     runs-on: [self-hosted, linux]
     timeout-minutes: 30
     container:
-      image: ghcr.io/interlay/chopsticks:docker-247f3fb
+      image: ghcr.io/interlay/chopsticks:master
     steps:
       - name: Checkout
         uses: actions/checkout@v3
