@@ -153,23 +153,13 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     }
 
     return combineLatest({
-      txFee: this.estimateTxFee({
-        amount: FN.ZERO,
-        to,
-        token,
-        address,
-        signer: address,
-      }),
       balance: this.balanceAdapter
         .subscribeBalance(token, address)
         .pipe(map((i) => i.available)),
     }).pipe(
-      map(({ balance, txFee }) => {
-        const tokenMeta = this.balanceAdapter?.getToken(token);
-        const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(
-          new FN(feeFactor)
-        );
+      map(({ balance }) => {
+        // fixed fee of 1 ksm or DOT until we get paymentinfo to work again
+        const fee = FN.fromInner(Math.pow(10, tokenMeta?.decimals), tokenMeta?.decimals);
 
         // always minus ed
         return balance
