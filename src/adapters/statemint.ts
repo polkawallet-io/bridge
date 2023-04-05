@@ -21,7 +21,7 @@ import {
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
-import { supportsV0V1Multilocation } from "src/utils/polkadotXcm-multilocation-check";
+import { supportsV0V1Multilocation } from "../utils/polkadotXcm-multilocation-check";
 
 export const statemintRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
