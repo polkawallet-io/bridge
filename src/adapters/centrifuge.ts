@@ -24,7 +24,7 @@ const altairRoutersConfig: Omit<RouteConfigs, "from">[] = [
     to: "karura",
     token: "AIR",
     xcm: {
-      fee: { token: "AIR", amount: "6400000000000000" },
+      fee: { token: "AIR", amount: "8082400000000000" },
       weightLimit: DEST_WEIGHT,
     },
   },

@@ -31,7 +31,7 @@ export const statemineRoutersConfig: Omit<RouteConfigs, "from">[] = [
     to: "karura",
     token: "RMRK",
     xcm: {
-      fee: { token: "RMRK", amount: "6400000" },
+      fee: { token: "RMRK", amount: "9918117" },
       weightLimit: "Unlimited",
     },
   },
