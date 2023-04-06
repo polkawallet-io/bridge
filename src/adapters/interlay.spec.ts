@@ -10,6 +10,7 @@ import { KaruraAdapter } from "./acala";
 import { HeikoAdapter } from "./parallel";
 import { buildTestTxWithConfigData } from "../utils/shared-spec-methods";
 import { BifrostAdapter } from "./bifrost";
+import { HydraAdapter } from "./hydradx";
 
 // helper method for getting balances, configs, fees, and constructing xcm extrinsics
 async function runMyTestSuite(testAccount: string, bridge: Bridge, from: ChainName, to: ChainName, token: string) {
@@ -127,20 +128,25 @@ describe.skip("interlay-adapter should work", () => {
   });
 
   test("connect interlay to do xcm", async () => {
-    const fromChains = ["interlay", "polkadot", "statemint"] as ChainName[];
+    const fromChains = ["interlay", "polkadot", "statemint", "hydra"] as ChainName[];
 
     await connect(fromChains);
 
     const interlay = new InterlayAdapter();
     const polkadot = new PolkadotAdapter();
     const statemint = new StatemintAdapter();
+    const hydra = new HydraAdapter();
 
-    await interlay.setApi(provider.getApi(fromChains[0]));
-    await polkadot.setApi(provider.getApi(fromChains[1]));
-    await statemint.setApi(provider.getApi(fromChains[2]));
+
+    await Promise.all([
+      interlay.setApi(provider.getApi(fromChains[0])),
+      polkadot.setApi(provider.getApi(fromChains[1])),
+      statemint.setApi(provider.getApi(fromChains[2])),
+      hydra.setApi(provider.getApi(fromChains[3]))
+    ]);
 
     const bridge = new Bridge({
-      adapters: [interlay, polkadot, statemint],
+      adapters: [interlay, polkadot, statemint, hydra],
     });
 
     expect(
@@ -157,7 +163,15 @@ describe.skip("interlay-adapter should work", () => {
       }).length
     ).toEqual(1);
 
+    expect(
+      bridge.router.getDestinationChains({
+        from: chains.interlay,
+        token: "IBTC",
+      }).length
+    ).toEqual(1);
+
     await runMyTestSuite(testAccount, bridge, "interlay", "polkadot", "DOT");
     await runMyTestSuite(testAccount, bridge, "interlay", "statemint", "USDT");
+    await runMyTestSuite(testAccount, bridge, "interlay", "hydra", "IBTC");
   });
 });

@@ -30,14 +30,14 @@ export abstract class BalanceAdapter {
     this.tokens = tokens;
   }
 
-  public getToken(token: string): BasicToken {
+  public getToken<R extends BasicToken = BasicToken>(token: string): R {
     const tokenConfig = this.tokens[token];
 
     if (!tokenConfig) {
       throw new TokenConfigNotFound(token, this.chain);
     }
 
-    return tokenConfig;
+    return tokenConfig as R;
   }
 
   public abstract subscribeBalance(
