@@ -251,8 +251,10 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       };
       const ass = [
         {
-          Concrete: { interior: "Here", parents: 1 },
-          Fungible: amount.toChainData(),
+          id: {
+            Concrete: { interior: "Here", parents: 1 },
+          },
+          fun: { Fungible: amount.toChainData() },
         },
       ];
 
@@ -282,9 +284,15 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
     };
     const ass = [
       {
-        Concrete: {
-          parents: 0,
-          interior: { X2: [{ PalletInstance: 50 }, { GeneralIndex: assetId }] },
+        id: {
+          Concrete: {
+            parents: 0,
+            interior: {
+              X2: [{ PalletInstance: 50 }, { GeneralIndex: assetId }],
+            },
+          },
+        },
+        fun: {
           Fungible: amount.toChainData(),
         },
       },
