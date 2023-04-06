@@ -23,7 +23,7 @@ export const statemineRoutersConfig: Omit<RouteConfigs, "from">[] = [
     to: "kusama",
     token: "KSM",
     xcm: {
-      fee: { token: "KSM", amount: "106666660" },
+      fee: { token: "KSM", amount: "90049287" },
       weightLimit: "Unlimited",
     },
   },
@@ -46,7 +46,7 @@ export const statemineRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "karura",
     token: "USDT",
-    xcm: { fee: { token: "USDT", amount: "640" }, weightLimit: "Unlimited" },
+    xcm: { fee: { token: "USDT", amount: "808" }, weightLimit: "Unlimited" },
   },
 ];
 
@@ -62,7 +62,7 @@ export const statemineTokensConfig: Record<
   },
 };
 
-const SUPPORTED_TOKENS: Record<string, BN> = {
+export const SUPPORTED_TOKENS: Record<string, BN> = {
   RMRK: new BN(8),
   ARIS: new BN(16),
   USDT: new BN(1984),
