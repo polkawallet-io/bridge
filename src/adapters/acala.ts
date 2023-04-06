@@ -16,7 +16,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
-import { ApiNotFound } from "../errors";
+import { ApiNotFound, TokenNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
@@ -24,6 +24,7 @@ import {
   TransferParams,
 } from "../types";
 import { isChainEqual } from "../utils/is-chain-equal";
+import { SUPPORTED_TOKENS as STATEMINE_SUPPORTED_TOKENS } from "./statemint";
 
 const ACALA_DEST_WEIGHT = "5000000000";
 
@@ -785,7 +786,6 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
 
     const tokenFormSDK = this.wallet?.getToken(token);
     const toChain = chains[to];
-    const destFee = this.getCrossChainFee(token, to);
     const oldDestWeight = this.getDestWeight(token, to);
     const useNewDestWeight =
       this.api.tx.xTokens.transfer.meta.args[3].type.toString() ===
@@ -836,13 +836,53 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
     }
 
     if (isChainEqual(toChain, "statemine")) {
-      return this.api.tx.xTokens.transferMulticurrencies(
-        [
-          [tokenFormSDK?.toChainData(), amount.toChainData()],
-          [{ Token: destFee.token }, destFee.balance.toChainData()],
-        ],
-        1,
-        { V1: dst },
+      const assetId = STATEMINE_SUPPORTED_TOKENS[token];
+
+      if (!assetId) {
+        throw new TokenNotFound(token);
+      }
+
+      const asset = {
+        V1: {
+          fun: {
+            Fungible: amount.toChainData(),
+          },
+          id: {
+            Concrete: {
+              parents: 1,
+              interior: {
+                X3: [
+                  { Parachain: toChain.paraChainId },
+                  { PalletInstance: 50 },
+                  { GeneralIndex: assetId },
+                ],
+              },
+            },
+          },
+        },
+      };
+      const dst = {
+        V1: {
+          parents: 1,
+          interior: {
+            X2: [
+              {
+                Parachain: toChain.paraChainId,
+              },
+              {
+                AccountId32: {
+                  network: "Any",
+                  id: accountId,
+                },
+              },
+            ],
+          },
+        },
+      };
+
+      return this.api.tx.xTokens.transferMultiasset(
+        asset,
+        dst,
         (useNewDestWeight ? "Unlimited" : oldDestWeight?.toString()) as any
       );
     } else {
