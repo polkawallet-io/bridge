@@ -172,7 +172,7 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     to: "statemine",
     token: "RMRK",
     xcm: {
-      fee: { token: "KSM", amount: "16000000000" },
+      fee: { token: "RMRK", amount: "100000" },
       weightLimit: ACALA_DEST_WEIGHT,
     },
   },
@@ -188,7 +188,7 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     to: "statemine",
     token: "USDT",
     xcm: {
-      fee: { token: "KSM", amount: "16000000000" },
+      fee: { token: "USDT", amount: "1000" },
       weightLimit: ACALA_DEST_WEIGHT,
     },
   },
@@ -244,7 +244,7 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     to: "altair",
     token: "AIR",
     xcm: {
-      fee: { token: "AIR", amount: "6400000000000000" },
+      fee: { token: "AIR", amount: "9269600000000000" },
       weightLimit: ACALA_DEST_WEIGHT,
     },
   },
