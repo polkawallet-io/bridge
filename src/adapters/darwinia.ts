@@ -115,7 +115,7 @@ class BaseDarwiniaAdapter extends BaseCrossChainAdapter {
       txFee:
         token === this.balanceAdapter?.nativeToken
           ? this.estimateTxFee({
-              amount: FN.ZERO,
+              amount: FN.ONE,
               to,
               token,
               address,
@@ -159,14 +159,32 @@ class BaseDarwiniaAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    const dst = { X2: ["Parent", { ParaChain: toChain.paraChainId }] };
-    const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
-    const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
+    const dst = {
+      parents: 1,
+      interior: { X1: { Parachain: toChain.paraChainId } },
+    };
+    const acc = {
+      parents: 0,
+      interior: { X1: { AccountId32: { id: accountId } } },
+    };
+    const ass = [
+      {
+        id: {
+          Concrete: {
+            parents: 0,
+            interior: "Here",
+          },
+        },
+        fun: {
+          Fungible: amount.toChainData(),
+        },
+      },
+    ];
 
     return this.api?.tx.polkadotXcm.limitedReserveTransferAssets(
-      { V0: dst },
-      { V0: acc },
-      { V0: ass },
+      { V3: dst },
+      { V3: acc },
+      { V3: ass },
       0,
       this.getDestWeight(token, to)?.toString()
     );
