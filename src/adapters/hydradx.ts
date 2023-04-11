@@ -68,22 +68,22 @@ export const basiliskRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
-  {
-    to: "karura",
-    token: "WETH",
-    xcm: {
-      fee: { token: "WETH", amount: "687004000000" },
-      weightLimit: DEST_WEIGHT,
-    },
-  },
-  {
-    to: "karura",
-    token: "WBTC",
-    xcm: {
-      fee: { token: "WBTC", amount: "4" },
-      weightLimit: DEST_WEIGHT,
-    },
-  },
+  // {
+  //   to: "karura",
+  //   token: "WETH",
+  //   xcm: {
+  //     fee: { token: "WETH", amount: "687004000000" },
+  //     weightLimit: DEST_WEIGHT,
+  //   },
+  // },
+  // {
+  //   to: "karura",
+  //   token: "WBTC",
+  //   xcm: {
+  //     fee: { token: "WBTC", amount: "4" },
+  //     weightLimit: DEST_WEIGHT,
+  //   },
+  // },
 ];
 
 export const basiliskTokensConfig: Record<string, ExpandToken> = {

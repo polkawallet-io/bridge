@@ -568,22 +568,22 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: ACALA_DEST_WEIGHT,
     },
   },
-  {
-    to: "basilisk",
-    token: "WETH",
-    xcm: {
-      fee: { token: "WETH", amount: "956965470918" },
-      weightLimit: ACALA_DEST_WEIGHT,
-    },
-  },
-  {
-    to: "basilisk",
-    token: "WBTC",
-    xcm: {
-      fee: { token: "WBTC", amount: "6" },
-      weightLimit: ACALA_DEST_WEIGHT,
-    },
-  },
+  // {
+  //   to: "basilisk",
+  //   token: "WETH",
+  //   xcm: {
+  //     fee: { token: "WETH", amount: "956965470918" },
+  //     weightLimit: ACALA_DEST_WEIGHT,
+  //   },
+  // },
+  // {
+  //   to: "basilisk",
+  //   token: "WBTC",
+  //   xcm: {
+  //     fee: { token: "WBTC", amount: "6" },
+  //     weightLimit: ACALA_DEST_WEIGHT,
+  //   },
+  // },
   {
     to: "listen",
     token: "LT",
