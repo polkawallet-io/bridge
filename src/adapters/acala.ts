@@ -157,6 +157,22 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: ACALA_DEST_WEIGHT,
     },
   },
+  {
+    to: "hydra",
+    token: "WETH",
+    xcm: {
+      fee: { token: "WETH", amount: "956965470918" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
+    to: "hydra",
+    token: "WBTC",
+    xcm: {
+      fee: { token: "WBTC", amount: "6" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
 ];
 
 export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
@@ -553,6 +569,22 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     },
   },
   {
+    to: "basilisk",
+    token: "WETH",
+    xcm: {
+      fee: { token: "WETH", amount: "956965470918" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
+    to: "basilisk",
+    token: "WBTC",
+    xcm: {
+      fee: { token: "WBTC", amount: "6" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
     to: "listen",
     token: "LT",
     xcm: {
@@ -617,6 +649,18 @@ export const acalaTokensConfig: Record<string, BasicToken> = {
     decimals: 18,
     ed: "10000000000000000",
   },
+  WETH: {
+    name: "WETH",
+    symbol: "WETH",
+    decimals: 18,
+    ed: "5555555555555",
+  },
+  WBTC: {
+    name: "WBTC",
+    symbol: "WBTC",
+    decimals: 8,
+    ed: "35",
+  },
 };
 
 export const karuraTokensConfig: Record<string, BasicToken> = {
@@ -667,6 +711,18 @@ export const karuraTokensConfig: Record<string, BasicToken> = {
     symbol: "USDCet",
     decimals: 6,
     ed: "10000",
+  },
+  WETH: {
+    name: "WETH",
+    symbol: "WETH",
+    decimals: 18,
+    ed: "5555555555555",
+  },
+  WBTC: {
+    name: "WBTC",
+    symbol: "WBTC",
+    decimals: 8,
+    ed: "35",
   },
 };
 
