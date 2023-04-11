@@ -68,6 +68,22 @@ export const basiliskRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
+  {
+    to: "karura",
+    token: "WETH",
+    xcm: {
+      fee: { token: "WETH", amount: "687004000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "karura",
+    token: "WBTC",
+    xcm: {
+      fee: { token: "WBTC", amount: "4" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
 ];
 
 export const basiliskTokensConfig: Record<string, ExpandToken> = {
@@ -106,6 +122,20 @@ export const basiliskTokensConfig: Record<string, ExpandToken> = {
     ed: "10000",
     toChainData: () => 9,
   },
+  WETH: {
+    name: "WETH",
+    symbol: "WETH",
+    decimals: 18,
+    ed: "7000000000000",
+    toChainData: () => 4,
+  },
+  WBTC: {
+    name: "WBTC",
+    symbol: "WBTC",
+    decimals: 8,
+    ed: "44",
+    toChainData: () => 3,
+  },
 };
 
 export const hydraRoutersConfig: Omit<RouteConfigs, "from">[] = [
@@ -114,6 +144,22 @@ export const hydraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "DAI",
     xcm: {
       fee: { token: "DAI", amount: "808240000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "acala",
+    token: "WETH",
+    xcm: {
+      fee: { token: "WETH", amount: "687004000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "acala",
+    token: "WBTC",
+    xcm: {
+      fee: { token: "WBTC", amount: "4" },
       weightLimit: DEST_WEIGHT,
     },
   },
@@ -126,6 +172,20 @@ export const hydraTokensConfig: Record<string, ExpandToken> = {
     decimals: 18,
     ed: "10000000000",
     toChainData: () => 2,
+  },
+  WETH: {
+    name: "WETH",
+    symbol: "WETH",
+    decimals: 18,
+    ed: "7000000000000",
+    toChainData: () => 4,
+  },
+  WBTC: {
+    name: "WBTC",
+    symbol: "WBTC",
+    decimals: 8,
+    ed: "44",
+    toChainData: () => 3,
   },
 };
 
