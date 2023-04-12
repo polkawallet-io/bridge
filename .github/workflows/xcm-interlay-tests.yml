@@ -9,7 +9,7 @@ on:
       - test-add-interlay-chopsticks-tests
 
 jobs:
-  chopsticks_test:
+  chopsticks_interlay_test:
     runs-on: [self-hosted, linux]
     timeout-minutes: 30
     container:
@@ -24,7 +24,7 @@ jobs:
           max_attempts: 3
           retry_on: error
           timeout_minutes: 10
-          command: |
+          run: |
             cd /app
             yarn start xcm \
               --relaychain=configs/polkadot.yml \

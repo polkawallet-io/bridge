@@ -29,8 +29,8 @@ async function main(): Promise<void> {
         ["polkadot", "DOT"],
         ["statemint", "USDT"],
     ].flatMap(([targetChain, token]) => [
-        {from: "kintsugi" as ChainName, to: targetChain as ChainName, token}, 
-        {from: targetChain as ChainName, to: "kintsugi" as ChainName, token}
+        {from: "interlay" as ChainName, to: targetChain as ChainName, token}, 
+        {from: targetChain as ChainName, to: "interlay" as ChainName, token}
     ]); // bidirectional testing
 
     await runTestCasesAndExit(adaptersEndpoints, testCases);
