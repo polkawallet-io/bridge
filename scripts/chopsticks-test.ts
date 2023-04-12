@@ -177,63 +177,50 @@ async function retryCheckTransfer(
     return result;
 }
 
-async function main(): Promise<void> {
+/**
+ * Run through all test cases passed through using the adapters and their endpoints provided.
+ * 
+ * Will print out results and end the process with an error code if it detects any errors, otherwise exit cleanly.
+ * 
+ * @param adapterEndpoints Records containing ChainName as key, an instantiated adapter and a list of ws(s) links as endpoints for each.
+ * @param testCases An array of xcm test cases to run.
+ */
+export async function runTestCasesAndExit(
+    // record key is chainname
+    adapterEndpoints: Record<ChainName, { adapter: BaseCrossChainAdapter, endpoints: Array<string> }>,
+    // testcases: array of chainname, token
+    testCases: {from: ChainName, to: ChainName, token: string}[]
+): Promise<void> {
+    const adapters = Object.values(adapterEndpoints).map((value) => value.adapter);
+    const bridge = new Bridge({adapters});
 
-    const availableAdapters: Record<string, BaseCrossChainAdapter> = {
-        kusama: new KusamaAdapter(),
-        statemine: new StatemineAdapter(),
-        kintsugi: new KintsugiAdapter(),
-        karura: new KaruraAdapter(),
-        heiko: new HeikoAdapter(),
-        bifrost: new BifrostAdapter(),
-    };
+    const chains = Object.keys(adapterEndpoints) as ChainName[];
+    const provider = new ApiProvider();
 
-    const bridge = new Bridge({
-        adapters: Object.values(availableAdapters),
-    });
-    const chains = Object.keys(availableAdapters) as ChainName[];
-
-    const provider = new ApiProvider(); // we overwrite endpoints, so not really mainnet
-    const endpoints = {
-        kintsugi: ['ws://127.0.0.1:8000'],
-        statemine: ['ws://127.0.0.1:8001'],
-        karura: ['ws://127.0.0.1:8002'],
-        heiko: ['ws://127.0.0.1:8003'],
-        bifrost: ['ws://127.0.0.1:8004'],
-        kusama: ['ws://127.0.0.1:8005'],
-    };
+    let endpoints: Record<string, string[]> = {};
+    for (let [key, value] of Object.entries(adapterEndpoints)) {
+        endpoints[key as ChainName] = value.endpoints;
+    }
 
     // connect all adapters
-    // const connected = 
     await lastValueFrom(
         provider.connectFromChain(chains, endpoints)
     );
     // and set apiProvider for each adapter
     await Promise.all(
         chains.map((chain) =>
-            availableAdapters[chain].setApi(provider.getApi(chain))
+            adapterEndpoints[chain].adapter.setApi(provider.getApi(chain))
         )
     );
-
-    let testcases = [
-        ["bifrost", "VKSM"],
-        ["kusama", "KSM"], 
-        ["karura", "KBTC"],
-        ["karura", "KINT"],
-        ["karura", "LKSM"],
-        ["statemine", "USDT"],
-        ["heiko", "KINT"],
-        ["heiko", "KBTC"],
-    ].flatMap(([to, token]) => [["kintsugi", to, token], [to, "kintsugi", token]]); // bidirectional testing
 
     let aggregateTestResult = ResultCode.OK;
     // collect failed/warning cases for logging at the end of the run, too
     const problematicTestCases: Array<{from: ChainName, to: ChainName, token: string, icon: string, message: string}> = [];
 
-    for (const [from, to, token] of testcases) {
+    for (const {from, to, token} of testCases) {
         // don't use console.log because I don't want newline here - I want the OK/FAIL to be added on the same line
         process.stdout.write(`Testing ${token} transfer from ${from} to ${to}... `);
-        const result = await retryCheckTransfer(from as ChainName, to as ChainName, token, bridge, 3);
+        const result = await retryCheckTransfer(from, to, token, bridge, 3);
         console.log(ResultCode[result.result]);
         if (result.result != ResultCode.OK) {
             console.log(iconOf(result.result), result.message);
@@ -261,5 +248,36 @@ async function main(): Promise<void> {
             console.log(icon, 'some channels FAILED');
             problematicTestStrings.forEach((logMessage) => console.log(logMessage));
             process.exit(-2);
-    } 
+    }
+}
+
+async function main(): Promise<void> {
+    const adaptersEndpoints : Record<string, { adapter: BaseCrossChainAdapter, endpoints: Array<string> }> = {
+        // make sure endpoints are aligned with the ports spun up by chopsticks config in
+        // .github/workflows/xcm-tests.yml
+        // reminder: parachains get ports in oder of arguments, starting with 8000 and incremented for each following one; 
+        //           relaychain gets its port last after all parachains.
+        kintsugi:   { adapter: new KintsugiAdapter(),   endpoints: ['ws://127.0.0.1:8000'] },
+        statemine:  { adapter: new StatemineAdapter(),  endpoints: ['ws://127.0.0.1:8001'] },
+        karura:     { adapter: new KaruraAdapter(),     endpoints: ['ws://127.0.0.1:8002'] },
+        heiko:      { adapter: new HeikoAdapter(),      endpoints: ['ws://127.0.0.1:8003'] },
+        bifrost:    { adapter: new BifrostAdapter(),    endpoints: ['ws://127.0.0.1:8004'] },
+        kusama:     { adapter: new KusamaAdapter(),     endpoints: ['ws://127.0.0.1:8005'] },
+    };
+
+    const testcases = [
+        ["bifrost", "VKSM"],
+        ["kusama", "KSM"], 
+        ["karura", "KBTC"],
+        ["karura", "KINT"],
+        ["karura", "LKSM"],
+        ["statemine", "USDT"],
+        ["heiko", "KINT"],
+        ["heiko", "KBTC"],
+    ].flatMap(([targetChain, token]) => [
+        {from: "kintsugi" as ChainName, to: targetChain as ChainName, token}, 
+        {from: targetChain as ChainName, to: "kintsugi" as ChainName, token}
+    ]); // bidirectional testing
+
+    await runTestCasesAndExit(adaptersEndpoints, testcases);
 }
