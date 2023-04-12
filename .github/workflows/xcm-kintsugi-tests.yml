@@ -38,8 +38,8 @@ jobs:
             yarn install --frozen-lockfile
             npx ts-node scripts/kintsugi-chopsticks-test.ts
 
-      - name: Report status to Discord
-        uses: sarisia/actions-status-discord@v1
-        if: failure()
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+      # - name: Report status to Discord
+      #   uses: sarisia/actions-status-discord@v1
+      #   if: failure()
+      #   with:
+      #     webhook: ${{ secrets.DISCORD_WEBHOOK }}
