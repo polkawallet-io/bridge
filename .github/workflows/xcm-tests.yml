@@ -8,7 +8,7 @@ on:
       - master
 
 jobs:
-  chopsticks_test:
+  chopsticks_kintsugi_test:
     runs-on: [self-hosted, linux]
     timeout-minutes: 30
     container:
@@ -17,20 +17,57 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Run tests
-        run: |
-          cd /app
-          yarn start xcm \
-            --relaychain=configs/kusama.yml \
-            --parachain=configs/kintsugi.yml \
-            --parachain=configs/statemine.yml \
-            --parachain=configs/karura.yml \
-            --parachain=configs/parallel-heiko.yml \
-            --parachain=configs/bifrost.yml &
-          cd -
+      - name: Run Kintsugi tests
+        uses: nick-fields/retry@v2
+        with:
+          max_attempts: 3
+          retry_on: error
+          timeout_minutes: 10
+          command: |
+            cd /app
+            yarn start xcm \
+              --relaychain=configs/kusama.yml \
+              --parachain=configs/kintsugi.yml \
+              --parachain=configs/statemine.yml \
+              --parachain=configs/karura.yml \
+              --parachain=configs/parallel-heiko.yml \
+              --parachain=configs/bifrost.yml &
+            cd -
 
-          yarn install --frozen-lockfile
-          npx ts-node scripts/chopsticks-test.ts
+            yarn install --frozen-lockfile
+            npx ts-node scripts/kintsugi-chopsticks-test.ts
+
+      - name: Report status to Discord
+        uses: sarisia/actions-status-discord@v1
+        if: failure()
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+
+  chopsticks_interlay_test:
+    runs-on: [self-hosted, linux]
+    timeout-minutes: 30
+    container:
+      image: ghcr.io/interlay/chopsticks:master
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run Interlay tests
+        uses: nick-fields/retry@v2
+        with:
+          max_attempts: 3
+          retry_on: error
+          timeout_minutes: 10
+          command: |
+            cd /app
+            yarn start xcm \
+              --relaychain=configs/polkadot.yml \
+              --parachain=configs/interlay.yml \
+              --parachain=configs/statemint.yml &
+            cd -
+
+            yarn install --frozen-lockfile
+            npx ts-node scripts/interlay-chopsticks-test.ts
 
       - name: Report status to Discord
         uses: sarisia/actions-status-discord@v1
