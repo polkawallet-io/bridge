@@ -19,7 +19,6 @@ import { HeikoAdapter } from "../src/adapters/parallel";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 
-
 main().catch((err) => {
     console.log("Error thrown by script:");
     console.log(err);
@@ -130,7 +129,7 @@ async function checkTransfer(fromChain: ChainName, toChain: ChainName, token: st
                 return {
                     message: message,
                     result: ResultCode.FAIL
-                }
+                };
             } else { 
                 // not immediately failing, but dangerously close - we need to return
                 // a warning, unless the code below will returns an error
@@ -153,6 +152,29 @@ async function checkTransfer(fromChain: ChainName, toChain: ChainName, token: st
             result: ResultCode.FAIL
         };
     }
+}
+
+async function retryCheckTransfer(
+    fromChain: ChainName, 
+    toChain: ChainName, 
+    token: string, 
+    bridge: Bridge,
+    maxAttempts: number,
+    attemptCount: number = 1
+  ): Promise<Awaited<ReturnType<typeof checkTransfer>>> {
+    const result = await checkTransfer(fromChain, toChain, token, bridge);
+
+    if (result.result === ResultCode.OK) {
+        return result;
+    }
+
+    // try again if we have retries left
+    process.stdout.write(` attempt ${attemptCount}/${maxAttempts} failed...`);
+    if (attemptCount < maxAttempts) {
+        return retryCheckTransfer(fromChain, toChain, token, bridge, maxAttempts, attemptCount + 1);
+    }
+    process.stdout.write(` giving up. `);
+    return result;
 }
 
 async function main(): Promise<void> {
@@ -205,21 +227,26 @@ async function main(): Promise<void> {
     ].flatMap(([to, token]) => [["kintsugi", to, token], [to, "kintsugi", token]]); // bidirectional testing
 
     let aggregateTestResult = ResultCode.OK;
+    // collect failed/warning cases for logging at the end of the run, too
+    const problematicTestCases: Array<{from: ChainName, to: ChainName, token: string, icon: string, message: string}> = [];
 
     for (const [from, to, token] of testcases) {
-
         // don't use console.log because I don't want newline here - I want the OK/FAIL to be added on the same line
         process.stdout.write(`Testing ${token} transfer from ${from} to ${to}... `);
-        let result = await checkTransfer(from as ChainName, to as ChainName, token, bridge);
+        const result = await retryCheckTransfer(from as ChainName, to as ChainName, token, bridge, 3);
         console.log(ResultCode[result.result]);
         if (result.result != ResultCode.OK) {
             console.log(iconOf(result.result), result.message);
+            problematicTestCases.push({from: from as ChainName, to: to as ChainName, token, icon: iconOf(result.result), message: result.message});
             if (aggregateTestResult == ResultCode.OK || (aggregateTestResult == ResultCode.WARN && result.result == ResultCode.FAIL)) {
                 // only 'increase' the aggregate error
                 aggregateTestResult = result.result;
             }
         } 
     }
+
+    // prepare for logging
+    const problematicTestStrings = problematicTestCases.map(({to, from, token, icon, message}) => `${token} from ${from} to ${to}: ${icon} ${message}`);
 
     let icon = iconOf(aggregateTestResult);
     switch (aggregateTestResult) {
@@ -228,9 +255,11 @@ async function main(): Promise<void> {
             process.exit(0);
         case ResultCode.WARN:
             console.log(icon, 'action required');
+            problematicTestStrings.forEach((logMessage) => console.log(logMessage));
             process.exit(-1);
         case ResultCode.FAIL:
             console.log(icon, 'some channels FAILED');
+            problematicTestStrings.forEach((logMessage) => console.log(logMessage));
             process.exit(-2);
     } 
 }
