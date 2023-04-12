@@ -1,0 +1,45 @@
+---
+name: Daily Kintsugi XCM tests
+on:
+  schedule:
+    - cron: '5 * * * *' # Run hourly
+  push:
+    branches:
+      - master
+      - test-add-interlay-chopsticks-tests
+
+jobs:
+  chopsticks_test:
+    runs-on: [self-hosted, linux]
+    timeout-minutes: 30
+    container:
+      image: ghcr.io/interlay/chopsticks:master
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run Kintsugi tests
+        uses: nick-fields/retry@v2
+        with:
+          max_attempts: 3
+          retry_on: error
+          timeout_minutes: 10
+          command: |
+            cd /app
+            yarn start xcm \
+              --relaychain=configs/kusama.yml \
+              --parachain=configs/kintsugi.yml \
+              --parachain=configs/statemine.yml \
+              --parachain=configs/karura.yml \
+              --parachain=configs/parallel-heiko.yml \
+              --parachain=configs/bifrost.yml &
+            cd -
+
+            yarn install --frozen-lockfile
+            npx ts-node scripts/kintsugi-chopsticks-test.ts
+
+      - name: Report status to Discord
+        uses: sarisia/actions-status-discord@v1
+        if: failure()
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
