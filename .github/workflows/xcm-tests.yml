@@ -1,5 +1,5 @@
 ---
-name: Daily Kintsugi XCM tests
+name: Daily XCM tests
 on:
   schedule:
     - cron: '5 * * * *' # Run hourly
