@@ -208,7 +208,7 @@ export async function runTestCasesAndExit(
     for (const {from, to, token} of testCases) {
         // don't use console.log because I don't want newline here - I want the OK/FAIL to be added on the same line
         process.stdout.write(`Testing ${token} transfer from ${from} to ${to}... `);
-        const result = await retryCheckTransfer(from, to, token, bridge, 3);
+        const result = await retryCheckTransfer(from, to, token, bridge, 2);
         console.log(ResultCode[result.result]);
         if (result.result != ResultCode.OK) {
             console.log(iconOf(result.result), result.message);
