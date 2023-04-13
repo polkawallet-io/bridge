@@ -11,6 +11,7 @@ import { StatemineAdapter, StatemintAdapter } from "./adapters/statemint";
 import { HeikoAdapter, ParallelAdapter } from "./adapters/parallel";
 import { AcalaAdapter, KaruraAdapter } from "./adapters/acala";
 import { BifrostAdapter } from "./adapters/bifrost";
+import { HydraAdapter } from "./adapters/hydradx";
 import { AstarAdapter } from "./adapters/astar";
 
 describe.skip("Bridge sdk usage", () => {
@@ -28,6 +29,7 @@ describe.skip("Bridge sdk usage", () => {
     statemine: new StatemineAdapter(),
     heiko: new HeikoAdapter(),
     bifrost: new BifrostAdapter(),
+    hydra: new HydraAdapter(),
     acala: new AcalaAdapter(),
     parallel: new ParallelAdapter(),
     astar: new AstarAdapter(),
@@ -44,7 +46,7 @@ describe.skip("Bridge sdk usage", () => {
     const tx = availableAdapters[fromChain].createTx({
       to: toChain,
       token,
-      amount: FN.fromInner("10000000000", 10),
+      amount: FN.fromInner("100000", 10),
       address: testAddress,
       signer: testAddress,
     });
@@ -177,6 +179,7 @@ describe.skip("Bridge sdk usage", () => {
     // interlay
     // printBidirectionalTxs("interlay", "polkadot", "DOT");
     // printBidirectionalTxs("interlay", "statemint", "USDT");
+    // printBidirectionalTxs("interlay", "hydra", "IBTC");
     // printBidirectionalTxs("interlay", "acala", "INTR");
     // printBidirectionalTxs("interlay", "acala", "IBTC");
     // printBidirectionalTxs("interlay", "parallel", "INTR");

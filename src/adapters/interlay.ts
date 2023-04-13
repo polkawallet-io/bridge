@@ -83,10 +83,16 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "statemint",
     token: "USDT",
     xcm: {
-      // fees from tests with chopsticks: 700_000 atomic units
-      fee: { token: "USDT", amount: "1000000" },
+      // fees from tests with chopsticks: 700_000 atomic units, need a minimum of 2x as buffer
+      fee: { token: "USDT", amount: "1500000" },
       weightLimit: DEST_WEIGHT,
     },
+  },
+  {
+    to: "hydra",
+    token: "IBTC",
+    // recent xcm fees: 7 - add 10x safety margin
+    xcm: { fee: { token: "IBTC", amount: "70" }, weightLimit: DEST_WEIGHT },
   },
 ];
 
@@ -170,8 +176,8 @@ export const interlayTokensConfig: Record<
 > = {
   interlay: {
     DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "0" },
-    INTR: { name: "INTR", symbol: "INTR", decimals: 10, ed: "0" },
     IBTC: { name: "IBTC", symbol: "IBTC", decimals: 8, ed: "0" },
+    INTR: { name: "INTR", symbol: "INTR", decimals: 10, ed: "0" },
     USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
   },
   kintsugi: {
@@ -195,8 +201,8 @@ const KINTSUGI_SUPPORTED_TOKENS: Record<string, unknown> = {
 
 const INTERLAY_SUPPORTED_TOKENS: Record<string, unknown> = {
   DOT: { Token: "DOT" },
-  INTR: { Token: "INTR" },
   IBTC: { Token: "IBTC" },
+  INTR: { Token: "INTR" },
   USDT: { ForeignAsset: 2 },
 };
 

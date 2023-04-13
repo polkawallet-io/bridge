@@ -15,6 +15,7 @@ import {
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
+import { supportsV0V1Multilocation } from "../utils/polkadotXcm-multilocation-check";
 
 export const polkadotRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
@@ -31,7 +32,8 @@ export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "kintsugi",
     token: "KSM",
     xcm: {
-      fee: { token: "KSM", amount: "1000000000" },
+      // fees in chopsticks test: 161_648_000 - add 10x buffer
+      fee: { token: "KSM", amount: "1616480000" },
       weightLimit: "Unlimited",
     },
   },
@@ -144,29 +146,24 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
   public subscribeMaxInput(
     token: string,
     address: string,
-    to: ChainName
+    _to: ChainName
   ): Observable<FN> {
     if (!this.balanceAdapter) {
       throw new ApiNotFound(this.chain.id);
     }
 
     return combineLatest({
-      txFee: this.estimateTxFee({
-        amount: FN.ZERO,
-        to,
-        token,
-        address,
-        signer: address,
-      }),
       balance: this.balanceAdapter
         .subscribeBalance(token, address)
         .pipe(map((i) => i.available)),
     }).pipe(
-      map(({ balance, txFee }) => {
+      map(({ balance }) => {
         const tokenMeta = this.balanceAdapter?.getToken(token);
-        const feeFactor = 1.2;
-        const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(
-          new FN(feeFactor)
+        // fixed fee of 0.05 ksm or DOT until we get paymentinfo to work again
+        const fee = FN.fromInner(
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          0.05 * Math.pow(10, tokenMeta!.decimals),
+          tokenMeta?.decimals
         );
 
         // always minus ed
@@ -195,54 +192,44 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    // to statemine
-    if (to === "statemine" || to === "statemint") {
-      const dst = {
-        interior: { X1: { ParaChain: toChain.paraChainId } },
-        parents: 0,
-      };
-      const acc = {
-        interior: { X1: { AccountId32: { id: accountId, network: "Any" } } },
-        parents: 0,
-      };
-      const ass = [
-        {
-          fun: { Fungible: amount.toChainData() },
-          id: { Concrete: { interior: "Here", parents: 0 } },
-        },
-      ];
-
-      return this.api?.tx.xcmPallet.limitedTeleportAssets(
-        { V1: dst },
-        { V1: acc },
-        { V1: ass },
-        0,
-        "Unlimited"
-      );
-    }
+    const [dst, acc, ass] = supportsV0V1Multilocation(this.api)
+      ? [
+          { V0: { X1: { Parachain: toChain.paraChainId } } },
+          { V0: { X1: { AccountId32: { id: accountId, network: "Any" } } } },
+          { V0: [{ ConcreteFungible: { amount: amount.toChainData() } }] },
+        ]
+      : [
+          {
+            V3: {
+              parents: 0,
+              interior: { X1: { Parachain: toChain.paraChainId } },
+            },
+          },
+          {
+            V3: {
+              parents: 0,
+              interior: { X1: { AccountId32: { id: accountId } } },
+            },
+          },
+          {
+            V3: [
+              {
+                fun: { Fungible: amount.toChainData() },
+                id: { Concrete: { parents: 0, interior: "Here" } },
+              },
+            ],
+          },
+        ];
 
     if (to === "kintsugi") {
-      const dst = { X1: { Parachain: toChain.paraChainId } };
-      const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
-      const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
-
-      return this.api?.tx.xcmPallet.reserveTransferAssets(
-        { V0: dst },
-        { V0: acc },
-        { V0: ass },
-        0
-      );
+      return this.api?.tx.xcmPallet.reserveTransferAssets(dst, acc, ass, 0);
     }
 
     // to other parachain
-    const dst = { X1: { Parachain: toChain.paraChainId } };
-    const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
-    const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
-
     return this.api?.tx.xcmPallet.limitedReserveTransferAssets(
-      { V0: dst },
-      { V0: acc },
-      { V0: ass },
+      dst,
+      acc,
+      ass,
       0,
       this.getDestWeight(token, to)?.toString()
     );

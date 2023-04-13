@@ -21,12 +21,14 @@ import {
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
+import { supportsV0V1Multilocation } from "../utils/polkadotXcm-multilocation-check";
 
 export const statemintRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
     to: "interlay",
     token: "USDT",
-    xcm: { fee: { token: "USDT", amount: "640" }, weightLimit: "Unlimited" },
+    // from recent transfer: 9_510 atomic units, add a minimum of 2x buffer
+    xcm: { fee: { token: "USDT", amount: "20000" }, weightLimit: "Unlimited" },
   },
 ];
 
@@ -235,34 +237,6 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       throw new DestinationWeightNotFound(this.chain.id, to, token);
     }
 
-    // to relay chain
-    if (to === "kusama" || to === "polkadot") {
-      if (token !== this.balanceAdapter?.nativeToken) {
-        throw new CurrencyNotFound(token);
-      }
-
-      const dst = { interior: "Here", parents: 1 };
-      const acc = {
-        interior: { X1: { AccountId32: { id: accountId, network: "Any" } } },
-        parents: 0,
-      };
-      const ass = [
-        {
-          fun: { Fungible: amount.toChainData() },
-          id: { Concrete: { interior: "Here", parents: 1 } },
-        },
-      ];
-
-      return this.api?.tx.polkadotXcm.limitedTeleportAssets(
-        { V1: dst },
-        { V1: acc },
-        { V1: ass },
-        0,
-        destWeight
-      );
-    }
-
-    // to kintsugi/interlay
     const assetId = SUPPORTED_TOKENS[token];
     if (
       (to !== "kintsugi" && to !== "interlay") ||
@@ -272,21 +246,57 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       throw new CurrencyNotFound(token);
     }
 
-    const dst = { X2: ["Parent", { Parachain: toChain.paraChainId }] };
-    const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
-    const ass = [
-      {
-        ConcreteFungible: {
-          id: { X2: [{ PalletInstance: 50 }, { GeneralIndex: assetId }] },
-          amount: amount.toChainData(),
-        },
-      },
-    ];
+    const [dst, acc, ass] = supportsV0V1Multilocation(this.api)
+      ? [
+          { V0: { X2: ["Parent", { Parachain: toChain.paraChainId }] } },
+          { V0: { X1: { AccountId32: { id: accountId, network: "Any" } } } },
+          {
+            V0: [
+              {
+                ConcreteFungible: {
+                  id: {
+                    X2: [{ PalletInstance: 50 }, { GeneralIndex: assetId }],
+                  },
+                  amount: amount.toChainData(),
+                },
+              },
+            ],
+          },
+        ]
+      : [
+          {
+            V3: {
+              parents: 1,
+              interior: { X1: { Parachain: toChain.paraChainId } },
+            },
+          } as any,
+          {
+            V3: {
+              parents: 0,
+              interior: { X1: { AccountId32: { id: accountId } } },
+            },
+          } as any,
+          {
+            V3: [
+              {
+                fun: { Fungible: amount.toChainData() },
+                id: {
+                  Concrete: {
+                    parents: 0,
+                    interior: {
+                      X2: [{ PalletInstance: 50 }, { GeneralIndex: assetId }],
+                    },
+                  },
+                },
+              },
+            ],
+          } as any,
+        ];
 
     return this.api?.tx.polkadotXcm.limitedReserveTransferAssets(
-      { V0: dst },
-      { V0: acc },
-      { V0: ass },
+      dst,
+      acc,
+      ass,
       0,
       destWeight
     );

@@ -140,8 +140,13 @@ export abstract class BaseCrossChainAdapter {
     );
   }
 
-  public getToken(token: string, chain: ChainName): BasicToken {
+  public getToken<R extends BasicToken = BasicToken>(
+    token: string,
+    chain?: ChainName
+  ): R {
     let tokenConfig: BasicToken;
+
+    if (!chain) return this.tokens[token] as R;
 
     if (chain === this.chain.id) {
       tokenConfig = this.tokens[token];
@@ -159,7 +164,7 @@ export abstract class BaseCrossChainAdapter {
       throw new TokenConfigNotFound(token, chain);
     }
 
-    return tokenConfig;
+    return tokenConfig as R;
   }
 
   public getDestED(token: string, destChain: ChainName): TokenBalance {

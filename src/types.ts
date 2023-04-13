@@ -29,6 +29,10 @@ export interface BasicToken {
   ed: string;
 }
 
+export interface ExpandToken extends BasicToken {
+  toChainData: () => any;
+}
+
 export interface CrossChainRouterConfigs {
   // from chain name
   from: ChainName;

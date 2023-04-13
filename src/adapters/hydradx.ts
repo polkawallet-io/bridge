@@ -3,61 +3,75 @@ import { AnyApi, FixedPointNumber as FN } from "@acala-network/sdk-core";
 import { combineLatest, map, Observable } from "rxjs";
 
 import { SubmittableExtrinsic } from "@polkadot/api/types";
+import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainName, chains } from "../configs";
-import { ApiNotFound, CurrencyNotFound } from "../errors";
+import {
+  ApiNotFound,
+  CurrencyNotFound,
+  DestinationWeightNotFound,
+} from "../errors";
 import {
   BalanceData,
-  BasicToken,
+  ExpandToken,
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
-import { supportsV0V1Multilocation } from "../utils/polkadotXcm-multilocation-check";
+import { supportsUnlimitedDestWeight } from "../utils/xtokens-dest-weight";
 
-const DEST_WEIGHT = "Unlimited";
+const DEST_WEIGHT = "5000000000";
 
-export const bifrostRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const hydraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
-    to: "kintsugi",
-    token: "VKSM",
+    to: "interlay",
+    token: "IBTC",
     xcm: {
-      // tested in chopsticks: fees were 166_363_195. Add 10x margin
-      fee: { token: "VKSM", amount: "1663631950" },
+      // recent transfer cost: 62 - add 10x margin to fee estimate
+      fee: { token: "IBTC", amount: "620" },
       weightLimit: DEST_WEIGHT,
     },
   },
 ];
 
-export const bifrostTokensConfig: Record<string, BasicToken> = {
-  VKSM: { name: "VKSM", symbol: "VKSM", decimals: 12, ed: "100000000" },
-};
-
-const SUPPORTED_TOKENS: Record<string, unknown> = {
-  VKSM: { VToken: "KSM" },
+export const hydraTokensConfig: Record<string, ExpandToken> = {
+  HDX: {
+    name: "HDX",
+    symbol: "HDX",
+    decimals: 12,
+    ed: "1000000000000",
+    toChainData: () => 0,
+  },
+  IBTC: {
+    name: "IBTC",
+    symbol: "IBTC",
+    decimals: 8,
+    ed: "36",
+    toChainData: () => 11,
+  },
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const createBalanceStorages = (api: AnyApi) => {
   return {
     balances: (address: string) =>
-      Storage.create<any>({
+      Storage.create<DeriveBalancesAll>({
         api,
-        path: "query.system.account",
+        path: "derive.balances.all",
         params: [address],
       }),
-    assets: (address: string, token: unknown) =>
+    assets: (tokenId: number, address: string) =>
       Storage.create<any>({
         api,
         path: "query.tokens.accounts",
-        params: [address, token],
+        params: [address, tokenId],
       }),
   };
 };
 
-class BifrostBalanceAdapter extends BalanceAdapter {
+class HydradxBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
   constructor({ api, chain, tokens }: BalanceAdapterConfigs) {
@@ -66,36 +80,35 @@ class BifrostBalanceAdapter extends BalanceAdapter {
   }
 
   public subscribeBalance(
-    token: string,
+    tokenName: string,
     address: string
   ): Observable<BalanceData> {
     const storage = this.storages.balances(address);
 
-    if (token === this.nativeToken) {
+    if (tokenName === this.nativeToken) {
       return storage.observable.pipe(
-        map(({ data }) => ({
-          free: FN.fromInner(data.free.toString(), this.decimals),
-          locked: FN.fromInner(data.miscFrozen.toString(), this.decimals),
-          reserved: FN.fromInner(data.reserved.toString(), this.decimals),
+        map((data) => ({
+          free: FN.fromInner(data.freeBalance.toString(), this.decimals),
+          locked: FN.fromInner(data.lockedBalance.toString(), this.decimals),
+          reserved: FN.fromInner(
+            data.reservedBalance.toString(),
+            this.decimals
+          ),
           available: FN.fromInner(
-            data.free.sub(data.miscFrozen).toString(),
+            data.availableBalance.toString(),
             this.decimals
           ),
         }))
       );
     }
 
-    const tokenId = SUPPORTED_TOKENS[token];
+    const token = this.getToken<ExpandToken>(tokenName);
 
-    if (tokenId === undefined) {
-      throw new CurrencyNotFound(token);
-    }
-
-    return this.storages.assets(address, tokenId).observable.pipe(
+    return this.storages.assets(token.toChainData(), address).observable.pipe(
       map((balance) => {
         const amount = FN.fromInner(
           balance.free?.toString() || "0",
-          this.getToken(token).decimals
+          token.decimals
         );
 
         return {
@@ -109,18 +122,18 @@ class BifrostBalanceAdapter extends BalanceAdapter {
   }
 }
 
-class BaseBifrostAdapter extends BaseCrossChainAdapter {
-  private balanceAdapter?: BifrostBalanceAdapter;
+class BaseHydradxAdapter extends BaseCrossChainAdapter {
+  private balanceAdapter?: HydradxBalanceAdapter;
 
-  public override async setApi(api: AnyApi) {
+  public async setApi(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
 
-    this.balanceAdapter = new BifrostBalanceAdapter({
+    this.balanceAdapter = new HydradxBalanceAdapter({
       chain: this.chain.id as ChainName,
       api,
-      tokens: bifrostTokensConfig,
+      tokens: this.tokens,
     });
   }
 
@@ -183,52 +196,49 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
       throw new ApiNotFound(this.chain.id);
     }
 
-    const { address, amount, to, token } = params;
-    const toChain = chains[to];
+    const { address, amount, to, token: tokenName } = params;
 
-    const accountId = this.api?.createType("AccountId32", address).toHex();
+    const token = this.getToken<ExpandToken>(tokenName);
 
-    const tokenId = SUPPORTED_TOKENS[token];
-
-    if (tokenId === undefined) {
+    if (!token) {
       throw new CurrencyNotFound(token);
     }
 
-    const dst = supportsV0V1Multilocation(this.api)
-      ? {
-          V1: {
-            parents: 1,
-            interior: {
+    const toChain = chains[to];
+    const accountId = this.api?.createType("AccountId32", address).toHex();
+    const dst = {
+      parents: 1,
+      interior:
+        to === "kusama" || to === "polkadot"
+          ? { X1: { AccountId32: { id: accountId, network: "Any" } } }
+          : {
               X2: [
                 { Parachain: toChain.paraChainId },
                 { AccountId32: { id: accountId, network: "Any" } },
               ],
             },
-          },
-        }
-      : {
-          V3: {
-            parents: 1,
-            interior: {
-              X2: [
-                { Parachain: toChain.paraChainId },
-                { AccountId32: { id: accountId } },
-              ],
-            },
-          },
-        };
+    };
 
-    return this.api.tx.xTokens.transfer(
-      tokenId,
+    // use "Unlimited" if the xToken.transfer's fourth parameter version supports it
+    const destWeight = supportsUnlimitedDestWeight(this.api)
+      ? "Unlimited"
+      : this.getDestWeight(tokenName, to);
+
+    if (destWeight === undefined) {
+      throw new DestinationWeightNotFound(this.chain.id, to, tokenName);
+    }
+
+    return this.api?.tx.xTokens.transfer(
+      token.toChainData(),
       amount.toChainData(),
-      dst as any,
-      this.getDestWeight(token, to) || "Unlimited"
+      { V1: dst },
+      destWeight
     );
   }
 }
 
-export class BifrostAdapter extends BaseBifrostAdapter {
+export class HydraAdapter extends BaseHydradxAdapter {
   constructor() {
-    super(chains.bifrost, bifrostRoutersConfig, bifrostTokensConfig);
+    super(chains.hydra, hydraRoutersConfig, hydraTokensConfig);
   }
 }
