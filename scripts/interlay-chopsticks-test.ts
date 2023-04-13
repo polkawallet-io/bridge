@@ -4,6 +4,7 @@
 import { PolkadotAdapter } from "../src/adapters/polkadot";
 import { InterlayAdapter } from "../src/adapters/interlay";
 import { StatemintAdapter } from "../src/adapters/statemint";
+import { HydraAdapter } from "../src/adapters/hydradx";
 import { BaseCrossChainAdapter } from "../src/base-chain-adapter";
 import { ChainName } from "../src/configs";
 import { runTestCasesAndExit } from "./chopsticks-test";
@@ -22,12 +23,14 @@ async function main(): Promise<void> {
         //           relaychain gets its port last after all parachains.
         interlay:   { adapter: new InterlayAdapter(),   endpoints: ['ws://127.0.0.1:8000'] },
         statemint:  { adapter: new StatemintAdapter(),  endpoints: ['ws://127.0.0.1:8001'] },
-        polkadot:   { adapter: new PolkadotAdapter(),   endpoints: ['ws://127.0.0.1:8002'] },
+        hydra:      { adapter: new HydraAdapter(),      endpoints: ['ws://127.0.0.1:8002'] },
+        polkadot:   { adapter: new PolkadotAdapter(),   endpoints: ['ws://127.0.0.1:8003'] },
     };
 
     const testCases = [
         ["polkadot", "DOT"],
         ["statemint", "USDT"],
+        ["hydra", "IBTC"],
     ].flatMap(([targetChain, token]) => [
         {from: "interlay" as ChainName, to: targetChain as ChainName, token}, 
         {from: targetChain as ChainName, to: "interlay" as ChainName, token}

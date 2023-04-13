@@ -63,7 +63,8 @@ jobs:
             yarn start xcm \
               --relaychain=configs/polkadot.yml \
               --parachain=configs/interlay.yml \
-              --parachain=configs/statemint.yml &
+              --parachain=configs/statemint.yml \
+              --parachain=configs/hydradx.yml &
             cd -
 
             yarn install --frozen-lockfile

@@ -55,6 +55,12 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
+  {
+    to: "hydra",
+    token: "IBTC",
+    // recent xcm fees: 7 - add 10x safety margin
+    xcm: { fee: { token: "IBTC", amount: "70" }, weightLimit: DEST_WEIGHT },
+  },
 ];
 
 export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
@@ -137,6 +143,8 @@ export const interlayTokensConfig: Record<
 > = {
   interlay: {
     DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "0" },
+    IBTC: { name: "IBTC", symbol: "IBTC", decimals: 8, ed: "100" },
+    INTR: { name: "INTR", symbol: "INTR", decimals: 10, ed: "0" },
     USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
   },
   kintsugi: {
@@ -160,6 +168,7 @@ const KINTSUGI_SUPPORTED_TOKENS: Record<string, unknown> = {
 
 const INTERLAY_SUPPORTED_TOKENS: Record<string, unknown> = {
   DOT: { Token: "DOT" },
+  IBTC: { Token: "IBTC" },
   USDT: { ForeignAsset: 2 },
 };
 

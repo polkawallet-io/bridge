@@ -11,6 +11,7 @@ import { StatemineAdapter, StatemintAdapter } from "./adapters/statemint";
 import { HeikoAdapter } from "./adapters/parallel";
 import { KaruraAdapter } from "./adapters/acala";
 import { BifrostAdapter } from "./adapters/bifrost";
+import { HydraAdapter } from "./adapters/hydradx";
 
 describe.skip("Bridge sdk usage", () => {
   jest.setTimeout(30000);
@@ -27,6 +28,7 @@ describe.skip("Bridge sdk usage", () => {
     statemine: new StatemineAdapter(),
     heiko: new HeikoAdapter(),
     bifrost: new BifrostAdapter(),
+    hydra: new HydraAdapter(),
   };
 
   const bridge = new Bridge({
@@ -162,8 +164,8 @@ describe.skip("Bridge sdk usage", () => {
 
   test("4. all transfer tx should be constructable", async () => {
     // kintsugi
-    printBidirectionalTxs("kintsugi", "kusama", "KSM");
-    printBidirectionalTxs("kintsugi", "statemine", "USDT");
+    // printBidirectionalTxs("kintsugi", "kusama", "KSM");
+    // printBidirectionalTxs("kintsugi", "statemine", "USDT");
     // printBidirectionalTxs("kintsugi", "heiko", "KBTC");
     // printBidirectionalTxs("kintsugi", "karura", "KINT");
     // printBidirectionalTxs("kintsugi", "karura", "KBTC");
@@ -173,6 +175,6 @@ describe.skip("Bridge sdk usage", () => {
     // interlay
     // printBidirectionalTxs("interlay", "polkadot", "DOT");
     // printBidirectionalTxs("interlay", "statemint", "USDT");
-    // no adapter available for tx originating from moonbeam (yet?)
+    printBidirectionalTxs("interlay", "hydra", "IBTC");
   });
 });
