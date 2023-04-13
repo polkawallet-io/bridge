@@ -7,24 +7,11 @@ import { ApiProvider } from "../src/api-provider";
 import { BaseCrossChainAdapter } from "../src/base-chain-adapter";
 import { ChainName } from "../src/configs";
 import { Bridge } from "../src/index";
-import { KintsugiAdapter } from "../src/adapters/interlay";
-import { BifrostAdapter } from "../src/adapters/bifrost";
 import { FN } from "../src/types";
-import { KusamaAdapter } from "../src/adapters/polkadot";
-import { StatemineAdapter } from "../src/adapters/statemint";
 import { Keyring } from "@polkadot/api";
 import { BalanceChangedStatus } from "../src/types";
-import { KaruraAdapter } from "../src/adapters/acala";
-import { HeikoAdapter } from "../src/adapters/parallel";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
-
-
-main().catch((err) => {
-    console.log("Error thrown by script:");
-    console.log(err);
-    process.exit(-1);
-});
 
 async function submitTx(tx: SubmittableExtrinsic<"rxjs", ISubmittableResult>) {
     const keyring = new Keyring({ type: "sr25519" });
@@ -130,7 +117,7 @@ async function checkTransfer(fromChain: ChainName, toChain: ChainName, token: st
                 return {
                     message: message,
                     result: ResultCode.FAIL
-                }
+                };
             } else { 
                 // not immediately failing, but dangerously close - we need to return
                 // a warning, unless the code below will returns an error
@@ -155,71 +142,86 @@ async function checkTransfer(fromChain: ChainName, toChain: ChainName, token: st
     }
 }
 
-async function main(): Promise<void> {
+async function retryCheckTransfer(
+    fromChain: ChainName, 
+    toChain: ChainName, 
+    token: string, 
+    bridge: Bridge,
+    maxAttempts: number,
+    attemptCount: number = 1
+  ): Promise<Awaited<ReturnType<typeof checkTransfer>>> {
+    const result = await checkTransfer(fromChain, toChain, token, bridge);
 
-    const availableAdapters: Record<string, BaseCrossChainAdapter> = {
-        kusama: new KusamaAdapter(),
-        statemine: new StatemineAdapter(),
-        kintsugi: new KintsugiAdapter(),
-        karura: new KaruraAdapter(),
-        heiko: new HeikoAdapter(),
-        bifrost: new BifrostAdapter(),
-    };
+    if (result.result === ResultCode.OK) {
+        return result;
+    }
 
-    const bridge = new Bridge({
-        adapters: Object.values(availableAdapters),
-    });
-    const chains = Object.keys(availableAdapters) as ChainName[];
+    // try again if we have retries left
+    process.stdout.write(` attempt ${attemptCount}/${maxAttempts} failed...`);
+    if (attemptCount < maxAttempts) {
+        return retryCheckTransfer(fromChain, toChain, token, bridge, maxAttempts, attemptCount + 1);
+    }
+    process.stdout.write(` giving up. `);
+    return result;
+}
 
-    const provider = new ApiProvider(); // we overwrite endpoints, so not really mainnet
-    const endpoints = {
-        kintsugi: ['ws://127.0.0.1:8000'],
-        statemine: ['ws://127.0.0.1:8001'],
-        karura: ['ws://127.0.0.1:8002'],
-        heiko: ['ws://127.0.0.1:8003'],
-        bifrost: ['ws://127.0.0.1:8004'],
-        kusama: ['ws://127.0.0.1:8005'],
-    };
+/**
+ * Run through all test cases passed through using the adapters and their endpoints provided.
+ * 
+ * Will print out results and end the process with an error code if it detects any errors, otherwise exit cleanly.
+ * 
+ * @param adapterEndpoints Records containing ChainName as key, an instantiated adapter and a list of ws(s) links as endpoints for each.
+ * @param testCases An array of xcm test cases to run.
+ */
+export async function runTestCasesAndExit(
+    // record key is chainname
+    adapterEndpoints: Record<ChainName, { adapter: BaseCrossChainAdapter, endpoints: Array<string> }>,
+    // testcases: array of chainname, token
+    testCases: {from: ChainName, to: ChainName, token: string}[]
+): Promise<void> {
+    const adapters = Object.values(adapterEndpoints).map((value) => value.adapter);
+    const bridge = new Bridge({adapters});
+
+    const chains = Object.keys(adapterEndpoints) as ChainName[];
+    const provider = new ApiProvider();
+
+    let endpoints: Record<string, string[]> = {};
+    for (let [key, value] of Object.entries(adapterEndpoints)) {
+        endpoints[key as ChainName] = value.endpoints;
+    }
 
     // connect all adapters
-    // const connected = 
     await lastValueFrom(
         provider.connectFromChain(chains, endpoints)
     );
     // and set apiProvider for each adapter
     await Promise.all(
         chains.map((chain) =>
-            availableAdapters[chain].setApi(provider.getApi(chain))
+            adapterEndpoints[chain].adapter.setApi(provider.getApi(chain))
         )
     );
 
-    let testcases = [
-        ["bifrost", "VKSM"],
-        ["kusama", "KSM"], 
-        ["karura", "KBTC"],
-        ["karura", "KINT"],
-        ["karura", "LKSM"],
-        ["statemine", "USDT"],
-        ["heiko", "KINT"],
-        ["heiko", "KBTC"],
-    ].flatMap(([to, token]) => [["kintsugi", to, token], [to, "kintsugi", token]]); // bidirectional testing
-
     let aggregateTestResult = ResultCode.OK;
+    // collect failed/warning cases for logging at the end of the run, too
+    const problematicTestCases: Array<{from: ChainName, to: ChainName, token: string, icon: string, message: string}> = [];
 
-    for (const [from, to, token] of testcases) {
-
+    for (const {from, to, token} of testCases) {
         // don't use console.log because I don't want newline here - I want the OK/FAIL to be added on the same line
         process.stdout.write(`Testing ${token} transfer from ${from} to ${to}... `);
-        let result = await checkTransfer(from as ChainName, to as ChainName, token, bridge);
+        const result = await retryCheckTransfer(from, to, token, bridge, 2);
         console.log(ResultCode[result.result]);
         if (result.result != ResultCode.OK) {
             console.log(iconOf(result.result), result.message);
+            problematicTestCases.push({from: from as ChainName, to: to as ChainName, token, icon: iconOf(result.result), message: result.message});
             if (aggregateTestResult == ResultCode.OK || (aggregateTestResult == ResultCode.WARN && result.result == ResultCode.FAIL)) {
                 // only 'increase' the aggregate error
                 aggregateTestResult = result.result;
             }
         } 
     }
+
+    // prepare for logging
+    const problematicTestStrings = problematicTestCases.map(({to, from, token, icon, message}) => `${token} from ${from} to ${to}: ${icon} ${message}`);
 
     let icon = iconOf(aggregateTestResult);
     switch (aggregateTestResult) {
@@ -228,9 +230,11 @@ async function main(): Promise<void> {
             process.exit(0);
         case ResultCode.WARN:
             console.log(icon, 'action required');
+            problematicTestStrings.forEach((logMessage) => console.log(logMessage));
             process.exit(-1);
         case ResultCode.FAIL:
             console.log(icon, 'some channels FAILED');
+            problematicTestStrings.forEach((logMessage) => console.log(logMessage));
             process.exit(-2);
-    } 
+    }
 }

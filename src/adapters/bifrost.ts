@@ -15,6 +15,7 @@ import {
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
+import { supportsV0V1Multilocation } from "../utils/polkadotXcm-multilocation-check";
 
 const DEST_WEIGHT = "Unlimited";
 
@@ -193,20 +194,34 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
       throw new CurrencyNotFound(token);
     }
 
+    const dst = supportsV0V1Multilocation(this.api)
+      ? {
+          V1: {
+            parents: 1,
+            interior: {
+              X2: [
+                { Parachain: toChain.paraChainId },
+                { AccountId32: { id: accountId, network: "Any" } },
+              ],
+            },
+          },
+        }
+      : {
+          V3: {
+            parents: 1,
+            interior: {
+              X2: [
+                { Parachain: toChain.paraChainId },
+                { AccountId32: { id: accountId } },
+              ],
+            },
+          },
+        };
+
     return this.api.tx.xTokens.transfer(
       tokenId,
       amount.toChainData(),
-      {
-        V1: {
-          parents: 1,
-          interior: {
-            X2: [
-              { Parachain: toChain.paraChainId },
-              { AccountId32: { id: accountId, network: "Any" } },
-            ],
-          },
-        },
-      },
+      dst as any,
       this.getDestWeight(token, to) || "Unlimited"
     );
   }
