@@ -6,7 +6,6 @@ import { InterlayAdapter } from "../src/adapters/interlay";
 import { StatemintAdapter } from "../src/adapters/statemint";
 import { HydraAdapter } from "../src/adapters/hydradx";
 import { AcalaAdapter } from "../src/adapters/acala";
-import { AstarAdapter } from "../src/adapters/astar";
 import { ParallelAdapter } from "../src/adapters/parallel";
 import { BaseCrossChainAdapter } from "../src/base-chain-adapter";
 import { ChainName } from "../src/configs";
