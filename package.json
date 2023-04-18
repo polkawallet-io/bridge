@@ -28,13 +28,14 @@
     "rxjs": "^7.5.7"
   },
   "dependencies": {
-    "@acala-network/api": "4.1.8-7",
-    "@acala-network/sdk": "4.1.8-7",
-    "@acala-network/sdk-core": "4.1.8-7",
-    "@polkadot/api": "^9.9.1",
-    "@polkadot/apps-config": "^0.122.2",
-    "@polkadot/types": "^9.9.1",
-    "@polkadot/types-augment": "^9.9.1",
+    "@acala-network/api": "^4.1.8-14",
+    "@acala-network/eth-providers": "^2.6.5",
+    "@acala-network/sdk": "^4.1.8-14",
+    "@acala-network/sdk-core": "^4.1.8-14",
+    "@polkadot/api": "^9.14.2",
+    "@polkadot/apps-config": "^0.127.1",
+    "@polkadot/types": "^9.14.2",
+    "@polkadot/types-augment": "^9.14.2",
     "axios": "^0.27.2",
     "lodash": "^4.17.20"
   },
