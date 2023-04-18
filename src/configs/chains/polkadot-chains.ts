@@ -58,7 +58,7 @@ export const polkadotChains = {
   unique: {
     display: "Unique Network",
     type: "substrate",
-    icon: "https://resources.acala.network/networks/unique.png",
+    icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Funique.png&w=96&q=75",
     paraChaindId: 2037,
     ss58Prefix: 7391,
   },
