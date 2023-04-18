@@ -17,6 +17,21 @@ import {
   TransferParams,
 } from "../types";
 
+export const uniqueRoutersConfig: Omit<RouteConfigs, "from">[] = [
+  {
+    to: "acala",
+    token: "UNQ",
+    xcm: {
+      fee: { token: "UNQ", amount: "101030000000000000" },
+      weightLimit: "Unlimited",
+    },
+  },
+];
+
+export const uniqueTokensConfig: Record<string, BasicToken> = {
+  UNQ: { name: "UNQ", symbol: "UNQ", decimals: 18, ed: "" },
+};
+
 export const quartzRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "karura",
@@ -87,7 +102,7 @@ class BaseUniqueAdapter extends BaseCrossChainAdapter {
     this.balanceAdapter = new UniqueBalanceAdapter({
       chain: this.chain.id as ChainId,
       api,
-      tokens: quartzTokensConfig,
+      tokens: this.tokens,
     });
   }
 
@@ -176,5 +191,11 @@ class BaseUniqueAdapter extends BaseCrossChainAdapter {
 export class QuartzAdapter extends BaseUniqueAdapter {
   constructor() {
     super(chains.quartz, quartzRoutersConfig, quartzTokensConfig);
+  }
+}
+
+export class UniqueAdapter extends BaseUniqueAdapter {
+  constructor() {
+    super(chains.unique, uniqueRoutersConfig, uniqueTokensConfig);
   }
 }
