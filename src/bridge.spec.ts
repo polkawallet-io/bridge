@@ -8,10 +8,11 @@ import { KintsugiAdapter, InterlayAdapter } from "./adapters/interlay";
 import { FN } from "./types";
 import { KusamaAdapter, PolkadotAdapter } from "./adapters/polkadot";
 import { StatemineAdapter, StatemintAdapter } from "./adapters/statemint";
-import { HeikoAdapter } from "./adapters/parallel";
-import { KaruraAdapter } from "./adapters/acala";
+import { HeikoAdapter, ParallelAdapter } from "./adapters/parallel";
+import { AcalaAdapter, KaruraAdapter } from "./adapters/acala";
 import { BifrostAdapter } from "./adapters/bifrost";
 import { HydraAdapter } from "./adapters/hydradx";
+import { AstarAdapter } from "./adapters/astar";
 
 describe.skip("Bridge sdk usage", () => {
   jest.setTimeout(30000);
@@ -29,6 +30,9 @@ describe.skip("Bridge sdk usage", () => {
     heiko: new HeikoAdapter(),
     bifrost: new BifrostAdapter(),
     hydra: new HydraAdapter(),
+    acala: new AcalaAdapter(),
+    parallel: new ParallelAdapter(),
+    astar: new AstarAdapter(),
   };
 
   const bridge = new Bridge({
@@ -175,6 +179,12 @@ describe.skip("Bridge sdk usage", () => {
     // interlay
     // printBidirectionalTxs("interlay", "polkadot", "DOT");
     // printBidirectionalTxs("interlay", "statemint", "USDT");
-    printBidirectionalTxs("interlay", "hydra", "IBTC");
+    // printBidirectionalTxs("interlay", "hydra", "IBTC");
+    // printBidirectionalTxs("interlay", "acala", "INTR");
+    // printBidirectionalTxs("interlay", "acala", "IBTC");
+    // printBidirectionalTxs("interlay", "parallel", "INTR");
+    // printBidirectionalTxs("interlay", "parallel", "IBTC");
+    printBidirectionalTxs("interlay", "astar", "INTR");
+    printBidirectionalTxs("interlay", "astar", "IBTC");
   });
 });

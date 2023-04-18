@@ -17,70 +17,39 @@ import {
   CrossChainTransferParams,
 } from "../types";
 
-const DEST_WEIGHT = "Unlimited";
-
-export const parallelRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const astarRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
     to: "interlay",
     token: "IBTC",
     xcm: {
-      // during chopsticks test: fee = 71 Add 10x margin
+      // from recent xcm transfer: fee = 71 - Add 10x margin
       fee: { token: "IBTC", amount: "710" },
-      weightLimit: DEST_WEIGHT,
+      weightLimit: "Unlimited",
     },
   },
   {
     to: "interlay",
     token: "INTR",
     xcm: {
-      // during chopsticks test: fee = 21_660_472 Add 10x margin
+      // from recent xcm transfer: fee = 21660472 - Add 10x margin
       fee: { token: "INTR", amount: "216604720" },
-      weightLimit: DEST_WEIGHT,
+      weightLimit: "Unlimited",
     },
   },
 ];
 
-export const heikoRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
-  {
-    to: "kintsugi",
-    token: "KBTC",
-    xcm: {
-      // chopsticks tests indicate fees are 107
-      fee: { token: "KBTC", amount: "1070" },
-      weightLimit: DEST_WEIGHT,
-    },
-  },
-  {
-    to: "kintsugi",
-    token: "KINT",
-    xcm: {
-      fee: { token: "KINT", amount: "2471893330" }, // 247189333 fee in recent chopsticks test. Added 10x margin
-      weightLimit: DEST_WEIGHT,
-    },
-  },
-];
-
-export const parallelTokensConfig: Record<
-  string,
-  Record<string, BasicToken>
-> = {
-  parallel: {
-    // ed confirmed via assets.asset(<id>)
+export const astarTokensConfig: Record<string, Record<string, BasicToken>> = {
+  astar: {
+    ASTR: { name: "ASTR", symbol: "ASTR", decimals: 18, ed: "1000000" },
     IBTC: { name: "IBTC", symbol: "IBTC", decimals: 8, ed: "1" },
     INTR: { name: "INTR", symbol: "INTR", decimals: 10, ed: "1" },
   },
-  heiko: {
-    // ed confirmed via assets.asset(<id>)
-    KBTC: { name: "KBTC", symbol: "KBTC", decimals: 8, ed: "0" },
-    KINT: { name: "Kintsugi", symbol: "KINT", decimals: 12, ed: "0" },
-  },
 };
 
-const SUPPORTED_TOKENS: Record<string, number> = {
-  IBTC: 122, // asset id 122
-  INTR: 120, // asset id 120
-  KBTC: 121, // asset id 121
-  KINT: 119, // asset id 119
+const SUPPORTED_TOKENS: Record<string, string> = {
+  // to interlay
+  IBTC: "18446744073709551620",
+  INTR: "18446744073709551621",
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -92,7 +61,7 @@ const createBalanceStorages = (api: AnyApi) => {
         path: "derive.balances.all",
         params: [address],
       }),
-    assets: (tokenId: number, address: string) =>
+    assets: (tokenId: string, address: string) =>
       Storage.create<any>({
         api,
         path: "query.assets.account",
@@ -101,7 +70,7 @@ const createBalanceStorages = (api: AnyApi) => {
   };
 };
 
-class ParallelBalanceAdapter extends BalanceAdapter {
+class AstarBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
   constructor({ api, chain, tokens }: BalanceAdapterConfigs) {
@@ -156,20 +125,20 @@ class ParallelBalanceAdapter extends BalanceAdapter {
   }
 }
 
-class BaseParallelAdapter extends BaseCrossChainAdapter {
-  private balanceAdapter?: ParallelBalanceAdapter;
+class BaseAstarAdapter extends BaseCrossChainAdapter {
+  private balanceAdapter?: AstarBalanceAdapter;
 
-  public override async setApi(api: AnyApi) {
+  public async setApi(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
 
     const chain = this.chain.id as ChainName;
 
-    this.balanceAdapter = new ParallelBalanceAdapter({
+    this.balanceAdapter = new AstarBalanceAdapter({
       chain,
       api,
-      tokens: parallelTokensConfig[chain],
+      tokens: astarTokensConfig[chain],
     });
   }
 
@@ -237,43 +206,68 @@ class BaseParallelAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    const tokenId = SUPPORTED_TOKENS[token];
+    const dst = {
+      parents: 1,
+      interior: { X1: { Parachain: toChain.paraChainId } },
+    };
+    const acc = {
+      parents: 0,
+      interior: { X1: { AccountId32: { id: accountId, network: "Any" } } },
+    };
+    let ass: any = [
+      {
+        id: { Concrete: { parents: 0, interior: "Here" } },
+        fun: { Fungible: amount.toChainData() },
+      },
+    ];
+
+    if (token === this.balanceAdapter?.nativeToken) {
+      return this.api?.tx.polkadotXcm.reserveTransferAssets(
+        { V1: dst },
+        { V1: acc },
+        { V1: ass },
+        0
+      );
+    }
+
+    const tokenIds: Record<string, string> = {
+      // ids taken from https://github.com/colorfulnotion/xcm-global-registry/blob/main/assets/polkadot/polkadot_2000_assets.json
+      // to interlay
+      IBTC: "0x0001",
+      INTR: "0x0002",
+    };
+
+    const tokenId = tokenIds[token];
 
     if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
     }
 
-    return this.api.tx.xTokens.transfer(
-      tokenId,
-      amount.toChainData(),
+    ass = [
       {
-        V1: {
-          parents: 1,
-          interior: {
-            X2: [
-              { Parachain: toChain.paraChainId },
-              { AccountId32: { id: accountId, network: "Any" } },
-            ],
+        id: {
+          Concrete: {
+            parents: 1,
+            interior: {
+              X2: [{ Parachain: toChain.paraChainId }, { GeneralKey: tokenId }],
+            },
           },
         },
+        fun: { Fungible: amount.toChainData() },
       },
-      this.getDestWeight(token, to) || "Unlimited"
+    ];
+
+    return this.api?.tx.polkadotXcm.reserveWithdrawAssets(
+      { V1: dst },
+      { V1: acc },
+      { V1: ass },
+      0
     );
   }
 }
 
-export class HeikoAdapter extends BaseParallelAdapter {
+export class AstarAdapter extends BaseAstarAdapter {
   constructor() {
-    super(chains.heiko, heikoRoutersConfig, parallelTokensConfig.heiko);
-  }
-}
-
-export class ParallelAdapter extends BaseParallelAdapter {
-  constructor() {
-    super(
-      chains.parallel,
-      parallelRoutersConfig,
-      parallelTokensConfig.parallel
-    );
+    super(chains.astar, astarRoutersConfig, astarTokensConfig.astar);
   }
 }

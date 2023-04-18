@@ -5,6 +5,9 @@ import { PolkadotAdapter } from "../src/adapters/polkadot";
 import { InterlayAdapter } from "../src/adapters/interlay";
 import { StatemintAdapter } from "../src/adapters/statemint";
 import { HydraAdapter } from "../src/adapters/hydradx";
+import { AcalaAdapter } from "../src/adapters/acala";
+import { AstarAdapter } from "../src/adapters/astar";
+import { ParallelAdapter } from "../src/adapters/parallel";
 import { BaseCrossChainAdapter } from "../src/base-chain-adapter";
 import { ChainName } from "../src/configs";
 import { runTestCasesAndExit } from "./chopsticks-test";
@@ -24,13 +27,22 @@ async function main(): Promise<void> {
         interlay:   { adapter: new InterlayAdapter(),   endpoints: ['ws://127.0.0.1:8000'] },
         statemint:  { adapter: new StatemintAdapter(),  endpoints: ['ws://127.0.0.1:8001'] },
         hydra:      { adapter: new HydraAdapter(),      endpoints: ['ws://127.0.0.1:8002'] },
-        polkadot:   { adapter: new PolkadotAdapter(),   endpoints: ['ws://127.0.0.1:8003'] },
+        acala:      { adapter: new AcalaAdapter(),      endpoints: ['ws://127.0.0.1:8003'] },
+        astar:      { adapter: new AstarAdapter(),      endpoints: ['ws://127.0.0.1:8004'] },
+        parallel:   { adapter: new ParallelAdapter(),   endpoints: ['ws://127.0.0.1:8005'] },
+        polkadot:   { adapter: new PolkadotAdapter(),   endpoints: ['ws://127.0.0.1:8006'] },
     };
 
     const testCases = [
         ["polkadot", "DOT"],
         ["statemint", "USDT"],
         ["hydra", "IBTC"],
+        ["acala", "IBTC"],
+        ["acala", "INTR"],
+        ["astar", "IBTC"],
+        ["astar", "INTR"],
+        ["parallel", "IBTC"],
+        ["parallel", "INTR"],
     ].flatMap(([targetChain, token]) => [
         {from: "interlay" as ChainName, to: targetChain as ChainName, token}, 
         {from: targetChain as ChainName, to: "interlay" as ChainName, token}

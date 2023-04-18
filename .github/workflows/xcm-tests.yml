@@ -23,6 +23,7 @@ jobs:
           max_attempts: 3
           retry_on: error
           timeout_minutes: 10
+          on_retry_command: killall node
           command: |
             cd /app
             yarn start xcm \
@@ -58,13 +59,17 @@ jobs:
           max_attempts: 3
           retry_on: error
           timeout_minutes: 10
+          on_retry_command: killall node
           command: |
             cd /app
             yarn start xcm \
               --relaychain=configs/polkadot.yml \
               --parachain=configs/interlay.yml \
               --parachain=configs/statemint.yml \
-              --parachain=configs/hydradx.yml &
+              --parachain=configs/hydradx.yml \
+              --parachain=configs/acala.yml \
+              --parachain=configs/astar.yml \
+              --parachain=configs/parallel.yml &
             cd -
 
             yarn install --frozen-lockfile
