@@ -130,6 +130,25 @@ const connected = await firstValueFrom(provider.connectFromChain(chains, undefin
 await Promise.all(chains.map((chain) => availableAdapters[chain].init(provider.getApi(chain))));
 ```
 
+> For ERC20 token of EVM, acala.js introduces an approach
+> to query token balance from EVM with `@acala-network/eth-providers`.
+> see: [src/adapters/acala.spec.ts](src/adapters/acala.spec.ts)
+
+```typescript
+import { EvmRpcProvider } from "@acala-network/eth-providers";
+import { Wallet } from "@acala-network/sdk";
+
+const provider = new ApiProvider();
+const api = provider.getApiPromise("acala");
+const evmProvider = new EvmRpcProvider("wss://acala.polkawallet.io");
+const wallet = new Wallet(api, { evmProvider });
+
+// by passing a wallet instance with [EvmRpcProvider],
+// the [AcalaAdapter] can access the ERC20 token balance in EVM.
+const acala = new AcalaAdapter();
+await acala.init(api, wallet);
+```
+
 ### 3. token balance query & token transfer
 
 ```typescript
