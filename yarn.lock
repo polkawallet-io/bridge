@@ -3512,7 +3512,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@polkadot/api@npm:9.14.2, @polkadot/api@npm:^9.10.1, @polkadot/api@npm:^9.13.2, @polkadot/api@npm:^9.14.1, @polkadot/api@npm:^9.9.1":
+"@polkadot/api@npm:9.14.2, @polkadot/api@npm:^9.10.1, @polkadot/api@npm:^9.13.2, @polkadot/api@npm:^9.14.1, @polkadot/api@npm:^9.14.2, @polkadot/api@npm:^9.9.1":
   version: 9.14.2
   resolution: "@polkadot/api@npm:9.14.2"
   dependencies:
@@ -4368,7 +4368,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@polkadot/types@npm:9.14.2, @polkadot/types@npm:^9.13.2, @polkadot/types@npm:^9.9.1":
+"@polkadot/types@npm:9.14.2, @polkadot/types@npm:^9.13.2, @polkadot/types@npm:^9.14.2, @polkadot/types@npm:^9.9.1":
   version: 9.14.2
   resolution: "@polkadot/types@npm:9.14.2"
   dependencies:
@@ -5116,8 +5116,9 @@ __metadata:
     "@acala-network/sdk": ^4.1.8-14
     "@acala-network/sdk-core": ^4.1.8-14
     "@open-web3/dev-config": ^0.2.3
-    "@polkadot/api": ^9.9.1
+    "@polkadot/api": ^9.14.2
     "@polkadot/apps-config": ^0.127.1
+    "@polkadot/types": ^9.14.2
     "@types/jest": ^28.1.1
     "@types/lodash": ^4.14.161
     axios: ^0.27.2
