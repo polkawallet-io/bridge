@@ -63,9 +63,9 @@ const allRouters = bridge.router.getRouters();
 const availableRouters = bridge.router.getAvailableRouters();
 
 /// and get filtered routers
-const destChains = bridge.router.getDestinationChains({ from: "acala" });
+const destChains = bridge.router.getDestinationChains({ from: "interlay" });
 const tokens = bridge.router.getAvailableTokens({
-  from: "acala",
+  from: "interlay",
   to: "polkadot",
 });
 ```
