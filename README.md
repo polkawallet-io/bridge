@@ -25,7 +25,7 @@ All channels support transfers in both directions.
 
 | channel   | tokens         |
 | --------- | -------------- |
-| bifrost   | VKS            |
+| bifrost   | VKSM            |
 | heiko     | KBTC KINT      |
 | karura    | KBTC KINT LKSM |
 | kusama    | DOT            |
