@@ -373,6 +373,6 @@ export class BasiliskAdapter extends BaseHydradxAdapter {
 
 export class HydraAdapter extends BaseHydradxAdapter {
   constructor() {
-    super(chains.hydra, hydraRoutersConfig, hydraTokensConfig);
+    super(chains.hydradx, hydraRoutersConfig, hydraTokensConfig);
   }
 }

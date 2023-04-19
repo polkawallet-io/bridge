@@ -48,7 +48,7 @@ export const polkadotChains = {
     paraChainId: 2006,
     ss58Prefix: 5,
   },
-  hydra: {
+  hydradx: {
     display: "HydraDX",
     type: "substrate",
     icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fhydra.png&w=96&q=75",

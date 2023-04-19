@@ -150,7 +150,7 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     },
   },
   {
-    to: "hydra",
+    to: "hydradx",
     token: "DAI",
     xcm: {
       fee: { token: "DAI", amount: "2926334210356268" },
@@ -158,7 +158,7 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     },
   },
   {
-    to: "hydra",
+    to: "hydradx",
     token: "WETH",
     xcm: {
       fee: { token: "WETH", amount: "956965470918" },
@@ -166,7 +166,7 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     },
   },
   {
-    to: "hydra",
+    to: "hydradx",
     token: "WBTC",
     xcm: {
       fee: { token: "WBTC", amount: "6" },
