@@ -10,7 +10,7 @@ And you're welcome to add your parachain-adapter into the SDK.
 
 All channels support transfers in both directions.
 
-#### Kintsugi:
+#### Interlay:
 
 | channel   | tokens    |
 | --------- | --------- |
@@ -21,7 +21,7 @@ All channels support transfers in both directions.
 | statemint | USDT      |
 | hydradx   | IBTC      |
 
-#### Interlay:
+#### Kintsugi:
 
 | channel   | tokens         |
 | --------- | -------------- |
