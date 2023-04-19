@@ -6,67 +6,30 @@ You can integrate the amazing multi-chain bridge into your DApp with this SDK.
 
 And you're welcome to add your parachain-adapter into the SDK.
 
-### Supported parachains
+### Supported channels
 
-Polkadot:
+All channels support transferring in either direction
 
-| from     | to       | tokens             |
-| -------- | -------- | ------------------ |
-| polkadot | acala    | DOT                |
-| acala    | polkadot | DOT                |
-| acala    | moonbeam | GLMR ACA AUSD      |
-| acala    | parallel | PARA ACA AUSD LDOT |
-| acala    | interlay | INTR IBTC          |
-| acala    | astar    | ASTR ACA AUSD LDOT |
-| parallel | acala    | PARA ACA AUSD LDOT |
-| interlay | acala    | INTR IBTC          |
-| astar    | acala    | ASTR ACA AUSD LDOT |
+#### Kintsugi:
 
-Kusama:
+#### Interlay:
 
-| from       | to         | tokens                 |
-| ---------- | ---------- | ---------------------- |
-| kusama     | karura     | KSM                    |
-| kusama     | statemine  | KSM                    |
-| kusama     | basilisk   | KSM                    |
-| statemine  | karura     | RMRK ARIS USDT         |
-| karura     | kusama     | KSM                    |
-| karura     | statemine  | RMRK ARIS USDT         |
-| karura     | bifrost    | BNC KAR AUSD VSKSM     |
-| karura     | shiden     | SDN AUSD               |
-| karura     | altair     | AIR AUSD               |
-| karura     | shadow     | CSM KAR AUSD           |
-| karura     | crab       | CRAB                   |
-| karura     | integritee | TEER                   |
-| karura     | kintsugi   | KINT KBTC              |
-| karura     | khala      | PHA KAR AUSD           |
-| karura     | kico       | KICO KAR AUSD          |
-| karura     | calamari   | KMA KAR AUSD LKSM      |
-| karura     | moonriver  | MOVR KAR AUSD          |
-| karura     | heiko      | HKO KAR AUSD LKSM      |
-| karura     | pichiu     | PCHU KAR AUSD LKSM     |
-| karura     | turing     | TUR KAR AUSD LKSM      |
-| karura     | quartz     | QTZ                    |
-| karura     | basilisk   | BSX AUSD               |
-| karura     | listen     | LT KAR AUSD LKSM       |
-| bifrost    | karura     | BNC KAR AUSD KSM VSKSM |
-| shiden     | karura     | SDN AUSD               |
-| altair     | karura     | AIR AUSD               |
-| shadow     | karura     | CSM KAR AUSD           |
-| crab       | karura     | CRAB                   |
-| integritee | karura     | TEER                   |
-| kintsugi   | karura     | KINT KBTC              |
-| khala      | karura     | PHA KAR AUSD           |
-| kico       | karura     | KICO KAR AUSD          |
-| calamari   | karura     | KMA KAR AUSD KSM LKSM  |
-| moonriver  | karura     | MOVR KAR AUSD          |
-| heiko      | karura     | HKO KAR AUSD LKSM      |
-| pichiu     | karura     | PCHU KAR AUSD LKSM     |
-| turing     | karura     | TUR KAR AUSD LKSM      |
-| quartz     | karura     | QTZ                    |
-| basilisk   | kusama     | KSM                    |
-| basilisk   | karura     | BSX AUSD KSM           |
-| listen     | karura     | LT KAR AUSD LKSM       |
+| channel   | tokens    |
+| --------- | --------- |
+| acala     | INTR IBTC |
+| astar     | INTR IBTC |
+| parallel  | INTR IBTC |
+| polkadot  | DOT       |
+| statemint | USDT      |
+| hydradx   | IBTC      |
+
+| channel   | tokens         |
+| --------- | -------------- |
+| bifrost   | VKSN           |
+| heiko     | KBTC KINT      |
+| karura    | KBTC KINT LKSM |
+| kusama    | DOT            |
+| statemine | USDT           |
 
 ## Usage
 
@@ -100,8 +63,11 @@ const allRouters = bridge.router.getRouters();
 const availableRouters = bridge.router.getAvailableRouters();
 
 /// and get filtered routers
-const destChains = bridge.router.getDestinationChains({from: 'acala'});
-const tokens = bridge.router.getAvailableTokens({from: 'acala', to: 'polkadot'});
+const destChains = bridge.router.getDestinationChains({ from: "acala" });
+const tokens = bridge.router.getAvailableTokens({
+  from: "acala",
+  to: "polkadot",
+});
 ```
 
 ### 2. network connection
