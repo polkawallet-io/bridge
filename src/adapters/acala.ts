@@ -173,6 +173,14 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: ACALA_DEST_WEIGHT,
     },
   },
+  {
+    to: "unique",
+    token: "UNQ",
+    xcm: {
+      fee: { token: "UNQ", amount: "" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
 ];
 
 export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
@@ -660,6 +668,12 @@ export const acalaTokensConfig: Record<string, BasicToken> = {
     symbol: "WBTC",
     decimals: 8,
     ed: "35",
+  },
+  UNQ: {
+    name: "Unique Network",
+    symbol: "UNQ",
+    decimals: 18,
+    ed: "1250000000000000000",
   },
 };
 
