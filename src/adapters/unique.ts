@@ -29,7 +29,7 @@ export const uniqueRoutersConfig: Omit<RouteConfigs, "from">[] = [
 ];
 
 export const uniqueTokensConfig: Record<string, BasicToken> = {
-  UNQ: { name: "UNQ", symbol: "UNQ", decimals: 18, ed: "" },
+  UNQ: { name: "UNQ", symbol: "UNQ", decimals: 18, ed: "0" },
 };
 
 export const quartzRoutersConfig: Omit<RouteConfigs, "from">[] = [
