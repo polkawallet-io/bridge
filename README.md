@@ -8,11 +8,9 @@ And you're welcome to add your parachain-adapter into the SDK.
 
 ### Supported channels
 
-All channels support transferring in either direction
+All channels support transfers in both directions.
 
 #### Kintsugi:
-
-#### Interlay:
 
 | channel   | tokens    |
 | --------- | --------- |
@@ -23,9 +21,11 @@ All channels support transferring in either direction
 | statemint | USDT      |
 | hydradx   | IBTC      |
 
+#### Interlay:
+
 | channel   | tokens         |
 | --------- | -------------- |
-| bifrost   | VKSN           |
+| bifrost   | VKS            |
 | heiko     | KBTC KINT      |
 | karura    | KBTC KINT LKSM |
 | kusama    | DOT            |
