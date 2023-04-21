@@ -174,14 +174,46 @@ class BaseUniqueAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    const dst = { X2: ["Parent", { ParaChain: toChain.paraChainId }] };
-    const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
-    const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
+    const dst = {
+      V3: {
+        parents: 1,
+        interior: {
+          X1: {
+            Parachain: toChain.paraChainId,
+          },
+        },
+      },
+    };
+    const acc = {
+      V3: {
+        parents: 0,
+        interior: {
+          X1: {
+            AccountId32: { id: accountId },
+          },
+        },
+      },
+    };
+    const ass = {
+      V3: [
+        {
+          id: {
+            Concrete: {
+              parents: 0,
+              interior: "Here",
+            },
+          },
+          fun: {
+            Fungible: amount.toChainData(),
+          },
+        },
+      ],
+    };
 
     return this.api?.tx.polkadotXcm.limitedReserveTransferAssets(
-      { V0: dst },
-      { V0: acc },
-      { V0: ass },
+      dst,
+      acc,
+      ass,
       0,
       this.getDestWeight(token, to)?.toString()
     );
