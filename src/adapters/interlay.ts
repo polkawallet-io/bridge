@@ -16,11 +16,13 @@ import {
 import {
   BalanceData,
   BasicToken,
+  Chain,
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
 import { isChainEqual } from "../utils/is-chain-equal";
 import { supportsUnlimitedDestWeight } from "../utils/xtokens-dest-weight";
+import { supportsV0V1Multilocation } from "../utils/xcm-versioned-multilocation-check";
 
 const DEST_WEIGHT = "180000000000";
 
@@ -327,6 +329,12 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
     );
   }
 
+  private isRelayChain(chainName: Chain): boolean {
+    return (
+      isChainEqual(chainName, "kusama") || isChainEqual(chainName, "polkadot")
+    );
+  }
+
   public createTx(
     params: CrossChainTransferParams
   ):
@@ -347,24 +355,27 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
       throw new CurrencyNotFound(token);
     }
 
-    // to other parachains
-    let dst: any = {
+    const supportsV1 = supportsV0V1Multilocation(this.api);
+    const isToRelayChain = this.isRelayChain(toChain);
+
+    const accountIdPart = supportsV1
+      ? { AccountId32: { id: accountId, network: "Any" } }
+      : { AccountId32: { id: accountId } };
+
+    const interiorPart = isToRelayChain
+      ? { interior: { X1: accountIdPart } }
+      : {
+          interior: {
+            X2: [{ Parachain: toChain.paraChainId }, accountIdPart],
+          },
+        };
+
+    const destPart = {
       parents: 1,
-      interior: {
-        X2: [
-          { Parachain: toChain.paraChainId },
-          { AccountId32: { id: accountId, network: "Any" } },
-        ],
-      },
+      ...interiorPart,
     };
 
-    // to relay-chain
-    if (isChainEqual(toChain, "kusama") || isChainEqual(toChain, "polkadot")) {
-      dst = {
-        interior: { X1: { AccountId32: { id: accountId, network: "Any" } } },
-        parents: 1,
-      };
-    }
+    const dst = supportsV1 ? { V1: destPart } : { V3: destPart };
 
     // use "Unlimited" if the xToken.transfer's fourth parameter version supports it
     const destWeight = supportsUnlimitedDestWeight(this.api)
@@ -378,9 +389,7 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
     return this.api.tx.xTokens.transfer(
       tokenId,
       amount.toChainData(),
-      {
-        V1: dst,
-      },
+      dst as any,
       destWeight
     );
   }
