@@ -24,6 +24,7 @@ import {
   CrossChainTransferParams,
 } from "../types";
 import { supportsUnlimitedDestWeight } from "../utils/xtokens-dest-weight";
+import { supportsV0V1Multilocation } from "../utils/xcm-versioned-multilocation-check";
 
 const ACALA_DEST_WEIGHT = "5000000000";
 
@@ -211,21 +212,34 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    // to other parachains
-    const dst: any = {
-      parents: 1,
-      interior: {
-        X2: [
-          { Parachain: toChain.paraChainId },
-          { AccountId32: { id: accountId, network: "Any" } },
-        ],
-      },
-    };
+    const dest = supportsV0V1Multilocation(this.api)
+      ? {
+          V1: {
+            parents: 1,
+            interior: {
+              X2: [
+                { Parachain: toChain.paraChainId },
+                { AccountId32: { id: accountId, network: "Any" } },
+              ],
+            },
+          },
+        }
+      : {
+          V3: {
+            parents: 1,
+            interior: {
+              X2: [
+                { Parachain: toChain.paraChainId },
+                { AccountId32: { id: accountId } },
+              ],
+            },
+          },
+        };
 
     return this.api.tx.xTokens.transfer(
       tokenFormSDK?.toChainData() as any,
       amount.toChainData(),
-      { V1: dst },
+      dest as any,
       destWeight
     );
   }
