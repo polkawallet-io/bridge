@@ -23,7 +23,7 @@ import {
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
-import { xTokensHelper } from "src/utils/xtokens-helper";
+import { xTokensHelper } from "../utils/xtokens-helper";
 
 const ACALA_DEST_WEIGHT = "5000000000";
 
