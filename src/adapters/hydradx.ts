@@ -207,29 +207,20 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
 
     const toChain = chains[to];
     const accountId = this.api?.createType("AccountId32", address).toHex();
-    const dst = supportsV0V1Multilocation(this.api)
-      ? {
-          V1: {
-            parents: 1,
-            interior: {
-              X2: [
-                { Parachain: toChain.paraChainId },
-                { AccountId32: { id: accountId, network: "Any" } },
-              ],
-            },
-          },
-        }
-      : {
-          V3: {
-            parents: 1,
-            interior: {
-              X2: [
-                { Parachain: toChain.paraChainId },
-                { AccountId32: { id: accountId } },
-              ],
-            },
-          },
-        };
+    const supportsV1 = supportsV0V1Multilocation(this.api);
+
+    const accountIdPart = supportsV1
+      ? { AccountId32: { id: accountId, network: "Any" } }
+      : { AccountId32: { id: accountId } };
+
+    const destPart = {
+      parents: 1,
+      interior: {
+        X2: [{ Parachain: toChain.paraChainId }, accountIdPart],
+      },
+    };
+
+    const dst = supportsV1 ? { V1: destPart } : { V3: destPart };
 
     // use "Unlimited" if the xToken.transfer's fourth parameter version supports it
     const destWeight = supportsUnlimitedDestWeight(this.api)

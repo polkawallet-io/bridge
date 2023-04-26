@@ -211,35 +211,25 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
     }
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
+    const supportsV1 = supportsV0V1Multilocation(this.api);
 
-    const dest = supportsV0V1Multilocation(this.api)
-      ? {
-          V1: {
-            parents: 1,
-            interior: {
-              X2: [
-                { Parachain: toChain.paraChainId },
-                { AccountId32: { id: accountId, network: "Any" } },
-              ],
-            },
-          },
-        }
-      : {
-          V3: {
-            parents: 1,
-            interior: {
-              X2: [
-                { Parachain: toChain.paraChainId },
-                { AccountId32: { id: accountId } },
-              ],
-            },
-          },
-        };
+    const accountIdPart = supportsV1
+      ? { AccountId32: { id: accountId, network: "Any" } }
+      : { AccountId32: { id: accountId } };
+
+    const destPart = {
+      parents: 1,
+      interior: {
+        X2: [{ Parachain: toChain.paraChainId }, accountIdPart],
+      },
+    };
+
+    const dst = supportsV1 ? { V1: destPart } : { V3: destPart };
 
     return this.api.tx.xTokens.transfer(
       tokenFormSDK?.toChainData() as any,
       amount.toChainData(),
-      dest as any,
+      dst as any,
       destWeight
     );
   }
