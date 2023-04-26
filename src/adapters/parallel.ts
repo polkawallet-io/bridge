@@ -16,6 +16,7 @@ import {
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
+import { supportsV0V1Multilocation } from "../utils/xcm-versioned-multilocation-check";
 
 const DEST_WEIGHT = "Unlimited";
 
@@ -243,20 +244,25 @@ class BaseParallelAdapter extends BaseCrossChainAdapter {
       throw new CurrencyNotFound(token);
     }
 
+    const supportsV1 = supportsV0V1Multilocation(this.api);
+
+    const accountIdPart = supportsV1
+      ? { AccountId32: { id: accountId, network: "Any" } }
+      : { AccountId32: { id: accountId } };
+
+    const destPart = {
+      parents: 1,
+      interior: {
+        X2: [{ Parachain: toChain.paraChainId }, accountIdPart],
+      },
+    };
+
+    const dst = supportsV1 ? { V1: destPart } : { V3: destPart };
+
     return this.api.tx.xTokens.transfer(
       tokenId,
       amount.toChainData(),
-      {
-        V1: {
-          parents: 1,
-          interior: {
-            X2: [
-              { Parachain: toChain.paraChainId },
-              { AccountId32: { id: accountId, network: "Any" } },
-            ],
-          },
-        },
-      },
+      dst as any,
       this.getDestWeight(token, to) || "Unlimited"
     );
   }
