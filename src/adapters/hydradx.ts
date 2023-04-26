@@ -20,8 +20,7 @@ import {
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
-import { supportsUnlimitedDestWeight } from "../utils/xtokens-dest-weight";
-import { supportsV0V1Multilocation } from "../utils/xcm-versioned-multilocation-check";
+import { xTokensHelper } from "../utils/xtokens-helper";
 
 const DEST_WEIGHT = "5000000000";
 
@@ -207,23 +206,14 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
 
     const toChain = chains[to];
     const accountId = this.api?.createType("AccountId32", address).toHex();
-    const supportsV1 = supportsV0V1Multilocation(this.api);
-
-    const accountIdPart = supportsV1
-      ? { AccountId32: { id: accountId, network: "Any" } }
-      : { AccountId32: { id: accountId } };
-
-    const destPart = {
-      parents: 1,
-      interior: {
-        X2: [{ Parachain: toChain.paraChainId }, accountIdPart],
-      },
-    };
-
-    const dst = supportsV1 ? { V1: destPart } : { V3: destPart };
+    const dst = xTokensHelper.buildV1orV3Destination(
+      this.api,
+      accountId,
+      toChain
+    );
 
     // use "Unlimited" if the xToken.transfer's fourth parameter version supports it
-    const destWeight = supportsUnlimitedDestWeight(this.api)
+    const destWeight = xTokensHelper.supportsUnlimitedDestWeight(this.api)
       ? "Unlimited"
       : this.getDestWeight(tokenName, to);
 

@@ -15,7 +15,7 @@ import {
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
-import { supportsV0V1Multilocation } from "../utils/xcm-versioned-multilocation-check";
+import { xTokensHelper } from "../utils/xtokens-helper";
 
 const DEST_WEIGHT = "Unlimited";
 
@@ -194,29 +194,11 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
       throw new CurrencyNotFound(token);
     }
 
-    const dst = supportsV0V1Multilocation(this.api)
-      ? {
-          V1: {
-            parents: 1,
-            interior: {
-              X2: [
-                { Parachain: toChain.paraChainId },
-                { AccountId32: { id: accountId, network: "Any" } },
-              ],
-            },
-          },
-        }
-      : {
-          V3: {
-            parents: 1,
-            interior: {
-              X2: [
-                { Parachain: toChain.paraChainId },
-                { AccountId32: { id: accountId } },
-              ],
-            },
-          },
-        };
+    const dst = xTokensHelper.buildV1orV3Destination(
+      this.api,
+      accountId,
+      toChain
+    );
 
     return this.api.tx.xTokens.transfer(
       tokenId,
