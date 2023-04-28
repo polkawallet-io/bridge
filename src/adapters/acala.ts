@@ -16,7 +16,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainName, chains } from "../configs";
-import { ApiNotFound, DestinationWeightNotFound } from "../errors";
+import { ApiNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
@@ -198,29 +198,17 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
     const { address, amount, to, token } = params;
 
     const tokenFormSDK = this.wallet?.getToken(token);
-    const toChain = chains[to];
+    const accountId = this.api.createType("AccountId32", address).toHex();
 
-    // use "Unlimited" if the xToken.transfer's fourth parameter version supports it
-    const destWeight = xTokensHelper.supportsUnlimitedDestWeight(this.api)
-      ? "Unlimited"
-      : this.getDestWeight(token, to);
-
-    if (destWeight === undefined) {
-      throw new DestinationWeightNotFound(this.chain.id, to, token);
-    }
-
-    const accountId = this.api?.createType("AccountId32", address).toHex();
-    const dst = xTokensHelper.buildV1orV3Destination(
+    return xTokensHelper.transfer(
       this.api,
+      this.chain,
+      chains[to],
       accountId,
-      toChain
-    );
-
-    return this.api.tx.xTokens.transfer(
+      token,
       tokenFormSDK?.toChainData() as any,
-      amount.toChainData(),
-      dst as any,
-      destWeight
+      amount,
+      this.getDestWeight(token, to)
     );
   }
 }

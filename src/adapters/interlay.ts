@@ -8,11 +8,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainName, chains } from "../configs";
-import {
-  ApiNotFound,
-  CurrencyNotFound,
-  DestinationWeightNotFound,
-} from "../errors";
+import { ApiNotFound, CurrencyNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
@@ -338,34 +334,19 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
     const { address, amount, to, token } = params;
     const toChain = chains[to];
 
-    const accountId = this.api?.createType("AccountId32", address).toHex();
+    const accountId = this.api.createType("AccountId32", address).toHex();
 
     const tokenId = getSupportedTokens(this.chain.id)[token];
 
-    if (tokenId === undefined) {
-      throw new CurrencyNotFound(token);
-    }
-
-    const dst = xTokensHelper.buildV1orV3Destination(
+    return xTokensHelper.transfer(
       this.api,
+      this.chain,
+      toChain,
       accountId,
-      toChain
-    );
-
-    // use "Unlimited" if the xToken.transfer's fourth parameter version supports it
-    const destWeight = xTokensHelper.supportsUnlimitedDestWeight(this.api)
-      ? "Unlimited"
-      : this.getDestWeight(token, to);
-
-    if (destWeight === undefined) {
-      throw new DestinationWeightNotFound(this.chain.id, to, token);
-    }
-
-    return this.api.tx.xTokens.transfer(
+      token,
       tokenId,
-      amount.toChainData(),
-      dst as any,
-      destWeight
+      amount,
+      this.getDestWeight(token, to) || "Unlimited"
     );
   }
 }

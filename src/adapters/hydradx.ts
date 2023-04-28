@@ -9,11 +9,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainName, chains } from "../configs";
-import {
-  ApiNotFound,
-  CurrencyNotFound,
-  DestinationWeightNotFound,
-} from "../errors";
+import { ApiNotFound, CurrencyNotFound } from "../errors";
 import {
   BalanceData,
   ExpandToken,
@@ -204,28 +200,19 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
       throw new CurrencyNotFound(token);
     }
 
+    const tokenId = token.toChainData();
     const toChain = chains[to];
-    const accountId = this.api?.createType("AccountId32", address).toHex();
-    const dst = xTokensHelper.buildV1orV3Destination(
+    const accountId = this.api.createType("AccountId32", address).toHex();
+
+    return xTokensHelper.transfer(
       this.api,
+      this.chain,
+      toChain,
       accountId,
-      toChain
-    );
-
-    // use "Unlimited" if the xToken.transfer's fourth parameter version supports it
-    const destWeight = xTokensHelper.supportsUnlimitedDestWeight(this.api)
-      ? "Unlimited"
-      : this.getDestWeight(tokenName, to);
-
-    if (destWeight === undefined) {
-      throw new DestinationWeightNotFound(this.chain.id, to, tokenName);
-    }
-
-    return this.api?.tx.xTokens.transfer(
-      token.toChainData(),
-      amount.toChainData(),
-      dst as any,
-      destWeight
+      tokenName,
+      tokenId,
+      amount,
+      this.getDestWeight(tokenName, to)
     );
   }
 }

@@ -186,7 +186,7 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
     const { address, amount, to, token } = params;
     const toChain = chains[to];
 
-    const accountId = this.api?.createType("AccountId32", address).toHex();
+    const accountId = this.api.createType("AccountId32", address).toHex();
 
     const tokenId = SUPPORTED_TOKENS[token];
 
@@ -194,16 +194,14 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
       throw new CurrencyNotFound(token);
     }
 
-    const dst = xTokensHelper.buildV1orV3Destination(
+    return xTokensHelper.transfer(
       this.api,
+      this.chain,
+      toChain,
       accountId,
-      toChain
-    );
-
-    return this.api.tx.xTokens.transfer(
+      token,
       tokenId,
-      amount.toChainData(),
-      dst as any,
+      amount,
       this.getDestWeight(token, to) || "Unlimited"
     );
   }
