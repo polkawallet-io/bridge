@@ -126,15 +126,15 @@ export const basiliskTokensConfig: Record<string, ExpandToken> = {
     name: "WETH",
     symbol: "WETH",
     decimals: 18,
-    ed: "7000000000000",
-    toChainData: () => 4,
+    ed: "6230529595016",
+    toChainData: () => 10,
   },
   WBTC: {
     name: "WBTC",
     symbol: "WBTC",
     decimals: 8,
-    ed: "44",
-    toChainData: () => 3,
+    ed: "33",
+    toChainData: () => 11,
   },
 };
 
