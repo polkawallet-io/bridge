@@ -9,18 +9,14 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainName, chains } from "../configs";
-import {
-  ApiNotFound,
-  CurrencyNotFound,
-  DestinationWeightNotFound,
-} from "../errors";
+import { ApiNotFound, CurrencyNotFound } from "../errors";
 import {
   BalanceData,
   ExpandToken,
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
-import { supportsUnlimitedDestWeight } from "../utils/xtokens-dest-weight";
+import { xTokensHelper } from "../utils/xtokens-helper";
 
 const DEST_WEIGHT = "5000000000";
 
@@ -204,35 +200,19 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
       throw new CurrencyNotFound(token);
     }
 
+    const tokenId = token.toChainData();
     const toChain = chains[to];
-    const accountId = this.api?.createType("AccountId32", address).toHex();
-    const dst = {
-      parents: 1,
-      interior:
-        to === "kusama" || to === "polkadot"
-          ? { X1: { AccountId32: { id: accountId, network: "Any" } } }
-          : {
-              X2: [
-                { Parachain: toChain.paraChainId },
-                { AccountId32: { id: accountId, network: "Any" } },
-              ],
-            },
-    };
+    const accountId = this.api.createType("AccountId32", address).toHex();
 
-    // use "Unlimited" if the xToken.transfer's fourth parameter version supports it
-    const destWeight = supportsUnlimitedDestWeight(this.api)
-      ? "Unlimited"
-      : this.getDestWeight(tokenName, to);
-
-    if (destWeight === undefined) {
-      throw new DestinationWeightNotFound(this.chain.id, to, tokenName);
-    }
-
-    return this.api?.tx.xTokens.transfer(
-      token.toChainData(),
-      amount.toChainData(),
-      { V1: dst },
-      destWeight
+    return xTokensHelper.transfer(
+      this.api,
+      this.chain,
+      toChain,
+      accountId,
+      tokenName,
+      tokenId,
+      amount,
+      this.getDestWeight(tokenName, to)
     );
   }
 }

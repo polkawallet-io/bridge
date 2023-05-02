@@ -16,6 +16,10 @@ import {
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
+import {
+  XCM_V3_GENERAL_KEY_DATA_BYTES,
+  supportsV0V1Multilocation,
+} from "../utils/xcm-versioned-multilocation-check";
 
 export const astarRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
@@ -206,28 +210,58 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    const dst = {
-      parents: 1,
-      interior: { X1: { Parachain: toChain.paraChainId } },
-    };
-    const acc = {
-      parents: 0,
-      interior: { X1: { AccountId32: { id: accountId, network: "Any" } } },
-    };
-    let ass: any = [
-      {
-        id: { Concrete: { parents: 0, interior: "Here" } },
-        fun: { Fungible: amount.toChainData() },
-      },
-    ];
+    const supportsV1 = supportsV0V1Multilocation(this.api);
+
+    let [dst, acc, ass] = supportsV1
+      ? [
+          {
+            V1: {
+              parents: 1,
+              interior: { X1: { Parachain: toChain.paraChainId } },
+            },
+          },
+          {
+            V1: {
+              parents: 0,
+              interior: {
+                X1: { AccountId32: { id: accountId, network: "Any" } },
+              },
+            },
+          },
+          {
+            V1: [
+              {
+                id: { Concrete: { parents: 0, interior: "Here" } },
+                fun: { Fungible: amount.toChainData() },
+              },
+            ],
+          },
+        ]
+      : [
+          {
+            V3: {
+              parents: 1,
+              interior: { X1: { Parachain: toChain.paraChainId } },
+            },
+          } as any,
+          {
+            V3: {
+              parents: 0,
+              interior: { X1: { AccountId32: { id: accountId } } },
+            },
+          } as any,
+          {
+            V3: [
+              {
+                id: { Concrete: { parents: 0, interior: "Here" } },
+                fun: { Fungible: amount.toChainData() },
+              },
+            ],
+          } as any,
+        ];
 
     if (token === this.balanceAdapter?.nativeToken) {
-      return this.api?.tx.polkadotXcm.reserveTransferAssets(
-        { V1: dst },
-        { V1: acc },
-        { V1: ass },
-        0
-      );
+      return this.api?.tx.polkadotXcm.reserveTransferAssets(dst, acc, ass, 0);
     }
 
     const tokenIds: Record<string, string> = {
@@ -243,26 +277,59 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
       throw new CurrencyNotFound(token);
     }
 
-    ass = [
-      {
-        id: {
-          Concrete: {
-            parents: 1,
-            interior: {
-              X2: [{ Parachain: toChain.paraChainId }, { GeneralKey: tokenId }],
-            },
-          },
-        },
-        fun: { Fungible: amount.toChainData() },
-      },
-    ];
-
-    return this.api?.tx.polkadotXcm.reserveWithdrawAssets(
-      { V1: dst },
-      { V1: acc },
-      { V1: ass },
-      0
+    // count bytes without the leading '0x'
+    const tokenIdByteCount = tokenId.replace("0x", "").length / 2;
+    const paddedTokenId = tokenId.padEnd(
+      // pad for a total length of required bytes plus '0x'
+      2 * XCM_V3_GENERAL_KEY_DATA_BYTES + 2,
+      "00"
     );
+
+    // not native token: reconstruct asset argument
+    ass = supportsV1
+      ? {
+          V1: [
+            {
+              id: {
+                Concrete: {
+                  parents: 1,
+                  interior: {
+                    X2: [
+                      { Parachain: toChain.paraChainId },
+                      { GeneralKey: tokenId },
+                    ],
+                  },
+                },
+              },
+              fun: { Fungible: amount.toChainData() },
+            },
+          ],
+        }
+      : {
+          V3: [
+            {
+              id: {
+                Concrete: {
+                  parents: 1,
+                  interior: {
+                    X2: [
+                      { Parachain: toChain.paraChainId },
+                      {
+                        GeneralKey: {
+                          length: tokenIdByteCount,
+                          data: paddedTokenId,
+                        },
+                      },
+                    ],
+                  },
+                },
+              },
+              fun: { Fungible: amount.toChainData() },
+            },
+          ],
+        };
+
+    return this.api?.tx.polkadotXcm.reserveWithdrawAssets(dst, acc, ass, 0);
   }
 }
 

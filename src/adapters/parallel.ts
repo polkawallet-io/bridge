@@ -16,6 +16,7 @@ import {
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
+import { xTokensHelper } from "../utils/xtokens-helper";
 
 const DEST_WEIGHT = "Unlimited";
 
@@ -235,7 +236,7 @@ class BaseParallelAdapter extends BaseCrossChainAdapter {
     const { address, amount, to, token } = params;
     const toChain = chains[to];
 
-    const accountId = this.api?.createType("AccountId32", address).toHex();
+    const accountId = this.api.createType("AccountId32", address).toHex();
 
     const tokenId = SUPPORTED_TOKENS[token];
 
@@ -243,20 +244,14 @@ class BaseParallelAdapter extends BaseCrossChainAdapter {
       throw new CurrencyNotFound(token);
     }
 
-    return this.api.tx.xTokens.transfer(
+    return xTokensHelper.transfer(
+      this.api,
+      this.chain,
+      toChain,
+      accountId,
+      token,
       tokenId,
-      amount.toChainData(),
-      {
-        V1: {
-          parents: 1,
-          interior: {
-            X2: [
-              { Parachain: toChain.paraChainId },
-              { AccountId32: { id: accountId, network: "Any" } },
-            ],
-          },
-        },
-      },
+      amount,
       this.getDestWeight(token, to) || "Unlimited"
     );
   }

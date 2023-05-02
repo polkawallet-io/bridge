@@ -8,19 +8,14 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainName, chains } from "../configs";
-import {
-  ApiNotFound,
-  CurrencyNotFound,
-  DestinationWeightNotFound,
-} from "../errors";
+import { ApiNotFound, CurrencyNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
-import { isChainEqual } from "../utils/is-chain-equal";
-import { supportsUnlimitedDestWeight } from "../utils/xtokens-dest-weight";
+import { xTokensHelper } from "../utils/xtokens-helper";
 
 const DEST_WEIGHT = "180000000000";
 
@@ -339,49 +334,19 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
     const { address, amount, to, token } = params;
     const toChain = chains[to];
 
-    const accountId = this.api?.createType("AccountId32", address).toHex();
+    const accountId = this.api.createType("AccountId32", address).toHex();
 
     const tokenId = getSupportedTokens(this.chain.id)[token];
 
-    if (tokenId === undefined) {
-      throw new CurrencyNotFound(token);
-    }
-
-    // to other parachains
-    let dst: any = {
-      parents: 1,
-      interior: {
-        X2: [
-          { Parachain: toChain.paraChainId },
-          { AccountId32: { id: accountId, network: "Any" } },
-        ],
-      },
-    };
-
-    // to relay-chain
-    if (isChainEqual(toChain, "kusama") || isChainEqual(toChain, "polkadot")) {
-      dst = {
-        interior: { X1: { AccountId32: { id: accountId, network: "Any" } } },
-        parents: 1,
-      };
-    }
-
-    // use "Unlimited" if the xToken.transfer's fourth parameter version supports it
-    const destWeight = supportsUnlimitedDestWeight(this.api)
-      ? "Unlimited"
-      : this.getDestWeight(token, to);
-
-    if (destWeight === undefined) {
-      throw new DestinationWeightNotFound(this.chain.id, to, token);
-    }
-
-    return this.api.tx.xTokens.transfer(
+    return xTokensHelper.transfer(
+      this.api,
+      this.chain,
+      toChain,
+      accountId,
+      token,
       tokenId,
-      amount.toChainData(),
-      {
-        V1: dst,
-      },
-      destWeight
+      amount,
+      this.getDestWeight(token, to) || "Unlimited"
     );
   }
 }

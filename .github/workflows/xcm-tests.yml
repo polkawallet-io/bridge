@@ -23,7 +23,7 @@ jobs:
           max_attempts: 3
           retry_on: error
           timeout_minutes: 10
-          on_retry_command: killall node
+          on_retry_command: pkill node; sleep 2
           command: |
             cd /app
             yarn start xcm \
@@ -59,7 +59,7 @@ jobs:
           max_attempts: 3
           retry_on: error
           timeout_minutes: 10
-          on_retry_command: killall node
+          on_retry_command: pkill node; sleep 2
           command: |
             cd /app
             yarn start xcm \

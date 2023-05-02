@@ -16,14 +16,14 @@ import { ISubmittableResult } from "@polkadot/types/types";
 
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainName, chains } from "../configs";
-import { ApiNotFound, DestinationWeightNotFound } from "../errors";
+import { ApiNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
-import { supportsUnlimitedDestWeight } from "../utils/xtokens-dest-weight";
+import { xTokensHelper } from "../utils/xtokens-helper";
 
 const ACALA_DEST_WEIGHT = "5000000000";
 
@@ -198,35 +198,17 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
     const { address, amount, to, token } = params;
 
     const tokenFormSDK = this.wallet?.getToken(token);
-    const toChain = chains[to];
+    const accountId = this.api.createType("AccountId32", address).toHex();
 
-    // use "Unlimited" if the xToken.transfer's fourth parameter version supports it
-    const destWeight = supportsUnlimitedDestWeight(this.api)
-      ? "Unlimited"
-      : this.getDestWeight(token, to);
-
-    if (destWeight === undefined) {
-      throw new DestinationWeightNotFound(this.chain.id, to, token);
-    }
-
-    const accountId = this.api?.createType("AccountId32", address).toHex();
-
-    // to other parachains
-    const dst: any = {
-      parents: 1,
-      interior: {
-        X2: [
-          { Parachain: toChain.paraChainId },
-          { AccountId32: { id: accountId, network: "Any" } },
-        ],
-      },
-    };
-
-    return this.api.tx.xTokens.transfer(
+    return xTokensHelper.transfer(
+      this.api,
+      this.chain,
+      chains[to],
+      accountId,
+      token,
       tokenFormSDK?.toChainData() as any,
-      amount.toChainData(),
-      { V1: dst },
-      destWeight
+      amount,
+      this.getDestWeight(token, to)
     );
   }
 }
