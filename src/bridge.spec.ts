@@ -206,13 +206,13 @@ describe.skip("Bridge sdk usage", () => {
       ["statemint", "DOT"],
     ];
 
-    for (const [chainName, expectedFirstToken] of testCases) {
+    for (const [chainName, expectedNativeToken] of testCases) {
       const adapter = bridge.router.findAdapterByName(chainName);
       if (adapter == undefined) {
         fail(`Unable to find adapter for test case chain: ${chainName}`);
       }
       const actualToken = adapter.getNativeToken();
-      expect(actualToken.symbol).toBe(expectedFirstToken);
+      expect(actualToken.symbol).toBe(expectedNativeToken);
     }
   });
 });
