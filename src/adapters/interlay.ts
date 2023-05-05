@@ -239,16 +239,28 @@ class InterlayBalanceAdapter extends BalanceAdapter {
 
     return this.storages.assets(address, tokenId).observable.pipe(
       map((balance) => {
-        const amount = FN.fromInner(
+        const free = FN.fromInner(
           balance.free?.toString() || "0",
           this.getToken(token).decimals
         );
 
+        const frozen = FN.fromInner(
+          balance.frozen?.toString() || "0",
+          this.getToken(token).decimals
+        );
+
+        const reserved = FN.fromInner(
+          balance.reserved?.toString() || "0",
+          this.getToken(token).decimals
+        );
+
+        const available = free.sub(frozen);
+
         return {
-          free: amount,
-          locked: new FN(0),
-          reserved: new FN(0),
-          available: amount,
+          free,
+          locked: frozen,
+          reserved,
+          available,
         };
       })
     );
