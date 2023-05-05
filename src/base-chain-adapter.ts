@@ -17,6 +17,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { ChainName, chains } from "./configs";
 import {
   AdapterNotFound,
+  ApiNotFound,
   RouterConfigNotFound,
   TokenConfigNotFound,
 } from "./errors";
@@ -165,6 +166,22 @@ export abstract class BaseCrossChainAdapter {
     }
 
     return tokenConfig as R;
+  }
+
+  public getNativeToken(): BasicToken {
+    if (this.api === undefined) {
+      throw new ApiNotFound(this.chain.id);
+    }
+
+    const nativeToken = this.api.registry.chainTokens[0];
+    const decimals = this.api.registry.chainDecimals[0];
+    const ed = this.api.consts.balances?.existentialDeposit?.toString() || "0";
+    return {
+      symbol: nativeToken,
+      name: nativeToken,
+      decimals,
+      ed,
+    };
   }
 
   public getDestED(token: string, destChain: ChainName): TokenBalance {
