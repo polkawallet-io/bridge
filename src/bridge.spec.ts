@@ -187,4 +187,32 @@ describe.skip("Bridge sdk usage", () => {
     printBidirectionalTxs("interlay", "astar", "INTR");
     printBidirectionalTxs("interlay", "astar", "IBTC");
   });
+
+  test("5. getNativeToken should work", () => {
+    const testCases: [ChainName, String][] = [
+      // kusama network
+      ["kusama", "KSM"],
+      ["kintsugi", "KINT"],
+      ["karura", "KAR"],
+      ["bifrost", "BNC"],
+      ["heiko", "HKO"],
+      ["statemine", "KSM"],
+      // polkadot network
+      ["polkadot", "DOT"],
+      ["interlay", "INTR"],
+      ["acala", "ACA"],
+      ["hydra", "HDX"],
+      ["parallel", "PARA"],
+      ["statemint", "DOT"],
+    ];
+
+    for (const [chainName, expectedNativeToken] of testCases) {
+      const adapter = bridge.router.findAdapterByName(chainName);
+      if (adapter == undefined) {
+        fail(`Unable to find adapter for test case chain: ${chainName}`);
+      }
+      const actualToken = adapter.getNativeToken();
+      expect(actualToken.symbol).toBe(expectedNativeToken);
+    }
+  });
 });
