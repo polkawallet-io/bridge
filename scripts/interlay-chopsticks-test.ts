@@ -8,8 +8,7 @@ import { HydraAdapter } from "../src/adapters/hydradx";
 import { AcalaAdapter } from "../src/adapters/acala";
 import { ParallelAdapter } from "../src/adapters/parallel";
 import { BaseCrossChainAdapter } from "../src/base-chain-adapter";
-import { ChainName } from "../src/configs";
-import { runTestCasesAndExit } from "./chopsticks-test";
+import { RouterTestCase, runTestCasesAndExit } from "./chopsticks-test";
 
 main().catch((err) => {
     console.log("Error thrown by script:");
@@ -35,20 +34,10 @@ async function main(): Promise<void> {
         polkadot:   { adapter: new PolkadotAdapter(),   endpoints: ['ws://127.0.0.1:8005'] },
     };
 
-    const testCases = [
-        ["polkadot", "DOT"],
-        ["statemint", "USDT"],
-        ["hydra", "IBTC"],
-        ["acala", "IBTC"],
-        ["acala", "INTR"],
-        // ["astar", "IBTC"],
-        // ["astar", "INTR"],
-        ["parallel", "IBTC"],
-        ["parallel", "INTR"],
-    ].flatMap(([targetChain, token]) => [
-        {from: "interlay" as ChainName, to: targetChain as ChainName, token}, 
-        {from: targetChain as ChainName, to: "interlay" as ChainName, token}
-    ]); // bidirectional testing
+    const filterCases: Partial<RouterTestCase>[] = [
+        {from: "astar"},
+        {to: "astar"},
+    ];
 
-    await runTestCasesAndExit(adaptersEndpoints, testCases);
+    await runTestCasesAndExit(adaptersEndpoints, filterCases);
 }
