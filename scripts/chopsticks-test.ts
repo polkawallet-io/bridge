@@ -13,6 +13,12 @@ import { BalanceChangedStatus } from "../src/types";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 
+export interface RouterTestCase {
+    from: ChainName,
+    to: ChainName,
+    token: string
+};
+
 async function submitTx(tx: SubmittableExtrinsic<"rxjs", ISubmittableResult>) {
     const keyring = new Keyring({ type: "sr25519" });
     // alice
@@ -166,18 +172,19 @@ async function retryCheckTransfer(
 }
 
 /**
- * Run through all test cases passed through using the adapters and their endpoints provided.
+ * Detect all routes to/from interlay or kintsugi, and runs test cases using the adapters and their endpoints provided.
  * 
  * Will print out results and end the process with an error code if it detects any errors, otherwise exit cleanly.
+ * Can skip specific test cases provided by the skipCases filter, and will also skip routes if no matching adapter has been provided.
  * 
  * @param adapterEndpoints Records containing ChainName as key, an instantiated adapter and a list of ws(s) links as endpoints for each.
- * @param testCases An array of xcm test cases to run.
+ * @param skipCases An array of xcm test cases to skip.
  */
 export async function runTestCasesAndExit(
     // record key is chainname
     adapterEndpoints: Record<ChainName, { adapter: BaseCrossChainAdapter, endpoints: Array<string> }>,
-    // testcases: array of chainname, token
-    testCases: {from: ChainName, to: ChainName, token: string}[]
+    // skip cases: array of to, from and/or token to skip tests for
+    skipCases: Partial<RouterTestCase>[] = []
 ): Promise<void> {
     const adapters = Object.values(adapterEndpoints).map((value) => value.adapter);
     const bridge = new Bridge({adapters});
@@ -201,11 +208,37 @@ export async function runTestCasesAndExit(
         )
     );
 
+    const srcDestAdapter = chains.includes("kintsugi") ? "kintsugi" : "interlay";
+    const routersOut = bridge.router.getRouters({from: srcDestAdapter});
+    const routersIn = bridge.router.getRouters({to: srcDestAdapter});
+    const testCases = routersOut.concat(routersIn).map((router) => ({
+        to: router.to.id as ChainName,
+        from: router.from.id as ChainName,
+        token: router.token
+    }));
+
+    const isSkipCase = (testCase: {to: ChainName, from: ChainName, token: string}): boolean => {
+        return skipCases.some((skipCase) =>
+            (skipCase.from === undefined || testCase.from === skipCase.from) &&
+            (skipCase.to === undefined || testCase.to === skipCase.to) &&
+            (skipCase.token === undefined || testCase.token === skipCase.token)
+        );
+    };
+    
+    const testCasesFiltered = testCases
+        .filter(testCase => !isSkipCase(testCase))
+        .filter(testCase => chains.includes(testCase.from) && chains.includes(testCase.to));
+    
+    if (testCasesFiltered.length != testCases.length) {
+        const countSkipped = testCases.length - testCasesFiltered.length;
+        console.log(`Skipping ${countSkipped} potential test cases because it was filtered, or no matching adapter was found.`);
+    }
+    
     let aggregateTestResult = ResultCode.OK;
     // collect failed/warning cases for logging at the end of the run, too
     const problematicTestCases: Array<{from: ChainName, to: ChainName, token: string, icon: string, message: string}> = [];
 
-    for (const {from, to, token} of testCases) {
+    for (const {from, to, token} of testCasesFiltered) {
         // don't use console.log because I don't want newline here - I want the OK/FAIL to be added on the same line
         process.stdout.write(`Testing ${token} transfer from ${from} to ${to}... `);
         const result = await retryCheckTransfer(from, to, token, bridge, 2);

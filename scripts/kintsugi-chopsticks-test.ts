@@ -1,14 +1,13 @@
 /* eslint @typescript-eslint/no-var-requires: "off" */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* tslint:disable:no-unused-variable */
-import { BaseCrossChainAdapter } from "../src/base-chain-adapter";
-import { ChainName } from "../src/configs";
-import { KintsugiAdapter } from "../src/adapters/interlay";
+import { KaruraAdapter } from "../src/adapters/acala";
 import { BifrostAdapter } from "../src/adapters/bifrost";
+import { KintsugiAdapter } from "../src/adapters/interlay";
+import { HeikoAdapter } from "../src/adapters/parallel";
 import { KusamaAdapter } from "../src/adapters/polkadot";
 import { StatemineAdapter } from "../src/adapters/statemint";
-import { KaruraAdapter } from "../src/adapters/acala";
-import { HeikoAdapter } from "../src/adapters/parallel";
+import { BaseCrossChainAdapter } from "../src/base-chain-adapter";
 import { runTestCasesAndExit } from "./chopsticks-test";
 
 main().catch((err) => {
@@ -31,19 +30,5 @@ async function main(): Promise<void> {
         kusama:     { adapter: new KusamaAdapter(),     endpoints: ['ws://127.0.0.1:8005'] },
     };
 
-    const testCases = [
-        ["bifrost", "VKSM"],
-        ["kusama", "KSM"], 
-        ["karura", "KBTC"],
-        ["karura", "KINT"],
-        ["karura", "LKSM"],
-        ["statemine", "USDT"],
-        ["heiko", "KINT"],
-        ["heiko", "KBTC"],
-    ].flatMap(([targetChain, token]) => [
-        {from: "kintsugi" as ChainName, to: targetChain as ChainName, token}, 
-        {from: targetChain as ChainName, to: "kintsugi" as ChainName, token}
-    ]); // bidirectional testing
-
-    await runTestCasesAndExit(adaptersEndpoints, testCases);
+    await runTestCasesAndExit(adaptersEndpoints);
 }
