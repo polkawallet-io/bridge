@@ -36,7 +36,8 @@ const buildV1orV3Destination = (
 };
 
 const supportsUnlimitedDestWeight = (api: AnyApi): boolean =>
-  api.tx.xTokens.transfer.meta.args[3].type.toString() === "XcmV2WeightLimit";
+  api.tx.xTokens.transfer.meta.args[3].type.toString() === "XcmV2WeightLimit" ||
+  api.tx.xTokens.transfer.meta.args[3].type.toString() === "XcmV3WeightLimit";
 
 export const xTokensHelper = {
   transfer: (
