@@ -25,10 +25,10 @@ All channels support transfers in both directions.
 
 | channel   | tokens         |
 | --------- | -------------- |
-| bifrost   | VKSM            |
+| bifrost   | VKSM           |
 | heiko     | KBTC KINT      |
 | karura    | KBTC KINT LKSM |
-| kusama    | DOT            |
+| kusama    | KSM            |
 | statemine | USDT           |
 
 ## Usage
