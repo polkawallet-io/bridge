@@ -243,6 +243,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
         interior: { X1: { ParaChain: toChain.paraChainId } },
         parents: 0,
       };
+
       const acc = {
         interior: {
           X1: {
@@ -254,6 +255,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
         },
         parents: 0,
       };
+
       const ass = [
         {
           fun: { Fungible: amount.toChainData() },
