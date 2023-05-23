@@ -843,6 +843,19 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
     );
   }
 
+  private get isV0V1() {
+    try {
+      const keys = (this.api?.createType("XcmVersionedMultiLocation") as any)
+        .defKeys as string[];
+
+      return keys.includes("V0");
+    } catch (e) {
+      // ignore error
+    }
+
+    return false;
+  }
+
   public createTx(
     params: TransferParams
   ):
@@ -854,12 +867,9 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
 
     const { address, amount, to, token } = params;
 
+    const isV0V1Support = this.isV0V1;
     const tokenFormSDK = this.wallet?.getToken(token);
     const toChain = chains[to];
-    const oldDestWeight = this.getDestWeight(token, to);
-    const useNewDestWeight =
-      this.api.tx.xTokens.transfer.meta.args[3].type.toString() ===
-      "XcmV2WeightLimit";
 
     // to moonriver/moonbeam
     if (
@@ -871,7 +881,12 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
         interior: {
           X2: [
             { Parachain: toChain.paraChainId },
-            { AccountKey20: { key: address, network: "Any" } },
+            {
+              AccountKey20: {
+                key: address,
+                network: isV0V1Support ? "Any" : undefined,
+              },
+            },
           ],
         },
       };
@@ -879,8 +894,8 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
       return this.api.tx.xTokens.transfer(
         tokenFormSDK?.toChainData() as any,
         amount.toChainData(),
-        { V1: dst },
-        (useNewDestWeight ? "Unlimited" : oldDestWeight?.toString()) as any
+        { [isV0V1Support ? "V1" : "V3"]: dst },
+        "Unlimited"
       );
     }
 
@@ -892,7 +907,12 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
       interior: {
         X2: [
           { Parachain: toChain.paraChainId },
-          { AccountId32: { id: accountId, network: "Any" } },
+          {
+            AccountId32: {
+              id: accountId,
+              network: isV0V1Support ? "Any" : undefined,
+            },
+          },
         ],
       },
     };
@@ -900,20 +920,26 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
     // to relay-chain
     if (isChainEqual(toChain, "kusama") || isChainEqual(toChain, "polkadot")) {
       dst = {
-        interior: { X1: { AccountId32: { id: accountId, network: "Any" } } },
+        interior: {
+          X1: {
+            AccountId32: {
+              id: accountId,
+              network: isV0V1Support ? "Any" : undefined,
+            },
+          },
+        },
         parents: 1,
       };
     }
 
+    // to state-mine
     if (isChainEqual(toChain, "statemine")) {
       const assetId = STATEMINE_SUPPORTED_TOKENS[token];
 
-      if (!assetId) {
-        throw new TokenNotFound(token);
-      }
+      if (!assetId) throw new TokenNotFound(token);
 
       const asset = {
-        V1: {
+        [isV0V1Support ? "V1" : "V3"]: {
           fun: {
             Fungible: amount.toChainData(),
           },
@@ -931,17 +957,16 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
           },
         },
       };
+
       const dst = {
-        V1: {
+        [isV0V1Support ? "V1" : "V3"]: {
           parents: 1,
           interior: {
             X2: [
-              {
-                Parachain: toChain.paraChainId,
-              },
+              { Parachain: toChain.paraChainId },
               {
                 AccountId32: {
-                  network: "Any",
+                  network: isV0V1Support ? "Any" : undefined,
                   id: accountId,
                 },
               },
@@ -950,19 +975,15 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
         },
       };
 
-      return this.api.tx.xTokens.transferMultiasset(
-        asset,
-        dst,
-        (useNewDestWeight ? "Unlimited" : oldDestWeight?.toString()) as any
-      );
-    } else {
-      return this.api.tx.xTokens.transfer(
-        tokenFormSDK?.toChainData(),
-        amount.toChainData(),
-        { V1: dst },
-        (useNewDestWeight ? "Unlimited" : oldDestWeight?.toString()) as any
-      );
+      return this.api.tx.xTokens.transferMultiasset(asset, dst, "Unlimited");
     }
+
+    return this.api.tx.xTokens.transfer(
+      tokenFormSDK?.toChainData(),
+      amount.toChainData(),
+      { [isV0V1Support ? "V1" : "V3"]: dst },
+      "Unlimited"
+    );
   }
 }
 
