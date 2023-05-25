@@ -1,7 +1,8 @@
-import { Storage } from "@acala-network/sdk/utils/storage";
 import { AnyApi, FixedPointNumber as FN } from "@acala-network/sdk-core";
-import { combineLatest, map, Observable } from "rxjs";
+import { Storage } from "@acala-network/sdk/utils/storage";
+import { Observable, combineLatest, map } from "rxjs";
 
+import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 
@@ -53,20 +54,11 @@ const polkadotTokensConfig: Record<string, Record<string, BasicToken>> = {
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const createBalanceStorages = (api: AnyApi) => {
-  // TODO: this works with polkadot/api 9.10.2, remember to return to this after upgrade
-  // return {
-  //   balances: (address: string) =>
-  //     Storage.create<DeriveBalancesAll>({
-  //       api,
-  //       path: "derive.balances.all",
-  //       params: [address],
-  //     }),
-  // };
   return {
     balances: (address: string) =>
-      Storage.create<any>({
+      Storage.create<DeriveBalancesAll>({
         api,
-        path: "query.system.account",
+        path: "derive.balances.all",
         params: [address],
       }),
   };
@@ -91,26 +83,16 @@ class PolkadotBalanceAdapter extends BalanceAdapter {
       throw new CurrencyNotFound(token);
     }
 
-    // TODO: remember to change back once we upgrade to polkadot 9.10.2 or higher.
     return storage.observable.pipe(
-      map((data) => {
-        const free = FN.fromInner(data.data.free.toString(), this.decimals);
-        const locked = FN.fromInner(
-          data.data.miscFrozen.toString(),
+      map((data) => ({
+        free: FN.fromInner(data.freeBalance.toString(), this.decimals),
+        locked: FN.fromInner(data.lockedBalance.toString(), this.decimals),
+        reserved: FN.fromInner(data.reservedBalance.toString(), this.decimals),
+        available: FN.fromInner(
+          data.availableBalance.toString(),
           this.decimals
-        );
-        const reserved = FN.fromInner(
-          data.data.reserved.toString(),
-          this.decimals
-        );
-        const available = free.sub(locked);
-        return {
-          free,
-          locked,
-          reserved,
-          available,
-        };
-      })
+        ),
+      }))
     );
   }
 }
