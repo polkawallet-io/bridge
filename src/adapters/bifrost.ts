@@ -11,10 +11,11 @@ import { ChainId, chains } from "../configs";
 import { ApiNotFound, TokenNotFound } from "../errors";
 import {
   BalanceData,
-  BasicToken,
+  ExpandToken,
   RouteConfigs,
   TransferParams,
 } from "../types";
+import { createXTokensDestParams } from "src/utils";
 
 const DEST_WEIGHT = "Unlimited";
 
@@ -61,21 +62,42 @@ export const bifrostRoutersConfig: Omit<RouteConfigs, "from">[] = [
   },
 ];
 
-export const bifrostTokensConfig: Record<string, BasicToken> = {
-  BNC: { name: "BNC", symbol: "BNC", decimals: 12, ed: "10000000000" },
-  VSKSM: { name: "VSKSM", symbol: "VSKSM", decimals: 12, ed: "100000000" },
-  KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "100000000" },
-  KAR: { name: "KAR", symbol: "KAR", decimals: 12, ed: "148000000" },
-  KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "100000000" },
-};
-
-const SUPPORTED_TOKENS: Record<string, unknown> = {
-  KUSD: { Stable: "KUSD" },
-  AUSD: { Stable: "AUSD" },
-  BNC: { Native: "BNC" },
-  VSKSM: { VSToken: "KSM" },
-  KSM: { Token: "KSM" },
-  KAR: { Token: "KAR" },
+export const bifrostTokensConfig: Record<string, ExpandToken> = {
+  BNC: {
+    name: "BNC",
+    symbol: "BNC",
+    decimals: 12,
+    ed: "10000000000",
+    toChainData: () => ({ Native: "BNC" }),
+  },
+  VSKSM: {
+    name: "VSKSM",
+    symbol: "VSKSM",
+    decimals: 12,
+    ed: "100000000",
+    toChainData: () => ({ VSToken: "KSM" }),
+  },
+  KSM: {
+    name: "KSM",
+    symbol: "KSM",
+    decimals: 12,
+    ed: "100000000",
+    toChainData: () => ({ Token: "KSM" }),
+  },
+  KAR: {
+    name: "KAR",
+    symbol: "KAR",
+    decimals: 12,
+    ed: "148000000",
+    toChainData: () => ({ Token: "KAR" }),
+  },
+  KUSD: {
+    name: "KUSD",
+    symbol: "KUSD",
+    decimals: 12,
+    ed: "100000000",
+    toChainData: () => ({ Stable: "KUSD" }),
+  },
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -109,6 +131,7 @@ class BifrostBalanceAdapter extends BalanceAdapter {
     address: string
   ): Observable<BalanceData> {
     const storage = this.storages.balances(address);
+    const tokenData: ExpandToken = this.getToken(token);
 
     if (token === this.nativeToken) {
       return storage.observable.pipe(
@@ -124,27 +147,27 @@ class BifrostBalanceAdapter extends BalanceAdapter {
       );
     }
 
-    const tokenId = SUPPORTED_TOKENS[token];
-
-    if (tokenId === undefined) {
+    if (!tokenData) {
       throw new TokenNotFound(token);
     }
 
-    return this.storages.assets(address, tokenId).observable.pipe(
-      map((balance) => {
-        const amount = FN.fromInner(
-          balance.free?.toString() || "0",
-          this.getToken(token).decimals
-        );
+    return this.storages
+      .assets(address, tokenData.toChainData())
+      .observable.pipe(
+        map((balance) => {
+          const amount = FN.fromInner(
+            balance.free?.toString() || "0",
+            this.getToken(token).decimals
+          );
 
-        return {
-          free: amount,
-          locked: new FN(0),
-          reserved: new FN(0),
-          available: amount,
-        };
-      })
-    );
+          return {
+            free: amount,
+            locked: new FN(0),
+            reserved: new FN(0),
+            available: amount,
+          };
+        })
+      );
   }
 }
 
@@ -227,9 +250,9 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    const tokenId = SUPPORTED_TOKENS[token];
+    const tokenData: ExpandToken = this.getToken(token);
 
-    if (tokenId === undefined) {
+    if (!tokenData) {
       throw new TokenNotFound(token);
     }
 
@@ -241,19 +264,9 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
     const destWeight = useNewDestWeight ? "Unlimited" : oldDestWeight;
 
     return this.api.tx.xTokens.transfer(
-      tokenId,
+      tokenData.toChainData(),
       amount.toChainData(),
-      {
-        V1: {
-          parents: 1,
-          interior: {
-            X2: [
-              { Parachain: toChain.paraChainId },
-              { AccountId32: { id: accountId, network: "Any" } },
-            ],
-          },
-        },
-      },
+      createXTokensDestParams(this.api, toChain.paraChainId, accountId),
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       destWeight
     );

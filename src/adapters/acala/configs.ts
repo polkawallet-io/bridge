@@ -1,32 +1,4 @@
-import { Wallet } from "@acala-network/sdk/wallet";
-import { AnyApi, FixedPointNumber } from "@acala-network/sdk-core";
-import {
-  catchError,
-  combineLatest,
-  firstValueFrom,
-  map,
-  Observable,
-  of,
-} from "rxjs";
-
-import "@acala-network/types/argument/api-tx";
-import { ApiRx } from "@polkadot/api";
-import { SubmittableExtrinsic } from "@polkadot/api/types";
-import { ISubmittableResult } from "@polkadot/types/types";
-
-import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { ChainId, chains } from "../configs";
-import { ApiNotFound, TokenNotFound } from "../errors";
-import {
-  BalanceData,
-  BasicToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
-import { isChainEqual } from "../utils/is-chain-equal";
-import { SUPPORTED_TOKENS as STATEMINE_SUPPORTED_TOKENS } from "./statemint";
-
-const ACALA_DEST_WEIGHT = "5000000000";
+import { BasicToken, RouteConfigs } from "../../types";
 
 export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
@@ -34,7 +6,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "DOT",
     xcm: {
       fee: { token: "DOT", amount: "469417452" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -42,7 +13,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "GLMR",
     xcm: {
       fee: { token: "GLMR", amount: "8000000000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -50,7 +20,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "ACA",
     xcm: {
       fee: { token: "ACA", amount: "24963428577" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -58,7 +27,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "AUSD",
     xcm: {
       fee: { token: "AUSD", amount: "2000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -66,7 +34,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "DOT",
     xcm: {
       fee: { token: "DOT", amount: "447889166" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -74,7 +41,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "PARA",
     xcm: {
       fee: { token: "PARA", amount: "9600000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -82,7 +48,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "ACA",
     xcm: {
       fee: { token: "ACA", amount: "1920000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -90,7 +55,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "AUSD",
     xcm: {
       fee: { token: "AUSD", amount: "2880000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -98,7 +62,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "LDOT",
     xcm: {
       fee: { token: "LDOT", amount: "96000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -106,7 +69,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "ASTR",
     xcm: {
       fee: { token: "ASTR", amount: "4635101624603120" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -114,7 +76,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "ACA",
     xcm: {
       fee: { token: "ACA", amount: "1108000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -122,7 +83,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "AUSD",
     xcm: {
       fee: { token: "AUSD", amount: "252800000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -130,7 +90,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "LDOT",
     xcm: {
       fee: { token: "LDOT", amount: "3692000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -138,7 +97,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "INTR",
     xcm: {
       fee: { token: "INTR", amount: "21787589" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -146,7 +104,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "IBTC",
     xcm: {
       fee: { token: "IBTC", amount: "72" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -154,7 +111,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "DAI",
     xcm: {
       fee: { token: "DAI", amount: "2926334210356268" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -162,7 +118,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "WETH",
     xcm: {
       fee: { token: "WETH", amount: "956965470918" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -170,7 +125,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "WBTC",
     xcm: {
       fee: { token: "WBTC", amount: "6" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -178,7 +132,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "UNQ",
     xcm: {
       fee: { token: "UNQ", amount: "" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
 ];
@@ -189,7 +142,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KSM",
     xcm: {
       fee: { token: "KSM", amount: "79999999" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -197,7 +149,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "RMRK",
     xcm: {
       fee: { token: "RMRK", amount: "100000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -205,7 +156,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "ARIS",
     xcm: {
       fee: { token: "KSM", amount: "16000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -213,7 +163,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "USDT",
     xcm: {
       fee: { token: "USDT", amount: "1000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -221,7 +170,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "SDN",
     xcm: {
       fee: { token: "SDN", amount: "4662276356431024" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -229,7 +177,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "1200000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -237,7 +184,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "BNC",
     xcm: {
       fee: { token: "BNC", amount: "5120000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -245,7 +191,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KAR",
     xcm: {
       fee: { token: "KAR", amount: "4800000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -253,7 +198,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "25600000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -261,7 +205,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "VSKSM",
     xcm: {
       fee: { token: "VSKSM", amount: "64000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -269,7 +212,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "AIR",
     xcm: {
       fee: { token: "AIR", amount: "9269600000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -277,7 +219,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "51200000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -285,7 +226,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "CSM",
     xcm: {
       fee: { token: "CSM", amount: "4000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -293,7 +233,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KAR",
     xcm: {
       fee: { token: "KAR", amount: "4000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -301,7 +240,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "4000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -309,7 +247,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "CRAB",
     xcm: {
       fee: { token: "CRAB", amount: "4000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -317,7 +254,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "TEER",
     xcm: {
       fee: { token: "TEER", amount: "4000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -325,7 +261,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KINT",
     xcm: {
       fee: { token: "KINT", amount: "170666666" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -333,7 +268,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KBTC",
     xcm: {
       fee: { token: "KBTC", amount: "85" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -341,7 +275,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "LKSM",
     xcm: {
       fee: { token: "LKSM", amount: "186480000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -349,7 +282,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "PHA",
     xcm: {
       fee: { token: "PHA", amount: "64000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -357,7 +289,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "16000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -365,7 +296,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KAR",
     xcm: {
       fee: { token: "KAR", amount: "8000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -373,7 +303,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KICO",
     xcm: {
       fee: { token: "KICO", amount: "96000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -381,7 +310,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KAR",
     xcm: {
       fee: { token: "KAR", amount: "160000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -389,7 +317,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "320000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -397,7 +324,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KMA",
     xcm: {
       fee: { token: "KMA", amount: "4000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -405,7 +331,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "100000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -413,7 +338,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KAR",
     xcm: {
       fee: { token: "KAR", amount: "100000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -421,7 +345,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "LKSM",
     xcm: {
       fee: { token: "LKSM", amount: "7692307692" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -429,7 +352,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "MOVR",
     xcm: {
       fee: { token: "MOVR", amount: "80000000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -437,7 +359,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KAR",
     xcm: {
       fee: { token: "KAR", amount: "9880000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -445,7 +366,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "16536000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -453,7 +373,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "HKO",
     xcm: {
       fee: { token: "HKO", amount: "1440000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -461,7 +380,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KAR",
     xcm: {
       fee: { token: "KAR", amount: "2400000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -469,7 +387,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "19200000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -477,7 +394,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "LKSM",
     xcm: {
       fee: { token: "LKSM", amount: "48000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -485,7 +401,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "PCHU",
     xcm: {
       fee: { token: "PCHU", amount: "400000000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -493,7 +408,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KAR",
     xcm: {
       fee: { token: "KAR", amount: "400000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -501,7 +415,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "400000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -509,7 +422,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "LKSM",
     xcm: {
       fee: { token: "LKSM", amount: "400000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -517,7 +429,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "TUR",
     xcm: {
       fee: { token: "TUR", amount: "1664000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -525,7 +436,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KAR",
     xcm: {
       fee: { token: "KAR", amount: "32000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -533,7 +443,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "256000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -541,7 +450,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "LKSM",
     xcm: {
       fee: { token: "LKSM", amount: "6400000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -549,7 +457,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "BSX",
     xcm: {
       fee: { token: "BSX", amount: "22000000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -557,7 +464,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "3150402683" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -565,7 +471,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "DAI",
     xcm: {
       fee: { token: "DAI", amount: "4400000000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -573,7 +478,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "USDCet",
     xcm: {
       fee: { token: "USDCet", amount: "4400" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -581,7 +485,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "WETH",
     xcm: {
       fee: { token: "WETH", amount: "2926000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -589,7 +492,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "WBTC",
     xcm: {
       fee: { token: "WBTC", amount: "22" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -597,7 +499,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "LT",
     xcm: {
       fee: { token: "LT", amount: "6400000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -605,7 +506,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KAR",
     xcm: {
       fee: { token: "KAR", amount: "6400000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -613,7 +513,6 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "6400000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
@@ -621,13 +520,12 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "LKSM",
     xcm: {
       fee: { token: "LKSM", amount: "6400000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
     },
   },
   {
     to: "quartz",
     token: "QTZ",
-    xcm: { fee: { token: "QTZ", amount: "0" }, weightLimit: ACALA_DEST_WEIGHT },
+    xcm: { fee: { token: "QTZ", amount: "0" } },
   },
 ];
 
@@ -739,262 +637,3 @@ export const karuraTokensConfig: Record<string, BasicToken> = {
     ed: "35",
   },
 };
-
-class BaseAcalaAdapter extends BaseCrossChainAdapter {
-  private wallet?: Wallet;
-
-  public async init(api: AnyApi, wallet?: Wallet) {
-    this.api = api;
-
-    if (this.api?.type === "rxjs") {
-      await firstValueFrom(api.isReady as Observable<ApiRx>);
-    }
-
-    await api.isReady;
-
-    // use custom wallet or create a new one
-    if (wallet) {
-      this.wallet = wallet;
-    } else {
-      this.wallet = new Wallet(api);
-    }
-
-    await this.wallet.isReady;
-  }
-
-  public override subscribeMinInput(
-    token: string,
-    to: ChainId
-  ): Observable<FixedPointNumber> {
-    if (!this.wallet) {
-      throw new ApiNotFound(this.chain.id);
-    }
-
-    const destFee = this.getCrossChainFee(token, to);
-
-    return of(
-      this.getDestED(token, to).balance.add(
-        destFee.token === token ? destFee.balance : FixedPointNumber.ZERO
-      )
-    );
-  }
-
-  public subscribeTokenBalance(
-    token: string,
-    address: string
-  ): Observable<BalanceData> {
-    if (!this.wallet) {
-      throw new ApiNotFound(this.chain.id);
-    }
-
-    const zeroResult: Observable<BalanceData> = new Observable((sub) =>
-      sub.next({
-        free: FixedPointNumber.ZERO,
-        locked: FixedPointNumber.ZERO,
-        available: FixedPointNumber.ZERO,
-        reserved: FixedPointNumber.ZERO,
-      })
-    );
-
-    return this.wallet
-      .subscribeBalance(token, address)
-      .pipe(catchError((_) => zeroResult));
-  }
-
-  public subscribeMaxInput(
-    token: string,
-    address: string,
-    to: ChainId
-  ): Observable<FixedPointNumber> {
-    if (!this.wallet) {
-      throw new ApiNotFound(this.chain.id);
-    }
-
-    const tokens = this.wallet.getPresetTokens();
-    const { nativeToken } = tokens;
-
-    return combineLatest({
-      txFee:
-        token === nativeToken.name
-          ? this.estimateTxFee({
-              amount: FixedPointNumber.ZERO,
-              to,
-              token,
-              address:
-                to === "moonriver" || to === "moonbeam"
-                  ? "0x0000000000000000000000000000000000000000"
-                  : address,
-              signer: address,
-            })
-          : "0",
-      balance: this.wallet
-        .subscribeBalance(token, address)
-        .pipe(map((i) => i.available)),
-    }).pipe(
-      map(({ balance, txFee }) => {
-        const feeFactor = 1.2;
-        const fee = FixedPointNumber.fromInner(
-          txFee,
-          nativeToken.decimals || 12
-        ).mul(new FixedPointNumber(feeFactor));
-
-        return balance.minus(fee);
-      })
-    );
-  }
-
-  private get isV0V1() {
-    try {
-      const keys = (this.api?.createType("XcmVersionedMultiLocation") as any)
-        .defKeys as string[];
-
-      return keys.includes("V0");
-    } catch (e) {
-      // ignore error
-    }
-
-    return false;
-  }
-
-  public createTx(
-    params: TransferParams
-  ):
-    | SubmittableExtrinsic<"promise", ISubmittableResult>
-    | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
-
-    const { address, amount, to, token } = params;
-
-    const isV0V1Support = this.isV0V1;
-    const tokenFormSDK = this.wallet?.getToken(token);
-    const toChain = chains[to];
-
-    // to moonriver/moonbeam
-    if (
-      isChainEqual(toChain, "moonriver") ||
-      isChainEqual(toChain, "moonbeam")
-    ) {
-      const dst = {
-        parents: 1,
-        interior: {
-          X2: [
-            { Parachain: toChain.paraChainId },
-            {
-              AccountKey20: {
-                key: address,
-                network: isV0V1Support ? "Any" : undefined,
-              },
-            },
-          ],
-        },
-      };
-
-      return this.api.tx.xTokens.transfer(
-        tokenFormSDK?.toChainData() as any,
-        amount.toChainData(),
-        { [isV0V1Support ? "V1" : "V3"]: dst },
-        "Unlimited"
-      );
-    }
-
-    const accountId = this.api?.createType("AccountId32", address).toHex();
-
-    // to other parachains
-    let dst: any = {
-      parents: 1,
-      interior: {
-        X2: [
-          { Parachain: toChain.paraChainId },
-          {
-            AccountId32: {
-              id: accountId,
-              network: isV0V1Support ? "Any" : undefined,
-            },
-          },
-        ],
-      },
-    };
-
-    // to relay-chain
-    if (isChainEqual(toChain, "kusama") || isChainEqual(toChain, "polkadot")) {
-      dst = {
-        interior: {
-          X1: {
-            AccountId32: {
-              id: accountId,
-              network: isV0V1Support ? "Any" : undefined,
-            },
-          },
-        },
-        parents: 1,
-      };
-    }
-
-    // to state-mine
-    if (isChainEqual(toChain, "statemine")) {
-      const assetId = STATEMINE_SUPPORTED_TOKENS[token];
-
-      if (!assetId) throw new TokenNotFound(token);
-
-      const asset = {
-        [isV0V1Support ? "V1" : "V3"]: {
-          fun: {
-            Fungible: amount.toChainData(),
-          },
-          id: {
-            Concrete: {
-              parents: 1,
-              interior: {
-                X3: [
-                  { Parachain: toChain.paraChainId },
-                  { PalletInstance: 50 },
-                  { GeneralIndex: assetId },
-                ],
-              },
-            },
-          },
-        },
-      };
-
-      const dst = {
-        [isV0V1Support ? "V1" : "V3"]: {
-          parents: 1,
-          interior: {
-            X2: [
-              { Parachain: toChain.paraChainId },
-              {
-                AccountId32: {
-                  network: isV0V1Support ? "Any" : undefined,
-                  id: accountId,
-                },
-              },
-            ],
-          },
-        },
-      };
-
-      return this.api.tx.xTokens.transferMultiasset(asset, dst, "Unlimited");
-    }
-
-    return this.api.tx.xTokens.transfer(
-      tokenFormSDK?.toChainData(),
-      amount.toChainData(),
-      { [isV0V1Support ? "V1" : "V3"]: dst },
-      "Unlimited"
-    );
-  }
-}
-
-export class AcalaAdapter extends BaseAcalaAdapter {
-  constructor() {
-    super(chains.acala, acalaRoutersConfig, acalaTokensConfig);
-  }
-}
-
-export class KaruraAdapter extends BaseAcalaAdapter {
-  constructor() {
-    super(chains.karura, karuraRoutersConfig, karuraTokensConfig);
-  }
-}
