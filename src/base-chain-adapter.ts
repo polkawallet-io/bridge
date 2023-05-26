@@ -231,6 +231,15 @@ export abstract class BaseCrossChainAdapter {
   public estimateTxFee(params: CrossChainTransferParams) {
     let tx = this.createTx({ ...params });
 
+    if (!tx.hasPaymentInfo) {
+      // TODO: remove when no longer needed
+      // workaround to have at least some fee estimate if paymentInfo is not available
+      // return 0.01 UNIT as best guesstimate
+      const token = this.getNativeToken();
+      const fallbackFeeEstimate = 10 ** (token.decimals - 2);
+      return from(fallbackFeeEstimate.toString());
+    }
+
     if (this.api?.type === "rxjs") {
       tx = tx as SubmittableExtrinsic<"rxjs", ISubmittableResult>;
 
