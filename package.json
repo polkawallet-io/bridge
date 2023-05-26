@@ -33,6 +33,7 @@
     "@acala-network/sdk-core": "^4.1.8-14",
     "@polkadot/apps-config": "^0.127.1",
     "axios": "^0.27.2",
+    "ethers": "^6.4.0",
     "lodash": "^4.17.20"
   },
   "devDependencies": {

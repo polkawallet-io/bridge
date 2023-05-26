@@ -9,13 +9,14 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
-import { ApiNotFound, TokenNotFound } from "../errors";
+import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import {
   BalanceData,
-  BasicToken,
+  ExtendedToken,
   RouteConfigs,
   TransferParams,
 } from "../types";
+import { validateAddress } from "../utils/validate-address";
 
 const DEST_WEIGHT = "5000000000";
 
@@ -62,20 +63,42 @@ export const calamariRoutersConfig: Omit<RouteConfigs, "from">[] = [
   },
 ];
 
-export const calamariTokensConfig: Record<string, BasicToken> = {
-  KMA: { name: "KMA", symbol: "KMA", decimals: 12, ed: "100000000000" },
-  KAR: { name: "KAR", symbol: "KAR", decimals: 12, ed: "100000000000" },
-  KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "10000000000" },
-  LKSM: { name: "LKSM", symbol: "LKSM", decimals: 12, ed: "500000000" },
-  KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "100000000" },
-};
-
-const SUPPORTED_TOKENS: Record<string, number> = {
-  KMA: 1,
-  KUSD: 9,
-  LKSM: 10,
-  KSM: 12,
-  KAR: 8,
+export const calamariTokensConfig: Record<string, ExtendedToken> = {
+  KMA: {
+    name: "KMA",
+    symbol: "KMA",
+    decimals: 12,
+    ed: "100000000000",
+    toRaw: () => 1,
+  },
+  KAR: {
+    name: "KAR",
+    symbol: "KAR",
+    decimals: 12,
+    ed: "100000000000",
+    toRaw: () => 8,
+  },
+  KUSD: {
+    name: "KUSD",
+    symbol: "KUSD",
+    decimals: 12,
+    ed: "10000000000",
+    toRaw: () => 9,
+  },
+  LKSM: {
+    name: "LKSM",
+    symbol: "LKSM",
+    decimals: 12,
+    ed: "500000000",
+    toRaw: () => 10,
+  },
+  KSM: {
+    name: "KSM",
+    symbol: "KSM",
+    decimals: 12,
+    ed: "100000000",
+    toRaw: () => 12,
+  },
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -108,6 +131,8 @@ class MantaBalanceAdapter extends BalanceAdapter {
     token: string,
     address: string
   ): Observable<BalanceData> {
+    if (!validateAddress(address)) throw new InvalidAddress(address);
+
     const storage = this.storages.balances(address);
 
     if (token === this.nativeToken) {
@@ -127,17 +152,15 @@ class MantaBalanceAdapter extends BalanceAdapter {
       );
     }
 
-    const tokenID = SUPPORTED_TOKENS[token];
+    const tokenData: ExtendedToken = this.getToken(token);
 
-    if (tokenID === undefined) {
-      throw new TokenNotFound(token);
-    }
+    if (!tokenData) throw new TokenNotFound(token);
 
-    return this.storages.assets(tokenID, address).observable.pipe(
+    return this.storages.assets(tokenData.toRaw(), address).observable.pipe(
       map((balance) => {
         const amount = FN.fromInner(
           balance.unwrapOrDefault()?.balance?.toString() || "0",
-          this.getToken(token).decimals
+          tokenData.decimals
         );
 
         return {
@@ -221,38 +244,7 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
-
-    const { address, amount, to, token } = params;
-    const toChain = chains[to];
-
-    const accountId = this.api?.createType("AccountId32", address).toHex();
-
-    const tokenId = SUPPORTED_TOKENS[token];
-
-    if (tokenId === undefined) {
-      throw new TokenNotFound(token);
-    }
-
-    return this.api?.tx.xTokens.transfer(
-      { MantaCurrency: tokenId },
-      amount.toChainData(),
-      {
-        V1: {
-          parents: 1,
-          interior: {
-            X2: [
-              { Parachain: toChain.paraChainId },
-              { AccountId32: { id: accountId, network: "Any" } },
-            ],
-          },
-        },
-      },
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.getDestWeight(token, to)!.toString()
-    );
+    return this.createXTokensTx(params);
   }
 }
 

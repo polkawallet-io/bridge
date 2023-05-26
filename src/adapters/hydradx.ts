@@ -9,10 +9,10 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
-import { ApiNotFound, TokenNotFound } from "../errors";
+import { ApiNotFound } from "../errors";
 import {
   BalanceData,
-  ExpandToken,
+  ExtendedToken,
   RouteConfigs,
   TransferParams,
 } from "../types";
@@ -86,55 +86,55 @@ export const basiliskRoutersConfig: Omit<RouteConfigs, "from">[] = [
   },
 ];
 
-export const basiliskTokensConfig: Record<string, ExpandToken> = {
+export const basiliskTokensConfig: Record<string, ExtendedToken> = {
   BSX: {
     name: "BSX",
     symbol: "BSX",
     decimals: 12,
     ed: "1000000000000",
-    toChainData: () => 0,
+    toRaw: () => 0,
   },
   KUSD: {
     name: "KUSD",
     symbol: "KUSD",
     decimals: 12,
     ed: "10000000000",
-    toChainData: () => 2,
+    toRaw: () => 2,
   },
   KSM: {
     name: "KSM",
     symbol: "KSM",
     decimals: 12,
     ed: "100000000",
-    toChainData: () => 1,
+    toRaw: () => 1,
   },
   DAI: {
     name: "DAI",
     symbol: "DAI",
     decimals: 18,
     ed: "10000000000",
-    toChainData: () => 13,
+    toRaw: () => 13,
   },
   USDCet: {
     name: "USDCet",
     symbol: "USDCet",
     decimals: 6,
     ed: "10000",
-    toChainData: () => 9,
+    toRaw: () => 9,
   },
   WETH: {
     name: "WETH",
     symbol: "WETH",
     decimals: 18,
     ed: "6230529595016",
-    toChainData: () => 10,
+    toRaw: () => 10,
   },
   WBTC: {
     name: "WBTC",
     symbol: "WBTC",
     decimals: 8,
     ed: "33",
-    toChainData: () => 11,
+    toRaw: () => 11,
   },
 };
 
@@ -165,27 +165,27 @@ export const hydraRoutersConfig: Omit<RouteConfigs, "from">[] = [
   },
 ];
 
-export const hydraTokensConfig: Record<string, ExpandToken> = {
+export const hydraTokensConfig: Record<string, ExtendedToken> = {
   DAI: {
     name: "DAI",
     symbol: "DAI",
     decimals: 18,
     ed: "10000000000",
-    toChainData: () => 2,
+    toRaw: () => 2,
   },
   WETH: {
     name: "WETH",
     symbol: "WETH",
     decimals: 18,
     ed: "7000000000000",
-    toChainData: () => 4,
+    toRaw: () => 4,
   },
   WBTC: {
     name: "WBTC",
     symbol: "WBTC",
     decimals: 8,
     ed: "44",
-    toChainData: () => 3,
+    toRaw: () => 3,
   },
 };
 
@@ -238,9 +238,9 @@ class HydradxBalanceAdapter extends BalanceAdapter {
       );
     }
 
-    const token = this.getToken<ExpandToken>(tokenName);
+    const token = this.getToken<ExtendedToken>(tokenName);
 
-    return this.storages.assets(token.toChainData(), address).observable.pipe(
+    return this.storages.assets(token.toRaw(), address).observable.pipe(
       map((balance) => {
         const amount = FN.fromInner(
           balance.free?.toString() || "0",
@@ -328,40 +328,7 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
-
-    const { address, amount, to, token: tokenName } = params;
-
-    const token = this.getToken<ExpandToken>(tokenName);
-
-    if (!token) {
-      throw new TokenNotFound(token);
-    }
-
-    const toChain = chains[to];
-    const accountId = this.api?.createType("AccountId32", address).toHex();
-    const dst = {
-      parents: 1,
-      interior:
-        to === "kusama" || to === "polkadot"
-          ? { X1: { AccountId32: { id: accountId, network: "Any" } } }
-          : {
-              X2: [
-                { Parachain: toChain.paraChainId },
-                { AccountId32: { id: accountId, network: "Any" } },
-              ],
-            },
-    };
-
-    return this.api?.tx.xTokens.transfer(
-      token.toChainData(),
-      amount.toChainData(),
-      { V1: dst },
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.getDestWeight(tokenName, to)!.toString()
-    );
+    return this.createXTokensTx(params);
   }
 }
 

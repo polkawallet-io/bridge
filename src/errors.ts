@@ -56,3 +56,12 @@ export class DestinationWeightNotFound extends Error {
     this.name = "DestinationWeightNotFound";
   }
 }
+
+export class InvalidAddress extends Error {
+  constructor(address: string) {
+    super();
+
+    this.message = `Address ${address} is invalid.`;
+    this.name = "InvalidAddress";
+  }
+}

@@ -1,17 +1,5 @@
 import { AnyApi } from "@acala-network/sdk-core";
-
-function checkMessageVersionIsV3(api: AnyApi) {
-  try {
-    const keys = (api?.createType("XcmVersionedMultiLocation") as any)
-      .defKeys as string[];
-
-    return keys.includes("V3");
-  } catch (e) {
-    // ignore error
-  }
-
-  return false;
-}
+import { checkMessageVersionIsV3 } from "./check-message-version";
 
 interface DestConfigs {
   useAccountKey20?: boolean;
@@ -87,7 +75,7 @@ export function createXTokensDestParam(
 export function createXTokensAssetsParam(
   api: AnyApi,
   paraChainId: number,
-  assetId: string,
+  assetId: any,
   amount: string
 ) {
   const isV3 = checkMessageVersionIsV3(api);
@@ -133,4 +121,11 @@ export function createXTokensAssetsParam(
       },
     },
   };
+}
+
+export function createXTokensWeight(api: AnyApi, weight: string) {
+  const isV2WeightLimit =
+    api.tx.xTokens.transfer.meta.args[3].type.toString() === "XcmV2WeightLimit";
+
+  return isV2WeightLimit ? "Unlimited" : weight;
 }

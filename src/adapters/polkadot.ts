@@ -9,13 +9,14 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
-import { ApiNotFound, TokenNotFound } from "../errors";
+import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
   RouteConfigs,
   TransferParams,
 } from "../types";
+import { validateAddress } from "src/utils";
 
 export const polkadotRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
@@ -114,6 +115,8 @@ class PolkadotBalanceAdapter extends BalanceAdapter {
     token: string,
     address: string
   ): Observable<BalanceData> {
+    if (!validateAddress(address)) throw new InvalidAddress(address);
+
     const storage = this.storages.balances(address);
 
     if (token !== this.nativeToken) {
@@ -223,11 +226,12 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
+    if (!this.api) throw new ApiNotFound(this.chain.id);
 
     const { address, amount, to, token } = params;
+
+    if (!validateAddress(address)) throw new InvalidAddress(address);
+
     const toChain = chains[to];
 
     if (token !== this.balanceAdapter?.nativeToken) {
@@ -243,7 +247,6 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
         interior: { X1: { ParaChain: toChain.paraChainId } },
         parents: 0,
       };
-
       const acc = {
         interior: {
           X1: {
@@ -255,7 +258,6 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
         },
         parents: 0,
       };
-
       const ass = [
         {
           fun: { Fungible: amount.toChainData() },

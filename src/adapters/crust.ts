@@ -12,7 +12,7 @@ import { ChainId, chains } from "../configs";
 import { ApiNotFound, TokenNotFound } from "../errors";
 import {
   BalanceData,
-  BasicToken,
+  ExtendedToken,
   RouteConfigs,
   TransferParams,
 } from "../types";
@@ -46,15 +46,29 @@ const shadowRoutersConfig: Omit<RouteConfigs, "from">[] = [
   },
 ];
 
-export const shadowTokensConfig: Record<string, BasicToken> = {
-  CSM: { name: "CSM", symbol: "CSM", decimals: 12, ed: "100000000000" },
-  KAR: { name: "KAR", symbol: "KAR", decimals: 12, ed: "1" },
-  KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "1" },
-};
-
-const SUPPORTED_TOKENS: Record<string, string> = {
-  KAR: "10810581592933651521121702237638664357",
-  KUSD: "214920334981412447805621250067209749032",
+export const shadowTokensConfig: Record<string, ExtendedToken> = {
+  CSM: {
+    name: "CSM",
+    symbol: "CSM",
+    decimals: 12,
+    ed: "100000000000",
+    // just for type checking
+    toRaw: () => "SelfReserve",
+  },
+  KAR: {
+    name: "KAR",
+    symbol: "KAR",
+    decimals: 12,
+    ed: "1",
+    toRaw: () => ({ OtherReserve: "10810581592933651521121702237638664357" }),
+  },
+  KUSD: {
+    name: "KUSD",
+    symbol: "KUSD",
+    decimals: 12,
+    ed: "1",
+    toRaw: () => ({ OtherReserve: "214920334981412447805621250067209749032" }),
+  },
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -106,13 +120,11 @@ class CrustBalanceAdapter extends BalanceAdapter {
       );
     }
 
-    const tokenId = SUPPORTED_TOKENS[token];
+    const tokenData: ExtendedToken = this.getToken(token);
 
-    if (tokenId === undefined) {
-      throw new TokenNotFound(token);
-    }
+    if (!tokenData) throw new TokenNotFound(token);
 
-    return this.storages.assets(tokenId, address).observable.pipe(
+    return this.storages.assets(tokenData.toRaw(), address).observable.pipe(
       map((balance) => {
         const amount = FN.fromInner(
           balance.unwrapOrDefault()?.balance?.toString() || "0",
@@ -200,46 +212,7 @@ class BaseCrustAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
-
-    const { address, amount, to, token } = params;
-    const toChain = chains[to];
-
-    let ass: any;
-
-    if (token === this.balanceAdapter?.nativeToken) {
-      ass = "SelfReserve";
-    } else {
-      const tokenId = SUPPORTED_TOKENS[token];
-
-      if (tokenId === undefined) {
-        throw new TokenNotFound(token);
-      } else {
-        ass = { OtherReserve: tokenId };
-      }
-    }
-
-    const accountId = this.api?.createType("AccountId32", address).toHex();
-
-    const dst = {
-      parents: 1,
-      interior: {
-        X2: [
-          { ParaChain: toChain.paraChainId },
-          { AccountId32: { id: accountId, network: "Any" } },
-        ],
-      },
-    };
-
-    return this.api?.tx.xTokens.transfer(
-      ass,
-      amount.toChainData(),
-      { V1: dst },
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.getDestWeight(token, to)!.toString()
-    );
+    return this.createXTokensTx(params);
   }
 }
 

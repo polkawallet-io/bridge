@@ -12,7 +12,7 @@ import { ChainId, chains } from "../configs";
 import { ApiNotFound, TokenNotFound } from "../errors";
 import {
   BalanceData,
-  BasicToken,
+  ExtendedToken,
   RouteConfigs,
   TransferParams,
 } from "../types";
@@ -28,8 +28,14 @@ export const integriteeRoutersConfig: Omit<RouteConfigs, "from">[] = [
   },
 ];
 
-export const integriteeTokensConfig: Record<string, BasicToken> = {
-  TEER: { name: "TEER", symbol: "TEER", decimals: 12, ed: "100000000000" },
+export const integriteeTokensConfig: Record<string, ExtendedToken> = {
+  TEER: {
+    name: "TEER",
+    symbol: "TEER",
+    decimals: 12,
+    ed: "100000000000",
+    toRaw: () => "TEER",
+  },
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -146,39 +152,7 @@ class BaseIntegriteeAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
-
-    const { address, amount, to, token } = params;
-    const toChain = chains[to];
-
-    const accountId = this.api?.createType("AccountId32", address).toHex();
-
-    const useNewDestWeight =
-      this.api.tx.xTokens.transfer.meta.args[3].type.toString() ===
-      "XcmV2WeightLimit";
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const oldDestWeight = this.getDestWeight(token, to)!.toString();
-    const destWeight = useNewDestWeight ? "Unlimited" : oldDestWeight;
-
-    return this.api?.tx.xTokens.transfer(
-      token,
-      amount.toChainData(),
-      {
-        V1: {
-          parents: 1,
-          interior: {
-            X2: [
-              { Parachain: toChain.paraChainId },
-              { AccountId32: { id: accountId, network: "Any" } },
-            ],
-          },
-        },
-      },
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      destWeight
-    );
+    return this.createXTokensTx(params);
   }
 }
 

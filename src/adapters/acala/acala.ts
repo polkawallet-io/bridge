@@ -16,7 +16,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 
 import { BaseCrossChainAdapter } from "../../base-chain-adapter";
 import { ChainId, chains } from "../../configs";
-import { ApiNotFound, TokenNotFound } from "../../errors";
+import { ApiNotFound, InvalidAddress, TokenNotFound } from "../../errors";
 import { BalanceData, TransferParams } from "../../types";
 import { isChainEqual } from "../../utils/is-chain-equal";
 import { SUPPORTED_TOKENS as STATEMINE_SUPPORTED_TOKENS } from "../statemint";
@@ -27,6 +27,7 @@ import {
   karuraRoutersConfig,
   karuraTokensConfig,
 } from "./configs";
+import { validateAddress } from "src/utils/validate-address";
 
 class BaseAcalaAdapter extends BaseCrossChainAdapter {
   private wallet?: Wallet;
@@ -136,22 +137,30 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
+    if (!this.api) throw new ApiNotFound(this.chain.id);
 
     const { address, amount, to, token } = params;
-
     const tokenFormSDK = this.wallet?.getToken(token);
     const toChain = chains[to];
 
-    const accountId = this.api?.createType("AccountId32", address).toHex();
+    const useAccountKey20 =
+      isChainEqual(toChain, "moonbeam") || isChainEqual(toChain, "moonriver");
+    const isToRelayChain =
+      isChainEqual(toChain, "kusama") || isChainEqual(toChain, "polkadot");
 
-    // to state-mine
+    const accountId = useAccountKey20
+      ? address
+      : this.api?.createType("AccountId32", address).toHex();
+
+    if (!validateAddress(address, useAccountKey20 ? "ethereum" : "substract")) {
+      throw new InvalidAddress(address);
+    }
+
+    // for statemine
     if (isChainEqual(toChain, "statemine")) {
       const assetId = STATEMINE_SUPPORTED_TOKENS[token];
 
-      if (!assetId) throw new TokenNotFound(token);
+      if (assetId === undefined) throw new TokenNotFound(token);
 
       return this.api.tx.xTokens.transferMultiasset(
         createXTokensAssetsParam(
@@ -169,11 +178,8 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
       tokenFormSDK?.toChainData(),
       amount.toChainData(),
       createXTokensDestParam(this.api, toChain.paraChainId, accountId, {
-        isToRelayChain:
-          isChainEqual(toChain, "kusama") || isChainEqual(toChain, "polkadot"),
-        useAccountKey20:
-          isChainEqual(toChain, "moonriver") ||
-          isChainEqual(toChain, "moonbeam"),
+        isToRelayChain,
+        useAccountKey20,
       }),
       "Unlimited"
     );
