@@ -8,15 +8,14 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
-import { ApiNotFound, TokenNotFound } from "../errors";
+import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import {
   BalanceData,
-  BasicToken,
+  ExtendedToken,
   RouteConfigs,
   TransferParams,
 } from "../types";
-
-const DEST_WEIGHT = "Unlimited";
+import { validateAddress } from "../utils";
 
 export const bifrostRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
@@ -24,7 +23,6 @@ export const bifrostRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "BNC",
     xcm: {
       fee: { token: "BNC", amount: "5120000000" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -32,7 +30,6 @@ export const bifrostRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "VSKSM",
     xcm: {
       fee: { token: "VSKSM", amount: "64000000" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -40,7 +37,6 @@ export const bifrostRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KSM",
     xcm: {
       fee: { token: "KSM", amount: "64000000" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -48,7 +44,6 @@ export const bifrostRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KAR",
     xcm: {
       fee: { token: "KAR", amount: "6400000000" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -56,26 +51,46 @@ export const bifrostRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "10011896008" },
-      weightLimit: DEST_WEIGHT,
     },
   },
 ];
 
-export const bifrostTokensConfig: Record<string, BasicToken> = {
-  BNC: { name: "BNC", symbol: "BNC", decimals: 12, ed: "10000000000" },
-  VSKSM: { name: "VSKSM", symbol: "VSKSM", decimals: 12, ed: "100000000" },
-  KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "100000000" },
-  KAR: { name: "KAR", symbol: "KAR", decimals: 12, ed: "148000000" },
-  KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "100000000" },
-};
-
-const SUPPORTED_TOKENS: Record<string, unknown> = {
-  KUSD: { Stable: "KUSD" },
-  AUSD: { Stable: "AUSD" },
-  BNC: { Native: "BNC" },
-  VSKSM: { VSToken: "KSM" },
-  KSM: { Token: "KSM" },
-  KAR: { Token: "KAR" },
+export const bifrostTokensConfig: Record<string, ExtendedToken> = {
+  BNC: {
+    name: "BNC",
+    symbol: "BNC",
+    decimals: 12,
+    ed: "10000000000",
+    toRaw: () => ({ Native: "BNC" }),
+  },
+  VSKSM: {
+    name: "VSKSM",
+    symbol: "VSKSM",
+    decimals: 12,
+    ed: "100000000",
+    toRaw: () => ({ VSToken: "KSM" }),
+  },
+  KSM: {
+    name: "KSM",
+    symbol: "KSM",
+    decimals: 12,
+    ed: "100000000",
+    toRaw: () => ({ Token: "KSM" }),
+  },
+  KAR: {
+    name: "KAR",
+    symbol: "KAR",
+    decimals: 12,
+    ed: "148000000",
+    toRaw: () => ({ Token: "KAR" }),
+  },
+  KUSD: {
+    name: "KUSD",
+    symbol: "KUSD",
+    decimals: 12,
+    ed: "100000000",
+    toRaw: () => ({ Stable: "KUSD" }),
+  },
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -108,7 +123,10 @@ class BifrostBalanceAdapter extends BalanceAdapter {
     token: string,
     address: string
   ): Observable<BalanceData> {
+    if (!validateAddress(address)) throw new InvalidAddress(address);
+
     const storage = this.storages.balances(address);
+    const tokenData: ExtendedToken = this.getToken(token);
 
     if (token === this.nativeToken) {
       return storage.observable.pipe(
@@ -124,13 +142,9 @@ class BifrostBalanceAdapter extends BalanceAdapter {
       );
     }
 
-    const tokenId = SUPPORTED_TOKENS[token];
+    if (!tokenData) throw new TokenNotFound(token);
 
-    if (tokenId === undefined) {
-      throw new TokenNotFound(token);
-    }
-
-    return this.storages.assets(address, tokenId).observable.pipe(
+    return this.storages.assets(address, tokenData.toRaw()).observable.pipe(
       map((balance) => {
         const amount = FN.fromInner(
           balance.free?.toString() || "0",
@@ -218,45 +232,7 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
-
-    const { address, amount, to, token } = params;
-    const toChain = chains[to];
-
-    const accountId = this.api?.createType("AccountId32", address).toHex();
-
-    const tokenId = SUPPORTED_TOKENS[token];
-
-    if (tokenId === undefined) {
-      throw new TokenNotFound(token);
-    }
-
-    const useNewDestWeight =
-      this.api.tx.xTokens.transfer.meta.args[3].type.toString() ===
-      "XcmV2WeightLimit";
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const oldDestWeight = this.getDestWeight(token, to)!.toString();
-    const destWeight = useNewDestWeight ? "Unlimited" : oldDestWeight;
-
-    return this.api.tx.xTokens.transfer(
-      tokenId,
-      amount.toChainData(),
-      {
-        V1: {
-          parents: 1,
-          interior: {
-            X2: [
-              { Parachain: toChain.paraChainId },
-              { AccountId32: { id: accountId, network: "Any" } },
-            ],
-          },
-        },
-      },
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      destWeight
-    );
+    return this.createXTokensTx(params);
   }
 }
 

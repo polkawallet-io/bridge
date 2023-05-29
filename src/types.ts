@@ -29,8 +29,8 @@ export interface BasicToken {
   ed: string;
 }
 
-export interface ExpandToken extends BasicToken {
-  toChainData: () => any;
+export interface ExtendedToken extends BasicToken {
+  toRaw: () => any;
 }
 
 export interface RouteConfigs {
@@ -57,7 +57,7 @@ export interface CrossChainRouter {
 
 export interface XCMTransferConfigs {
   // XCM transfer weight limit
-  weightLimit: string | "Unlimited" | "Limited";
+  weightLimit?: string | "Unlimited" | "Limited";
   // XCM transfer fee charged by `to chain`
   fee: {
     token: string;

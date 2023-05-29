@@ -18,7 +18,13 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 
 import { ChainId, chains } from "./configs";
-import { AdapterNotFound, RouterConfigNotFound, TokenNotFound } from "./errors";
+import {
+  AdapterNotFound,
+  ApiNotFound,
+  InvalidAddress,
+  RouterConfigNotFound,
+  TokenNotFound,
+} from "./errors";
 import {
   BalanceChangeStatue,
   BalanceData,
@@ -29,7 +35,14 @@ import {
   RouteConfigs,
   TransferParams,
   TokenBalance,
+  ExtendedToken,
 } from "./types";
+import {
+  createXTokensDestParam,
+  createXTokensWeight,
+  isChainEqual,
+  validateAddress,
+} from "./utils";
 
 const DEFAULT_TX_CHECKING_TIMEOUT = 2 * 60 * 1000;
 
@@ -297,4 +310,35 @@ export abstract class BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult>;
+
+  // create xtokens.transfer tx
+  public createXTokensTx(
+    params: TransferParams
+  ):
+    | SubmittableExtrinsic<"promise", ISubmittableResult>
+    | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
+    if (!this.api) throw new ApiNotFound(this.chain.id);
+
+    const { address, amount, to, token } = params;
+
+    if (!validateAddress(address)) throw new InvalidAddress(address);
+
+    const tokenData: ExtendedToken = this.getToken(token);
+    const toChain = chains[to];
+    const accountId = this.api?.createType("AccountId32", address).toHex();
+    const isToRelayChain =
+      isChainEqual(toChain, "kusama") || isChainEqual(toChain, "polkadot");
+
+    if (!tokenData) throw new TokenNotFound(token);
+
+    return this.api?.tx.xTokens.transfer(
+      tokenData.toRaw(),
+      amount.toChainData(),
+      createXTokensDestParam(this.api, toChain.paraChainId, accountId, {
+        isToRelayChain,
+      }),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      createXTokensWeight(this.api, this.getDestWeight(token, to)!)
+    );
+  }
 }

@@ -9,13 +9,19 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
-import { ApiNotFound, TokenNotFound } from "../errors";
+import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import {
   BalanceData,
-  BasicToken,
+  ExtendedToken,
   RouteConfigs,
   TransferParams,
 } from "../types";
+import {
+  createPolkadotXCMAccount,
+  createPolkadotXCMAsset,
+  createPolkadotXCMDest,
+  validateAddress,
+} from "../utils";
 
 export const astarRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
@@ -71,26 +77,58 @@ export const shidenRoutersConfig: Omit<RouteConfigs, "from">[] = [
   },
 ];
 
-export const astarTokensConfig: Record<string, Record<string, BasicToken>> = {
+export const astarTokensConfig: Record<
+  string,
+  Record<string, ExtendedToken>
+> = {
   astar: {
-    ASTR: { name: "ASTR", symbol: "ASTR", decimals: 18, ed: "1000000" },
-    ACA: { name: "ACA", symbol: "ACA", decimals: 12, ed: "1" },
-    AUSD: { name: "AUSD", symbol: "AUSD", decimals: 12, ed: "1" },
-    LDOT: { name: "LDOT", symbol: "LDOT", decimals: 10, ed: "1" },
+    ASTR: {
+      name: "ASTR",
+      symbol: "ASTR",
+      decimals: 18,
+      ed: "1000000",
+      // just for type check
+      toRaw: () => undefined,
+    },
+    ACA: {
+      name: "ACA",
+      symbol: "ACA",
+      decimals: 12,
+      ed: "1",
+      toRaw: () => "18446744073709551616",
+    },
+    AUSD: {
+      name: "AUSD",
+      symbol: "AUSD",
+      decimals: 12,
+      ed: "1",
+      toRaw: () => "18446744073709551617",
+    },
+    LDOT: {
+      name: "LDOT",
+      symbol: "LDOT",
+      decimals: 10,
+      ed: "1",
+      toRaw: () => "18446744073709551618",
+    },
   },
   shiden: {
-    SDN: { name: "SDN", symbol: "SDN", decimals: 18, ed: "1000000" },
-    KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "1" },
+    SDN: {
+      name: "SDN",
+      symbol: "SDN",
+      decimals: 18,
+      ed: "1000000",
+      // just for type check
+      toRaw: () => undefined,
+    },
+    KUSD: {
+      name: "KUSD",
+      symbol: "KUSD",
+      decimals: 12,
+      ed: "1",
+      toRaw: () => "18446744073709551616",
+    },
   },
-};
-
-const SUPPORTED_TOKENS: Record<string, string> = {
-  // to karura
-  KUSD: "18446744073709551616",
-  // to acala
-  ACA: "18446744073709551616",
-  AUSD: "18446744073709551617",
-  LDOT: "18446744073709551618",
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -142,13 +180,11 @@ class AstarBalanceAdapter extends BalanceAdapter {
       );
     }
 
-    const tokenId = SUPPORTED_TOKENS[token];
+    const tokenData: ExtendedToken = this.getToken(token);
 
-    if (tokenId === undefined) {
-      throw new TokenNotFound(token);
-    }
+    if (!tokenData) throw new TokenNotFound(token);
 
-    return this.storages.assets(tokenId, address).observable.pipe(
+    return this.storages.assets(tokenData.toRaw(), address).observable.pipe(
       map((balance) => {
         const amount = FN.fromInner(
           balance.unwrapOrDefault()?.balance?.toString() || "0",
@@ -238,35 +274,22 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
+    if (!this.api) throw new ApiNotFound(this.chain.id);
 
     const { address, amount, to, token } = params;
+
+    if (!validateAddress(address)) throw new InvalidAddress(address);
+
     const toChain = chains[to];
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
-
-    const dst = {
-      parents: 1,
-      interior: { X1: { Parachain: toChain.paraChainId } },
-    };
-    const acc = {
-      parents: 0,
-      interior: { X1: { AccountId32: { id: accountId, network: "Any" } } },
-    };
-    let ass: any = [
-      {
-        id: { Concrete: { parents: 0, interior: "Here" } },
-        fun: { Fungible: amount.toChainData() },
-      },
-    ];
+    const rawAmount = amount.toChainData();
 
     if (token === this.balanceAdapter?.nativeToken) {
       return this.api?.tx.polkadotXcm.reserveTransferAssets(
-        { V1: dst },
-        { V1: acc },
-        { V1: ass },
+        createPolkadotXCMDest(this.api, toChain.paraChainId),
+        createPolkadotXCMAccount(this.api, accountId),
+        createPolkadotXCMAsset(this.api, rawAmount, "NATIVE"),
         0
       );
     }
@@ -282,28 +305,14 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
 
     const tokenId = tokenIds[token];
 
-    if (tokenId === undefined) {
-      throw new TokenNotFound(token);
-    }
+    if (!tokenId) throw new TokenNotFound(token);
 
-    ass = [
-      {
-        id: {
-          Concrete: {
-            parents: 1,
-            interior: {
-              X2: [{ Parachain: toChain.paraChainId }, { GeneralKey: tokenId }],
-            },
-          },
-        },
-        fun: { Fungible: amount.toChainData() },
-      },
-    ];
+    const paraChainId = toChain.paraChainId;
 
     return this.api?.tx.polkadotXcm.reserveWithdrawAssets(
-      { V1: dst },
-      { V1: acc },
-      { V1: ass },
+      createPolkadotXCMDest(this.api, toChain.paraChainId),
+      createPolkadotXCMAccount(this.api, accountId),
+      createPolkadotXCMAsset(this.api, rawAmount, { paraChainId, tokenId }),
       0
     );
   }

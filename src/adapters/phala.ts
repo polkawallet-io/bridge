@@ -9,13 +9,14 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
-import { ApiNotFound, TokenNotFound } from "../errors";
+import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import {
   BalanceData,
-  BasicToken,
+  ExtendedToken,
   RouteConfigs,
   TransferParams,
 } from "../types";
+import { validateAddress } from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
@@ -46,10 +47,28 @@ export const khalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
   },
 ];
 
-export const khalaTokensConfig: Record<string, BasicToken> = {
-  PHA: { name: "PHA", symbol: "PHA", decimals: 12, ed: "40000000000" },
-  KAR: { name: "KAR", symbol: "KAR", decimals: 12, ed: "10000000000" },
-  KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "10000000000" },
+export const khalaTokensConfig: Record<string, ExtendedToken> = {
+  PHA: {
+    name: "PHA",
+    symbol: "PHA",
+    decimals: 12,
+    ed: "40000000000",
+    toRaw: () => undefined,
+  },
+  KAR: {
+    name: "KAR",
+    symbol: "KAR",
+    decimals: 12,
+    ed: "10000000000",
+    toRaw: () => "0x0080",
+  },
+  KUSD: {
+    name: "KUSD",
+    symbol: "KUSD",
+    decimals: 12,
+    ed: "10000000000",
+    toRaw: () => "0x0081",
+  },
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -199,13 +218,13 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
+    if (!this.api) throw new ApiNotFound(this.chain.id);
 
     const { address, amount, to, token } = params;
-    const toChain = chains[to];
 
+    if (!validateAddress(address)) throw new InvalidAddress(address);
+
+    const toChain = chains[to];
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
     const dst = {
@@ -217,29 +236,26 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
         ],
       },
     };
+
     let asset: any = {
       id: { Concrete: { parents: 0, interior: "Here" } },
       fun: { Fungible: amount.toChainData() },
     };
 
     if (token !== this.balanceAdapter?.nativeToken) {
-      const tokenIds: Record<string, string> = {
-        KUSD: "0x0081",
-        KAR: "0x0080",
-      };
+      const tokenData: ExtendedToken = this.getToken(token);
 
-      const tokenId = tokenIds[token];
-
-      if (tokenId === undefined) {
-        throw new TokenNotFound(token);
-      }
+      if (!tokenData) throw new TokenNotFound(token);
 
       asset = {
         id: {
           Concrete: {
             parents: 1,
             interior: {
-              X2: [{ Parachain: toChain.paraChainId }, { GeneralKey: tokenId }],
+              X2: [
+                { Parachain: toChain.paraChainId },
+                { GeneralKey: tokenData.toRaw() },
+              ],
             },
           },
         },

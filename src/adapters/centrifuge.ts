@@ -9,13 +9,14 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
-import { ApiNotFound } from "../errors";
+import { ApiNotFound, InvalidAddress } from "../errors";
 import {
   BalanceData,
-  ExpandToken,
+  ExtendedToken,
   RouteConfigs,
   TransferParams,
 } from "../types";
+import { validateAddress } from "../utils";
 
 const DEST_WEIGHT = "Unlimited";
 
@@ -38,20 +39,20 @@ const altairRoutersConfig: Omit<RouteConfigs, "from">[] = [
   },
 ];
 
-export const altairTokensConfig: Record<string, ExpandToken> = {
+export const altairTokensConfig: Record<string, ExtendedToken> = {
   AIR: {
     name: "AIR",
     symbol: "AIR",
     decimals: 18,
     ed: "1000000000000",
-    toChainData: () => "Native",
+    toRaw: () => "Native",
   },
   KUSD: {
     name: "KUSD",
     symbol: "KUSD",
     decimals: 12,
     ed: "100000000000",
-    toChainData: () => "AUSD",
+    toRaw: () => "AUSD",
   },
 };
 
@@ -85,6 +86,8 @@ class CentrifugeBalanceAdapter extends BalanceAdapter {
     name: string,
     address: string
   ): Observable<BalanceData> {
+    if (!validateAddress(address)) throw new InvalidAddress(address);
+
     const storage = this.storages.balances(address);
 
     if (name === this.nativeToken) {
@@ -104,9 +107,9 @@ class CentrifugeBalanceAdapter extends BalanceAdapter {
       );
     }
 
-    const token = this.getToken<ExpandToken>(name);
+    const token = this.getToken<ExtendedToken>(name);
 
-    return this.storages.assets(address, token.toChainData()).observable.pipe(
+    return this.storages.assets(address, token.toRaw()).observable.pipe(
       map((balance) => {
         const amount = FN.fromInner(
           balance.free?.toString() || "0",
@@ -194,33 +197,7 @@ class BaseCentrifugeAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
-
-    const { address, amount, to, token: tokenName } = params;
-    const toChain = chains[to];
-
-    const accountId = this.api?.createType("AccountId32", address).toHex();
-
-    const token = this.getToken<ExpandToken>(tokenName);
-
-    return this.api?.tx.xTokens.transfer(
-      token.toChainData(),
-      amount.toChainData(),
-      {
-        V1: {
-          parents: 1,
-          interior: {
-            X2: [
-              { Parachain: toChain.paraChainId },
-              { AccountId32: { id: accountId, network: "Any" } },
-            ],
-          },
-        },
-      },
-      DEST_WEIGHT
-    );
+    return this.createXTokensTx(params);
   }
 }
 

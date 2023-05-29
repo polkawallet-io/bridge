@@ -4,12 +4,12 @@ import { Wallet } from "@acala-network/sdk";
 import { FixedPointNumber } from "@acala-network/sdk-core";
 import { firstValueFrom } from "rxjs";
 
-import { ApiProvider } from "../api-provider";
-import { chains, ChainId } from "../configs";
-import { Bridge } from "../bridge";
+import { ApiProvider } from "../../api-provider";
+import { chains, ChainId } from "../../configs";
+import { Bridge } from "../../bridge";
 import { KaruraAdapter, AcalaAdapter } from "./acala";
-import { HydraAdapter } from "./hydradx";
-import { KusamaAdapter } from "./polkadot";
+import { HydraAdapter } from "../hydradx";
+import { KusamaAdapter } from "../polkadot";
 
 describe.skip("acala-adapter should work", () => {
   jest.setTimeout(30000);

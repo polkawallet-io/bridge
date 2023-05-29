@@ -9,13 +9,14 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
-import { ApiNotFound, TokenNotFound } from "../errors";
+import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import {
   BalanceData,
-  BasicToken,
+  ExtendedToken,
   RouteConfigs,
   TransferParams,
 } from "../types";
+import { validateAddress } from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
@@ -54,18 +55,35 @@ export const listenRoutersConfig: Omit<RouteConfigs, "from">[] = [
   },
 ];
 
-export const listenTokensConfig: Record<string, BasicToken> = {
-  LT: { name: "LT", symbol: "LT", decimals: 12, ed: "500000000000" },
-  KAR: { name: "KAR", symbol: "KAR", decimals: 12, ed: "100000000000" },
-  KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "10000000000" },
-  LKSM: { name: "LKSM", symbol: "LKSM", decimals: 12, ed: "500000000" },
-};
-
-const SUPPORTED_TOKENS: Record<string, number> = {
-  LT: 0,
-  KAR: 128,
-  KUSD: 129,
-  LKSM: 131,
+export const listenTokensConfig: Record<string, ExtendedToken> = {
+  LT: {
+    name: "LT",
+    symbol: "LT",
+    decimals: 12,
+    ed: "500000000000",
+    toRaw: () => 0,
+  },
+  KAR: {
+    name: "KAR",
+    symbol: "KAR",
+    decimals: 12,
+    ed: "100000000000",
+    toRaw: () => 128,
+  },
+  KUSD: {
+    name: "KUSD",
+    symbol: "KUSD",
+    decimals: 12,
+    ed: "10000000000",
+    toRaw: () => 129,
+  },
+  LKSM: {
+    name: "LKSM",
+    symbol: "LKSM",
+    decimals: 12,
+    ed: "500000000",
+    toRaw: () => 131,
+  },
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -98,6 +116,8 @@ class ListenBalanceAdapter extends BalanceAdapter {
     token: string,
     address: string
   ): Observable<BalanceData> {
+    if (!validateAddress(address)) throw new InvalidAddress(address);
+
     const storage = this.storages.balances(address);
 
     if (token === this.nativeToken) {
@@ -117,17 +137,15 @@ class ListenBalanceAdapter extends BalanceAdapter {
       );
     }
 
-    const tokenId = SUPPORTED_TOKENS[token];
+    const tokenData: ExtendedToken = this.getToken(token);
 
-    if (tokenId === undefined) {
-      throw new TokenNotFound(token);
-    }
+    if (!tokenData) throw new TokenNotFound(token);
 
-    return this.storages.assets(tokenId, address).observable.pipe(
+    return this.storages.assets(tokenData.toRaw(), address).observable.pipe(
       map((balance) => {
         const amount = FN.fromInner(
           balance.free?.toString() || "0",
-          this.getToken(token).decimals
+          tokenData.decimals
         );
 
         return {
@@ -211,37 +229,7 @@ class BaseListenAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
-
-    const { address, amount, to, token } = params;
-
-    const tokenId = SUPPORTED_TOKENS[token];
-
-    if (tokenId === undefined) {
-      throw new TokenNotFound(token);
-    }
-
-    const toChain = chains[to];
-    const accountId = this.api?.createType("AccountId32", address).toHex();
-    const dst = {
-      parents: 1,
-      interior: {
-        X2: [
-          { Parachain: toChain.paraChainId },
-          { AccountId32: { id: accountId, network: "Any" } },
-        ],
-      },
-    };
-
-    return this.api?.tx.xTokens.transfer(
-      tokenId,
-      amount.toChainData(),
-      { V1: dst },
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.getDestWeight(token, to)!.toString()
-    );
+    return this.createXTokensTx(params);
   }
 }
 

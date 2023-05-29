@@ -9,13 +9,14 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
-import { ApiNotFound, TokenNotFound } from "../errors";
+import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import {
   BalanceData,
-  BasicToken,
+  ExtendedToken,
   RouteConfigs,
   TransferParams,
 } from "../types";
+import { validateAddress } from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
@@ -46,16 +47,22 @@ export const kicoRoutersConfig: Omit<RouteConfigs, "from">[] = [
   },
 ];
 
-export const kicoTokensConfig: Record<string, BasicToken> = {
-  KICO: { name: "KICO", symbol: "KICO", decimals: 14, ed: "100000000000000" },
-  KAR: { name: "KAR", symbol: "KAR", decimals: 12, ed: "0" },
-  KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "0" },
-};
-
-const SUPPORTED_TOKENS: Record<string, number> = {
-  KICO: 0,
-  KAR: 102,
-  KUSD: 10,
+export const kicoTokensConfig: Record<string, ExtendedToken> = {
+  KICO: {
+    name: "KICO",
+    symbol: "KICO",
+    decimals: 14,
+    ed: "100000000000000",
+    toRaw: () => 0,
+  },
+  KAR: { name: "KAR", symbol: "KAR", decimals: 12, ed: "0", toRaw: () => 102 },
+  KUSD: {
+    name: "KUSD",
+    symbol: "KUSD",
+    decimals: 12,
+    ed: "0",
+    toRaw: () => 10,
+  },
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -88,6 +95,8 @@ class KicoBalanceAdapter extends BalanceAdapter {
     token: string,
     address: string
   ): Observable<BalanceData> {
+    if (!validateAddress(address)) throw new InvalidAddress(address);
+
     const storage = this.storages.balances(address);
 
     if (token === this.nativeToken) {
@@ -107,13 +116,11 @@ class KicoBalanceAdapter extends BalanceAdapter {
       );
     }
 
-    const tokenId = SUPPORTED_TOKENS[token];
+    const tokenData: ExtendedToken = this.getToken(token);
 
-    if (tokenId === undefined) {
-      throw new TokenNotFound(token);
-    }
+    if (!tokenData) throw new TokenNotFound(token);
 
-    return this.storages.assets(address, tokenId).observable.pipe(
+    return this.storages.assets(address, tokenData.toRaw()).observable.pipe(
       map((balance) => {
         const amount = FN.fromInner(
           balance.free?.toString() || "0",
@@ -201,38 +208,7 @@ class BaseKicoAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
-
-    const { address, amount, to, token } = params;
-    const toChain = chains[to];
-
-    const accountId = this.api?.createType("AccountId32", address).toHex();
-
-    const tokenId = SUPPORTED_TOKENS[token];
-
-    if (tokenId === undefined) {
-      throw new TokenNotFound(token);
-    }
-
-    return this.api.tx.xTokens.transfer(
-      tokenId,
-      amount.toChainData(),
-      {
-        V1: {
-          parents: 1,
-          interior: {
-            X2: [
-              { Parachain: toChain.paraChainId },
-              { AccountId32: { id: accountId, network: "Any" } },
-            ],
-          },
-        },
-      },
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.getDestWeight(token, to)!.toString()
-    );
+    return this.createXTokensTx(params);
   }
 }
 

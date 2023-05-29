@@ -9,13 +9,19 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
-import { ApiNotFound, TokenNotFound } from "../errors";
+import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
   RouteConfigs,
   TransferParams,
 } from "../types";
+import {
+  createPolkadotXCMAccount,
+  createPolkadotXCMAsset,
+  createPolkadotXCMDest,
+  validateAddress,
+} from "../utils";
 
 export const uniqueRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
@@ -161,11 +167,12 @@ class BaseUniqueAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
+    if (!this.api) throw new ApiNotFound(this.chain.id);
 
     const { address, amount, to, token } = params;
+
+    if (!validateAddress(address)) throw new InvalidAddress(address);
+
     const toChain = chains[to];
 
     if (token !== this.balanceAdapter?.nativeToken) {
@@ -173,47 +180,13 @@ class BaseUniqueAdapter extends BaseCrossChainAdapter {
     }
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
-
-    const dst = {
-      V3: {
-        parents: 1,
-        interior: {
-          X1: {
-            Parachain: toChain.paraChainId,
-          },
-        },
-      },
-    };
-    const acc = {
-      V3: {
-        parents: 0,
-        interior: {
-          X1: {
-            AccountId32: { id: accountId },
-          },
-        },
-      },
-    };
-    const ass = {
-      V3: [
-        {
-          id: {
-            Concrete: {
-              parents: 0,
-              interior: "Here",
-            },
-          },
-          fun: {
-            Fungible: amount.toChainData(),
-          },
-        },
-      ],
-    };
+    const paraChainId = toChain.paraChainId;
+    const rawAmount = amount.toChainData();
 
     return this.api?.tx.polkadotXcm.limitedReserveTransferAssets(
-      dst,
-      acc,
-      ass,
+      createPolkadotXCMDest(this.api, paraChainId),
+      createPolkadotXCMAccount(this.api, accountId),
+      createPolkadotXCMAsset(this.api, rawAmount, "NATIVE"),
       0,
       this.getDestWeight(token, to)?.toString()
     );

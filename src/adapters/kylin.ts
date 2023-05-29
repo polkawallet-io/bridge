@@ -9,13 +9,14 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
-import { ApiNotFound, TokenNotFound } from "../errors";
+import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import {
   BalanceData,
-  BasicToken,
+  ExtendedToken,
   RouteConfigs,
   TransferParams,
 } from "../types";
+import { validateAddress } from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
@@ -54,19 +55,42 @@ export const pichiuRoutersConfig: Omit<RouteConfigs, "from">[] = [
   },
 ];
 
-export const pichiuTokensConfig: Record<string, BasicToken> = {
-  PCHU: { name: "PCHU", symbol: "PCHU", decimals: 18, ed: "1000000000000" },
-  KAR: { name: "KAR", symbol: "KAR", decimals: 12, ed: "100000000000" },
-  AUSD: { name: "AUSD", symbol: "AUSD", decimals: 12, ed: "10000000000" },
-  KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "10000000000" },
-  LKSM: { name: "LKSM", symbol: "LKSM", decimals: 12, ed: "500000000" },
-};
-
-const SUPPORTED_TOKENS: Record<string, string> = {
-  PCHU: "PCHU",
-  KAR: "KAR",
-  KUSD: "AUSD",
-  LKSM: "LKSM",
+export const pichiuTokensConfig: Record<string, ExtendedToken> = {
+  PCHU: {
+    name: "PCHU",
+    symbol: "PCHU",
+    decimals: 18,
+    ed: "1000000000000",
+    toRaw: () => "PCHU",
+  },
+  KAR: {
+    name: "KAR",
+    symbol: "KAR",
+    decimals: 12,
+    ed: "100000000000",
+    toRaw: () => "KAR",
+  },
+  AUSD: {
+    name: "AUSD",
+    symbol: "AUSD",
+    decimals: 12,
+    ed: "10000000000",
+    toRaw: () => "AUSD",
+  },
+  KUSD: {
+    name: "KUSD",
+    symbol: "KUSD",
+    decimals: 12,
+    ed: "10000000000",
+    toRaw: () => "AUSD",
+  },
+  LKSM: {
+    name: "LKSM",
+    symbol: "LKSM",
+    decimals: 12,
+    ed: "500000000",
+    toRaw: () => "LKSM",
+  },
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -99,6 +123,8 @@ class KylinBalanceAdapter extends BalanceAdapter {
     token: string,
     address: string
   ): Observable<BalanceData> {
+    if (!validateAddress(address)) throw new InvalidAddress(address);
+
     const storage = this.storages.balances(address);
 
     if (token === this.nativeToken) {
@@ -118,17 +144,15 @@ class KylinBalanceAdapter extends BalanceAdapter {
       );
     }
 
-    const tokenId = SUPPORTED_TOKENS[token];
+    const tokenData: ExtendedToken = this.getToken(token);
 
-    if (tokenId === undefined) {
-      throw new TokenNotFound(token);
-    }
+    if (!tokenData) throw new TokenNotFound(token);
 
-    return this.storages.assets(address, tokenId).observable.pipe(
+    return this.storages.assets(address, tokenData.toRaw()).observable.pipe(
       map((balance) => {
         const amount = FN.fromInner(
           balance.free?.toString() || "0",
-          this.getToken(tokenId).decimals
+          tokenData.decimals
         );
 
         return {
@@ -212,37 +236,7 @@ class BaseKylinAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
-
-    const { address, amount, to, token } = params;
-    const toChain = chains[to];
-
-    const accountId = this.api?.createType("AccountId32", address).toHex();
-
-    const tokenId = SUPPORTED_TOKENS[token];
-
-    if (tokenId === undefined) {
-      throw new TokenNotFound(token);
-    }
-
-    return this.api?.tx.ormlXTokens.transfer(
-      tokenId,
-      amount.toChainData(),
-      {
-        V1: {
-          parents: 1,
-          interior: {
-            X2: [
-              { Parachain: toChain.paraChainId },
-              { AccountId32: { id: accountId, network: "Any" } },
-            ],
-          },
-        },
-      },
-      this.getDestWeight(token, to)?.toString()
-    );
+    return this.createXTokensTx(params);
   }
 }
 

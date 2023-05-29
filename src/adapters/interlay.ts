@@ -8,17 +8,14 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
-import {
-  ApiNotFound,
-  TokenNotFound,
-  DestinationWeightNotFound,
-} from "../errors";
+import { ApiNotFound, TokenNotFound, InvalidAddress } from "../errors";
 import {
   BalanceData,
-  BasicToken,
+  ExtendedToken,
   RouteConfigs,
   TransferParams,
 } from "../types";
+import { validateAddress } from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
@@ -64,25 +61,47 @@ export const kintsugiRoutersConfig: Omit<RouteConfigs, "from">[] = [
 
 export const interlayTokensConfig: Record<
   string,
-  Record<string, BasicToken>
+  Record<string, ExtendedToken>
 > = {
   interlay: {
-    INTR: { name: "INTR", symbol: "INTR", decimals: 10, ed: "0" },
-    IBTC: { name: "IBTC", symbol: "IBTC", decimals: 8, ed: "0" },
+    INTR: {
+      name: "INTR",
+      symbol: "INTR",
+      decimals: 10,
+      ed: "0",
+      toRaw: () => ({ Token: "INTR" }),
+    },
+    IBTC: {
+      name: "IBTC",
+      symbol: "IBTC",
+      decimals: 8,
+      ed: "0",
+      toRaw: () => ({ Token: "IBTC" }),
+    },
   },
   kintsugi: {
-    KINT: { name: "KINT", symbol: "KINT", decimals: 12, ed: "0" },
-    KBTC: { name: "KBTC", symbol: "KBTC", decimals: 8, ed: "0" },
-    LKSM: { name: "LKSM", symbol: "LKSM", decimals: 12, ed: "0" },
+    KINT: {
+      name: "KINT",
+      symbol: "KINT",
+      decimals: 12,
+      ed: "0",
+      toRaw: () => ({ Token: "KINT" }),
+    },
+    KBTC: {
+      name: "KBTC",
+      symbol: "KBTC",
+      decimals: 8,
+      ed: "0",
+      toRaw: () => ({ Token: "KBTC" }),
+    },
+    LKSM: {
+      name: "LKSM",
+      symbol: "LKSM",
+      decimals: 12,
+      ed: "0",
+      toRaw: () => ({ ForeignAsset: 2 }),
+    },
   },
-};
-
-const SUPPORTED_TOKENS: Record<string, unknown> = {
-  KINT: { Token: "KINT" },
-  KBTC: { Token: "KBTC" },
-  INTR: { Token: "INTR" },
-  IBTC: { Token: "IBTC" },
-  LKSM: { ForeignAsset: 2 },
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -109,13 +128,13 @@ class InterlayBalanceAdapter extends BalanceAdapter {
     token: string,
     address: string
   ): Observable<BalanceData> {
-    const tokenId = SUPPORTED_TOKENS[token];
+    if (!validateAddress(address)) throw new InvalidAddress(address);
 
-    if (tokenId === undefined) {
-      throw new TokenNotFound(token);
-    }
+    const tokenData: ExtendedToken = this.getToken(token);
 
-    return this.storages.assets(address, tokenId).observable.pipe(
+    if (!tokenData) throw new TokenNotFound(token);
+
+    return this.storages.assets(address, tokenData.toRaw()).observable.pipe(
       map((balance) => {
         const amount = FN.fromInner(
           balance.free?.toString() || "0",
@@ -205,49 +224,7 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
-
-    const { address, amount, to, token } = params;
-    const toChain = chains[to];
-
-    const accountId = this.api?.createType("AccountId32", address).toHex();
-
-    const tokenId = SUPPORTED_TOKENS[token];
-
-    if (tokenId === undefined) {
-      throw new TokenNotFound(token);
-    }
-
-    // use "Unlimited" if the xToken.transfer's fourth parameter version supports it
-    const destWeight =
-      this.api.tx.xTokens.transfer.meta.args[3].type.toString() ===
-      "XcmV2WeightLimit"
-        ? "Unlimited"
-        : this.getDestWeight(token, to);
-
-    if (destWeight === undefined) {
-      throw new DestinationWeightNotFound(this.chain.id, to, token);
-    }
-
-    return this.api.tx.xTokens.transfer(
-      tokenId,
-      amount.toChainData(),
-      {
-        V1: {
-          parents: 1,
-          interior: {
-            X2: [
-              { Parachain: toChain.paraChainId },
-              { AccountId32: { id: accountId, network: "Any" } },
-            ],
-          },
-        },
-      },
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      destWeight
-    );
+    return this.createXTokensTx(params);
   }
 }
 
