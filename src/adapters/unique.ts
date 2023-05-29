@@ -21,7 +21,7 @@ import {
   createPolkadotXCMAsset,
   createPolkadotXCMDest,
   validateAddress,
-} from "src/utils";
+} from "../utils";
 
 export const uniqueRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {

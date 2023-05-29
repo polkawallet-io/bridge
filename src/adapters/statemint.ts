@@ -17,7 +17,7 @@ import {
   RouteConfigs,
   TransferParams,
 } from "../types";
-import { validateAddress } from "src/utils";
+import { validateAddress } from "../utils";
 
 export const statemineRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {

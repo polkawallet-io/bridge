@@ -4,7 +4,7 @@ import * as ethers from "ethers";
 type AddressType = "substract" | "ethereum";
 
 function validateEthereumAddress(address: string) {
-  return ethers.isAddress(address);
+  return ethers.utils.isAddress(address);
 }
 
 function validateSubstrateAddress(address: string) {

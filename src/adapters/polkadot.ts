@@ -16,7 +16,7 @@ import {
   RouteConfigs,
   TransferParams,
 } from "../types";
-import { validateAddress } from "src/utils";
+import { validateAddress } from "../utils";
 
 export const polkadotRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {

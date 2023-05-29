@@ -16,7 +16,7 @@ import {
   RouteConfigs,
   TransferParams,
 } from "../types";
-import { validateAddress } from "src/utils/validate-address";
+import { validateAddress } from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 

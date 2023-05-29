@@ -21,7 +21,7 @@ import {
   createPolkadotXCMAsset,
   createPolkadotXCMDest,
   validateAddress,
-} from "src/utils";
+} from "../utils";
 
 const crabRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {

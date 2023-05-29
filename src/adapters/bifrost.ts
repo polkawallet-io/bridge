@@ -15,8 +15,7 @@ import {
   RouteConfigs,
   TransferParams,
 } from "../types";
-import { createXTokensDestParam } from "../utils";
-import { validateAddress } from "src/utils/validate-address";
+import { validateAddress } from "../utils";
 
 export const bifrostRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
@@ -233,25 +232,7 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (!this.api) throw new ApiNotFound(this.chain.id);
-
-    const { address, amount, to, token } = params;
-    const toChain = chains[to];
-
-    if (!validateAddress(address)) throw new InvalidAddress(address);
-
-    const accountId = this.api?.createType("AccountId32", address).toHex();
-
-    const tokenData: ExtendedToken = this.getToken(token);
-
-    if (!tokenData) throw new TokenNotFound(token);
-
-    return this.api.tx.xTokens.transfer(
-      tokenData.toRaw(),
-      amount.toChainData(),
-      createXTokensDestParam(this.api, toChain.paraChainId, accountId),
-      "Unlimited"
-    );
+    return this.createXTokensTx(params);
   }
 }
 

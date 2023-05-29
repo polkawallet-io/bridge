@@ -20,14 +20,17 @@ import { ApiNotFound, InvalidAddress, TokenNotFound } from "../../errors";
 import { BalanceData, TransferParams } from "../../types";
 import { isChainEqual } from "../../utils/is-chain-equal";
 import { SUPPORTED_TOKENS as STATEMINE_SUPPORTED_TOKENS } from "../statemint";
-import { createXTokensAssetsParam, createXTokensDestParam } from "../../utils";
+import {
+  createXTokensAssetsParam,
+  createXTokensDestParam,
+  validateAddress,
+} from "../../utils";
 import {
   acalaRoutersConfig,
   acalaTokensConfig,
   karuraRoutersConfig,
   karuraTokensConfig,
 } from "./configs";
-import { validateAddress } from "src/utils/validate-address";
 
 class BaseAcalaAdapter extends BaseCrossChainAdapter {
   private wallet?: Wallet;
