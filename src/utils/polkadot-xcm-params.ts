@@ -47,7 +47,7 @@ export function createPolkadotXCMAsset(
   const tokenPosition =
     token === "NATIVE"
       ? {
-          id: { Concrate: { parents: 0, interior: "Here" } },
+          id: { Concrete: { parents: 0, interior: "Here" } },
         }
       : {
           id: {

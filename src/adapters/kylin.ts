@@ -16,7 +16,12 @@ import {
   RouteConfigs,
   TransferParams,
 } from "../types";
-import { validateAddress } from "../utils";
+import {
+  createXTokensDestParam,
+  createXTokensWeight,
+  isChainEqual,
+  validateAddress,
+} from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
@@ -236,7 +241,29 @@ class BaseKylinAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    return this.createXTokensTx(params);
+    if (!this.api) throw new ApiNotFound(this.chain.id);
+
+    const { address, amount, to, token } = params;
+
+    if (!validateAddress(address)) throw new InvalidAddress(address);
+
+    const tokenData: ExtendedToken = this.getToken(token);
+    const toChain = chains[to];
+    const accountId = this.api?.createType("AccountId32", address).toHex();
+    const isToRelayChain =
+      isChainEqual(toChain, "kusama") || isChainEqual(toChain, "polkadot");
+
+    if (!tokenData) throw new TokenNotFound(token);
+
+    return this.api?.tx.ormlXTokens.transfer(
+      tokenData.toRaw(),
+      amount.toChainData(),
+      createXTokensDestParam(this.api, toChain.paraChainId, accountId, {
+        isToRelayChain,
+      }),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      createXTokensWeight(this.api, this.getDestWeight(token, to)!)
+    );
   }
 }
 
