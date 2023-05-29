@@ -65,3 +65,12 @@ export class InvalidAddress extends Error {
     this.name = "InvalidAddress";
   }
 }
+
+export class ModuleNotFound extends Error {
+  constructor(module: string) {
+    super();
+
+    this.message = `${module} module not found`;
+    this.name = "ModuleNotFound";
+  }
+}

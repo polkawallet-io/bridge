@@ -124,8 +124,13 @@ export function createXTokensAssetsParam(
 }
 
 export function createXTokensWeight(api: AnyApi, weight: string) {
-  const isV2WeightLimit =
-    api.tx.xTokens.transfer.meta.args[3].type.toString() === "XcmV2WeightLimit";
+  const isV2WeightLimit = api.tx.xTokens
+    ? api.tx?.xTokens?.transfer.meta.args[3].type.toString() ===
+      "XcmV2WeightLimit"
+    : api.tx.ormlXTokens
+    ? api.tx?.ormlXTokens?.transfer.meta.args[3].type.toString() ===
+      "XcmV2WeightLimit"
+    : false;
 
   return isV2WeightLimit ? "Unlimited" : weight;
 }

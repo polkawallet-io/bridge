@@ -22,6 +22,7 @@ import {
   AdapterNotFound,
   ApiNotFound,
   InvalidAddress,
+  ModuleNotFound,
   RouterConfigNotFound,
   TokenNotFound,
 } from "./errors";
@@ -331,14 +332,30 @@ export abstract class BaseCrossChainAdapter {
 
     if (!tokenData) throw new TokenNotFound(token);
 
-    return this.api?.tx.xTokens.transfer(
-      tokenData.toRaw(),
-      amount.toChainData(),
-      createXTokensDestParam(this.api, toChain.paraChainId, accountId, {
-        isToRelayChain,
-      }),
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      createXTokensWeight(this.api, this.getDestWeight(token, to)!)
-    );
+    if (this.api.tx.ormlXTokens) {
+      return this.api.tx.ormlXTokens.transfer(
+        tokenData.toRaw(),
+        amount.toChainData(),
+        createXTokensDestParam(this.api, toChain.paraChainId, accountId, {
+          isToRelayChain,
+        }),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        createXTokensWeight(this.api, this.getDestWeight(token, to)!)
+      );
+    }
+
+    if (this.api.tx.xTokens) {
+      return this.api?.tx.xTokens.transfer(
+        tokenData.toRaw(),
+        amount.toChainData(),
+        createXTokensDestParam(this.api, toChain.paraChainId, accountId, {
+          isToRelayChain,
+        }),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        createXTokensWeight(this.api, this.getDestWeight(token, to)!)
+      );
+    }
+
+    throw new ModuleNotFound("xTokens");
   }
 }
