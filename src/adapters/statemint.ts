@@ -19,6 +19,17 @@ import {
 } from "../types";
 import { validateAddress } from "../utils";
 
+export const statemintRoutersConfig: Omit<RouteConfigs, "from">[] = [
+  {
+    to: "polkadot",
+    token: "DOT",
+    xcm: {
+      fee: { token: "DOT", amount: "421500000" },
+      weightLimit: "Unlimited",
+    },
+  },
+];
+
 export const statemineRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "kusama",
@@ -51,10 +62,14 @@ export const statemineRoutersConfig: Omit<RouteConfigs, "from">[] = [
   },
 ];
 
-export const statemineTokensConfig: Record<
+export const statemintTokensConfig: Record<
   string,
   Record<string, BasicToken>
 > = {
+  statemint: {
+    DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "10000000000" },
+    USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "1000" },
+  },
   statemine: {
     KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "79999999" },
     RMRK: { name: "RMRK", symbol: "RMRK", decimals: 10, ed: "100000000" },
@@ -172,7 +187,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
     this.balanceAdapter = new StatemintBalanceAdapter({
       api,
       chain,
-      tokens: statemineTokensConfig[chain],
+      tokens: statemintTokensConfig[chain],
     });
   }
 
@@ -226,6 +241,19 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
     );
   }
 
+  private get isV0V1() {
+    try {
+      const keys = (this.api?.createType("XcmVersionedMultiLocation") as any)
+        .defKeys as string[];
+
+      return keys.includes("V0");
+    } catch (e) {
+      // ignore error
+    }
+
+    return false;
+  }
+
   public createTx(
     params: TransferParams
   ):
@@ -248,6 +276,8 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
         throw new TokenNotFound(token);
       }
 
+      const isV0V1Support = this.isV0V1;
+
       const dst = { interior: "Here", parents: 1 };
       const acc = {
         interior: { X1: { AccountId32: { id: accountId } } },
@@ -263,9 +293,9 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       ];
 
       return this.api?.tx.polkadotXcm.limitedTeleportAssets(
-        { V3: dst },
-        { V3: acc },
-        { V3: ass },
+        { [isV0V1Support ? "V1" : "V3"]: dst },
+        { [isV0V1Support ? "V1" : "V3"]: acc },
+        { [isV0V1Support ? "V1" : "V3"]: ass },
         0,
         this.getDestWeight(token, to)?.toString()
       );
@@ -312,12 +342,22 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
   }
 }
 
+export class StatemintAdapter extends BaseStatemintAdapter {
+  constructor() {
+    super(
+      chains.statemint,
+      statemintRoutersConfig,
+      statemintTokensConfig.statemint
+    );
+  }
+}
+
 export class StatemineAdapter extends BaseStatemintAdapter {
   constructor() {
     super(
       chains.statemine,
       statemineRoutersConfig,
-      statemineTokensConfig.statemine
+      statemintTokensConfig.statemine
     );
   }
 }
