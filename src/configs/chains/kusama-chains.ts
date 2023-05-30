@@ -15,7 +15,7 @@ export const kusamaChains = {
   },
   statemine: {
     id: "statemine",
-    display: "Statemine",
+    display: "Kusama Asset Hub",
     type: typeSubstrate,
     icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fstatemine.png&w=96&q=75",
     paraChainId: 1000,

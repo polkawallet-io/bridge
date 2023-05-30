@@ -12,24 +12,24 @@ All channels support transfers in both directions.
 
 #### Interlay:
 
-| channel   | tokens    |
-| --------- | --------- |
-| acala     | INTR IBTC |
-| astar     | INTR IBTC |
-| parallel  | INTR IBTC |
-| polkadot  | DOT       |
-| statemint | USDT      |
-| hydradx   | IBTC      |
+| channel            | tokens    |
+| ------------------ | --------- |
+| acala              | INTR IBTC |
+| astar              | INTR IBTC |
+| parallel           | INTR IBTC |
+| polkadot           | DOT       |
+| polkadot asset hub | USDT      |
+| hydradx            | IBTC      |
 
 #### Kintsugi:
 
-| channel   | tokens         |
-| --------- | -------------- |
-| bifrost   | VKSM           |
-| heiko     | KBTC KINT      |
-| karura    | KBTC KINT LKSM |
-| kusama    | KSM            |
-| statemine | USDT           |
+| channel          | tokens         |
+| ---------------- | -------------- |
+| bifrost          | VKSM           |
+| heiko            | KBTC KINT      |
+| karura           | KBTC KINT LKSM |
+| kusama           | KSM            |
+| kusama asset hub | USDT           |
 
 ## Usage
 
