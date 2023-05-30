@@ -25,6 +25,14 @@ export const polkadotRoutersConfig: Omit<RouteConfigs, "from">[] = [
     xcm: { fee: { token: "DOT", amount: "3549633" }, weightLimit: "Unlimited" },
   },
   {
+    to: "hydradx",
+    token: "DOT",
+    xcm: {
+      fee: { token: "DOT", amount: "21711791" },
+      weightLimit: "Unlimited",
+    },
+  },
+  {
     to: "statemint",
     token: "DOT",
     xcm: {

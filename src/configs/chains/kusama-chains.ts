@@ -132,6 +132,22 @@ export const kusamaChains = {
     paraChainId: 2090,
     ss58Prefix: 10041,
   },
+  tinkernet: {
+    id: "tinkernet",
+    display: "Tinkernet",
+    type: "substrate",
+    icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fbasilisk.png&w=96&q=75",
+    paraChainId: 2125,
+    ss58Prefix: 117,
+  },
+  robonomics: {
+    id: "robonomics",
+    display: "Robonomics",
+    type: "substrate",
+    icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fbasilisk.png&w=96&q=75",
+    paraChainId: 2048,
+    ss58Prefix: 32,
+  },
   listen: {
     display: "Listen",
     type: "substrate",

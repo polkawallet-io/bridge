@@ -56,6 +56,14 @@ export const astarRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: "Unlimited",
     },
   },
+  {
+    to: "hydradx",
+    token: "ASTR",
+    xcm: {
+      fee: { token: "ASTR", amount: "44306118000000000" },
+      weightLimit: "Unlimited",
+    },
+  },
 ];
 
 export const shidenRoutersConfig: Omit<RouteConfigs, "from">[] = [
