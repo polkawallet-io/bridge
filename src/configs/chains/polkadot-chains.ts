@@ -15,7 +15,7 @@ export const polkadotChains = {
   },
   statemint: {
     id: "statemint",
-    display: "Statemint",
+    display: "Polkadot Asset Hub",
     type: typeSubstrate,
     icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fstatemine.png&w=96&q=75",
     paraChainId: 1000,
