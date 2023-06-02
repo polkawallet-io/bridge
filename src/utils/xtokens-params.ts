@@ -48,7 +48,7 @@ export function createXTokensDestParam(
             { Parachain: paraChainId },
             {
               [accountKeyName]: {
-                id: accountId,
+                [useAccountKey20 ? "key" : "id"]: accountId,
                 network: "Any",
               },
             },
@@ -65,7 +65,11 @@ export function createXTokensDestParam(
       interior: {
         X2: [
           { Parachain: paraChainId },
-          { [accountKeyName]: { id: accountId } },
+          {
+            [accountKeyName]: {
+              [useAccountKey20 ? "key" : "id"]: accountId,
+            },
+          },
         ],
       },
     },
