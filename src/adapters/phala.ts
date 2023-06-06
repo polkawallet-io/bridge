@@ -18,15 +18,12 @@ import {
 } from "../types";
 import { validateAddress } from "../utils";
 
-const DEST_WEIGHT = "5000000000";
-
 export const khalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "karura",
     token: "PHA",
     xcm: {
       fee: { token: "PHA", amount: "51200000000" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -34,7 +31,6 @@ export const khalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "4616667257" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -42,7 +38,6 @@ export const khalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KAR",
     xcm: {
       fee: { token: "KAR", amount: "6400000000" },
-      weightLimit: DEST_WEIGHT,
     },
   },
 ];
@@ -232,7 +227,7 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
       interior: {
         X2: [
           { Parachain: toChain.paraChainId },
-          { AccountId32: { id: accountId, network: "Any" } },
+          { AccountId32: { id: accountId } },
         ],
       },
     };
@@ -263,11 +258,7 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
       };
     }
 
-    return this.api.tx.xTransfer.transfer(
-      asset,
-      dst,
-      this.getDestWeight(token, to)?.toString()
-    );
+    return this.api.tx.xTransfer.transfer(asset, dst);
   }
 }
 
