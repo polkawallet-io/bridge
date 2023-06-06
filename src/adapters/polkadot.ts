@@ -24,6 +24,14 @@ export const polkadotRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "DOT",
     xcm: { fee: { token: "DOT", amount: "3549633" }, weightLimit: "Unlimited" },
   },
+  {
+    to: "statemint",
+    token: "DOT",
+    xcm: {
+      fee: { token: "DOT", amount: "15800000" },
+      weightLimit: "Unlimited",
+    },
+  },
 ];
 
 // TODO: should remove after kusama upgrade
