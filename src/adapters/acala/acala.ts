@@ -9,7 +9,6 @@ import {
   of,
 } from "rxjs";
 
-import "@acala-network/types/argument/api-tx";
 import { ApiRx } from "@polkadot/api";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
