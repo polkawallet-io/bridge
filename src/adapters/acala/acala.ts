@@ -171,7 +171,7 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
           assetId,
           amount.toChainData()
         ),
-        createXTokensDestParam(this.api, toChain.paraChainId, accountId),
+        createXTokensDestParam(this.api, toChain.paraChainId, accountId) as any,
         "Unlimited"
       );
     }
@@ -182,7 +182,7 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
       createXTokensDestParam(this.api, toChain.paraChainId, accountId, {
         isToRelayChain,
         useAccountKey20,
-      }),
+      }) as any,
       "Unlimited"
     );
   }

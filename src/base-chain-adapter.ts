@@ -37,6 +37,7 @@ import {
   TransferParams,
   TokenBalance,
   ExtendedToken,
+  TransferParamsWithSigner,
 } from "./types";
 import {
   createXTokensDestParam,
@@ -67,6 +68,10 @@ export abstract class BaseCrossChainAdapter {
 
   public abstract init(api: AnyApi, ...others: any[]): Promise<void>;
 
+  public getApi() {
+    return this.api;
+  }
+
   public injectFindAdapter(
     func: (chain: ChainId | Chain) => BaseCrossChainAdapter
   ): void {
@@ -85,7 +90,7 @@ export abstract class BaseCrossChainAdapter {
   }
 
   public subscribeInputConfig(
-    params: Omit<TransferParams, "amount">
+    params: Omit<TransferParamsWithSigner, "amount">
   ): Observable<InputConfig> {
     const { signer, to, token } = params;
 
@@ -116,7 +121,7 @@ export abstract class BaseCrossChainAdapter {
     );
   }
 
-  public getInputConfig(params: Omit<TransferParams, "amount">) {
+  public getInputConfig(params: Omit<TransferParamsWithSigner, "amount">) {
     return firstValueFrom(this.subscribeInputConfig(params));
   }
 
@@ -203,7 +208,7 @@ export abstract class BaseCrossChainAdapter {
     return router.xcm?.weightLimit;
   }
 
-  public estimateTxFee(params: TransferParams) {
+  public estimateTxFee(params: TransferParamsWithSigner) {
     let tx = this.createTx({
       ...params,
       // overwrite amount just for estimating fee
@@ -237,7 +242,7 @@ export abstract class BaseCrossChainAdapter {
     );
   }
 
-  public getEstimateTxFee(params: TransferParams) {
+  public getEstimateTxFee(params: TransferParamsWithSigner) {
     return firstValueFrom(this.estimateTxFee(params));
   }
 
@@ -350,7 +355,7 @@ export abstract class BaseCrossChainAdapter {
         amount.toChainData(),
         createXTokensDestParam(this.api, toChain.paraChainId, accountId, {
           isToRelayChain,
-        }),
+        }) as any,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         createXTokensWeight(this.api, this.getDestWeight(token, to)!)
       );
