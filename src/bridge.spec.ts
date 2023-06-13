@@ -180,12 +180,13 @@ describe.skip("Bridge sdk usage", () => {
     // printBidirectionalTxs("interlay", "polkadot", "DOT");
     // printBidirectionalTxs("interlay", "statemint", "USDT");
     // printBidirectionalTxs("interlay", "hydra", "IBTC");
+    printBidirectionalTxs("interlay", "hydra", "INTR");
     // printBidirectionalTxs("interlay", "acala", "INTR");
     // printBidirectionalTxs("interlay", "acala", "IBTC");
     // printBidirectionalTxs("interlay", "parallel", "INTR");
     // printBidirectionalTxs("interlay", "parallel", "IBTC");
-    printBidirectionalTxs("interlay", "astar", "INTR");
-    printBidirectionalTxs("interlay", "astar", "IBTC");
+    // printBidirectionalTxs("interlay", "astar", "INTR");
+    // printBidirectionalTxs("interlay", "astar", "IBTC");
   });
 
   test("5. getNativeToken should work", () => {
