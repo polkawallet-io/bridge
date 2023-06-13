@@ -92,9 +92,9 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
     to: "hydra",
     token: "INTR",
-    // recent xcm fees: ??? - add 10x safety margin
+    // in chopsticks tests: 1_577_910_765 - add 10x safety margin
     xcm: {
-      fee: { token: "INTR", amount: "65359477120" },
+      fee: { token: "INTR", amount: "15779107650" },
       weightLimit: DEST_WEIGHT,
     },
   },
