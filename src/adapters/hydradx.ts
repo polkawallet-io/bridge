@@ -30,6 +30,15 @@ export const hydraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
+  {
+    to: "interlay",
+    token: "INTR",
+    xcm: {
+      // recent transfer cost: ??? - add 10x margin to fee estimate
+      fee: { token: "INTR", amount: "216604720" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
 ];
 
 export const hydraTokensConfig: Record<string, ExpandToken> = {
@@ -46,6 +55,13 @@ export const hydraTokensConfig: Record<string, ExpandToken> = {
     decimals: 8,
     ed: "36",
     toChainData: () => 11,
+  },
+  INTR: {
+    name: "INTR",
+    symbol: "INTR",
+    decimals: 10,
+    ed: "6164274209",
+    toChainData: () => 17,
   },
 };
 

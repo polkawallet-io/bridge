@@ -89,6 +89,15 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     // recent xcm fees: 7 - add 10x safety margin
     xcm: { fee: { token: "IBTC", amount: "70" }, weightLimit: DEST_WEIGHT },
   },
+  {
+    to: "hydra",
+    token: "INTR",
+    // recent xcm fees: ??? - add 10x safety margin
+    xcm: {
+      fee: { token: "INTR", amount: "65359477120" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
 ];
 
 export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
