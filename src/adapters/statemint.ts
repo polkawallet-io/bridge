@@ -28,6 +28,14 @@ export const statemintRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: "Unlimited",
     },
   },
+  {
+    to: "hydradx",
+    token: "USDT",
+    xcm: {
+      fee: { token: "USDT", amount: "2200" },
+      weightLimit: "Unlimited",
+    },
+  },
 ];
 
 export const statemineRoutersConfig: Omit<RouteConfigs, "from">[] = [

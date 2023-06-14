@@ -55,6 +55,13 @@ export const polkadotChains = {
     paraChainId: 2034,
     ss58Prefix: 63,
   },
+  zeitgeist: {
+    display: "Zeitgeist",
+    type: "substrate",
+    icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fzeitgeist.png&w=96&q=75",
+    paraChainId: 2092,
+    ss58Prefix: 73,
+  },
   unique: {
     display: "Unique Network",
     type: "substrate",

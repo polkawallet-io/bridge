@@ -33,6 +33,11 @@ export const interlayRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "IBTC",
     xcm: { fee: { token: "IBTC", amount: "9" }, weightLimit: DEST_WEIGHT },
   },
+  {
+    to: "hydradx",
+    token: "IBTC",
+    xcm: { fee: { token: "IBTC", amount: "7" }, weightLimit: DEST_WEIGHT },
+  },
 ];
 
 export const kintsugiRoutersConfig: Omit<RouteConfigs, "from">[] = [
