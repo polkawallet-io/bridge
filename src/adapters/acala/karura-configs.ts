@@ -27,7 +27,7 @@ export const karuraRouteConfigs = createRouteConfigs("karura", [
     to: "statemine",
     token: "USDT",
     xcm: {
-      fee: { token: "USDT", amount: "1000" },
+      fee: { token: "USDT", amount: "1183" },
     },
   },
   {
@@ -326,9 +326,23 @@ export const karuraRouteConfigs = createRouteConfigs("karura", [
   },
   {
     to: "basilisk",
+    token: "KSM",
+    xcm: {
+      fee: { token: "KSM", amount: "359882060" },
+    },
+  },
+  {
+    to: "basilisk",
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "3150402683" },
+    },
+  },
+  {
+    to: "basilisk",
+    token: "aUSD",
+    xcm: {
+      fee: { token: "aUSD", amount: "3150402683" },
     },
   },
   {
