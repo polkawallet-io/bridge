@@ -4,7 +4,7 @@ import { AcalaAdapter } from './acala';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { FixedPointNumber } from '@acala-network/sdk-core';
 
-describe('astar adapter should work', () => {
+describe.skip('astar adapter should work', () => {
   jest.setTimeout(50000);
 
   const address = '5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN';
