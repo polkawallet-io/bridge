@@ -21,7 +21,8 @@
     "test": "jest",
     "lint": "polkadot-dev-run-lint",
     "build:docs": "ts-node ./scripts/generate-bridge-document.ts",
-    "build:release": "polkadot-ci-ghact-build"
+    "build:release": "polkadot-ci-ghact-build",
+    "prepare": "husky install"
   },
   "peerDependencies": {
     "@acala-network/api": "^5",
@@ -36,14 +37,14 @@
     "@polkadot/types": "^10.7.3"
   },
   "dependencies": {
-    "@acala-network/api": "^5.1.1",
+    "@acala-network/api": "^5",
     "@acala-network/sdk": "^4.1.9-2",
     "@acala-network/sdk-core": "^4.1.9-2",
-    "@polkadot/api": "^10.7.3",
+    "@polkadot/api": "^10",
     "@polkadot/apps-config": "^0.131.4",
     "@polkadot/types": "^10.7.3",
     "axios": "^0.27.2",
-    "ethers": "~5.7.0",
+    "ethers": "^5",
     "lodash": "^4.17.20"
   },
   "devDependencies": {
