@@ -10,15 +10,10 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
-import {
-  BalanceData,
-  ExtendedToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
-import { validateAddress } from "../utils";
+import { BalanceData, ExtendedToken, TransferParams } from "../types";
+import { createRouteConfigs, validateAddress } from "../utils";
 
-export const khalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const khalaRouteConfigs = createRouteConfigs("khala", [
   {
     to: "karura",
     token: "PHA",
@@ -40,7 +35,7 @@ export const khalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
       fee: { token: "KAR", amount: "6400000000" },
     },
   },
-];
+]);
 
 export const khalaTokensConfig: Record<string, ExtendedToken> = {
   PHA: {
@@ -264,6 +259,6 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
 
 export class KhalaAdapter extends BasePhalaAdapter {
   constructor() {
-    super(chains.khala, khalaRoutersConfig, khalaTokensConfig);
+    super(chains.khala, khalaRouteConfigs, khalaTokensConfig);
   }
 }

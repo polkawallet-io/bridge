@@ -10,17 +10,12 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress } from "../errors";
-import {
-  BalanceData,
-  ExtendedToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
-import { validateAddress } from "../utils";
+import { BalanceData, ExtendedToken, TransferParams } from "../types";
+import { createRouteConfigs, validateAddress } from "../utils";
 
 const DEST_WEIGHT = "Unlimited";
 
-const altairRoutersConfig: Omit<RouteConfigs, "from">[] = [
+const altairRouteConfigs = createRouteConfigs("altair", [
   {
     to: "karura",
     token: "AIR",
@@ -37,7 +32,7 @@ const altairRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
-];
+]);
 
 export const altairTokensConfig: Record<string, ExtendedToken> = {
   AIR: {
@@ -203,6 +198,6 @@ class BaseCentrifugeAdapter extends BaseCrossChainAdapter {
 
 export class AltairAdapter extends BaseCentrifugeAdapter {
   constructor() {
-    super(chains.altair, altairRoutersConfig, altairTokensConfig);
+    super(chains.altair, altairRouteConfigs, altairTokensConfig);
   }
 }

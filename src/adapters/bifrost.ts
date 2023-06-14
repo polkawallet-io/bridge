@@ -9,15 +9,10 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
-import {
-  BalanceData,
-  ExtendedToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
-import { validateAddress } from "../utils";
+import { BalanceData, ExtendedToken, TransferParams } from "../types";
+import { createRouteConfigs, validateAddress } from "../utils";
 
-export const bifrostRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const bifrostRouteConfigs = createRouteConfigs("bifrost", [
   {
     to: "karura",
     token: "BNC",
@@ -53,7 +48,7 @@ export const bifrostRoutersConfig: Omit<RouteConfigs, "from">[] = [
       fee: { token: "KUSD", amount: "10011896008" },
     },
   },
-];
+]);
 
 export const bifrostTokensConfig: Record<string, ExtendedToken> = {
   BNC: {
@@ -238,6 +233,6 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
 
 export class BifrostAdapter extends BaseBifrostAdapter {
   constructor() {
-    super(chains.bifrost, bifrostRoutersConfig, bifrostTokensConfig);
+    super(chains.bifrost, bifrostRouteConfigs, bifrostTokensConfig);
   }
 }

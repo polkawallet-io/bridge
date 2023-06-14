@@ -10,17 +10,12 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
-import {
-  BalanceData,
-  ExtendedToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
-import { validateAddress } from "../utils";
+import { BalanceData, ExtendedToken, TransferParams } from "../types";
+import { createRouteConfigs, validateAddress } from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
-export const kicoRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const kicoRouteConfigs = createRouteConfigs("kico", [
   {
     to: "karura",
     token: "KICO",
@@ -45,7 +40,7 @@ export const kicoRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
-];
+]);
 
 export const kicoTokensConfig: Record<string, ExtendedToken> = {
   KICO: {
@@ -214,6 +209,6 @@ class BaseKicoAdapter extends BaseCrossChainAdapter {
 
 export class KicoAdapter extends BaseKicoAdapter {
   constructor() {
-    super(chains.kico, kicoRoutersConfig, kicoTokensConfig);
+    super(chains.kico, kicoRouteConfigs, kicoTokensConfig);
   }
 }

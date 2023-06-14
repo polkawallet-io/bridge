@@ -10,13 +10,9 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
+import { BalanceData, ExtendedToken, TransferParams } from "../types";
 import {
-  BalanceData,
-  ExtendedToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
-import {
+  createRouteConfigs,
   createXTokensDestParam,
   createXTokensWeight,
   isChainEqual,
@@ -25,7 +21,7 @@ import {
 
 const DEST_WEIGHT = "5000000000";
 
-export const pichiuRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const pichiuRouteConfigs = createRouteConfigs("pichiu", [
   {
     to: "karura",
     token: "PCHU",
@@ -58,7 +54,7 @@ export const pichiuRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
-];
+]);
 
 export const pichiuTokensConfig: Record<string, ExtendedToken> = {
   PCHU: {
@@ -269,6 +265,6 @@ class BaseKylinAdapter extends BaseCrossChainAdapter {
 
 export class PichiuAdapter extends BaseKylinAdapter {
   constructor() {
-    super(chains.pichiu, pichiuRoutersConfig, pichiuTokensConfig);
+    super(chains.pichiu, pichiuRouteConfigs, pichiuTokensConfig);
   }
 }

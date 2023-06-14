@@ -1,2 +1,3 @@
 export * from "./acala";
-export * from "./configs";
+export * from "./acala-configs";
+export * from "./karura-configs";

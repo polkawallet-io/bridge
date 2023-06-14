@@ -75,6 +75,10 @@ describe("acala-adapter", () => {
 
     const kusama = adapter.getToken('KSM');
     const api = adapter.getApi();
+
+    // just for type check
+    if (!api) return;
+
     const amount = new FixedPointNumber(1, kusama.decimals);
     const tx = adapter.createTx({
       to: 'kusama',
@@ -98,8 +102,6 @@ describe("acala-adapter", () => {
       location.toHuman()
     );
 
-    console.log(JSON.stringify(tx.args[2].toHuman()));
-
     done();
   });
 
@@ -109,6 +111,10 @@ describe("acala-adapter", () => {
     expect(adapter).toBeDefined();
     const movr = adapter.getToken('MOVR');
     const api = adapter.getApi();
+
+    // just for type check
+    if (!api) return;
+
     const amount = new FixedPointNumber(1, movr.decimals);
     const tx = adapter.createTx({
       to: 'moonriver',
@@ -147,6 +153,10 @@ describe("acala-adapter", () => {
 
     const rmrk = adapter.getToken('RMRK');
     const api = adapter.getApi();
+
+    // just for type check
+    if (!api) return;
+
     const amount = new FixedPointNumber(1, rmrk.decimals);
     const tx = adapter.createTx({
       to: 'statemine',

@@ -58,8 +58,7 @@ describe.skip('polkadot-adapter should work', () => {
         amount: FixedPointNumber.fromInner('10000000000', 10),
         to: 'karura',
         token: 'KSM',
-        address: testAccount,
-        signer: testAccount
+        address: testAccount
       });
 
       expect(tx.method.section).toEqual('xcmPallet');

@@ -10,20 +10,16 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
-import {
-  BalanceData,
-  BasicToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
+import { BalanceData, BasicToken, TransferParams } from "../types";
 import {
   createPolkadotXCMAccount,
   createPolkadotXCMAsset,
   createPolkadotXCMDest,
+  createRouteConfigs,
   validateAddress,
 } from "../utils";
 
-const crabRoutersConfig: Omit<RouteConfigs, "from">[] = [
+const crabRouteConfigs = createRouteConfigs("crab", [
   {
     to: "karura",
     token: "CRAB",
@@ -32,7 +28,7 @@ const crabRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: "Unlimited",
     },
   },
-];
+]);
 
 export const crabTokensConfig: Record<string, BasicToken> = {
   CRAB: { name: "CRAB", symbol: "CRAB", decimals: 18, ed: "0" },
@@ -176,13 +172,13 @@ class BaseDarwiniaAdapter extends BaseCrossChainAdapter {
       createPolkadotXCMAccount(this.api, accountId),
       createPolkadotXCMAsset(this.api, rawAmount, "NATIVE"),
       0,
-      this.getDestWeight(token, to)?.toString()
+      this.getDestWeight(token, to)?.toString() as any
     );
   }
 }
 
 export class CrabAdapter extends BaseDarwiniaAdapter {
   constructor() {
-    super(chains.crab, crabRoutersConfig, crabTokensConfig);
+    super(chains.crab, crabRouteConfigs, crabTokensConfig);
   }
 }

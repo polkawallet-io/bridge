@@ -5,7 +5,7 @@ export function createPolkadotXCMDest(
   api: AnyApi,
   parachainId: number,
   parents = 1
-) {
+): any {
   const isV3 = checkMessageVersionIsV3(api);
   const versionTag = isV3 ? "V3" : "V1";
 
@@ -17,7 +17,7 @@ export function createPolkadotXCMDest(
   };
 }
 
-export function createPolkadotXCMAccount(api: AnyApi, accountId: string) {
+export function createPolkadotXCMAccount(api: AnyApi, accountId: string): any {
   const isV3 = checkMessageVersionIsV3(api);
   const versionTag = isV3 ? "V3" : "V1";
 
@@ -42,7 +42,7 @@ export function createPolkadotXCMAsset(
         paraChainId: number;
         tokenId?: string;
       }
-) {
+): any {
   const isV3 = checkMessageVersionIsV3(api);
   const tokenPosition =
     token === "NATIVE"

@@ -10,17 +10,12 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
-import {
-  BalanceData,
-  ExtendedToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
-import { validateAddress } from "../utils";
+import { BalanceData, ExtendedToken, TransferParams } from "../types";
+import { createRouteConfigs, validateAddress } from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
-export const turingRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const turingRouteConfigs = createRouteConfigs("turing", [
   {
     to: "karura",
     token: "TUR",
@@ -53,7 +48,7 @@ export const turingRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
-];
+]);
 
 export const turingTokensConfig: Record<string, ExtendedToken> = {
   TUR: {
@@ -235,6 +230,6 @@ class BaseOakAdapter extends BaseCrossChainAdapter {
 
 export class TuringAdapter extends BaseOakAdapter {
   constructor() {
-    super(chains.turing, turingRoutersConfig, turingTokensConfig);
+    super(chains.turing, turingRouteConfigs, turingTokensConfig);
   }
 }

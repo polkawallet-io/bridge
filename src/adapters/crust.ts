@@ -10,16 +10,12 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, TokenNotFound } from "../errors";
-import {
-  BalanceData,
-  ExtendedToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
+import { BalanceData, ExtendedToken, TransferParams } from "../types";
+import { createRouteConfigs } from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
-const shadowRoutersConfig: Omit<RouteConfigs, "from">[] = [
+const shadowRouteConfigs = createRouteConfigs("shadow", [
   {
     to: "karura",
     token: "CSM",
@@ -44,7 +40,7 @@ const shadowRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
-];
+]);
 
 export const shadowTokensConfig: Record<string, ExtendedToken> = {
   CSM: {
@@ -218,6 +214,6 @@ class BaseCrustAdapter extends BaseCrossChainAdapter {
 
 export class ShadowAdapter extends BaseCrustAdapter {
   constructor() {
-    super(chains.shadow, shadowRoutersConfig, shadowTokensConfig);
+    super(chains.shadow, shadowRouteConfigs, shadowTokensConfig);
   }
 }
