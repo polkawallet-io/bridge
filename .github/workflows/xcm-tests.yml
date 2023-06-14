@@ -6,6 +6,10 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
+
 
 jobs:
   chopsticks_kintsugi_test:
@@ -26,13 +30,16 @@ jobs:
           on_retry_command: pkill node; sleep 2
           command: |
             cd /app
+            echo "Start..." > log.txt
             yarn start xcm \
               --relaychain=configs/kusama.yml \
               --parachain=configs/kintsugi.yml \
               --parachain=configs/statemine.yml \
               --parachain=configs/karura.yml \
               --parachain=configs/parallel-heiko.yml \
-              --parachain=configs/bifrost.yml &
+              --parachain=configs/bifrost.yml \
+              | tee log.txt &
+            tail -f log.txt | grep -q "Connected parachains"
             cd -
 
             yarn install --frozen-lockfile
@@ -62,6 +69,7 @@ jobs:
           on_retry_command: pkill node; sleep 2
           command: |
             cd /app
+            echo "Start..." > log.txt
             yarn start xcm \
               --relaychain=configs/polkadot.yml \
               --parachain=configs/interlay.yml \
@@ -69,7 +77,9 @@ jobs:
               --parachain=configs/hydradx.yml \
               --parachain=configs/acala.yml \
               --parachain=configs/astar.yml \
-              --parachain=configs/parallel.yml &
+              --parachain=configs/parallel.yml \
+              | tee log.txt &
+            tail -f log.txt | grep -q "Connected parachains"
             cd -
 
             yarn install --frozen-lockfile
