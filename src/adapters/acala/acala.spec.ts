@@ -10,6 +10,7 @@ import { MoonriverAdapter } from "../moonbeam";
 import { StatemineAdapter } from "../statemint";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
+import { ApiPromise, WsProvider } from "@polkadot/api";
 
 describe("acala-adapter", () => {
   jest.setTimeout(50000);
@@ -35,17 +36,18 @@ describe("acala-adapter", () => {
 
 
   beforeAll(async () => {
-    const provider = new ApiProvider();
     const karura = new KaruraAdapter();
     const kusama = new KusamaAdapter();
     const moonriver = new MoonriverAdapter();
     const statemine = new StatemineAdapter();
 
-    await firstValueFrom(provider.connectFromChain(['karura', 'kusama', 'statemine'] as ChainId[]));
+    const karuraApi = new ApiPromise({ provider: new WsProvider('wss://karura.api.onfinality.io/public-ws') });
+    const kusmaApi = new ApiPromise({ provider: new WsProvider('wss://kusama.api.onfinality.io/public-ws') });
+    const statemineApi = new ApiPromise({ provider: new WsProvider('wss://statemine-rpc.dwellir.com') });
 
-    await karura.init(provider.getApi('karura'));
-    await kusama.init(provider.getApi('kusama'));
-    await statemine.init(provider.getApi('statemine'));
+    await karura.init(karuraApi);
+    await kusama.init(kusmaApi);
+    await statemine.init(statemineApi);
 
     bridge = new Bridge({
       adapters: [karura, kusama, moonriver, statemine],
@@ -56,9 +58,9 @@ describe("acala-adapter", () => {
     bridge.adapters.forEach((i) => {
       const api = i.getApi();
 
-      if (api) {
-        api.disconnect();
-      }
+      console.log('clean');
+
+      if (api) api.disconnect();
     });
   });
 

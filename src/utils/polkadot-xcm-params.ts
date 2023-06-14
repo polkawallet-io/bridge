@@ -36,16 +36,11 @@ export function createPolkadotXCMAccount(api: AnyApi, accountId: string): any {
 export function createPolkadotXCMAsset(
   api: AnyApi,
   amount: string,
-  token:
-    | "NATIVE"
-    | {
-        paraChainId: number;
-        tokenId?: string;
-      }
+  position: "NATIVE" | any[]
 ): any {
   const isV3 = checkMessageVersionIsV3(api);
   const tokenPosition =
-    token === "NATIVE"
+    position === "NATIVE"
       ? {
           id: { Concrete: { parents: 0, interior: "Here" } },
         }
@@ -54,10 +49,7 @@ export function createPolkadotXCMAsset(
             Concrete: {
               parents: 1,
               interior: {
-                X2: [
-                  { Parachain: token.paraChainId },
-                  { GeneralKey: token.tokenId },
-                ],
+                X2: position,
               },
             },
           },

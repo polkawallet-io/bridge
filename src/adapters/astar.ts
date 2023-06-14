@@ -316,7 +316,10 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
     return this.api?.tx.polkadotXcm.reserveWithdrawAssets(
       createPolkadotXCMDest(this.api, toChain.paraChainId),
       createPolkadotXCMAccount(this.api, accountId),
-      createPolkadotXCMAsset(this.api, rawAmount, { paraChainId, tokenId }),
+      createPolkadotXCMAsset(this.api, rawAmount, [
+        { Parachain: paraChainId },
+        { GeneralKey: { length: 2, data: tokenId } },
+      ]),
       0
     );
   }
