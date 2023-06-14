@@ -1,8 +1,4 @@
 import { FixedPointNumber } from "@acala-network/sdk-core";
-import { firstValueFrom } from "rxjs";
-
-import { ApiProvider } from "../../api-provider";
-import { ChainId } from "../../configs";
 import { Bridge } from "../../bridge";
 import { KaruraAdapter } from "./acala";
 import { KusamaAdapter } from "../polkadot";
@@ -57,8 +53,6 @@ describe("acala-adapter", () => {
   afterAll(() => {
     bridge.adapters.forEach((i) => {
       const api = i.getApi();
-
-      console.log('clean');
 
       if (api) api.disconnect();
     });
