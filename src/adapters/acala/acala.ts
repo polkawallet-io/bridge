@@ -24,12 +24,8 @@ import {
   createXTokensDestParam,
   validateAddress,
 } from "../../utils";
-import {
-  acalaRoutersConfig,
-  acalaTokensConfig,
-  karuraRoutersConfig,
-  karuraTokensConfig,
-} from "./configs";
+import { acalaRouteConfigs, acalaTokensConfig } from "./acala-configs";
+import { karuraRouteConfigs, karuraTokensConfig } from "./karura-configs";
 
 class BaseAcalaAdapter extends BaseCrossChainAdapter {
   private wallet?: Wallet;
@@ -190,12 +186,12 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
 
 export class AcalaAdapter extends BaseAcalaAdapter {
   constructor() {
-    super(chains.acala, acalaRoutersConfig, acalaTokensConfig);
+    super(chains.acala, acalaRouteConfigs, acalaTokensConfig);
   }
 }
 
 export class KaruraAdapter extends BaseAcalaAdapter {
   constructor() {
-    super(chains.karura, karuraRoutersConfig, karuraTokensConfig);
+    super(chains.karura, karuraRouteConfigs, karuraTokensConfig);
   }
 }

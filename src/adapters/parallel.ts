@@ -10,17 +10,12 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
-import {
-  BalanceData,
-  ExtendedToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
-import { validateAddress } from "../utils";
+import { BalanceData, ExtendedToken, TransferParams } from "../types";
+import { createRouteConfigs, validateAddress } from "../utils";
 
 const DEST_WEIGHT = "Unlimited";
 
-export const parallelRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const parallelRouteConfigs = createRouteConfigs("parallel", [
   {
     to: "acala",
     token: "PARA",
@@ -53,9 +48,9 @@ export const parallelRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
-];
+]);
 
-export const heikoRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const heikoRouteConfigs = createRouteConfigs("heiko", [
   {
     to: "karura",
     token: "HKO",
@@ -88,7 +83,7 @@ export const heikoRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
-];
+]);
 
 export const parallelTokensConfig: Record<
   string,
@@ -307,16 +302,12 @@ class BaseParallelAdapter extends BaseCrossChainAdapter {
 
 export class HeikoAdapter extends BaseParallelAdapter {
   constructor() {
-    super(chains.heiko, heikoRoutersConfig, parallelTokensConfig.heiko);
+    super(chains.heiko, heikoRouteConfigs, parallelTokensConfig.heiko);
   }
 }
 
 export class ParallelAdapter extends BaseParallelAdapter {
   constructor() {
-    super(
-      chains.parallel,
-      parallelRoutersConfig,
-      parallelTokensConfig.parallel
-    );
+    super(chains.parallel, parallelRouteConfigs, parallelTokensConfig.parallel);
   }
 }

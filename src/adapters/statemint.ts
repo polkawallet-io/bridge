@@ -11,15 +11,10 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
-import {
-  BalanceData,
-  BasicToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
-import { validateAddress } from "../utils";
+import { BalanceData, BasicToken, TransferParams } from "../types";
+import { createRouteConfigs, validateAddress } from "../utils";
 
-export const statemintRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const statemintRouteConfigs = createRouteConfigs("statemint", [
   {
     to: "polkadot",
     token: "DOT",
@@ -36,9 +31,9 @@ export const statemintRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: "Unlimited",
     },
   },
-];
+]);
 
-export const statemineRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const statemineRouteConfigs = createRouteConfigs("statemine", [
   {
     to: "kusama",
     token: "KSM",
@@ -68,7 +63,7 @@ export const statemineRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "USDT",
     xcm: { fee: { token: "USDT", amount: "808" }, weightLimit: "Unlimited" },
   },
-];
+]);
 
 export const statemintTokensConfig: Record<
   string,
@@ -301,11 +296,11 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       ];
 
       return this.api?.tx.polkadotXcm.limitedTeleportAssets(
-        { [isV0V1Support ? "V1" : "V3"]: dst },
-        { [isV0V1Support ? "V1" : "V3"]: acc },
-        { [isV0V1Support ? "V1" : "V3"]: ass },
+        { [isV0V1Support ? "V1" : "V3"]: dst } as any,
+        { [isV0V1Support ? "V1" : "V3"]: acc } as any,
+        { [isV0V1Support ? "V1" : "V3"]: ass } as any,
         0,
-        this.getDestWeight(token, to)?.toString()
+        this.getDestWeight(token, to)?.toString() as any
       );
     }
 
@@ -341,11 +336,11 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
     ];
 
     return this.api?.tx.polkadotXcm.limitedReserveTransferAssets(
-      { V3: dst },
-      { V3: acc },
-      { V3: ass },
+      { V3: dst } as any,
+      { V3: acc } as any,
+      { V3: ass } as any,
       0,
-      this.getDestWeight(token, to)?.toString()
+      this.getDestWeight(token, to)?.toString() as any
     );
   }
 }
@@ -354,7 +349,7 @@ export class StatemintAdapter extends BaseStatemintAdapter {
   constructor() {
     super(
       chains.statemint,
-      statemintRoutersConfig,
+      statemintRouteConfigs,
       statemintTokensConfig.statemint
     );
   }
@@ -364,7 +359,7 @@ export class StatemineAdapter extends BaseStatemintAdapter {
   constructor() {
     super(
       chains.statemine,
-      statemineRoutersConfig,
+      statemineRouteConfigs,
       statemintTokensConfig.statemine
     );
   }

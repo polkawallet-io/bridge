@@ -6,69 +6,8 @@ You can integrate the amazing multi-chain bridge into your DApp with this SDK.
 
 And you're welcome to add your parachain-adapter into the SDK.
 
-### Supported parachains
-
-Polkadot:
-
-| from     | to       | tokens             |
-| -------- | -------- | ------------------ |
-| polkadot | acala    | DOT                |
-| acala    | polkadot | DOT                |
-| acala    | moonbeam | GLMR ACA AUSD DOT  |
-| acala    | parallel | PARA ACA AUSD LDOT |
-| acala    | interlay | INTR IBTC          |
-| acala    | astar    | ASTR ACA AUSD LDOT |
-| acala    | hydraDX  | DAI WETH WBTC      |
-| parallel | acala    | PARA ACA AUSD LDOT |
-| interlay | acala    | INTR IBTC          |
-| astar    | acala    | ASTR ACA AUSD LDOT |
-| hydraDX  | acala    | DAI WETH WBTC      |
-
-Kusama:
-
-| from       | to         | tokens                 |
-| ---------- | ---------- | ---------------------- |
-| kusama     | karura     | KSM                    |
-| kusama     | statemine  | KSM                    |
-| kusama     | basilisk   | KSM                    |
-| statemine  | karura     | RMRK ARIS USDT         |
-| karura     | kusama     | KSM                    |
-| karura     | statemine  | RMRK ARIS USDT         |
-| karura     | bifrost    | BNC KAR AUSD VSKSM     |
-| karura     | shiden     | SDN AUSD               |
-| karura     | altair     | AIR AUSD               |
-| karura     | shadow     | CSM KAR AUSD           |
-| karura     | crab       | CRAB                   |
-| karura     | integritee | TEER                   |
-| karura     | kintsugi   | KINT KBTC              |
-| karura     | khala      | PHA KAR AUSD           |
-| karura     | kico       | KICO KAR AUSD          |
-| karura     | calamari   | KMA KAR AUSD LKSM      |
-| karura     | moonriver  | MOVR KAR AUSD          |
-| karura     | heiko      | HKO KAR AUSD LKSM      |
-| karura     | pichiu     | PCHU KAR AUSD LKSM     |
-| karura     | turing     | TUR KAR AUSD LKSM      |
-| karura     | quartz     | QTZ                    |
-| karura     | basilisk   | BSX AUSD DAI USDCet    |
-| karura     | listen     | LT KAR AUSD LKSM       |
-| bifrost    | karura     | BNC KAR AUSD KSM VSKSM |
-| shiden     | karura     | SDN AUSD               |
-| altair     | karura     | AIR AUSD               |
-| shadow     | karura     | CSM KAR AUSD           |
-| crab       | karura     | CRAB                   |
-| integritee | karura     | TEER                   |
-| kintsugi   | karura     | KINT KBTC              |
-| khala      | karura     | PHA KAR AUSD           |
-| kico       | karura     | KICO KAR AUSD          |
-| calamari   | karura     | KMA KAR AUSD KSM LKSM  |
-| moonriver  | karura     | MOVR KAR AUSD          |
-| heiko      | karura     | HKO KAR AUSD LKSM      |
-| pichiu     | karura     | PCHU KAR AUSD LKSM     |
-| turing     | karura     | TUR KAR AUSD LKSM      |
-| quartz     | karura     | QTZ                    |
-| basilisk   | kusama     | KSM                    |
-| basilisk   | karura     | BSX AUSD KSM DAI       |
-| listen     | karura     | LT KAR AUSD LKSM       |
+## Support Bridges
+[all support bridges](docs/support-bridges.md)
 
 ## Usage
 
@@ -208,7 +147,7 @@ export const bifrostTokensConfig: Record<string, MultiChainToken> = {
   VSKSM: { name: "VSKSM", symbol: "VSKSM", decimals: 12, ed: "100000000" },
   /// ...other tokens
 };
-export const bifrostRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const bifrostRouteConfigs: Omit<RouteConfigs, "from">[] = [
   /// router for token `BNC` from `bifrost` to `karura`,
   /// `xcm.fee` defines the XCM-Fee on karura,
   /// `xcm.weightLimit` defines the weightLimit value used creating Extrinsic.
@@ -328,10 +267,10 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
 
 ```typescript
 /// `chains.bifrost` is the config you added in step 1.
-/// `bifrostRoutersConfig` & `bifrostTokensConfig` is the config you defined in step 2.1.
+/// `bifrostRouteConfigs` & `bifrostTokensConfig` is the config you defined in step 2.1.
 export class BifrostAdapter extends BaseBifrostAdapter {
   constructor() {
-    super(chains.bifrost, bifrostRoutersConfig, bifrostTokensConfig);
+    super(chains.bifrost, bifrostRouteConfigs, bifrostTokensConfig);
   }
 }
 ```

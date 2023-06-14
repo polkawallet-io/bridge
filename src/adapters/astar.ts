@@ -10,20 +10,16 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
-import {
-  BalanceData,
-  ExtendedToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
+import { BalanceData, ExtendedToken, TransferParams } from "../types";
 import {
   createPolkadotXCMAccount,
   createPolkadotXCMAsset,
   createPolkadotXCMDest,
   validateAddress,
+  createRouteConfigs,
 } from "../utils";
 
-export const astarRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const astarRouteConfigs = createRouteConfigs("astar", [
   {
     to: "acala",
     token: "ASTR",
@@ -64,9 +60,9 @@ export const astarRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: "Unlimited",
     },
   },
-];
+]);
 
-export const shidenRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const shidenRouteConfigs = createRouteConfigs("shiden", [
   {
     to: "karura",
     token: "SDN",
@@ -83,7 +79,7 @@ export const shidenRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: "Unlimited",
     },
   },
-];
+]);
 
 export const astarTokensConfig: Record<
   string,
@@ -295,16 +291,16 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
 
     if (token === this.balanceAdapter?.nativeToken) {
       return this.api?.tx.polkadotXcm.reserveTransferAssets(
-        createPolkadotXCMDest(this.api, toChain.paraChainId),
-        createPolkadotXCMAccount(this.api, accountId),
-        createPolkadotXCMAsset(this.api, rawAmount, "NATIVE"),
+        createPolkadotXCMDest(this.api, toChain.paraChainId) as any,
+        createPolkadotXCMAccount(this.api, accountId) as any,
+        createPolkadotXCMAsset(this.api, rawAmount, "NATIVE") as any,
         0
       );
     }
 
     const tokenIds: Record<string, string> = {
       // to karura
-      KUSD: "0x0081",
+      KUSD: "0x0081000000000000000000000000000000000000000000000000000000000000",
       // to acala
       ACA: "0x0000",
       AUSD: "0x0001",
@@ -320,7 +316,10 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
     return this.api?.tx.polkadotXcm.reserveWithdrawAssets(
       createPolkadotXCMDest(this.api, toChain.paraChainId),
       createPolkadotXCMAccount(this.api, accountId),
-      createPolkadotXCMAsset(this.api, rawAmount, { paraChainId, tokenId }),
+      createPolkadotXCMAsset(this.api, rawAmount, [
+        { Parachain: paraChainId },
+        { GeneralKey: { length: 2, data: tokenId } },
+      ]),
       0
     );
   }
@@ -328,12 +327,12 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
 
 export class AstarAdapter extends BaseAstarAdapter {
   constructor() {
-    super(chains.astar, astarRoutersConfig, astarTokensConfig.astar);
+    super(chains.astar, astarRouteConfigs, astarTokensConfig.astar);
   }
 }
 
 export class ShidenAdapter extends BaseAstarAdapter {
   constructor() {
-    super(chains.shiden, shidenRoutersConfig, astarTokensConfig.shiden);
+    super(chains.shiden, shidenRouteConfigs, astarTokensConfig.shiden);
   }
 }

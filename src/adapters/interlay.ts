@@ -9,17 +9,12 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, TokenNotFound, InvalidAddress } from "../errors";
-import {
-  BalanceData,
-  ExtendedToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
-import { validateAddress } from "../utils";
+import { BalanceData, ExtendedToken, TransferParams } from "../types";
+import { createRouteConfigs, validateAddress } from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
-export const interlayRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const interlayRouteConfigs = createRouteConfigs("interlay", [
   {
     to: "acala",
     token: "INTR",
@@ -38,9 +33,9 @@ export const interlayRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "IBTC",
     xcm: { fee: { token: "IBTC", amount: "7" }, weightLimit: DEST_WEIGHT },
   },
-];
+]);
 
-export const kintsugiRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const kintsugiRouteConfigs = createRouteConfigs("kintsugi", [
   {
     to: "karura",
     token: "KINT",
@@ -62,7 +57,7 @@ export const kintsugiRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
-];
+]);
 
 export const interlayTokensConfig: Record<
   string,
@@ -235,20 +230,12 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
 
 export class InterlayAdapter extends BaseInterlayAdapter {
   constructor() {
-    super(
-      chains.interlay,
-      interlayRoutersConfig,
-      interlayTokensConfig.interlay
-    );
+    super(chains.interlay, interlayRouteConfigs, interlayTokensConfig.interlay);
   }
 }
 
 export class KintsugiAdapter extends BaseInterlayAdapter {
   constructor() {
-    super(
-      chains.kintsugi,
-      kintsugiRoutersConfig,
-      interlayTokensConfig.kintsugi
-    );
+    super(chains.kintsugi, kintsugiRouteConfigs, interlayTokensConfig.kintsugi);
   }
 }

@@ -10,20 +10,16 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
-import {
-  BalanceData,
-  BasicToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
+import { BalanceData, BasicToken, TransferParams } from "../types";
 import {
   createPolkadotXCMAccount,
   createPolkadotXCMAsset,
   createPolkadotXCMDest,
+  createRouteConfigs,
   validateAddress,
 } from "../utils";
 
-export const uniqueRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const uniqueRouteConfigs = createRouteConfigs("unique", [
   {
     to: "acala",
     token: "UNQ",
@@ -32,13 +28,13 @@ export const uniqueRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: "Unlimited",
     },
   },
-];
+]);
 
 export const uniqueTokensConfig: Record<string, BasicToken> = {
   UNQ: { name: "UNQ", symbol: "UNQ", decimals: 18, ed: "0" },
 };
 
-export const quartzRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const quartzRouteConfigs = createRouteConfigs("quartz", [
   {
     to: "karura",
     token: "QTZ",
@@ -47,7 +43,7 @@ export const quartzRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: "Unlimited",
     },
   },
-];
+]);
 
 export const quartzTokensConfig: Record<string, BasicToken> = {
   QTZ: { name: "QTZ", symbol: "QTZ", decimals: 18, ed: "1000000000000000000" },
@@ -188,19 +184,19 @@ class BaseUniqueAdapter extends BaseCrossChainAdapter {
       createPolkadotXCMAccount(this.api, accountId),
       createPolkadotXCMAsset(this.api, rawAmount, "NATIVE"),
       0,
-      this.getDestWeight(token, to)?.toString()
+      this.getDestWeight(token, to)?.toString() as any
     );
   }
 }
 
 export class QuartzAdapter extends BaseUniqueAdapter {
   constructor() {
-    super(chains.quartz, quartzRoutersConfig, quartzTokensConfig);
+    super(chains.quartz, quartzRouteConfigs, quartzTokensConfig);
   }
 }
 
 export class UniqueAdapter extends BaseUniqueAdapter {
   constructor() {
-    super(chains.unique, uniqueRoutersConfig, uniqueTokensConfig);
+    super(chains.unique, uniqueRouteConfigs, uniqueTokensConfig);
   }
 }

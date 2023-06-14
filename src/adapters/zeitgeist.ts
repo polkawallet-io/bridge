@@ -10,16 +10,12 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, TokenNotFound } from "../errors";
-import {
-  BalanceData,
-  BasicToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
+import { BalanceData, BasicToken, TransferParams } from "../types";
+import { createRouteConfigs } from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
-export const zeitgeistRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const zeitgeistRouteConfigs = createRouteConfigs("zeitgeist", [
   {
     to: "hydradx",
     token: "ZTG",
@@ -28,7 +24,7 @@ export const zeitgeistRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
-];
+]);
 
 const zeitgeistTokensConfig: Record<string, BasicToken> = {
   ZTG: { name: "ZTG", symbol: "ZTG", decimals: 10, ed: "50000000" },
@@ -177,6 +173,6 @@ class ZeitgeistBaseAdapter extends BaseCrossChainAdapter {
 
 export class ZeitgeistAdapter extends ZeitgeistBaseAdapter {
   constructor() {
-    super(chains.zeitgeist, zeitgeistRoutersConfig, zeitgeistTokensConfig);
+    super(chains.zeitgeist, zeitgeistRouteConfigs, zeitgeistTokensConfig);
   }
 }

@@ -10,14 +10,10 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, TokenNotFound } from "../errors";
-import {
-  BalanceData,
-  ExtendedToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
+import { BalanceData, ExtendedToken, TransferParams } from "../types";
+import { createRouteConfigs } from "../utils";
 
-export const integriteeRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const integriteeRouteConfigs = createRouteConfigs("integritee", [
   {
     to: "karura",
     token: "TEER",
@@ -26,7 +22,7 @@ export const integriteeRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: "5000000000",
     },
   },
-];
+]);
 
 export const integriteeTokensConfig: Record<string, ExtendedToken> = {
   TEER: {
@@ -158,6 +154,6 @@ class BaseIntegriteeAdapter extends BaseCrossChainAdapter {
 
 export class IntegriteeAdapter extends BaseIntegriteeAdapter {
   constructor() {
-    super(chains.integritee, integriteeRoutersConfig, integriteeTokensConfig);
+    super(chains.integritee, integriteeRouteConfigs, integriteeTokensConfig);
   }
 }

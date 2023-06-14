@@ -85,7 +85,7 @@ describe.skip('Bridge sdk usage', () => {
     expect(inputConfig.minInput.toNumber()).toBeGreaterThan(0);
     expect(inputConfig.maxInput.toNumber()).toBeLessThanOrEqual(balance.available.toNumber());
 
-    const tx = availableAdapters[chain].createTx({to: toChain, token, amount: FN.fromInner('10000000000', 10), address:testAddress, signer: testAddress});
+    const tx = availableAdapters[chain].createTx({to: toChain, token, amount: FN.fromInner('10000000000', 10), address:testAddress });
 
     expect(tx.args.length).toBeGreaterThan(1);
   });

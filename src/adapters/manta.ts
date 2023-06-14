@@ -10,17 +10,12 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
-import {
-  BalanceData,
-  ExtendedToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
-import { validateAddress } from "../utils/validate-address";
+import { BalanceData, ExtendedToken, TransferParams } from "../types";
+import { createRouteConfigs, validateAddress } from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
-export const calamariRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const calamariRouteConfigs = createRouteConfigs("calamari", [
   {
     to: "karura",
     token: "KMA",
@@ -61,7 +56,7 @@ export const calamariRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
-];
+]);
 
 export const calamariTokensConfig: Record<string, ExtendedToken> = {
   KMA: {
@@ -250,6 +245,6 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
 
 export class CalamariAdapter extends BaseMantaAdapter {
   constructor() {
-    super(chains.calamari, calamariRoutersConfig, calamariTokensConfig);
+    super(chains.calamari, calamariRouteConfigs, calamariTokensConfig);
   }
 }

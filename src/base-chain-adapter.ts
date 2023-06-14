@@ -49,7 +49,7 @@ import {
 const DEFAULT_TX_CHECKING_TIMEOUT = 2 * 60 * 1000;
 
 export abstract class BaseCrossChainAdapter {
-  protected routers: Omit<RouteConfigs, "from">[];
+  protected routers: RouteConfigs[];
   protected tokens: Record<string, BasicToken>;
   protected api?: AnyApi;
   readonly chain: Chain;
@@ -58,7 +58,7 @@ export abstract class BaseCrossChainAdapter {
 
   constructor(
     chain: Chain,
-    routers: Omit<RouteConfigs, "from">[],
+    routers: RouteConfigs[],
     tokens: Record<string, BasicToken>
   ) {
     this.chain = chain;

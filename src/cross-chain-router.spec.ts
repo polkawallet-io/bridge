@@ -127,7 +127,7 @@ describe.skip("cross-chain-router-manager", () => {
   //   manager = new BridgeRouterManager();
 
   //   manager.addRouters(
-  //     routersConfig.karura.map(e => ({...e, from: 'karura'})),
+  //     RouteConfigs.karura.map(e => ({...e, from: 'karura'})),
   //     false
   //   );
 

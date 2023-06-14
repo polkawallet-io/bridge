@@ -10,15 +10,10 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
-import {
-  BalanceData,
-  BasicToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
-import { validateAddress } from "../utils";
+import { BalanceData, BasicToken, TransferParams } from "../types";
+import { createRouteConfigs, validateAddress } from "../utils";
 
-export const polkadotRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const polkadotRouteConfigs = createRouteConfigs("polkadot", [
   {
     to: "acala",
     token: "DOT",
@@ -40,37 +35,9 @@ export const polkadotRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: "Unlimited",
     },
   },
-];
+]);
 
-// TODO: should remove after kusama upgrade
-export const kusamaRoutersConfig: Omit<RouteConfigs, "from">[] = [
-  {
-    to: "karura",
-    token: "KSM",
-    xcm: {
-      fee: { token: "KSM", amount: "71927964" },
-      weightLimit: "Unlimited",
-    },
-  },
-  {
-    to: "basilisk",
-    token: "KSM",
-    xcm: {
-      fee: { token: "KSM", amount: "51618187" },
-      weightLimit: "Unlimited",
-    },
-  },
-  {
-    to: "statemine",
-    token: "KSM",
-    xcm: {
-      fee: { token: "KSM", amount: "5275240" },
-      weightLimit: "Unlimited",
-    },
-  },
-];
-
-export const V3KusamaRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const kusamaRouteConfigs = createRouteConfigs("kusama", [
   {
     to: "karura",
     token: "KSM",
@@ -95,7 +62,7 @@ export const V3KusamaRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: "Unlimited",
     },
   },
-];
+]);
 
 const polkadotTokensConfig: Record<string, Record<string, BasicToken>> = {
   polkadot: {
@@ -168,12 +135,6 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
       api,
       tokens: polkadotTokensConfig[chain],
     });
-
-    // TODO: should remove after kusama upgrade
-    // update routers config when the chain is not support V0, V1 xcm message
-    if (!this.isV0V1 && chain === "kusama") {
-      this.routers = V3KusamaRoutersConfig;
-    }
   }
 
   public subscribeTokenBalance(
@@ -347,16 +308,12 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
 
 export class PolkadotAdapter extends BasePolkadotAdapter {
   constructor() {
-    super(
-      chains.polkadot,
-      polkadotRoutersConfig,
-      polkadotTokensConfig.polkadot
-    );
+    super(chains.polkadot, polkadotRouteConfigs, polkadotTokensConfig.polkadot);
   }
 }
 
 export class KusamaAdapter extends BasePolkadotAdapter {
   constructor() {
-    super(chains.kusama, kusamaRoutersConfig, polkadotTokensConfig.kusama);
+    super(chains.kusama, kusamaRouteConfigs, polkadotTokensConfig.kusama);
   }
 }

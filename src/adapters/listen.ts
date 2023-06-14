@@ -10,17 +10,12 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
-import {
-  BalanceData,
-  ExtendedToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
-import { validateAddress } from "../utils";
+import { BalanceData, ExtendedToken, TransferParams } from "../types";
+import { createRouteConfigs, validateAddress } from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
-export const listenRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const listenRouteConfigs = createRouteConfigs("listen", [
   {
     to: "karura",
     token: "LT",
@@ -53,7 +48,7 @@ export const listenRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
-];
+]);
 
 export const listenTokensConfig: Record<string, ExtendedToken> = {
   LT: {
@@ -235,6 +230,6 @@ class BaseListenAdapter extends BaseCrossChainAdapter {
 
 export class ListenAdapter extends BaseListenAdapter {
   constructor() {
-    super(chains.listen, listenRoutersConfig, listenTokensConfig);
+    super(chains.listen, listenRouteConfigs, listenTokensConfig);
   }
 }

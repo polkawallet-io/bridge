@@ -1,27 +1,27 @@
 import { Bridge } from '../bridge';
-import { AstarAdapter } from './astar';
-import { AcalaAdapter } from './acala';
+import { ShidenAdapter } from './astar';
+import { KaruraAdapter } from './acala';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { FixedPointNumber } from '@acala-network/sdk-core';
 
-describe.skip('astar adapter should work', () => {
+describe.skip('shiden adapter should work', () => {
   jest.setTimeout(50000);
 
   const address = '5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN';
   let bridge: Bridge;
 
   beforeAll(async () => {
-    const astar = new AstarAdapter();
-    const acala = new AcalaAdapter();
+    const shiden = new ShidenAdapter();
+    const karura = new KaruraAdapter();
 
-    const astarApi = new ApiPromise({ provider: new WsProvider('wss://rpc.astar.network') });
-    const acalaApi = new ApiPromise({ provider: new WsProvider('wss://acala-rpc-0.aca-api.network') });
+    const shidenApi = new ApiPromise({ provider: new WsProvider('wss://rpc.shiden.astar.network') });
+    const karuraApi = new ApiPromise({ provider: new WsProvider('wss://karura-rpc-0.aca-api.network') });
 
-    await astar.init(astarApi);
-    await acala.init(acalaApi);
+    await shiden.init(shidenApi);
+    await karura.init(karuraApi);
 
     bridge = new Bridge({
-      adapters: [astar, acala],
+      adapters: [shiden, karura],
     });
   });
 
@@ -41,20 +41,21 @@ describe.skip('astar adapter should work', () => {
     done();
   });
 
-  test('transfer ASTR from astar to acala should work', (done) => {
+  test('transfer SDN from shiden to karura should work', (done) => {
     try {
-      const adapter = bridge.findAdapter('astar');
+
+      const adapter = bridge.findAdapter('shiden');
 
       expect(adapter).toBeDefined();
 
       if (!adapter) return;
 
-      const astr = adapter.getToken('ASTR');
+      const sdn = adapter.getToken('SDN');
 
       const tx = adapter.createTx({
-        to: 'acala',
-        token: 'ASTR',
-        amount: new FixedPointNumber(1, astr.decimals),
+        to: 'karura',
+        token: 'SDN',
+        amount: new FixedPointNumber(1, sdn.decimals),
         address
       });
 
@@ -65,21 +66,20 @@ describe.skip('astar adapter should work', () => {
     }
   });
 
-  test('transfer ACA from shiden to karura should work', (done) => {
+  test('transfer KUSD from shiden to karura should work', (done) => {
     try {
-
-      const adapter = bridge.findAdapter('astar');
+      const adapter = bridge.findAdapter('shiden');
 
       expect(adapter).toBeDefined();
 
       if (!adapter) return;
 
-      const aca = adapter.getToken('ACA');
+      const kusd = adapter.getToken('KUSD');
 
       const tx = adapter.createTx({
-        to: 'acala',
-        token: 'ACA',
-        amount: new FixedPointNumber(1, aca.decimals),
+        to: 'karura',
+        token: 'KUSD',
+        amount: new FixedPointNumber(1, kusd.decimals),
         address
       });
 

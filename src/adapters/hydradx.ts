@@ -10,16 +10,12 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound } from "../errors";
-import {
-  BalanceData,
-  ExtendedToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
+import { BalanceData, ExtendedToken, TransferParams } from "../types";
+import { createRouteConfigs } from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
-export const basiliskRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
   {
     to: "kusama",
     token: "KSM",
@@ -84,7 +80,7 @@ export const basiliskRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
-];
+]);
 
 export const basiliskTokensConfig: Record<string, ExtendedToken> = {
   BSX: {
@@ -138,7 +134,7 @@ export const basiliskTokensConfig: Record<string, ExtendedToken> = {
   },
 };
 
-export const hydraRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const hydraRouteConfigs = createRouteConfigs("hydradx", [
   {
     to: "acala",
     token: "DAI",
@@ -163,7 +159,7 @@ export const hydraRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
-];
+]);
 
 export const hydraTokensConfig: Record<string, ExtendedToken> = {
   DAI: {
@@ -334,12 +330,12 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
 
 export class BasiliskAdapter extends BaseHydradxAdapter {
   constructor() {
-    super(chains.basilisk, basiliskRoutersConfig, basiliskTokensConfig);
+    super(chains.basilisk, basiliskRouteConfigs, basiliskTokensConfig);
   }
 }
 
 export class HydraAdapter extends BaseHydradxAdapter {
   constructor() {
-    super(chains.hydradx, hydraRoutersConfig, hydraTokensConfig);
+    super(chains.hydradx, hydraRouteConfigs, hydraTokensConfig);
   }
 }
