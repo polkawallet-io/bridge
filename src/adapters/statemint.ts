@@ -63,6 +63,14 @@ export const statemineRouteConfigs = createRouteConfigs("statemine", [
     token: "USDT",
     xcm: { fee: { token: "USDT", amount: "808" }, weightLimit: "Unlimited" },
   },
+  {
+    to: "basilisk",
+    token: "USDT",
+    xcm: {
+      fee: { token: "USDT", amount: "3177" },
+      weightLimit: "Unlimited",
+    },
+  },
 ]);
 
 export const statemintTokensConfig: Record<
