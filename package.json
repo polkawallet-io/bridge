@@ -26,19 +26,26 @@
     "@polkadot/api": "^10",
     "ethers": "^5"
   },
+  "resolutions": {
+    "@acala-network/api": "^5.1.1",
+    "@acala-network/sdk": "^4.1.9-2",
+    "@acala-network/sdk-core": "^4.1.9-2",
+    "@polkadot/api": "^10.7.3",
+    "@polkadot/types": "^10.7.3"
+  },
   "dependencies": {
     "@acala-network/api": "^5.1.1",
     "@acala-network/sdk": "^4.1.9-2",
     "@acala-network/sdk-core": "^4.1.9-2",
     "@polkadot/api": "^10.7.3",
-    "@polkadot/apps-config": "^0.127.1",
+    "@polkadot/apps-config": "^0.131.4",
     "@polkadot/types": "^10.7.3",
     "axios": "^0.27.2",
     "ethers": "~5.7.0",
     "lodash": "^4.17.20"
   },
   "devDependencies": {
-    "@acala-network/eth-providers": "^2.6.5",
+    "@acala-network/eth-providers": "^2.7.1",
     "@open-web3/dev-config": "^0.2.3",
     "@types/jest": "^28.1.1",
     "@types/lodash": "^4.14.161",

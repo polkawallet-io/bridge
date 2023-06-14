@@ -27,7 +27,7 @@ export class ApiProvider {
 
   public connectFromChain(
     ChainId: ChainId[],
-    nodeList: Partial<Record<ChainId, string[]>> | undefined
+    nodeList?: Partial<Record<ChainId, string[]>>
   ) {
     return combineLatest(
       ChainId.map((chain) => {

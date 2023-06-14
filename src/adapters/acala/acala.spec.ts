@@ -1,167 +1,199 @@
-import { EvmRpcProvider } from "@acala-network/eth-providers";
-import { Wallet } from "@acala-network/sdk";
-
 import { FixedPointNumber } from "@acala-network/sdk-core";
 import { firstValueFrom } from "rxjs";
 
 import { ApiProvider } from "../../api-provider";
-import { chains, ChainId } from "../../configs";
+import { ChainId } from "../../configs";
 import { Bridge } from "../../bridge";
-import { KaruraAdapter, AcalaAdapter } from "./acala";
-import { HydraAdapter } from "../hydradx";
+import { KaruraAdapter } from "./acala";
 import { KusamaAdapter } from "../polkadot";
+import { MoonriverAdapter } from "../moonbeam";
+import { StatemineAdapter } from "../statemint";
+import { SubmittableExtrinsic } from "@polkadot/api/types";
+import { ISubmittableResult } from "@polkadot/types/types";
 
-describe.skip("acala-adapter should work", () => {
-  jest.setTimeout(30000);
+describe("acala-adapter", () => {
+  jest.setTimeout(50000);
 
-  const testAccount = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
-  const provider = new ApiProvider();
+  let bridge: Bridge;
+  const address = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
+  // the addressId is the address above in hex format
+  const addressId = '0xc0997c4f2b3a83eb07ef74a867cf672a25a2a30cc61abc936dcc994df77ba84a'
+  const moonbeamReceive = "0x46DBcbDe55be6cc4ce0C72C8d48BF61eb19D6be0";
 
-  async function connect(chains: ChainId[]) {
-    // return firstValueFrom(provider.connectFromChain([chain], { karura: ["wss://crosschain-dev.polkawallet.io:9907"] }));
-    return firstValueFrom(provider.connectFromChain(chains, undefined));
+  const validateTx = (
+    tx: SubmittableExtrinsic<'rxjs', ISubmittableResult>,
+    token: any,
+    amount: string,
+    destination: any,
+  ) => {
+    expect(tx.method.method).toEqual('transfer');
+    expect(tx.method.section).toEqual('xTokens');
+    expect(tx.args[0].toHuman()).toEqual(token);
+    expect(tx.args[1].toString()).toEqual(amount);
+    expect(tx.args[2].toHuman()).toEqual(destination);
   }
 
-  test("connect karura to do xcm", async () => {
-    const fromChains = ["karura", "kusama"] as ChainId[];
 
-    await connect(fromChains);
-
+  beforeAll(async () => {
+    const provider = new ApiProvider();
     const karura = new KaruraAdapter();
     const kusama = new KusamaAdapter();
+    const moonriver = new MoonriverAdapter();
+    const statemine = new StatemineAdapter();
 
-    await karura.init(provider.getApi(fromChains[0]));
-    await kusama.init(provider.getApi(fromChains[1]));
+    await firstValueFrom(provider.connectFromChain(['karura', 'kusama', 'statemine'] as ChainId[]));
 
-    const bridge = new Bridge({
-      adapters: [karura, kusama],
+    await karura.init(provider.getApi('karura'));
+    await kusama.init(provider.getApi('kusama'));
+    await statemine.init(provider.getApi('statemine'));
+
+    bridge = new Bridge({
+      adapters: [karura, kusama, moonriver, statemine],
     });
-
-    expect(bridge.router.getDestinationChains({ from: chains.karura, token: "KSM" }).length).toEqual(1);
-
-    const adapter = bridge.findAdapter(fromChains[0]);
-
-    async function runMyTestSuit(to: ChainId, token: string) {
-      if (adapter) {
-        const balance = await firstValueFrom(adapter.subscribeTokenBalance(token, testAccount));
-
-        console.log(
-          `balance ${token}: free-${balance.free.toNumber()} locked-${balance.locked.toNumber()} available-${balance.available.toNumber()}`
-        );
-        expect(balance.available.toNumber()).toBeGreaterThanOrEqual(0);
-        expect(balance.free.toNumber()).toBeGreaterThanOrEqual(balance.available.toNumber());
-        expect(balance.free.toNumber()).toEqual(balance.locked.add(balance.available).toNumber());
-
-        const inputConfig = await firstValueFrom(adapter.subscribeInputConfig({ to, token, address: testAccount, signer: testAccount }));
-
-        console.log(
-          `inputConfig: min-${inputConfig.minInput.toNumber()} max-${inputConfig.maxInput.toNumber()} ss58-${inputConfig.ss58Prefix}`
-        );
-        expect(inputConfig.minInput.toNumber()).toBeGreaterThan(0);
-        expect(inputConfig.maxInput.toNumber()).toBeLessThanOrEqual(balance.available.toNumber());
-
-        const destFee = adapter.getCrossChainFee(token, to);
-
-        console.log(`destFee: fee-${destFee.balance.toNumber()} ${destFee.token}`);
-        expect(destFee.balance.toNumber()).toBeGreaterThan(0);
-
-        const tx = adapter.createTx({
-          amount: FixedPointNumber.fromInner("10000000000", 10),
-          to,
-          token,
-          address: testAccount,
-          signer: testAccount,
-        });
-
-        if (to !== "statemine") {
-          expect(tx.method.section).toEqual("xTokens");
-          expect(tx.method.method).toEqual("transfer");
-          expect(tx.args.length).toEqual(4);
-        }
-      }
-    }
-
-    // await runMyTestSuit('statemine', 'RMRK');
-    await runMyTestSuit("kusama", "KSM");
-    // await runMyTestSuit("bifrost", "KAR");
-    // await runMyTestSuit("bifrost", "KUSD");
-    // await runMyTestSuit("khala", "KAR");
-    // await runMyTestSuit("khala", "KUSD");
   });
-});
 
-describe.skip("acala-adapter for erc20 token should work", () => {
-  jest.setTimeout(30000);
+  afterAll(() => {
+    bridge.adapters.forEach((i) => {
+      const api = i.getApi();
 
-  const testAccount = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
-  const provider = new ApiProvider();
+      if (api) {
+        api.disconnect();
+      }
+    });
+  });
 
-  async function connect(chains: ChainId[]) {
-    return firstValueFrom(provider.connectFromChain(chains, undefined));
-  }
+  test('bridge sdk init should work', (done) => {
+    expect(bridge).toBeDefined();
 
-  test("connect acala to transfer erc20 token with xcm", async () => {
-    const fromChains = ["acala", "hydradx"] as ChainId[];
+    done();
+  });
 
-    await connect(fromChains);
+  test('transfer from karura to kusama should be ok', (done) => {
+    const adapter = bridge.findAdapter('karura');
 
-    const acala = new AcalaAdapter();
-    const hydra = new HydraAdapter();
+    expect(adapter).toBeDefined();
 
-    const api = provider.getApiPromise(fromChains[0]);
-    const evmProvider = new EvmRpcProvider("wss://acala.polkawallet.io");
-    const wallet = new Wallet(api, { evmProvider });
-    await acala.init(api, wallet);
-    await hydra.init(provider.getApiPromise(fromChains[1]));
-
-    const bridge = new Bridge({
-      adapters: [acala, hydra],
+    const kusama = adapter.getToken('KSM');
+    const api = adapter.getApi();
+    const amount = new FixedPointNumber(1, kusama.decimals);
+    const tx = adapter.createTx({
+      to: 'kusama',
+      token: 'KSM',
+      amount,
+      address
     });
 
-    expect(bridge.router.getDestinationChains({ from: chains.acala, token: "DAI" }).length).toEqual(1);
+    // DONT MODIFY THIS, THE OBJECT IS VALID, UNLESS YOU KNOW WHAT YOU ARE DOING
+    const location = api.createType('XcmVersionedMultiLocation', {
+      V3: {
+        parents: '1',
+        interior: { X1: { AccountId32: { id: addressId, network: null }} }
+      }
+    });
 
-    const adapter = bridge.findAdapter(fromChains[0]);
+    validateTx(
+      tx as SubmittableExtrinsic<'rxjs', ISubmittableResult>,
+      { Token: 'KSM'},
+      amount.toChainData(),
+      location.toHuman()
+    );
 
-    async function runMyTestSuit(to: ChainId, token: string) {
-      if (adapter) {
-        const balance = await firstValueFrom(adapter.subscribeTokenBalance(token, testAccount));
+    console.log(JSON.stringify(tx.args[2].toHuman()));
 
-        console.log(
-          `balance ${token}: free-${balance.free.toNumber()} locked-${balance.locked.toNumber()} available-${balance.available.toNumber()}`
-        );
-        expect(balance.available.toNumber()).toBeGreaterThanOrEqual(0);
-        expect(balance.free.toNumber()).toBeGreaterThanOrEqual(balance.available.toNumber());
-        expect(balance.free.toNumber()).toEqual(balance.locked.add(balance.available).toNumber());
+    done();
+  });
 
-        const inputConfig = await firstValueFrom(adapter.subscribeInputConfig({ to, token, address: testAccount, signer: testAccount }));
+  test('tranfser from karura to moonbeam should be ok', (done) => {
+    const adapter = bridge.findAdapter('karura');
 
-        console.log(
-          `inputConfig: min-${inputConfig.minInput.toNumber()} max-${inputConfig.maxInput.toNumber()} ss58-${inputConfig.ss58Prefix}`
-        );
-        expect(inputConfig.minInput.toNumber()).toBeGreaterThan(0);
-        expect(inputConfig.maxInput.toNumber()).toBeLessThanOrEqual(balance.available.toNumber());
+    expect(adapter).toBeDefined();
+    const movr = adapter.getToken('MOVR');
+    const api = adapter.getApi();
+    const amount = new FixedPointNumber(1, movr.decimals);
+    const tx = adapter.createTx({
+      to: 'moonriver',
+      token: 'MOVR',
+      amount,
+      address: moonbeamReceive
+    });
 
-        const destFee = adapter.getCrossChainFee(token, to);
-
-        console.log(`destFee: fee-${destFee.balance.toNumber()} ${destFee.token}`);
-        expect(destFee.balance.toNumber()).toBeGreaterThan(0);
-
-        const tx = adapter.createTx({
-          amount: FixedPointNumber.fromInner("10000000000", 10),
-          to,
-          token,
-          address: testAccount,
-          signer: testAccount,
-        });
-
-        if (to !== "statemine") {
-          expect(tx.method.section).toEqual("xTokens");
-          expect(tx.method.method).toEqual("transfer");
-          expect(tx.args.length).toEqual(4);
+    // DONT MODIFY THIS, THE OBJECT IS VALID, UNLESS YOU KNOW WHAT YOU ARE DOING
+    const location = api.createType('XcmVersionedMultiLocation', {
+      V3: {
+        parents: "1",
+        interior: {
+          X2: [
+            { Parachain: "2023" },
+            { AccountKey20: { key: moonbeamReceive }}
+          ]
         }
       }
-    }
+    })
 
-    await runMyTestSuit("hydradx", "DAI");
+    validateTx(
+      tx as SubmittableExtrinsic<'rxjs', ISubmittableResult>,
+      { ForeignAsset: "3" },
+      amount.toChainData(),
+      location.toHuman()
+    );
+
+    done();
+  });
+
+  test('transfer from karura to statemine should be ok', (done) => {
+    const adapter = bridge.findAdapter('karura');
+
+    expect(adapter).toBeDefined();
+
+    const rmrk = adapter.getToken('RMRK');
+    const api = adapter.getApi();
+    const amount = new FixedPointNumber(1, rmrk.decimals);
+    const tx = adapter.createTx({
+      to: 'statemine',
+      token: 'RMRK',
+      amount,
+      address
+    });
+
+    // DONT MODIFY THIS, THE OBJECT IS VALID, UNLESS YOU KNOW WHAT YOU ARE DOING
+    const location = api.createType('XcmVersionedMultiLocation', {
+      V3: {
+        parents: "1",
+        interior: {
+          X2: [
+            { Parachain: "1000" },
+            { AccountId32: { id: addressId } }
+          ]
+        }
+      }
+    });
+
+    // DONT MODIFY THIS, THE OBJECT IS VALID, UNLESS YOU KNOW WHAT YOU ARE DOING
+    const assets = api.createType('XcmVersionedMultiAsset', {
+      V3: {
+        fun: {
+          Fungible: amount.toChainData(),
+        },
+        id: {
+          Concrete: {
+            parents: 1,
+            interior: {
+              X3: [
+                { Parachain: "1000" },
+                { PalletInstance: 50 },
+                { GeneralIndex: 8 }
+              ]
+            }
+          }
+        }
+      }
+    })
+
+    expect(tx.method.method).toEqual('transferMultiasset');
+    expect(tx.method.section).toEqual('xTokens');
+    expect(tx.args[0].toHuman()).toEqual(assets.toHuman());
+    expect(tx.args[1].toHuman()).toEqual(location.toHuman());
+
+    done();
   });
 });
