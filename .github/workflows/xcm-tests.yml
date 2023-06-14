@@ -68,6 +68,7 @@ jobs:
               --parachain=configs/statemint.yml \
               --parachain=configs/hydradx.yml \
               --parachain=configs/acala.yml \
+              --parachain=configs/astar.yml \
               --parachain=configs/parallel.yml &
             cd -
 
