@@ -18,7 +18,7 @@ export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
     to: "kusama",
     token: "KSM",
     xcm: {
-      fee: { token: "KSM", amount: "11523248" },
+      fee: { token: "KSM", amount: "104571640" },
     },
   },
   {
@@ -87,12 +87,40 @@ export const basiliskTokensConfig: Record<string, ExtendedToken> = {
     ed: "10000000000",
     toRaw: () => 2,
   },
+  aUSD: {
+    name: "aUSD",
+    symbol: "aUSD",
+    decimals: 12,
+    ed: "10000000000",
+    toRaw: () => 2,
+  },
   KSM: {
     name: "KSM",
     symbol: "KSM",
     decimals: 12,
     ed: "100000000",
     toRaw: () => 1,
+  },
+  USDT: {
+    name: "USDT",
+    symbol: "USDT",
+    decimals: 6,
+    ed: "10000",
+    toRaw: () => 14,
+  },
+  TNKR: {
+    name: "TNKR",
+    symbol: "TNKR",
+    decimals: 12,
+    ed: "1000000000",
+    toRaw: () => 6,
+  },
+  XRT: {
+    name: "XRT",
+    symbol: "XRT",
+    decimals: 9,
+    ed: "1683502",
+    toRaw: () => 16,
   },
   DAI: {
     name: "DAI",
@@ -124,12 +152,26 @@ export const basiliskTokensConfig: Record<string, ExtendedToken> = {
   },
 };
 
-export const hydraRouteConfigs = createRouteConfigs("hydradx", [
+export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
+  {
+    to: "polkadot",
+    token: "DOT",
+    xcm: {
+      fee: { token: "DOT", amount: "469417452" },
+    },
+  },
   {
     to: "acala",
     token: "DAI",
     xcm: {
-      fee: { token: "DAI", amount: "808240000000000" },
+      fee: { token: "DAI", amount: "926960000000000" },
+    },
+  },
+  {
+    to: "acala",
+    token: "DOT",
+    xcm: {
+      fee: { token: "DOT", amount: "471820453" },
     },
   },
   {
@@ -146,15 +188,41 @@ export const hydraRouteConfigs = createRouteConfigs("hydradx", [
       fee: { token: "WBTC", amount: "4" },
     },
   },
+  {
+    to: "interlay",
+    token: "IBTC",
+    xcm: { fee: { token: "IBTC", amount: "62" } },
+  },
+  {
+    to: "statemint",
+    token: "USDT",
+    xcm: {
+      fee: { token: "USDT", amount: "700000" },
+    },
+  },
+  {
+    to: "zeitgeist",
+    token: "ZTG",
+    xcm: {
+      fee: { token: "ZTG", amount: "93000000" },
+    },
+  },
+  {
+    to: "astar",
+    token: "ASTR",
+    xcm: {
+      fee: { token: "ASTR", amount: "4041465440000000" },
+    },
+  },
 ]);
 
-export const hydraTokensConfig: Record<string, ExtendedToken> = {
-  DAI: {
-    name: "DAI",
-    symbol: "DAI",
-    decimals: 18,
-    ed: "10000000000",
-    toRaw: () => 2,
+export const hydradxTokensConfig: Record<string, ExtendedToken> = {
+  HDX: {
+    name: "HDX",
+    symbol: "HDX",
+    decimals: 12,
+    ed: "1000000000000",
+    toRaw: () => 0,
   },
   WETH: {
     name: "WETH",
@@ -163,12 +231,48 @@ export const hydraTokensConfig: Record<string, ExtendedToken> = {
     ed: "7000000000000",
     toRaw: () => 4,
   },
-  WBTC: {
-    name: "WBTC",
-    symbol: "WBTC",
+  WBTC: { name: "WBTC", symbol: "WBTC", decimals: 8, ed: "44", toRaw: () => 3 },
+  IBTC: {
+    name: "IBTC",
+    symbol: "IBTC",
     decimals: 8,
-    ed: "44",
-    toRaw: () => 3,
+    ed: "36",
+    toRaw: () => 11,
+  },
+  DOT: {
+    name: "DOT",
+    symbol: "DOT",
+    decimals: 10,
+    ed: "17540000",
+    toRaw: () => 5,
+  },
+  DAI: {
+    name: "DAI",
+    symbol: "DAI",
+    decimals: 18,
+    ed: "10000000000000000",
+    toRaw: () => 2,
+  },
+  USDT: {
+    name: "USDT",
+    symbol: "USDT",
+    decimals: 6,
+    ed: "10000",
+    toRaw: () => 10,
+  },
+  ZTG: {
+    name: "ZTG",
+    symbol: "ZTG",
+    decimals: 10,
+    ed: "1204151916",
+    toRaw: () => 12,
+  },
+  ASTR: {
+    name: "ASTR",
+    symbol: "ASTR",
+    decimals: 18,
+    ed: "147058823529412000",
+    toRaw: () => 9,
   },
 };
 
@@ -321,8 +425,8 @@ export class BasiliskAdapter extends BaseHydradxAdapter {
   }
 }
 
-export class HydraAdapter extends BaseHydradxAdapter {
+export class HydraDxAdapter extends BaseHydradxAdapter {
   constructor() {
-    super(chains.hydradx, hydraRouteConfigs, hydraTokensConfig);
+    super(chains.hydradx, hydradxRoutersConfig, hydradxTokensConfig);
   }
 }
