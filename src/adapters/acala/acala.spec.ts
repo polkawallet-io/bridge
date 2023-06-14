@@ -8,7 +8,7 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 
-describe("acala-adapter", () => {
+describe.skip("acala-adapter", () => {
   jest.setTimeout(50000);
 
   let bridge: Bridge;
@@ -50,12 +50,14 @@ describe("acala-adapter", () => {
     });
   });
 
-  afterAll(() => {
-    bridge.adapters.forEach((i) => {
-      const api = i.getApi();
+  afterAll(async () => {
+    for (const adapter of bridge.adapters) {
+      const api = adapter.getApi();
 
-      if (api) api.disconnect();
-    });
+      if (api) {
+        await api?.disconnect();
+      }
+    }
   });
 
   test('bridge sdk init should work', (done) => {

@@ -300,7 +300,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
 
     const tokenIds: Record<string, string> = {
       // to karura
-      KUSD: "0x0081",
+      KUSD: "0x0081000000000000000000000000000000000000000000000000000000000000",
       // to acala
       ACA: "0x0000",
       AUSD: "0x0001",
