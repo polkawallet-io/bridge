@@ -5,3 +5,4 @@ yarn run lint
 yarn run test
 yarn run build:docs
 yarn run build
+git add .
