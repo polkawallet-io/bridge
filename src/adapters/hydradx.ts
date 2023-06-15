@@ -13,15 +13,12 @@ import { ApiNotFound } from "../errors";
 import { BalanceData, ExtendedToken, TransferParams } from "../types";
 import { createRouteConfigs } from "../utils";
 
-const DEST_WEIGHT = "5000000000";
-
 export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
   {
     to: "kusama",
     token: "KSM",
     xcm: {
       fee: { token: "KSM", amount: "11523248" },
-      weightLimit: "800000000",
     },
   },
   {
@@ -29,7 +26,6 @@ export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
     token: "BSX",
     xcm: {
       fee: { token: "BSX", amount: "93240000000" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -37,7 +33,6 @@ export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "5060238106" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -45,7 +40,6 @@ export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
     token: "KSM",
     xcm: {
       fee: { token: "KSM", amount: "90741527" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -53,7 +47,6 @@ export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
     token: "DAI",
     xcm: {
       fee: { token: "DAI", amount: "808240000000000" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -61,7 +54,6 @@ export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
     token: "USDCet",
     xcm: {
       fee: { token: "USDCet", amount: "808" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -69,7 +61,6 @@ export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
     token: "WETH",
     xcm: {
       fee: { token: "WETH", amount: "449022222222" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -77,7 +68,6 @@ export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
     token: "WBTC",
     xcm: {
       fee: { token: "WBTC", amount: "2" },
-      weightLimit: DEST_WEIGHT,
     },
   },
 ]);
@@ -140,7 +130,6 @@ export const hydraRouteConfigs = createRouteConfigs("hydradx", [
     token: "DAI",
     xcm: {
       fee: { token: "DAI", amount: "808240000000000" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -148,7 +137,6 @@ export const hydraRouteConfigs = createRouteConfigs("hydradx", [
     token: "WETH",
     xcm: {
       fee: { token: "WETH", amount: "687004000000" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -156,7 +144,6 @@ export const hydraRouteConfigs = createRouteConfigs("hydradx", [
     token: "WBTC",
     xcm: {
       fee: { token: "WBTC", amount: "4" },
-      weightLimit: DEST_WEIGHT,
     },
   },
 ]);
