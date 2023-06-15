@@ -12,6 +12,7 @@ import { ChainId, chains } from "../configs";
 import { BalanceData, ExtendedToken, TransferParams } from "../types";
 import { ApiNotFound, TokenNotFound } from "../errors";
 import { isChainEqual } from "../utils/is-chain-equal";
+import { checkMessageVersionIsV3 } from "../utils/check-message-version";
 import {
   createXTokensAssetsParam,
   createXTokensDestParam,
@@ -40,6 +41,13 @@ export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "5060238106" },
+    },
+  },
+  {
+    to: "karura",
+    token: "aUSD",
+    xcm: {
+      fee: { token: "aUSD", amount: "5060238106" },
     },
   },
   {
@@ -447,10 +455,7 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
 
     const { amount, to, token, address } = params;
     const toChain = chains[to];
-
-    const accountId = this.api?.createType("AccountId32", address).toHex();
-    const isToRelayChain =
-      isChainEqual(toChain, "kusama") || isChainEqual(toChain, "polkadot");
+    const isV3 = checkMessageVersionIsV3(this.api);
 
     // For statemine & statemint
     if (
@@ -458,6 +463,8 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
       isChainEqual(toChain, "statemint")
     ) {
       const assetId = STATEMINE_SUPPORTED_TOKENS[token];
+      const accountId = this.api?.createType("AccountId32", address).toHex();
+      const destWeight = isV3 ? "Unlimited" : "5000000000";
 
       if (assetId === undefined) throw new TokenNotFound(token);
       return this.api.tx.xTokens.transferMultiasset(
@@ -468,18 +475,11 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
           amount.toChainData()
         ),
         createXTokensDestParam(this.api, toChain.paraChainId, accountId) as any,
-        "Unlimited"
+        destWeight
       );
     }
 
-    return this.api.tx.xTokens.transfer(
-      token,
-      amount.toChainData(),
-      createXTokensDestParam(this.api, toChain.paraChainId, accountId, {
-        isToRelayChain,
-      }) as any,
-      "Unlimited"
-    );
+    return this.createXTokensTx(params);
   }
 }
 

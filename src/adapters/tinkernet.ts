@@ -10,16 +10,12 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, TokenNotFound } from "../errors";
-import {
-  BalanceData,
-  BasicToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
+import { BalanceData, BasicToken, TransferParams } from "../types";
+import { createRouteConfigs } from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
-export const tinkernetRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const tinkernetRoutersConfig = createRouteConfigs("robonomics", [
   {
     to: "basilisk",
     token: "TNKR",
@@ -28,7 +24,7 @@ export const tinkernetRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
-];
+]);
 
 const tinkernetTokensConfig: Record<string, BasicToken> = {
   TNKR: { name: "TNKR", symbol: "TNKR", decimals: 12, ed: "1000000000" },

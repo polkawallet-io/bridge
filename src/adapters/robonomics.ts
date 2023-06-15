@@ -10,16 +10,12 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, TokenNotFound } from "../errors";
-import {
-  BalanceData,
-  BasicToken,
-  RouteConfigs,
-  TransferParams,
-} from "../types";
+import { BalanceData, BasicToken, TransferParams } from "../types";
+import { createRouteConfigs } from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
-export const robonomicsRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const robonomicsRoutersConfig = createRouteConfigs("robonomics", [
   {
     to: "basilisk",
     token: "XRT",
@@ -28,7 +24,7 @@ export const robonomicsRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
-];
+]);
 
 const robonomicsTokensConfig: Record<string, BasicToken> = {
   XRT: { name: "XRT", symbol: "XRT", decimals: 9, ed: "1000" },
@@ -46,7 +42,7 @@ const createBalanceStorages = (api: AnyApi) => {
   };
 };
 
-class TinkernetBalanceAdapter extends BalanceAdapter {
+class RobonomicsBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
   constructor({ api, chain, tokens }: BalanceAdapterConfigs) {
@@ -79,7 +75,7 @@ class TinkernetBalanceAdapter extends BalanceAdapter {
 }
 
 class RobonomicsBaseAdapter extends BaseCrossChainAdapter {
-  private balanceAdapter?: TinkernetBalanceAdapter;
+  private balanceAdapter?: RobonomicsBalanceAdapter;
 
   public async init(api: AnyApi) {
     this.api = api;
@@ -88,7 +84,7 @@ class RobonomicsBaseAdapter extends BaseCrossChainAdapter {
 
     const chain = this.chain.id as ChainId;
 
-    this.balanceAdapter = new TinkernetBalanceAdapter({
+    this.balanceAdapter = new RobonomicsBalanceAdapter({
       chain,
       api,
       tokens: robonomicsTokensConfig,

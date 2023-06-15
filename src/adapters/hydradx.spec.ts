@@ -1,7 +1,7 @@
 import { Bridge } from '../bridge';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { FixedPointNumber } from '@acala-network/sdk-core';
-import { HydraAdapter } from './hydradx';
+import { HydraDxAdapter } from './hydradx';
 import { AcalaAdapter } from './acala';
 
 describe.skip('hydradx adapter should work', () => {
@@ -11,7 +11,7 @@ describe.skip('hydradx adapter should work', () => {
   let bridge: Bridge;
 
   beforeAll(async () => {
-    const hydradx = new HydraAdapter();
+    const hydradx = new HydraDxAdapter();
     const acala = new AcalaAdapter();
 
     const hydradxApi = new ApiPromise({ provider: new WsProvider('wss://hydradx.api.onfinality.io/public-ws') });

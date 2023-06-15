@@ -276,8 +276,8 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
 
     if (!validateAddress(address)) throw new InvalidAddress(address);
 
+    const isV0V1Support = this.isV0V1;
     const toChain = chains[to];
-
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
     // to relay chain
@@ -286,8 +286,6 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       if (token !== this.balanceAdapter?.nativeToken) {
         throw new TokenNotFound(token);
       }
-
-      const isV0V1Support = this.isV0V1;
 
       const dst = { interior: "Here", parents: 1 };
       const acc = {
@@ -312,44 +310,63 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       );
     }
 
-    // to karura/acala
     const assetId = SUPPORTED_TOKENS[token];
-
     if (token === this.balanceAdapter?.nativeToken || !assetId) {
       throw new TokenNotFound(token);
     }
 
-    const dst = {
-      parents: 1,
-      interior: { X1: { Parachain: toChain.paraChainId } },
-    };
-    const acc = {
-      parents: 0,
-      interior: { X1: { AccountId32: { id: accountId } } },
-    };
-    const ass = [
-      {
-        id: {
-          Concrete: {
-            parents: 0,
-            interior: {
-              X2: [{ PalletInstance: 50 }, { GeneralIndex: assetId }],
-            },
+    if (isV0V1Support) {
+      const dst = { X2: ["Parent", { Parachain: toChain.paraChainId }] };
+      const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
+      const ass = [
+        {
+          ConcreteFungible: {
+            id: { X2: [{ PalletInstance: 50 }, { GeneralIndex: assetId }] },
+            amount: amount.toChainData(),
           },
         },
-        fun: {
-          Fungible: amount.toChainData(),
-        },
-      },
-    ];
+      ];
 
-    return this.api?.tx.polkadotXcm.limitedReserveTransferAssets(
-      { V3: dst } as any,
-      { V3: acc } as any,
-      { V3: ass } as any,
-      0,
-      this.getDestWeight(token, to)?.toString() as any
-    );
+      return this.api?.tx.polkadotXcm.limitedReserveTransferAssets(
+        { V0: dst },
+        { V0: acc },
+        { V0: ass },
+        0,
+        this.getDestWeight(token, to)?.toString() as any
+      );
+    } else {
+      const dst = {
+        parents: 1,
+        interior: { X1: { Parachain: toChain.paraChainId } },
+      };
+      const acc = {
+        parents: 0,
+        interior: { X1: { AccountId32: { id: accountId } } },
+      };
+      const ass = [
+        {
+          id: {
+            Concrete: {
+              parents: 0,
+              interior: {
+                X2: [{ PalletInstance: 50 }, { GeneralIndex: assetId }],
+              },
+            },
+          },
+          fun: {
+            Fungible: amount.toChainData(),
+          },
+        },
+      ];
+
+      return this.api?.tx.polkadotXcm.limitedReserveTransferAssets(
+        { V3: dst } as any,
+        { V3: acc } as any,
+        { V3: ass } as any,
+        0,
+        this.getDestWeight(token, to)?.toString() as any
+      );
+    }
   }
 }
 
