@@ -34,14 +34,14 @@ export const karuraRouteConfigs = createRouteConfigs("karura", [
     to: "shiden",
     token: "SDN",
     xcm: {
-      fee: { token: "SDN", amount: "4662276356431024" },
+      fee: { token: "SDN", amount: "4006410300000000" },
     },
   },
   {
     to: "shiden",
     token: "KUSD",
     xcm: {
-      fee: { token: "KUSD", amount: "1200000000" },
+      fee: { token: "KUSD", amount: "2080000000" },
     },
   },
   {
