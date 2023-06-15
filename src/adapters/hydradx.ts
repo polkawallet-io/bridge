@@ -9,9 +9,16 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
-import { ApiNotFound } from "../errors";
 import { BalanceData, ExtendedToken, TransferParams } from "../types";
-import { createRouteConfigs } from "../utils";
+import { ApiNotFound, TokenNotFound } from "../errors";
+import { isChainEqual } from "../utils/is-chain-equal";
+import {
+  createXTokensAssetsParam,
+  createXTokensDestParam,
+  createRouteConfigs,
+} from "../utils";
+
+import { SUPPORTED_TOKENS as STATEMINE_SUPPORTED_TOKENS } from "./statemint";
 
 export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
   {
@@ -68,6 +75,27 @@ export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
     token: "WBTC",
     xcm: {
       fee: { token: "WBTC", amount: "2" },
+    },
+  },
+  {
+    to: "statemine",
+    token: "USDT",
+    xcm: {
+      fee: { token: "USDT", amount: "1183" },
+    },
+  },
+  {
+    to: "tinkernet",
+    token: "TNKR",
+    xcm: {
+      fee: { token: "TNKR", amount: "9270203240" },
+    },
+  },
+  {
+    to: "robonomics",
+    token: "XRT",
+    xcm: {
+      fee: { token: "XRT", amount: "4632" },
     },
   },
 ]);
@@ -415,7 +443,43 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    return this.createXTokensTx(params);
+    if (!this.api) throw new ApiNotFound(this.chain.id);
+
+    const { amount, to, token, address } = params;
+    const toChain = chains[to];
+
+    const accountId = this.api?.createType("AccountId32", address).toHex();
+    const isToRelayChain =
+      isChainEqual(toChain, "kusama") || isChainEqual(toChain, "polkadot");
+
+    // For statemine & statemint
+    if (
+      isChainEqual(toChain, "statemine") ||
+      isChainEqual(toChain, "statemint")
+    ) {
+      const assetId = STATEMINE_SUPPORTED_TOKENS[token];
+
+      if (assetId === undefined) throw new TokenNotFound(token);
+      return this.api.tx.xTokens.transferMultiasset(
+        createXTokensAssetsParam(
+          this.api,
+          toChain.paraChainId,
+          assetId,
+          amount.toChainData()
+        ),
+        createXTokensDestParam(this.api, toChain.paraChainId, accountId) as any,
+        "Unlimited"
+      );
+    }
+
+    return this.api.tx.xTokens.transfer(
+      token,
+      amount.toChainData(),
+      createXTokensDestParam(this.api, toChain.paraChainId, accountId, {
+        isToRelayChain,
+      }) as any,
+      "Unlimited"
+    );
   }
 }
 
