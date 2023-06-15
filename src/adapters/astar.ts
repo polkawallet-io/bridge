@@ -67,7 +67,7 @@ export const shidenRouteConfigs = createRouteConfigs("shiden", [
     to: "karura",
     token: "SDN",
     xcm: {
-      fee: { token: "SDN", amount: "932400000000000" },
+      fee: { token: "SDN", amount: "801280000000000" },
       weightLimit: "Unlimited",
     },
   },
@@ -75,7 +75,7 @@ export const shidenRouteConfigs = createRouteConfigs("shiden", [
     to: "karura",
     token: "KUSD",
     xcm: {
-      fee: { token: "KUSD", amount: "3826597686" },
+      fee: { token: "KUSD", amount: "2120203588" },
       weightLimit: "Unlimited",
     },
   },
@@ -318,7 +318,11 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
       createPolkadotXCMAccount(this.api, accountId),
       createPolkadotXCMAsset(this.api, rawAmount, [
         { Parachain: paraChainId },
-        { GeneralKey: { length: 2, data: tokenId } },
+        this.chain.id === "astar"
+          ? {
+              GeneralKey: tokenId,
+            }
+          : { GeneralKey: { length: 2, data: tokenId } },
       ]),
       0
     );
