@@ -17,28 +17,24 @@ Example: [src/bridge.spec.ts](src/bridge.spec.ts)
 
 ```typescript
 /// import any parachain-adapters you want in your bridge.
-const availableAdapters: Record<string, BaseCrossChainAdapter> = {
-  polkadot: new PolkadotAdapter(),
-  // kusama: new KusamaAdapter(),
-  acala: new AcalaAdapter(),
-  // karura: new KaruraAdapter(),
-  // statemine: new StatemineAdapter(),
-  // bifrost: new BifrostAdapter(),
-  // ...
-};
+const acala = new AcalaAdapter();
+const polkadot = new PolkadotAdapter();
+const acalaApi = new ApiPromise({ provider: new WsProvider('xxx') });
+const polkadotApi = new ApiPromise({ provider: new WsProvider('xxx') });
+
+await acala.init(acalaApi);
+await polkadot.init(polkadotApi);
 
 /// create your bridge instance and pass the adapters to it.
-const bridge = new Bridge({
-  adapters: Object.values(availableAdapters),
-});
+const bridge = new Bridge({ adapters: [acala, polkadot] });
 ```
 
 Then you can get the bridge routers:
 
 ```typescript
 const allRouters = bridge.router.getRouters();
-/// or the available routers (some may temporarily unavailable)
-const availableRouters = bridge.router.getAvailableRouters();
+/// or the available routers, we can disable some routes by config
+/// const availableRouters = bridge.router.getAvailableRouters();
 
 /// and get filtered routers
 const destChains = bridge.router.getDestinationChains({ from: "acala" });
@@ -104,8 +100,7 @@ const tx = adapter.createTx({
   amount: FixedPointNumber.fromInner("10000000000", 10),
   to: "polkadot",
   token: "DOT",
-  address: toAddress,
-  signer: testAccount,
+  address: toAddress
 });
 tx.signAndSend(keyPair, { tip: "0" }, onStatusChangecCallback);
 ```
