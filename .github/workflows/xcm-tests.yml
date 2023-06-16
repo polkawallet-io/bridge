@@ -58,7 +58,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: kintsugi-chopsticks-logs
-          path: app/log.txt
+          path: /app/log.txt
           retention-days: 14
 
   chopsticks_interlay_test:
@@ -108,5 +108,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: interlay-chopsticks-logs
-          path: app/log.txt
+          path: /app/log.txt
           retention-days: 14
