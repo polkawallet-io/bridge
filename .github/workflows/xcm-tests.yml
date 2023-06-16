@@ -6,6 +6,10 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
+
 
 jobs:
   chopsticks_kintsugi_test:
@@ -25,14 +29,20 @@ jobs:
           timeout_minutes: 10
           on_retry_command: pkill node; sleep 2
           command: |
+            echo "Launching chopsticks..."
             cd /app
+            echo "Start..." > log.txt
             yarn start xcm \
               --relaychain=configs/kusama.yml \
               --parachain=configs/kintsugi.yml \
               --parachain=configs/statemine.yml \
               --parachain=configs/karura.yml \
               --parachain=configs/parallel-heiko.yml \
-              --parachain=configs/bifrost.yml &
+              --parachain=configs/bifrost.yml \
+              &> log.txt &
+            echo "Waiting for log to show chopsticks is ready..."
+            tail -f log.txt | grep -q "Connected parachains"
+            echo "Chopsticks launched, start tests."
             cd -
 
             yarn install --frozen-lockfile
@@ -43,6 +53,13 @@ jobs:
         if: failure()
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: kintsugi-chopsticks-logs
+          path: app/log.txt
+          retention-days: 14
 
   chopsticks_interlay_test:
     runs-on: [self-hosted, linux]
@@ -61,7 +78,9 @@ jobs:
           timeout_minutes: 10
           on_retry_command: pkill node; sleep 2
           command: |
+            echo "Launching chopsticks..."
             cd /app
+            echo "Start..." > log.txt
             yarn start xcm \
               --relaychain=configs/polkadot.yml \
               --parachain=configs/interlay.yml \
@@ -69,7 +88,11 @@ jobs:
               --parachain=configs/hydradx.yml \
               --parachain=configs/acala.yml \
               --parachain=configs/astar.yml \
-              --parachain=configs/parallel.yml &
+              --parachain=configs/parallel.yml \
+              &> log.txt &
+            echo "Waiting for log to show chopsticks is ready..."
+            tail -f log.txt | grep -q "Connected parachains"
+            echo "Chopsticks launched, start tests."
             cd -
 
             yarn install --frozen-lockfile
@@ -80,3 +103,10 @@ jobs:
         if: failure()
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: interlay-chopsticks-logs
+          path: app/log.txt
+          retention-days: 14
