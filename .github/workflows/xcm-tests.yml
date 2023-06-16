@@ -29,6 +29,7 @@ jobs:
           timeout_minutes: 10
           on_retry_command: pkill node; sleep 2
           command: |
+            echo "Launching chopsticks..."
             cd /app
             echo "Start..." > log.txt
             yarn start xcm \
@@ -39,7 +40,9 @@ jobs:
               --parachain=configs/parallel-heiko.yml \
               --parachain=configs/bifrost.yml \
               &> log.txt &
+            echo "Waiting for log to show chopsticks is ready..."
             tail -f log.txt | grep -q "Connected parachains"
+            echo "Chopsticks launched, start tests."
             cd -
 
             yarn install --frozen-lockfile
@@ -75,6 +78,7 @@ jobs:
           timeout_minutes: 10
           on_retry_command: pkill node; sleep 2
           command: |
+            echo "Launching chopsticks..."
             cd /app
             echo "Start..." > log.txt
             yarn start xcm \
@@ -86,7 +90,9 @@ jobs:
               --parachain=configs/astar.yml \
               --parachain=configs/parallel.yml \
               &> log.txt &
+            echo "Waiting for log to show chopsticks is ready..."
             tail -f log.txt | grep -q "Connected parachains"
+            echo "Chopsticks launched, start tests."
             cd -
 
             yarn install --frozen-lockfile
