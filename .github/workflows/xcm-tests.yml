@@ -38,7 +38,7 @@ jobs:
               --parachain=configs/karura.yml \
               --parachain=configs/parallel-heiko.yml \
               --parachain=configs/bifrost.yml \
-              | tee log.txt &
+              &> log.txt &
             tail -f log.txt | grep -q "Connected parachains"
             cd -
 
@@ -50,6 +50,13 @@ jobs:
         if: failure()
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: kintsugi-chopsticks-logs
+          path: app/log.txt
+          retention-days: 14
 
   chopsticks_interlay_test:
     runs-on: [self-hosted, linux]
@@ -78,7 +85,7 @@ jobs:
               --parachain=configs/acala.yml \
               --parachain=configs/astar.yml \
               --parachain=configs/parallel.yml \
-              | tee log.txt &
+              &> log.txt &
             tail -f log.txt | grep -q "Connected parachains"
             cd -
 
@@ -90,3 +97,10 @@ jobs:
         if: failure()
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: interlay-chopsticks-logs
+          path: app/log.txt
+          retention-days: 14
