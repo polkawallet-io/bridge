@@ -54,7 +54,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
       - name: Upload logs
-        if: always()
+        if: failure()
         uses: actions/upload-artifact@v3
         with:
           name: kintsugi-chopsticks-logs
