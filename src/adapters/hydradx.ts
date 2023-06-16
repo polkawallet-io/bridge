@@ -188,12 +188,15 @@ export const basiliskTokensConfig: Record<string, ExtendedToken> = {
   },
 };
 
+const DEST_WEIGHT = "5000000000";
+
 export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
   {
     to: "polkadot",
     token: "DOT",
     xcm: {
       fee: { token: "DOT", amount: "469417452" },
+      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -201,6 +204,7 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
     token: "DAI",
     xcm: {
       fee: { token: "DAI", amount: "926960000000000" },
+      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -208,6 +212,7 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
     token: "DOT",
     xcm: {
       fee: { token: "DOT", amount: "471820453" },
+      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -215,6 +220,7 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
     token: "WETH",
     xcm: {
       fee: { token: "WETH", amount: "687004000000" },
+      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -222,12 +228,13 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
     token: "WBTC",
     xcm: {
       fee: { token: "WBTC", amount: "4" },
+      weightLimit: DEST_WEIGHT,
     },
   },
   {
     to: "interlay",
     token: "IBTC",
-    xcm: { fee: { token: "IBTC", amount: "62" } },
+    xcm: { fee: { token: "IBTC", amount: "62" }, weightLimit: DEST_WEIGHT },
   },
   {
     to: "statemint",
@@ -241,6 +248,7 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
     token: "ZTG",
     xcm: {
       fee: { token: "ZTG", amount: "93000000" },
+      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -248,6 +256,7 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
     token: "ASTR",
     xcm: {
       fee: { token: "ASTR", amount: "4041465440000000" },
+      weightLimit: DEST_WEIGHT,
     },
   },
 ]);
@@ -464,7 +473,7 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
     ) {
       const assetId = STATEMINE_SUPPORTED_TOKENS[token];
       const accountId = this.api?.createType("AccountId32", address).toHex();
-      const destWeight = isV3 ? "Unlimited" : "5000000000";
+      const destWeight = isV3 ? "Unlimited" : DEST_WEIGHT;
 
       if (assetId === undefined) throw new TokenNotFound(token);
       return this.api.tx.xTokens.transferMultiasset(
