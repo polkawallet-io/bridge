@@ -326,9 +326,23 @@ export const karuraRouteConfigs = createRouteConfigs("karura", [
   },
   {
     to: "basilisk",
+    token: "KSM",
+    xcm: {
+      fee: { token: "KSM", amount: "359882060" },
+    },
+  },
+  {
+    to: "basilisk",
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "3150402683" },
+    },
+  },
+  {
+    to: "basilisk",
+    token: "aUSD",
+    xcm: {
+      fee: { token: "aUSD", amount: "3150402683" },
     },
   },
   {
@@ -397,6 +411,7 @@ export const karuraRouteConfigs = createRouteConfigs("karura", [
 export const karuraTokensConfig: Record<string, BasicToken> = {
   KAR: { name: "KAR", symbol: "KAR", decimals: 12, ed: "100000000000" },
   KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "10000000000" },
+  aUSD: { name: "aUSD", symbol: "aUSD", decimals: 12, ed: "10000000000" },
   LKSM: { name: "LKSM", symbol: "LKSM", decimals: 12, ed: "500000000" },
   SDN: { name: "SDN", symbol: "SDN", decimals: 18, ed: "10000000000000000" },
   BNC: { name: "BNC", symbol: "BNC", decimals: 12, ed: "8000000000" },
