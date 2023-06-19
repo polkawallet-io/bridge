@@ -87,7 +87,6 @@ jobs:
               --parachain=configs/statemint.yml \
               --parachain=configs/hydradx.yml \
               --parachain=configs/acala.yml \
-              --parachain=configs/astar.yml \
               --parachain=configs/parallel.yml \
               &> log.txt &
             echo "Waiting for log to show chopsticks is ready..."

@@ -7,7 +7,6 @@ import { StatemintAdapter } from "../src/adapters/statemint";
 import { HydraAdapter } from "../src/adapters/hydradx";
 import { AcalaAdapter } from "../src/adapters/acala";
 import { ParallelAdapter } from "../src/adapters/parallel";
-import { AstarAdapter } from "../src/adapters/astar";
 import { BaseCrossChainAdapter } from "../src/base-chain-adapter";
 import { RouterTestCase, runTestCasesAndExit } from "./chopsticks-test";
 
@@ -27,12 +26,18 @@ async function main(): Promise<void> {
         statemint:  { adapter: new StatemintAdapter(),  endpoints: ['ws://127.0.0.1:8001'] },
         hydra:      { adapter: new HydraAdapter(),      endpoints: ['ws://127.0.0.1:8002'] },
         acala:      { adapter: new AcalaAdapter(),      endpoints: ['ws://127.0.0.1:8003'] },
-        astar:      { adapter: new AstarAdapter(),      endpoints: ['ws://127.0.0.1:8004'] },
-        parallel:   { adapter: new ParallelAdapter(),   endpoints: ['ws://127.0.0.1:8005'] },
-        polkadot:   { adapter: new PolkadotAdapter(),   endpoints: ['ws://127.0.0.1:8006'] },
+        // disable astar - rpc currently is too fragile for use in recurring tests
+        // astar:      { adapter: new AstarAdapter(),      endpoints: ['ws://127.0.0.1:8004'] },
+        // parallel:   { adapter: new ParallelAdapter(),   endpoints: ['ws://127.0.0.1:8005'] },
+        // polkadot:   { adapter: new PolkadotAdapter(),   endpoints: ['ws://127.0.0.1:8006'] },
+        parallel:   { adapter: new ParallelAdapter(),   endpoints: ['ws://127.0.0.1:8004'] },
+        polkadot:   { adapter: new PolkadotAdapter(),   endpoints: ['ws://127.0.0.1:8005'] },
     };
 
-    const filterCases: Partial<RouterTestCase>[] = [];
+    const filterCases: Partial<RouterTestCase>[] = [
+        {from: "astar"},
+        {to: "astar"},
+    ];
 
     await runTestCasesAndExit(adaptersEndpoints, filterCases);
 }
