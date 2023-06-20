@@ -196,7 +196,6 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
     token: "DOT",
     xcm: {
       fee: { token: "DOT", amount: "469417452" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -204,7 +203,6 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
     token: "DAI",
     xcm: {
       fee: { token: "DAI", amount: "926960000000000" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -212,7 +210,6 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
     token: "DOT",
     xcm: {
       fee: { token: "DOT", amount: "471820453" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -220,7 +217,6 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
     token: "WETH",
     xcm: {
       fee: { token: "WETH", amount: "687004000000" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -228,13 +224,12 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
     token: "WBTC",
     xcm: {
       fee: { token: "WBTC", amount: "4" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
     to: "interlay",
     token: "IBTC",
-    xcm: { fee: { token: "IBTC", amount: "62" }, weightLimit: DEST_WEIGHT },
+    xcm: { fee: { token: "IBTC", amount: "62" } },
   },
   {
     to: "statemint",
@@ -248,7 +243,6 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
     token: "ZTG",
     xcm: {
       fee: { token: "ZTG", amount: "93000000" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
@@ -256,7 +250,6 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
     token: "ASTR",
     xcm: {
       fee: { token: "ASTR", amount: "4041465440000000" },
-      weightLimit: DEST_WEIGHT,
     },
   },
 ]);
