@@ -302,9 +302,9 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
       // to karura
       KUSD: "0x0081000000000000000000000000000000000000000000000000000000000000",
       // to acala
-      ACA: "0x0000",
-      AUSD: "0x0001",
-      LDOT: "0x0003",
+      ACA: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      AUSD: "0x0001000000000000000000000000000000000000000000000000000000000000",
+      LDOT: "0x0003000000000000000000000000000000000000000000000000000000000000",
     };
 
     const tokenId = tokenIds[token];
@@ -318,11 +318,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
       createPolkadotXCMAccount(this.api, accountId),
       createPolkadotXCMAsset(this.api, rawAmount, [
         { Parachain: paraChainId },
-        this.chain.id === "astar"
-          ? {
-              GeneralKey: tokenId,
-            }
-          : { GeneralKey: { length: 2, data: tokenId } },
+        { GeneralKey: { length: 2, data: tokenId } },
       ]),
       0
     );

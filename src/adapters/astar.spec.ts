@@ -1,27 +1,31 @@
-import { Bridge } from '../bridge';
-import { AstarAdapter } from './astar';
-import { AcalaAdapter } from './acala';
-import { ApiPromise, WsProvider } from '@polkadot/api';
-import { FixedPointNumber } from '@acala-network/sdk-core';
+import { Bridge } from "../bridge";
+import { AstarAdapter, ShidenAdapter } from "./astar";
+import { AcalaAdapter } from "./acala";
+import { ApiPromise, WsProvider } from "@polkadot/api";
+import { FixedPointNumber } from "@acala-network/sdk-core";
+import { ChainId } from "../configs";
 
-describe.skip('astar adapter should work', () => {
+describe.skip("astar adapter should work", () => {
   jest.setTimeout(50000);
 
-  const address = '5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN';
+  const address = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
   let bridge: Bridge;
 
   beforeAll(async () => {
     const astar = new AstarAdapter();
+    const shiden = new ShidenAdapter();
     const acala = new AcalaAdapter();
 
-    const astarApi = new ApiPromise({ provider: new WsProvider('wss://rpc.astar.network') });
-    const acalaApi = new ApiPromise({ provider: new WsProvider('wss://acala-rpc-0.aca-api.network') });
+    const astarApi = new ApiPromise({ provider: new WsProvider("wss://rpc.astar.network") });
+    const shidenApi = new ApiPromise({ provider: new WsProvider("wss://shiden-rpc.dwellir.com") });
+    const acalaApi = new ApiPromise({ provider: new WsProvider("wss://acala-rpc-0.aca-api.network") });
 
     await astar.init(astarApi);
+    await shiden.init(shidenApi);
     await acala.init(acalaApi);
 
     bridge = new Bridge({
-      adapters: [astar, acala],
+      adapters: [astar, acala, shiden],
     });
   });
 
@@ -33,60 +37,41 @@ describe.skip('astar adapter should work', () => {
         await api.disconnect();
       }
     }
-  })
+  });
 
-  test('bridge sdk init should work', (done) => {
+  test("bridge sdk init should work", (done) => {
     expect(bridge).toBeDefined();
 
     done();
   });
 
-  test('transfer ASTR from astar to acala should work', (done) => {
-    try {
-      const adapter = bridge.findAdapter('astar');
+  ["astar", "shiden"].forEach((chainId) => {
+    const tokens = chainId === "astar" ? ["AUSD", "ACA", "LDOT", "ASTR"] : ["KUSD", "SDN"];
+    const destChain = chainId === "astar" ? "acala" : "karura";
+    tokens.forEach((token) => {
+      test(`transfer ${token} from ${chainId} to ${destChain} should work`, (done) => {
+        try {
+          const adapter = bridge.findAdapter(chainId as ChainId);
 
-      expect(adapter).toBeDefined();
+          expect(adapter).toBeDefined();
 
-      if (!adapter) return;
+          if (!adapter) return;
 
-      const astr = adapter.getToken('ASTR');
+          const t = adapter.getToken(token);
 
-      const tx = adapter.createTx({
-        to: 'acala',
-        token: 'ASTR',
-        amount: new FixedPointNumber(1, astr.decimals),
-        address
+          const tx = adapter.createTx({
+            to: destChain,
+            token,
+            amount: new FixedPointNumber(1, t.decimals),
+            address,
+          });
+
+          expect(tx).toBeDefined();
+          done();
+        } catch (e) {
+          // ignore error
+        }
       });
-
-      expect(tx).toBeDefined();
-      done();
-    } catch (e) {
-      // ignore error
-    }
-  });
-
-  test('transfer ACA from shiden to karura should work', (done) => {
-    try {
-
-      const adapter = bridge.findAdapter('astar');
-
-      expect(adapter).toBeDefined();
-
-      if (!adapter) return;
-
-      const aca = adapter.getToken('ACA');
-
-      const tx = adapter.createTx({
-        to: 'acala',
-        token: 'ACA',
-        amount: new FixedPointNumber(1, aca.decimals),
-        address
-      });
-
-      expect(tx).toBeDefined();
-      done();
-    } catch (e) {
-      // ignore error
-    }
+    });
   });
 });
