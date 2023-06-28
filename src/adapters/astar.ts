@@ -318,11 +318,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
       createPolkadotXCMAccount(this.api, accountId),
       createPolkadotXCMAsset(this.api, rawAmount, [
         { Parachain: paraChainId },
-        this.chain.id === "astar"
-          ? {
-              GeneralKey: tokenId,
-            }
-          : { GeneralKey: { length: 2, data: tokenId } },
+        { GeneralKey: { length: 2, data: tokenId } },
       ]),
       0
     );
