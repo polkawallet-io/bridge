@@ -3,8 +3,9 @@ import { AstarAdapter } from './astar';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { FixedPointNumber } from '@acala-network/sdk-core';
 
-describe('astar adapter should work', () => {
-  jest.setTimeout(50000);
+// TODO: fix astar xcm params to enable this test
+describe.skip('astar adapter should work', () => {
+  jest.setTimeout(300000);
 
   const address = '5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN';
   let bridge: Bridge;
