@@ -135,6 +135,13 @@ export const acalaRouteConfigs = createRouteConfigs("acala", [
       fee: { token: "UNQ", amount: "" },
     },
   },
+  {
+    to: "statemint",
+    token: "USDT",
+    xcm: {
+      fee: { token: "USDT", amount: "700000" },
+    },
+  },
 ]);
 
 export const acalaTokensConfig: Record<string, BasicToken> = {
@@ -180,5 +187,11 @@ export const acalaTokensConfig: Record<string, BasicToken> = {
     symbol: "UNQ",
     decimals: 18,
     ed: "1250000000000000000",
+  },
+  USDT: {
+    name: "USDT",
+    symbol: "USDT",
+    decimals: 6,
+    ed: "700000",
   },
 };

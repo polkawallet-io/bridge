@@ -11,7 +11,7 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
-import { BalanceData, BasicToken, TransferParams } from "../types";
+import { BalanceData, ExtendedToken, TransferParams } from "../types";
 import { createRouteConfigs, validateAddress } from "../utils";
 
 export const statemintRouteConfigs = createRouteConfigs("statemint", [
@@ -28,6 +28,14 @@ export const statemintRouteConfigs = createRouteConfigs("statemint", [
     token: "USDT",
     xcm: {
       fee: { token: "USDT", amount: "2200" },
+      weightLimit: "Unlimited",
+    },
+  },
+  {
+    to: "acala",
+    token: "USDT",
+    xcm: {
+      fee: { token: "USDT", amount: "808" },
       weightLimit: "Unlimited",
     },
   },
@@ -65,26 +73,52 @@ export const statemineRouteConfigs = createRouteConfigs("statemine", [
   },
 ]);
 
-export const statemintTokensConfig: Record<
-  string,
-  Record<string, BasicToken>
-> = {
-  statemint: {
-    DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "10000000000" },
-    USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "1000" },
+export const statemintTokensConfig: Record<string, ExtendedToken> = {
+  DOT: {
+    name: "DOT",
+    symbol: "DOT",
+    decimals: 10,
+    ed: "10000000000",
+    toRaw: () => "NATIVE",
   },
-  statemine: {
-    KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "79999999" },
-    RMRK: { name: "RMRK", symbol: "RMRK", decimals: 10, ed: "100000000" },
-    ARIS: { name: "ARIS", symbol: "ARIS", decimals: 8, ed: "10000000" },
-    USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "1000" },
+  USDT: {
+    name: "USDT",
+    symbol: "USDT",
+    decimals: 6,
+    ed: "1000",
+    toRaw: () => new BN(1984),
   },
 };
 
-export const SUPPORTED_TOKENS: Record<string, BN> = {
-  RMRK: new BN(8),
-  ARIS: new BN(16),
-  USDT: new BN(1984),
+export const statemineTokensConfig: Record<string, ExtendedToken> = {
+  KSM: {
+    name: "KSM",
+    symbol: "KSM",
+    decimals: 12,
+    ed: "79999999",
+    toRaw: () => "NATIVE",
+  },
+  RMRK: {
+    name: "RMRK",
+    symbol: "RMRK",
+    decimals: 10,
+    ed: "100000000",
+    toRaw: () => new BN(8),
+  },
+  ARIS: {
+    name: "ARIS",
+    symbol: "ARIS",
+    decimals: 8,
+    ed: "10000000",
+    toRaw: () => new BN(16),
+  },
+  USDT: {
+    name: "USDT",
+    symbol: "USDT",
+    decimals: 6,
+    ed: "1000",
+    toRaw: () => new BN(1984),
+  },
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -126,14 +160,14 @@ class StatemintBalanceAdapter extends BalanceAdapter {
   }
 
   public subscribeBalance(
-    token: string,
+    tokenName: string,
     address: string
   ): Observable<BalanceData> {
     if (!validateAddress(address)) throw new InvalidAddress(address);
 
     const storage = this.storages.balances(address);
 
-    if (token === this.nativeToken) {
+    if (tokenName === this.nativeToken) {
       return storage.observable.pipe(
         map((data) => ({
           free: FN.fromInner(data.freeBalance.toString(), this.decimals),
@@ -150,15 +184,13 @@ class StatemintBalanceAdapter extends BalanceAdapter {
       );
     }
 
-    const assetId = SUPPORTED_TOKENS[token];
+    const token: ExtendedToken = this.getToken(tokenName);
 
-    if (assetId === undefined) {
-      throw new TokenNotFound(token);
-    }
+    if (!token) throw new TokenNotFound(tokenName);
 
     return combineLatest({
-      meta: this.storages.assetsMeta(assetId).observable,
-      balance: this.storages.assets(assetId, address).observable,
+      meta: this.storages.assetsMeta(token.toRaw()).observable,
+      balance: this.storages.assets(token.toRaw(), address).observable,
     }).pipe(
       map(({ balance, meta }) => {
         const amount = FN.fromInner(
@@ -190,7 +222,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
     this.balanceAdapter = new StatemintBalanceAdapter({
       api,
       chain,
-      tokens: statemintTokensConfig[chain],
+      tokens: this.tokens,
     });
   }
 
@@ -244,19 +276,6 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
     );
   }
 
-  private get isV0V1() {
-    try {
-      const keys = (this.api?.createType("XcmVersionedMultiLocation") as any)
-        .defKeys as string[];
-
-      return keys.includes("V0");
-    } catch (e) {
-      // ignore error
-    }
-
-    return false;
-  }
-
   public createTx(
     params: TransferParams
   ):
@@ -264,7 +283,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
     if (!this.api) throw new ApiNotFound(this.chain.id);
 
-    const { address, amount, to, token } = params;
+    const { address, amount, to, token: tokenName } = params;
 
     if (!validateAddress(address)) throw new InvalidAddress(address);
 
@@ -272,14 +291,11 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    // to relay chain
+    // to relay chain, support native token
     if (to === "kusama" || to === "polkadot") {
-      // to relay chain only support native token
-      if (token !== this.balanceAdapter?.nativeToken) {
-        throw new TokenNotFound(token);
+      if (tokenName !== this.balanceAdapter?.nativeToken) {
+        throw new TokenNotFound(tokenName);
       }
-
-      const isV0V1Support = this.isV0V1;
 
       const dst = { interior: "Here", parents: 1 };
       const acc = {
@@ -296,19 +312,19 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       ];
 
       return this.api?.tx.polkadotXcm.limitedTeleportAssets(
-        { [isV0V1Support ? "V1" : "V3"]: dst } as any,
-        { [isV0V1Support ? "V1" : "V3"]: acc } as any,
-        { [isV0V1Support ? "V1" : "V3"]: ass } as any,
+        { V3: dst } as any,
+        { V3: acc } as any,
+        { V3: ass } as any,
         0,
-        this.getDestWeight(token, to)?.toString() as any
+        this.getDestWeight(tokenName, to)?.toString() as any
       );
     }
 
-    // to karura/acala
-    const assetId = SUPPORTED_TOKENS[token];
+    // to others
+    const token = this.getToken(tokenName) as ExtendedToken;
 
-    if (token === this.balanceAdapter?.nativeToken || !assetId) {
-      throw new TokenNotFound(token);
+    if (tokenName === this.balanceAdapter?.nativeToken || !token) {
+      throw new TokenNotFound(tokenName);
     }
 
     const dst = {
@@ -325,7 +341,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
           Concrete: {
             parents: 0,
             interior: {
-              X2: [{ PalletInstance: 50 }, { GeneralIndex: assetId }],
+              X2: [{ PalletInstance: 50 }, { GeneralIndex: token.toRaw() }],
             },
           },
         },
@@ -340,27 +356,19 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       { V3: acc } as any,
       { V3: ass } as any,
       0,
-      this.getDestWeight(token, to)?.toString() as any
+      this.getDestWeight(tokenName, to)?.toString() as any
     );
   }
 }
 
 export class StatemintAdapter extends BaseStatemintAdapter {
   constructor() {
-    super(
-      chains.statemint,
-      statemintRouteConfigs,
-      statemintTokensConfig.statemint
-    );
+    super(chains.statemint, statemintRouteConfigs, statemintTokensConfig);
   }
 }
 
 export class StatemineAdapter extends BaseStatemintAdapter {
   constructor() {
-    super(
-      chains.statemine,
-      statemineRouteConfigs,
-      statemintTokensConfig.statemine
-    );
+    super(chains.statemine, statemineRouteConfigs, statemineTokensConfig);
   }
 }
