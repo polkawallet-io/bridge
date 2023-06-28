@@ -1,23 +1,24 @@
 import { Bridge } from '../bridge';
-import { AstarAdapter } from './astar';
+import { ShidenAdapter } from './astar';
+import { KaruraAdapter } from './acala';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { FixedPointNumber } from '@acala-network/sdk-core';
 
-describe('astar adapter should work', () => {
+describe('shiden adapter should work', () => {
   jest.setTimeout(50000);
 
   const address = '5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN';
   let bridge: Bridge;
 
   beforeAll(async () => {
-    const astar = new AstarAdapter();
+    const shiden = new ShidenAdapter();
 
-    const astarApi = new ApiPromise({ provider: new WsProvider('wss://rpc.astar.network') });
+    const shidenApi = new ApiPromise({ provider: new WsProvider('wss://shiden-rpc.dwellir.com') });
 
-    await astar.init(astarApi);
+    await shiden.init(shidenApi);
 
     bridge = new Bridge({
-      adapters: [astar],
+      adapters: [shiden],
     });
   });
 
@@ -27,9 +28,9 @@ describe('astar adapter should work', () => {
     done();
   });
 
-  test('transfer token out of astar should work', (done) => {
+  test('transfer SDN from shiden to karura should work', (done) => {
     try {
-      const adapter = bridge.findAdapter('astar');
+      const adapter = bridge.findAdapter('shiden');
       expect(adapter).toBeDefined();
 
       if (!adapter) return;
