@@ -6,7 +6,6 @@ import { BaseCrossChainAdapter } from "./base-chain-adapter";
 import { BridgeRouterManager } from "./cross-chain-router";
 import { NoCrossChainAdapterFound } from "./errors";
 import { BridgeConfigs, Chain } from "./types";
-import { DEV_ROUTER_DISABLED } from "./configs/common";
 
 export class Bridge implements BaseSDK {
   readonly router: BridgeRouterManager;
@@ -18,10 +17,7 @@ export class Bridge implements BaseSDK {
 
   public isReady$: BehaviorSubject<boolean>;
 
-  constructor({
-    adapters,
-    disabledRouters = DEV_ROUTER_DISABLED,
-  }: BridgeConfigs) {
+  constructor({ adapters, disabledRouters }: BridgeConfigs) {
     this.isReady$ = new BehaviorSubject<boolean>(false);
     this.adapters = adapters;
     this.router = new BridgeRouterManager({ adapters, disabledRouters });
