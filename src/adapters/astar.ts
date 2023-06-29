@@ -24,7 +24,7 @@ export const astarRouteConfigs = createRouteConfigs("astar", [
     to: "acala",
     token: "ASTR",
     xcm: {
-      fee: { token: "ASTR", amount: "9269600000000000" },
+      fee: { token: "ASTR", amount: "8082400000000000" },
       weightLimit: "Unlimited",
     },
   },
@@ -32,7 +32,7 @@ export const astarRouteConfigs = createRouteConfigs("astar", [
     to: "acala",
     token: "ACA",
     xcm: {
-      fee: { token: "ACA", amount: "9269600000" },
+      fee: { token: "ACA", amount: "8082400000" },
       weightLimit: "Unlimited",
     },
   },
@@ -40,7 +40,7 @@ export const astarRouteConfigs = createRouteConfigs("astar", [
     to: "acala",
     token: "AUSD",
     xcm: {
-      fee: { token: "AUSD", amount: "2931921869" },
+      fee: { token: "AUSD", amount: "1815098681" },
       weightLimit: "Unlimited",
     },
   },
@@ -48,7 +48,7 @@ export const astarRouteConfigs = createRouteConfigs("astar", [
     to: "acala",
     token: "LDOT",
     xcm: {
-      fee: { token: "LDOT", amount: "31449750" },
+      fee: { token: "LDOT", amount: "13400229" },
       weightLimit: "Unlimited",
     },
   },
