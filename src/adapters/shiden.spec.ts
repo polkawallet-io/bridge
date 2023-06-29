@@ -1,5 +1,6 @@
 import { Bridge } from "../bridge";
 import { ShidenAdapter } from "./astar";
+import { logFormatedRoute, formateRouteLogLine } from "../utils/unit-test";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { FixedPointNumber } from "@acala-network/sdk-core";
 
@@ -8,6 +9,7 @@ describe("shiden adapter should work", () => {
 
   const address = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
   let bridge: Bridge;
+  const outputSummary: string[] = [];
 
   beforeAll(async () => {
     const shiden = new ShidenAdapter();
@@ -31,6 +33,7 @@ describe("shiden adapter should work", () => {
     }
 
     await new Promise((resolve) => setTimeout(() => resolve(undefined), 5000));
+    logFormatedRoute("Shiden summary:\n", outputSummary);
   });
 
   test("bridge sdk init should work", (done) => {
@@ -58,7 +61,10 @@ describe("shiden adapter should work", () => {
         });
 
         expect(tx).toBeDefined();
-        console.log(`transfer ${e.token} from ${e.from.display} to ${e.to.display} should work`);
+
+        const logRoute = formateRouteLogLine(e.token, e.from.display, e.to.display, "createTx");
+        logFormatedRoute("", [logRoute]);
+        outputSummary.push(logRoute);
       });
 
       done();

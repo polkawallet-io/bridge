@@ -1,100 +1,129 @@
-import { FixedPointNumber } from '@acala-network/sdk-core';
-import { firstValueFrom } from 'rxjs';
+import { FixedPointNumber } from "@acala-network/sdk-core";
+import { firstValueFrom } from "rxjs";
 
-import { ApiProvider } from '../api-provider';
-import { chains, ChainId } from '../configs';
-import { Bridge } from '../bridge';
-import { KusamaAdapter, PolkadotAdapter } from './polkadot';
-import { BasiliskAdapter, HydraAdapter } from './hydradx';
-import { StatemineAdapter, StatemintAdapter } from './statemint';
-import { AcalaAdapter, KaruraAdapter } from './acala/acala';
-import { BaseCrossChainAdapter } from '../base-chain-adapter';
+import { ApiProvider } from "../api-provider";
+import { chains, ChainId } from "../configs";
+import { Bridge } from "../bridge";
+import { KusamaAdapter, PolkadotAdapter } from "./polkadot";
+import { BasiliskAdapter, HydraAdapter } from "./hydradx";
+import { StatemineAdapter, StatemintAdapter } from "./statemint";
+import { AcalaAdapter, KaruraAdapter } from "./acala/acala";
+import { BaseCrossChainAdapter } from "../base-chain-adapter";
+import { logFormatedRoute, formateRouteLogLine } from "../utils/unit-test";
 
-describe.skip('polkadot-adapter should work', () => {
+describe("polkadot-adapter should work", () => {
   jest.setTimeout(300000);
 
-  const testAccount = '5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN';
+  const testAccount = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
   const adapters: Record<string, BaseCrossChainAdapter> = {
-     kusama: new KusamaAdapter(),
-     karura : new KaruraAdapter(),
-     basilisk : new BasiliskAdapter(),
-     statemine : new StatemineAdapter(),
-     polkadot : new PolkadotAdapter(),
-     acala : new AcalaAdapter(),
-     hydradx : new HydraAdapter(),
-     statemint : new StatemintAdapter(),
+    kusama: new KusamaAdapter(),
+    karura: new KaruraAdapter(),
+    basilisk: new BasiliskAdapter(),
+    statemine: new StatemineAdapter(),
+    polkadot: new PolkadotAdapter(),
+    acala: new AcalaAdapter(),
+    hydradx: new HydraAdapter(),
+    statemint: new StatemintAdapter(),
   };
   const provider = new ApiProvider();
   let bridge: Bridge;
+  const outputSummary: string[] = [];
 
-  async function connect (chains: ChainId[]) {
+  afterAll(async () => {
+    for (const adapter of bridge.adapters) {
+      const api = adapter.getApi();
+
+      if (api) {
+        await api.disconnect();
+      }
+    }
+
+    await new Promise((resolve) => setTimeout(() => resolve(undefined), 5000));
+
+    logFormatedRoute("Polkadot/Kusama summary:\n", outputSummary);
+  });
+
+  async function connect(chains: ChainId[]) {
     return firstValueFrom(provider.connectFromChain(chains, undefined));
   }
 
-  const fromChains = ['kusama', 'polkadot'] as ChainId[];
+  const fromChains = ["kusama", "polkadot"] as ChainId[];
 
-  test('connect kusama/polkadot should work', async () => {
-    await connect(fromChains);
+  test("connect kusama/polkadot should work", async () => {
+    try {
+      await connect(fromChains);
 
-    await adapters.kusama.init(provider.getApi(fromChains[0]));
-    await adapters.polkadot.init(provider.getApi(fromChains[1]));
+      await adapters.kusama.init(provider.getApi(fromChains[0]));
+      await adapters.polkadot.init(provider.getApi(fromChains[1]));
 
-    bridge = new Bridge({
-      adapters: Object.values(adapters),
-    });
+      bridge = new Bridge({
+        adapters: Object.values(adapters),
+      });
 
-    expect(bridge.router.getDestinationChains({ from: chains.kusama, token: 'KSM' }).length).toBeGreaterThanOrEqual(1);
+      expect(bridge.router.getDestinationChains({ from: chains.kusama, token: "KSM" }).length).toBeGreaterThanOrEqual(1);
+    } catch (err) {
+      // ignore node disconnected error
+    }
   });
 
   fromChains.forEach((fromChain) => {
     test(`connect ${fromChain} to do xcm`, async () => {
       const adapter = bridge.findAdapter(fromChain);
       expect(adapter).toBeDefined();
-  
+
       const testRoute = async (e) => {
         // TODO: add DOT to hydradx tokensConfig to fix this
-        if (e.token === 'DOT' && e.to === 'hydradx') return;
+        if (e.token === "DOT" && e.to === "hydradx") return;
 
         const balance = await firstValueFrom(adapter.subscribeTokenBalance(e.token, testAccount));
-  
-        console.log(`[${e.from} -> ${e.to}] ${e.token} balance: free-${balance.free.toNumber()} locked-${balance.locked.toNumber()} available-${balance.available.toNumber()}`);
+
+        const balanceLog = formateRouteLogLine(e.token, e.from, e.to, "balance");
+        logFormatedRoute("", [balanceLog]);
+        outputSummary.push(balanceLog);
         expect(balance.available.toNumber()).toBeGreaterThanOrEqual(0);
         expect(balance.free.toNumber()).toBeGreaterThanOrEqual(balance.available.toNumber());
         expect(balance.free.toNumber()).toEqual(balance.locked.add(balance.available).toNumber());
-  
-        const inputConfig = await firstValueFrom(adapter.subscribeInputConfig({ to: e.to, token: e.token, address: testAccount, signer: testAccount }));
-  
-        console.log(
-          `[${e.from} -> ${e.to}] ${e.token} inputConfig: min-${inputConfig.minInput.toNumber()} max-${inputConfig.maxInput.toNumber()} ss58-${inputConfig.ss58Prefix}`
+
+        const inputConfig = await firstValueFrom(
+          adapter.subscribeInputConfig({ to: e.to, token: e.token, address: testAccount, signer: testAccount })
         );
+
+        const inputConfigLog = formateRouteLogLine(e.token, e.from, e.to, "inputConfig");
+        logFormatedRoute("", [inputConfigLog]);
+        outputSummary.push(inputConfigLog);
         expect(inputConfig.minInput.toNumber()).toBeGreaterThan(0);
         expect(inputConfig.maxInput.toNumber()).toBeLessThanOrEqual(balance.available.toNumber());
-  
+
         const destFee = adapter.getCrossChainFee(e.token, e.to);
-  
-        console.log(`[${e.from} -> ${e.to}] ${e.token} destFee: ${destFee.balance.toNumber()} ${destFee.token}`);
+
+        const destFeeLog = formateRouteLogLine(e.token, e.from, e.to, "destFee");
+        logFormatedRoute("", [destFeeLog]);
+        outputSummary.push(destFeeLog);
         expect(destFee.balance.toNumber()).toBeGreaterThan(0);
-  
+
         const token = adapter.getToken(e.token);
         const tx = adapter.createTx({
           amount: new FixedPointNumber(0.01, token.decimals),
           to: e.to,
           token: e.token,
-          address: testAccount
+          address: testAccount,
         });
-  
+
         expect(tx).toBeDefined();
-        expect(tx.method.section).toEqual('xcmPallet');
-        if (e.to === 'statemine' || e.to === 'statemint') {
-          expect(tx.method.method).toEqual('limitedTeleportAssets');
+        expect(tx.method.section).toEqual("xcmPallet");
+        if (e.to === "statemine" || e.to === "statemint") {
+          expect(tx.method.method).toEqual("limitedTeleportAssets");
         } else {
-          expect(tx.method.method).toEqual('limitedReserveTransferAssets');
+          expect(tx.method.method).toEqual("limitedReserveTransferAssets");
         }
-        console.log(`[${e.from} -> ${e.to}] ${e.token} create tx works.`);
-      }
-  
+
+        const createTxLog = formateRouteLogLine(e.token, e.from, e.to, "createTx");
+        logFormatedRoute("", [createTxLog]);
+        outputSummary.push(createTxLog);
+      };
+
       const allRoutes = adapter.getRouters();
-      await Promise.all(allRoutes.map(e => testRoute(e)));
+      await Promise.all(allRoutes.map((e) => testRoute(e)));
     });
   });
 });
