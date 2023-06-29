@@ -69,7 +69,7 @@ export const acalaRouteConfigs = createRouteConfigs("acala", [
     to: "astar",
     token: "ASTR",
     xcm: {
-      fee: { token: "ASTR", amount: "4635101624603120" },
+      fee: { token: "ASTR", amount: "4006410300000000" },
     },
   },
   {
