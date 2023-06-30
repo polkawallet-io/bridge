@@ -15,6 +15,27 @@ import { createRouteConfigs, validateAddress } from "../utils";
 
 const DEST_WEIGHT = "Unlimited";
 
+const centrifugeRouteConfigs = createRouteConfigs("centrifuge", [
+  {
+    to: "hydradx",
+    token: "CFG",
+    xcm: {
+      fee: { token: "CFG", amount: "6373834498834048" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+]);
+
+export const centrifugeTokensonfigs: Record<string, ExtendedToken> = {
+  CFG: {
+    name: "CFG",
+    symbol: "CFG",
+    decimals: 18,
+    ed: "1000000000000",
+    toRaw: () => "Native",
+  },
+};
+
 const altairRouteConfigs = createRouteConfigs("altair", [
   {
     to: "karura",
@@ -199,5 +220,11 @@ class BaseCentrifugeAdapter extends BaseCrossChainAdapter {
 export class AltairAdapter extends BaseCentrifugeAdapter {
   constructor() {
     super(chains.altair, altairRouteConfigs, altairTokensConfig);
+  }
+}
+
+export class CentrifugeAdapter extends BaseCentrifugeAdapter {
+  constructor() {
+    super(chains.centrifuge, centrifugeRouteConfigs, centrifugeTokensonfigs);
   }
 }

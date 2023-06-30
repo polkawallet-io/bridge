@@ -249,6 +249,13 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
       fee: { token: "ASTR", amount: "4041465440000000" },
     },
   },
+  {
+    to: "centrifuge",
+    token: "CFG",
+    xcm: {
+      fee: { token: "CFG", amount: "9269600000000000" },
+    },
+  },
 ]);
 
 export const hydradxTokensConfig: Record<string, ExtendedToken> = {
@@ -308,6 +315,13 @@ export const hydradxTokensConfig: Record<string, ExtendedToken> = {
     decimals: 18,
     ed: "147058823529412000",
     toRaw: () => 9,
+  },
+  CFG: {
+    name: "CFG",
+    symbol: "CFG",
+    decimals: 18,
+    ed: "32467532467532500",
+    toRaw: () => 13,
   },
 };
 
