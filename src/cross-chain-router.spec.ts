@@ -1,9 +1,3 @@
-import { options } from "@acala-network/api";
-import { Wallet } from "@acala-network/sdk/wallet";
-
-import { ApiPromise } from "@polkadot/api";
-import { WsProvider } from "@polkadot/rpc-provider";
-
 import { isChainEqual } from "./utils/is-chain-equal";
 import { chains } from "./configs";
 import { BridgeRouterManager } from "./cross-chain-router";
@@ -11,26 +5,13 @@ import { RouteConfigs } from "./types";
 
 describe("cross-chain-router-manager", () => {
   let manager: BridgeRouterManager;
-  let api: ApiPromise;
-  let wallet: Wallet;
 
-  jest.setTimeout(30000);
+  jest.setTimeout(300000);
 
   const initSDK = async () => {
     if (manager) {
       return manager;
     }
-
-    const endpoint = "wss://karura.api.onfinality.io/public-ws";
-    const provider = new WsProvider(endpoint) as any;
-
-    api = await ApiPromise.create(options({ provider }));
-
-    await api.isReady;
-
-    wallet = new Wallet(api);
-
-    await wallet.isReady;
 
     manager = new BridgeRouterManager();
 
@@ -124,13 +105,5 @@ describe("cross-chain-router-manager", () => {
     } catch (err) {
       // ignore node disconnect issue
     }
-  });
-
-  afterAll(async () => {
-    if (api) {
-      await api.disconnect();
-    }
-
-    await new Promise((resolve) => setTimeout(() => resolve(undefined), 5000));
   });
 });

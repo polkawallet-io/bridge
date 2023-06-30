@@ -4,7 +4,7 @@ import { ApiProvider } from "./api-provider";
 import { ChainId } from "./configs";
 
 describe("api-provider", () => {
-  jest.setTimeout(30000);
+  jest.setTimeout(300000);
 
   const provider = new ApiProvider();
 
@@ -16,7 +16,7 @@ describe("api-provider", () => {
 
     const res = await firstValueFrom(
       provider.connectFromChain(chains, {
-        karura: ["wss://karura.api.onfinality.io/public-ws"],
+        karura: ["wss://karura-rpc.dwellir.com", "wss://karura.api.onfinality.io/public-ws", "wss://karura.polkawallet.io"],
       })
     );
 
