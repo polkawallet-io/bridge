@@ -85,7 +85,7 @@ export const statemintTokensConfig: Record<string, ExtendedToken> = {
     name: "USDT",
     symbol: "USDT",
     decimals: 6,
-    ed: "1000",
+    ed: "700000",
     toRaw: () => new BN(1984),
   },
 };
