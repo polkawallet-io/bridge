@@ -9,7 +9,7 @@ import { chains } from "./configs";
 import { BridgeRouterManager } from "./cross-chain-router";
 import { RouteConfigs } from "./types";
 
-describe.skip("cross-chain-router-manager", () => {
+describe("cross-chain-router-manager", () => {
   let manager: BridgeRouterManager;
   let api: ApiPromise;
   let wallet: Wallet;
@@ -119,20 +119,18 @@ describe.skip("cross-chain-router-manager", () => {
   });
 
   beforeAll(async () => {
-    await initSDK();
+    try {
+      await initSDK();
+    } catch (err) {
+      // ignore node disconnect issue
+    }
   });
 
-  // test('get routers config should be ok', async () => {
+  afterAll(async () => {
+    if (api) {
+      await api.disconnect();
+    }
 
-  //   manager = new BridgeRouterManager();
-
-  //   manager.addRouters(
-  //     RouteConfigs.karura.map(e => ({...e, from: 'karura'})),
-  //     false
-  //   );
-
-  //   const routers = manager.getRouters();
-  //   console.log(routers[0].xcm?.weightLimit?.toString());
-  //   expect(routers[0].xcm?.fee.token).toEqual('KSM');
-  // });
+    await new Promise((resolve) => setTimeout(() => resolve(undefined), 5000));
+  });
 });

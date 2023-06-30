@@ -1,15 +1,14 @@
+import { firstValueFrom } from "rxjs";
 
-import { firstValueFrom } from 'rxjs';
+import { ApiProvider } from "./api-provider";
+import { BaseCrossChainAdapter } from "./base-chain-adapter";
+import { PolkadotAdapter } from "./adapters/polkadot";
+import { ChainId } from "./configs";
+import { Bridge } from "./bridge";
+import { AcalaAdapter } from "./adapters/acala";
+import { FN } from "./types";
 
-import { ApiProvider } from './api-provider';
-import { BaseCrossChainAdapter } from './base-chain-adapter';
-import { PolkadotAdapter } from './adapters/polkadot';
-import { ChainId } from './configs';
-import { Bridge } from './bridge';
-import { AcalaAdapter } from './adapters/acala';
-import { FN } from './types';
-
-describe.skip('Bridge sdk usage', () => {
+describe("Bridge sdk usage", () => {
   jest.setTimeout(30000);
 
   const provider = new ApiProvider();
@@ -34,18 +33,30 @@ describe.skip('Bridge sdk usage', () => {
     adapters: Object.values(availableAdapters),
   });
 
-  test('1. bridge init should be ok', async () => {
-    expect(bridge.router.getRouters().length).toBeGreaterThanOrEqual(Object.keys(availableAdapters).length);
-    expect(bridge.router.getDestinationChains({from: 'acala'}).length).toBeGreaterThanOrEqual(0);
-    expect(bridge.router.getAvailableTokens({from: 'acala', to: 'polkadot'}).length).toBeGreaterThanOrEqual(0);
+  afterAll(async () => {
+    for (const adapter of bridge.adapters) {
+      const api = adapter.getApi();
+
+      if (api) {
+        await api.disconnect();
+      }
+    }
+
+    await new Promise((resolve) => setTimeout(() => resolve(undefined), 5000));
   });
 
-  test('2. connect fromChain should be ok', async () => {
+  test("1. bridge init should be ok", async () => {
+    expect(bridge.router.getRouters().length).toBeGreaterThanOrEqual(Object.keys(availableAdapters).length);
+    expect(bridge.router.getDestinationChains({ from: "acala" }).length).toBeGreaterThanOrEqual(0);
+    expect(bridge.router.getAvailableTokens({ from: "acala", to: "polkadot" }).length).toBeGreaterThanOrEqual(0);
+  });
+
+  test("2. connect fromChain should be ok", async () => {
     const chains = Object.keys(availableAdapters) as ChainId[];
 
     expect(provider.getApi(chains[0])).toEqual(undefined);
     expect(provider.getApi(chains[1])).toEqual(undefined);
-  
+
     // connect all adapters
     const connected = await firstValueFrom(provider.connectFromChain(chains, undefined));
     // and set apiProvider for each adapter
@@ -68,24 +79,26 @@ describe.skip('Bridge sdk usage', () => {
     }, 1000);
   });
 
-  test('3. token balance query & create tx should be ok', async () => {
-    const chain: ChainId = 'acala';
-    const toChain: ChainId = 'polkadot';
-    const token = 'DOT';
-    const testAddress = '23M5ttkmR6Kco7bReRDve6bQUSAcwqebatp3fWGJYb4hDSDJ';
+  test("3. token balance query & create tx should be ok", async () => {
+    const chain: ChainId = "acala";
+    const toChain: ChainId = "polkadot";
+    const token = "DOT";
+    const testAddress = "23M5ttkmR6Kco7bReRDve6bQUSAcwqebatp3fWGJYb4hDSDJ";
 
     const balance = await firstValueFrom(availableAdapters[chain].subscribeTokenBalance(token, testAddress));
 
     expect(balance.free.toNumber()).toBeGreaterThanOrEqual(0);
     expect(balance.available.toNumber()).toBeGreaterThanOrEqual(0);
 
-    const inputConfig = await firstValueFrom(availableAdapters[chain].subscribeInputConfig({to: toChain, token, address:testAddress, signer: testAddress}));
+    const inputConfig = await firstValueFrom(
+      availableAdapters[chain].subscribeInputConfig({ to: toChain, token, address: testAddress, signer: testAddress })
+    );
 
     expect(BigInt(inputConfig.estimateFee)).toBeGreaterThanOrEqual(BigInt(0));
     expect(inputConfig.minInput.toNumber()).toBeGreaterThan(0);
     expect(inputConfig.maxInput.toNumber()).toBeLessThanOrEqual(balance.available.toNumber());
 
-    const tx = availableAdapters[chain].createTx({to: toChain, token, amount: FN.fromInner('10000000000', 10), address:testAddress });
+    const tx = availableAdapters[chain].createTx({ to: toChain, token, amount: FN.fromInner("10000000000", 10), address: testAddress });
 
     expect(tx.args.length).toBeGreaterThan(1);
   });
