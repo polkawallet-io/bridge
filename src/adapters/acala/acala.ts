@@ -16,9 +16,9 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BaseCrossChainAdapter } from "../../base-chain-adapter";
 import { ChainId, chains } from "../../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../../errors";
-import { BalanceData, TransferParams } from "../../types";
+import { BalanceData, ExtendedToken, TransferParams } from "../../types";
 import { isChainEqual } from "../../utils/is-chain-equal";
-import { SUPPORTED_TOKENS as STATEMINE_SUPPORTED_TOKENS } from "../statemint";
+import { statemineTokensConfig, statemintTokensConfig } from "../statemint";
 import {
   createXTokensAssetsParam,
   createXTokensDestParam,
@@ -155,16 +155,21 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
     }
 
     // for statemine
-    if (isChainEqual(toChain, "statemine")) {
-      const assetId = STATEMINE_SUPPORTED_TOKENS[token];
+    if (
+      isChainEqual(toChain, "statemine") ||
+      isChainEqual(toChain, "statemint")
+    ) {
+      const tokenData: ExtendedToken = isChainEqual(toChain, "statemine")
+        ? statemineTokensConfig[token]
+        : statemintTokensConfig[token];
 
-      if (assetId === undefined) throw new TokenNotFound(token);
+      if (!token) throw new TokenNotFound(token);
 
       return this.api.tx.xTokens.transferMultiasset(
         createXTokensAssetsParam(
           this.api,
           toChain.paraChainId,
-          assetId,
+          tokenData.toRaw(),
           amount.toChainData()
         ),
         createXTokensDestParam(this.api, toChain.paraChainId, accountId) as any,

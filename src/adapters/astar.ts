@@ -24,7 +24,7 @@ export const astarRouteConfigs = createRouteConfigs("astar", [
     to: "acala",
     token: "ASTR",
     xcm: {
-      fee: { token: "ASTR", amount: "9269600000000000" },
+      fee: { token: "ASTR", amount: "8082400000000000" },
       weightLimit: "Unlimited",
     },
   },
@@ -32,7 +32,7 @@ export const astarRouteConfigs = createRouteConfigs("astar", [
     to: "acala",
     token: "ACA",
     xcm: {
-      fee: { token: "ACA", amount: "9269600000" },
+      fee: { token: "ACA", amount: "8082400000" },
       weightLimit: "Unlimited",
     },
   },
@@ -40,7 +40,7 @@ export const astarRouteConfigs = createRouteConfigs("astar", [
     to: "acala",
     token: "AUSD",
     xcm: {
-      fee: { token: "AUSD", amount: "2931921869" },
+      fee: { token: "AUSD", amount: "1815098681" },
       weightLimit: "Unlimited",
     },
   },
@@ -48,7 +48,7 @@ export const astarRouteConfigs = createRouteConfigs("astar", [
     to: "acala",
     token: "LDOT",
     xcm: {
-      fee: { token: "LDOT", amount: "31449750" },
+      fee: { token: "LDOT", amount: "13400229" },
       weightLimit: "Unlimited",
     },
   },
@@ -302,9 +302,9 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
       // to karura
       KUSD: "0x0081000000000000000000000000000000000000000000000000000000000000",
       // to acala
-      ACA: "0x0000",
-      AUSD: "0x0001",
-      LDOT: "0x0003",
+      ACA: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      AUSD: "0x0001000000000000000000000000000000000000000000000000000000000000",
+      LDOT: "0x0003000000000000000000000000000000000000000000000000000000000000",
     };
 
     const tokenId = tokenIds[token];
@@ -318,11 +318,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
       createPolkadotXCMAccount(this.api, accountId),
       createPolkadotXCMAsset(this.api, rawAmount, [
         { Parachain: paraChainId },
-        this.chain.id === "astar"
-          ? {
-              GeneralKey: tokenId,
-            }
-          : { GeneralKey: { length: 2, data: tokenId } },
+        { GeneralKey: { length: 2, data: tokenId } },
       ]),
       0
     );

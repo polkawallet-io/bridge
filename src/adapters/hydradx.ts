@@ -12,14 +12,13 @@ import { ChainId, chains } from "../configs";
 import { BalanceData, ExtendedToken, TransferParams } from "../types";
 import { ApiNotFound, TokenNotFound } from "../errors";
 import { isChainEqual } from "../utils/is-chain-equal";
-import { checkMessageVersionIsV3 } from "../utils/check-message-version";
 import {
   createXTokensAssetsParam,
   createXTokensDestParam,
   createRouteConfigs,
 } from "../utils";
 
-import { SUPPORTED_TOKENS as STATEMINE_SUPPORTED_TOKENS } from "./statemint";
+import { statemineTokensConfig, statemintTokensConfig } from "./statemint";
 
 export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
   {
@@ -187,8 +186,6 @@ export const basiliskTokensConfig: Record<string, ExtendedToken> = {
     toRaw: () => 11,
   },
 };
-
-const DEST_WEIGHT = "5000000000";
 
 export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
   {
@@ -457,27 +454,28 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
 
     const { amount, to, token, address } = params;
     const toChain = chains[to];
-    const isV3 = checkMessageVersionIsV3(this.api);
 
     // For statemine & statemint
     if (
       isChainEqual(toChain, "statemine") ||
       isChainEqual(toChain, "statemint")
     ) {
-      const assetId = STATEMINE_SUPPORTED_TOKENS[token];
-      const accountId = this.api?.createType("AccountId32", address).toHex();
-      const destWeight = isV3 ? "Unlimited" : DEST_WEIGHT;
+      const tokenData: ExtendedToken = isChainEqual(toChain, "statemine")
+        ? statemineTokensConfig[token]
+        : statemintTokensConfig[token];
 
-      if (assetId === undefined) throw new TokenNotFound(token);
+      const accountId = this.api?.createType("AccountId32", address).toHex();
+
+      if (!token) throw new TokenNotFound(token);
       return this.api.tx.xTokens.transferMultiasset(
         createXTokensAssetsParam(
           this.api,
           toChain.paraChainId,
-          assetId,
+          tokenData.toRaw(),
           amount.toChainData()
         ),
         createXTokensDestParam(this.api, toChain.paraChainId, accountId) as any,
-        destWeight
+        "Unlimited"
       );
     }
 
