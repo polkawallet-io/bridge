@@ -9,16 +9,23 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
-import { ApiNotFound } from "../errors";
 import { BalanceData, ExtendedToken, TransferParams } from "../types";
-import { createRouteConfigs } from "../utils";
+import { ApiNotFound, TokenNotFound } from "../errors";
+import { isChainEqual } from "../utils/is-chain-equal";
+import {
+  createXTokensAssetsParam,
+  createXTokensDestParam,
+  createRouteConfigs,
+} from "../utils";
+
+import { statemineTokensConfig, statemintTokensConfig } from "./statemint";
 
 export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
   {
     to: "kusama",
     token: "KSM",
     xcm: {
-      fee: { token: "KSM", amount: "11523248" },
+      fee: { token: "KSM", amount: "104571640" },
     },
   },
   {
@@ -33,6 +40,13 @@ export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "5060238106" },
+    },
+  },
+  {
+    to: "karura",
+    token: "aUSD",
+    xcm: {
+      fee: { token: "aUSD", amount: "5060238106" },
     },
   },
   {
@@ -70,6 +84,27 @@ export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
       fee: { token: "WBTC", amount: "2" },
     },
   },
+  {
+    to: "statemine",
+    token: "USDT",
+    xcm: {
+      fee: { token: "USDT", amount: "1183" },
+    },
+  },
+  {
+    to: "tinkernet",
+    token: "TNKR",
+    xcm: {
+      fee: { token: "TNKR", amount: "9270203240" },
+    },
+  },
+  {
+    to: "robonomics",
+    token: "XRT",
+    xcm: {
+      fee: { token: "XRT", amount: "4632" },
+    },
+  },
 ]);
 
 export const basiliskTokensConfig: Record<string, ExtendedToken> = {
@@ -87,12 +122,40 @@ export const basiliskTokensConfig: Record<string, ExtendedToken> = {
     ed: "10000000000",
     toRaw: () => 2,
   },
+  aUSD: {
+    name: "aUSD",
+    symbol: "aUSD",
+    decimals: 12,
+    ed: "10000000000",
+    toRaw: () => 2,
+  },
   KSM: {
     name: "KSM",
     symbol: "KSM",
     decimals: 12,
     ed: "100000000",
     toRaw: () => 1,
+  },
+  USDT: {
+    name: "USDT",
+    symbol: "USDT",
+    decimals: 6,
+    ed: "10000",
+    toRaw: () => 14,
+  },
+  TNKR: {
+    name: "TNKR",
+    symbol: "TNKR",
+    decimals: 12,
+    ed: "1000000000",
+    toRaw: () => 6,
+  },
+  XRT: {
+    name: "XRT",
+    symbol: "XRT",
+    decimals: 9,
+    ed: "1683502",
+    toRaw: () => 16,
   },
   DAI: {
     name: "DAI",
@@ -124,12 +187,26 @@ export const basiliskTokensConfig: Record<string, ExtendedToken> = {
   },
 };
 
-export const hydraRouteConfigs = createRouteConfigs("hydradx", [
+export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
+  {
+    to: "polkadot",
+    token: "DOT",
+    xcm: {
+      fee: { token: "DOT", amount: "469417452" },
+    },
+  },
   {
     to: "acala",
     token: "DAI",
     xcm: {
-      fee: { token: "DAI", amount: "808240000000000" },
+      fee: { token: "DAI", amount: "926960000000000" },
+    },
+  },
+  {
+    to: "acala",
+    token: "DOT",
+    xcm: {
+      fee: { token: "DOT", amount: "471820453" },
     },
   },
   {
@@ -146,15 +223,48 @@ export const hydraRouteConfigs = createRouteConfigs("hydradx", [
       fee: { token: "WBTC", amount: "4" },
     },
   },
+  {
+    to: "interlay",
+    token: "IBTC",
+    xcm: { fee: { token: "IBTC", amount: "62" } },
+  },
+  {
+    to: "statemint",
+    token: "USDT",
+    xcm: {
+      fee: { token: "USDT", amount: "700000" },
+    },
+  },
+  {
+    to: "zeitgeist",
+    token: "ZTG",
+    xcm: {
+      fee: { token: "ZTG", amount: "93000000" },
+    },
+  },
+  {
+    to: "astar",
+    token: "ASTR",
+    xcm: {
+      fee: { token: "ASTR", amount: "4041465440000000" },
+    },
+  },
+  {
+    to: "centrifuge",
+    token: "CFG",
+    xcm: {
+      fee: { token: "CFG", amount: "9269600000000000" },
+    },
+  },
 ]);
 
-export const hydraTokensConfig: Record<string, ExtendedToken> = {
-  DAI: {
-    name: "DAI",
-    symbol: "DAI",
-    decimals: 18,
-    ed: "10000000000",
-    toRaw: () => 2,
+export const hydradxTokensConfig: Record<string, ExtendedToken> = {
+  HDX: {
+    name: "HDX",
+    symbol: "HDX",
+    decimals: 12,
+    ed: "1000000000000",
+    toRaw: () => 0,
   },
   WETH: {
     name: "WETH",
@@ -163,12 +273,55 @@ export const hydraTokensConfig: Record<string, ExtendedToken> = {
     ed: "7000000000000",
     toRaw: () => 4,
   },
-  WBTC: {
-    name: "WBTC",
-    symbol: "WBTC",
+  WBTC: { name: "WBTC", symbol: "WBTC", decimals: 8, ed: "44", toRaw: () => 3 },
+  IBTC: {
+    name: "IBTC",
+    symbol: "IBTC",
     decimals: 8,
-    ed: "44",
-    toRaw: () => 3,
+    ed: "36",
+    toRaw: () => 11,
+  },
+  DOT: {
+    name: "DOT",
+    symbol: "DOT",
+    decimals: 10,
+    ed: "17540000",
+    toRaw: () => 5,
+  },
+  DAI: {
+    name: "DAI",
+    symbol: "DAI",
+    decimals: 18,
+    ed: "10000000000000000",
+    toRaw: () => 2,
+  },
+  USDT: {
+    name: "USDT",
+    symbol: "USDT",
+    decimals: 6,
+    ed: "10000",
+    toRaw: () => 10,
+  },
+  ZTG: {
+    name: "ZTG",
+    symbol: "ZTG",
+    decimals: 10,
+    ed: "1204151916",
+    toRaw: () => 12,
+  },
+  ASTR: {
+    name: "ASTR",
+    symbol: "ASTR",
+    decimals: 18,
+    ed: "147058823529412000",
+    toRaw: () => 9,
+  },
+  CFG: {
+    name: "CFG",
+    symbol: "CFG",
+    decimals: 18,
+    ed: "32467532467532500",
+    toRaw: () => 13,
   },
 };
 
@@ -311,6 +464,35 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
+    if (!this.api) throw new ApiNotFound(this.chain.id);
+
+    const { amount, to, token, address } = params;
+    const toChain = chains[to];
+
+    // For statemine & statemint
+    if (
+      isChainEqual(toChain, "statemine") ||
+      isChainEqual(toChain, "statemint")
+    ) {
+      const tokenData: ExtendedToken = isChainEqual(toChain, "statemine")
+        ? statemineTokensConfig[token]
+        : statemintTokensConfig[token];
+
+      const accountId = this.api?.createType("AccountId32", address).toHex();
+
+      if (!token) throw new TokenNotFound(token);
+      return this.api.tx.xTokens.transferMultiasset(
+        createXTokensAssetsParam(
+          this.api,
+          toChain.paraChainId,
+          tokenData.toRaw(),
+          amount.toChainData()
+        ),
+        createXTokensDestParam(this.api, toChain.paraChainId, accountId) as any,
+        "Unlimited"
+      );
+    }
+
     return this.createXTokensTx(params);
   }
 }
@@ -321,8 +503,8 @@ export class BasiliskAdapter extends BaseHydradxAdapter {
   }
 }
 
-export class HydraAdapter extends BaseHydradxAdapter {
+export class HydraDxAdapter extends BaseHydradxAdapter {
   constructor() {
-    super(chains.hydradx, hydraRouteConfigs, hydraTokensConfig);
+    super(chains.hydradx, hydradxRoutersConfig, hydradxTokensConfig);
   }
 }

@@ -20,18 +20,17 @@ export const interlayRouteConfigs = createRouteConfigs("interlay", [
     token: "INTR",
     xcm: {
       fee: { token: "INTR", amount: "92696000" },
-      weightLimit: DEST_WEIGHT,
     },
   },
   {
     to: "acala",
     token: "IBTC",
-    xcm: { fee: { token: "IBTC", amount: "9" }, weightLimit: DEST_WEIGHT },
+    xcm: { fee: { token: "IBTC", amount: "9" } },
   },
   {
     to: "hydradx",
     token: "IBTC",
-    xcm: { fee: { token: "IBTC", amount: "7" }, weightLimit: DEST_WEIGHT },
+    xcm: { fee: { token: "IBTC", amount: "7" } },
   },
 ]);
 

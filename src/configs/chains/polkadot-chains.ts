@@ -69,4 +69,11 @@ export const polkadotChains = {
     paraChainId: 2037,
     ss58Prefix: 7391,
   },
+  centrifuge: {
+    display: "Centrifuge",
+    type: "substrate",
+    icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fcentrifuge.png&w=96&q=75",
+    paraChainId: 2031,
+    ss58Prefix: 36,
+  },
 };
