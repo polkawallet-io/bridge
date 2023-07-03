@@ -1,78 +1,77 @@
-import { firstValueFrom } from "rxjs";
-
-import { ApiProvider } from "../api-provider";
-import { ChainId } from "../configs";
 import { Bridge } from "../bridge";
 import { TuringAdapter } from "./oak";
+import { logFormatedRoute, formateRouteLogLine } from "../utils/unit-test";
+import { FixedPointNumber } from "@acala-network/sdk-core";
+import { ApiProvider } from "../api-provider";
+import { ApiPromise, WsProvider } from "@polkadot/api";
 
-describe.skip("oak-adapter should work", () => {
-  jest.setTimeout(30000);
+describe("oak adapter should work", () => {
+  jest.setTimeout(300000);
 
-  const testAccount = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
+  const address = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
   const provider = new ApiProvider();
+  let bridge: Bridge;
+  const outputSummary: string[] = [];
 
-  async function connect(chain: ChainId) {
-    return firstValueFrom(provider.connectFromChain([chain], undefined));
-  }
-
-  test("connect turing to do xcm", async () => {
-    const fromChain = "turing";
-
-    await connect(fromChain);
-
+  beforeAll(async () => {
     const turing = new TuringAdapter();
 
-    await turing.init(provider.getApi(fromChain));
+    const turingApi = new ApiPromise({ provider: new WsProvider("wss://turing-rpc.dwellir.com") });
 
-    const bridge = new Bridge({
+    await turing.init(turingApi);
+
+    bridge = new Bridge({
       adapters: [turing],
     });
+  });
 
-    // expect(bridge.router.getDestinationChains({ from: chains.karura, token: 'KSM' }).length).toEqual(1);
+  afterAll(async () => {
+    for (const adapter of bridge.adapters) {
+      const api = adapter.getApi();
 
-    const adapter = bridge.findAdapter(fromChain);
-
-    async function runMyTestSuit(to: ChainId, token: string) {
-      if (adapter) {
-        const balance = await firstValueFrom(adapter.subscribeTokenBalance(token, testAccount));
-
-        console.log(
-          `balance ${token}: free-${balance.free.toNumber()} locked-${balance.locked.toNumber()} available-${balance.available.toNumber()}`
-        );
-        expect(balance.available.toNumber()).toBeGreaterThanOrEqual(0);
-        // expect(balance.free.toNumber()).toBeGreaterThanOrEqual(balance.available.toNumber());
-        // expect(balance.free.toNumber()).toEqual(balance.locked.add(balance.available).toNumber());
-
-        // const inputConfig = await firstValueFrom(adapter.subscribeInputConfigs({ to, token, address: testAccount, signer: testAccount }));
-
-        // console.log(
-        //   `inputConfig: min-${inputConfig.minInput.toNumber()} max-${inputConfig.maxInput.toNumber()} ss58-${inputConfig.ss58Prefix}`
-        // );
-        // expect(inputConfig.minInput.toNumber()).toBeGreaterThan(0);
-        // expect(inputConfig.maxInput.toNumber()).toBeLessThanOrEqual(balance.available.toNumber());
-
-        // const destFee = adapter.getCrossChainFee(token, to);
-
-        // console.log(`destFee: fee-${destFee.balance.toNumber()} ${destFee.token}`);
-        // expect(destFee.balance.toNumber()).toBeGreaterThan(0);
-
-        // const tx = adapter.createTx({
-        //   amount: FixedPointNumber.fromInner('10000000000', 10),
-        //   to,
-        //   token,
-        //   address: testAccount,
-        //   signer: testAccount
-        // });
-
-        // if (to !== 'statemine') {
-        //   expect(tx.method.section).toEqual('xTokens');
-        //   expect(tx.method.method).toEqual('transfer');
-        //   expect(tx.args.length).toEqual(4);
-        // }
+      if (api) {
+        await api.disconnect();
       }
     }
 
-    // await runMyTestSuit('karura', 'SDN');
-    await runMyTestSuit("turing", "LKSM");
+    await new Promise((resolve) => setTimeout(() => resolve(undefined), 5000));
+    logFormatedRoute("Turing summary:\n", outputSummary);
+  });
+
+  test("bridge sdk init should work", (done) => {
+    expect(bridge).toBeDefined();
+
+    done();
+  });
+
+  test("transfer tokens from turing should work", (done) => {
+    try {
+      const adapter = bridge.findAdapter("turing");
+      expect(adapter).toBeDefined();
+
+      if (!adapter) return;
+
+      const allRoutes = bridge.router.getAvailableRouters();
+      allRoutes.forEach((e) => {
+        const token = adapter.getToken(e.token);
+
+        const tx = adapter.createTx({
+          to: e.to.id,
+          token: token.name,
+          amount: new FixedPointNumber(1, token.decimals),
+          address,
+        });
+
+        expect(tx).toBeDefined();
+
+        const logRoute = formateRouteLogLine(e.token, e.from.display, e.to.display, "createTx");
+        logFormatedRoute("", [logRoute]);
+        outputSummary.push(logRoute);
+      });
+
+      done();
+    } catch (e) {
+      // ignore error
+    }
   });
 });
