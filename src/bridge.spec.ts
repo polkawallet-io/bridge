@@ -30,18 +30,6 @@ describe("Bridge sdk usage", () => {
     adapters: Object.values(availableAdapters),
   });
 
-  afterAll(async () => {
-    for (const adapter of bridge.adapters) {
-      const api = adapter.getApi();
-
-      if (api) {
-        await api.disconnect();
-      }
-    }
-
-    await new Promise((resolve) => setTimeout(() => resolve(undefined), 5000));
-  });
-
   test("1. bridge init should be ok", async () => {
     expect(bridge.router.getRouters().length).toBeGreaterThanOrEqual(Object.keys(availableAdapters).length);
     expect(bridge.router.getDestinationChains({ from: "acala" }).length).toBeGreaterThanOrEqual(0);

@@ -5,7 +5,7 @@ import { ApiProvider } from "../api-provider";
 import { chains, ChainId } from "../configs";
 import { Bridge } from "../bridge";
 import { KusamaAdapter, PolkadotAdapter } from "./polkadot";
-import { BasiliskAdapter, HydraAdapter } from "./hydradx";
+import { BasiliskAdapter, HydraDxAdapter } from "./hydradx";
 import { StatemineAdapter, StatemintAdapter } from "./statemint";
 import { AcalaAdapter, KaruraAdapter } from "./acala/acala";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
@@ -22,7 +22,7 @@ describe("polkadot-adapter should work", () => {
     statemine: new StatemineAdapter(),
     polkadot: new PolkadotAdapter(),
     acala: new AcalaAdapter(),
-    hydradx: new HydraAdapter(),
+    hydradx: new HydraDxAdapter(),
     statemint: new StatemintAdapter(),
   };
   const provider = new ApiProvider();
