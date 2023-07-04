@@ -1,28 +1,25 @@
 import { Bridge } from "../bridge";
-import { TuringAdapter } from "./oak";
+import { ShidenAdapter } from "./astar";
 import { logFormatedRoute, formateRouteLogLine } from "../utils/unit-test";
-import { FixedPointNumber } from "@acala-network/sdk-core";
-import { ApiProvider } from "../api-provider";
 import { ApiPromise, WsProvider } from "@polkadot/api";
+import { FixedPointNumber } from "@acala-network/sdk-core";
 
-// TODO: turing API can not connect in test, need to be fixed
-describe.skip("oak adapter should work", () => {
+describe("shiden adapter should work", () => {
   jest.setTimeout(300000);
 
   const address = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
-  const provider = new ApiProvider();
   let bridge: Bridge;
   const outputSummary: string[] = [];
 
   beforeAll(async () => {
-    const turing = new TuringAdapter();
+    const shiden = new ShidenAdapter();
 
-    const turingApi = new ApiPromise({ provider: new WsProvider("wss://turing-rpc.dwellir.com") });
+    const shidenApi = new ApiPromise({ provider: new WsProvider("wss://shiden-rpc.dwellir.com") });
 
-    await turing.init(turingApi);
+    await shiden.init(shidenApi);
 
     bridge = new Bridge({
-      adapters: [turing],
+      adapters: [shiden],
     });
   });
 
@@ -36,7 +33,7 @@ describe.skip("oak adapter should work", () => {
     }
 
     await new Promise((resolve) => setTimeout(() => resolve(undefined), 5000));
-    logFormatedRoute("Turing summary:\n", outputSummary);
+    logFormatedRoute("Shiden summary:\n", outputSummary);
   });
 
   test("bridge sdk init should work", (done) => {
@@ -45,9 +42,9 @@ describe.skip("oak adapter should work", () => {
     done();
   });
 
-  test("transfer tokens from turing should work", (done) => {
+  test("transfer tokens from shiden should work", (done) => {
     try {
-      const adapter = bridge.findAdapter("turing");
+      const adapter = bridge.findAdapter("shiden");
       expect(adapter).toBeDefined();
 
       if (!adapter) return;

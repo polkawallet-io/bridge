@@ -18,7 +18,7 @@
   "scripts": {
     "clain": "rm -rf build",
     "build": "tsc",
-    "test": "jest",
+    "test": "jest --runInBand --detectOpenHandles --forceExit",
     "lint": "polkadot-dev-run-lint",
     "build:docs": "ts-node ./scripts/generate-bridge-document.ts",
     "build:release": "polkadot-ci-ghact-build"

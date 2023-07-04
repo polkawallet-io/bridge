@@ -1,36 +1,17 @@
-import { options } from "@acala-network/api";
-import { Wallet } from "@acala-network/sdk/wallet";
-
-import { ApiPromise } from "@polkadot/api";
-import { WsProvider } from "@polkadot/rpc-provider";
-
 import { isChainEqual } from "./utils/is-chain-equal";
 import { chains } from "./configs";
 import { BridgeRouterManager } from "./cross-chain-router";
 import { RouteConfigs } from "./types";
 
-describe.skip("cross-chain-router-manager", () => {
+describe("cross-chain-router-manager", () => {
   let manager: BridgeRouterManager;
-  let api: ApiPromise;
-  let wallet: Wallet;
 
-  jest.setTimeout(30000);
+  jest.setTimeout(300000);
 
   const initSDK = async () => {
     if (manager) {
       return manager;
     }
-
-    const endpoint = "wss://karura.api.onfinality.io/public-ws";
-    const provider = new WsProvider(endpoint) as any;
-
-    api = await ApiPromise.create(options({ provider }));
-
-    await api.isReady;
-
-    wallet = new Wallet(api);
-
-    await wallet.isReady;
 
     manager = new BridgeRouterManager();
 
@@ -119,20 +100,10 @@ describe.skip("cross-chain-router-manager", () => {
   });
 
   beforeAll(async () => {
-    await initSDK();
+    try {
+      await initSDK();
+    } catch (err) {
+      // ignore node disconnect issue
+    }
   });
-
-  // test('get routers config should be ok', async () => {
-
-  //   manager = new BridgeRouterManager();
-
-  //   manager.addRouters(
-  //     RouteConfigs.karura.map(e => ({...e, from: 'karura'})),
-  //     false
-  //   );
-
-  //   const routers = manager.getRouters();
-  //   console.log(routers[0].xcm?.weightLimit?.toString());
-  //   expect(routers[0].xcm?.fee.token).toEqual('KSM');
-  // });
 });

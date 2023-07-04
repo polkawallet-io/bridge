@@ -1,29 +1,26 @@
 import { Bridge } from "../bridge";
-import { TuringAdapter } from "./oak";
-import { logFormatedRoute, formateRouteLogLine } from "../utils/unit-test";
 import { FixedPointNumber } from "@acala-network/sdk-core";
+import { formateRouteLogLine, logFormatedRoute } from "../utils/unit-test";
 import { ApiProvider } from "../api-provider";
-import { ApiPromise, WsProvider } from "@polkadot/api";
+import { firstValueFrom } from "rxjs";
+import { RobonomicsAdapter } from "./robonomics";
 
-// TODO: turing API can not connect in test, need to be fixed
-describe.skip("oak adapter should work", () => {
+describe("robonomics adapter should work", () => {
   jest.setTimeout(300000);
 
   const address = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
-  const provider = new ApiProvider();
   let bridge: Bridge;
+  const provider = new ApiProvider();
   const outputSummary: string[] = [];
 
   beforeAll(async () => {
-    const turing = new TuringAdapter();
+    const robo = new RobonomicsAdapter();
 
-    const turingApi = new ApiPromise({ provider: new WsProvider("wss://turing-rpc.dwellir.com") });
+    await firstValueFrom(provider.connectFromChain(["robonomics"]));
 
-    await turing.init(turingApi);
+    await robo.init(provider.getApi("robonomics"));
 
-    bridge = new Bridge({
-      adapters: [turing],
-    });
+    bridge = new Bridge({ adapters: [robo] });
   });
 
   afterAll(async () => {
@@ -36,7 +33,8 @@ describe.skip("oak adapter should work", () => {
     }
 
     await new Promise((resolve) => setTimeout(() => resolve(undefined), 5000));
-    logFormatedRoute("Turing summary:\n", outputSummary);
+
+    logFormatedRoute("robonomics summary:\n", outputSummary);
   });
 
   test("bridge sdk init should work", (done) => {
@@ -45,9 +43,9 @@ describe.skip("oak adapter should work", () => {
     done();
   });
 
-  test("transfer tokens from turing should work", (done) => {
+  test("transfer tokens out of robonomics should work", (done) => {
     try {
-      const adapter = bridge.findAdapter("turing");
+      const adapter = bridge.findAdapter("robonomics");
       expect(adapter).toBeDefined();
 
       if (!adapter) return;

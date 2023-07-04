@@ -1,26 +1,24 @@
-import { Bridge } from '../bridge';
-import { ApiPromise, WsProvider } from '@polkadot/api';
-import { FixedPointNumber } from '@acala-network/sdk-core';
-import { BasiliskAdapter } from './hydradx';
-import { KaruraAdapter } from './acala';
+import { Bridge } from "../bridge";
+import { ApiPromise, WsProvider } from "@polkadot/api";
+import { FixedPointNumber } from "@acala-network/sdk-core";
+import { BasiliskAdapter } from "./hydradx";
+import { formateRouteLogLine, logFormatedRoute } from "../utils/unit-test";
 
-describe.skip('basilisk adapter should work', () => {
-  jest.setTimeout(50000);
+describe("basilisk adapter should work", () => {
+  jest.setTimeout(300000);
 
-  const address = '5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN';
+  const address = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
   let bridge: Bridge;
+  const outputSummary: string[] = [];
 
   beforeAll(async () => {
     const basilisk = new BasiliskAdapter();
-    const karura= new KaruraAdapter();
 
-    const basiliskApi = new ApiPromise({ provider: new WsProvider('wss://rpc.basilisk.cloud') });
-    const karuraApi = new ApiPromise({ provider: new WsProvider('wss://karura-rpc-0.aca-api.network') });
+    const basiliskApi = new ApiPromise({ provider: new WsProvider("wss://rpc.basilisk.cloud") });
 
     await basilisk.init(basiliskApi);
-    await karura.init(karuraApi);
 
-    bridge = new Bridge({ adapters: [basilisk, karura] });
+    bridge = new Bridge({ adapters: [basilisk] });
   });
 
   afterAll(async () => {
@@ -31,56 +29,43 @@ describe.skip('basilisk adapter should work', () => {
         await api.disconnect();
       }
     }
-  })
 
-  test('bridge sdk init should work', (done) => {
+    await new Promise((resolve) => setTimeout(() => resolve(undefined), 5000));
+
+    logFormatedRoute("Basilisk summary:\n", outputSummary);
+  });
+
+  test("bridge sdk init should work", (done) => {
     expect(bridge).toBeDefined();
 
     done();
   });
 
-  test('transfer BSX from basilisk to karura should work', (done) => {
+  test("transfer tokens out of balsilisk should work", (done) => {
     try {
-      const adapter = bridge.findAdapter('basilisk');
-
+      const adapter = bridge.findAdapter("basilisk");
       expect(adapter).toBeDefined();
 
       if (!adapter) return;
 
-      const bsx = adapter.getToken('BSX');
+      const allRoutes = bridge.router.getAvailableRouters();
+      allRoutes.forEach((e) => {
+        const token = adapter.getToken(e.token);
 
-      const tx = adapter.createTx({
-        to: 'karura',
-        token: 'BSX',
-        amount: new FixedPointNumber(1, bsx.decimals),
-        address
+        const tx = adapter.createTx({
+          to: e.to.id,
+          token: token.name,
+          amount: new FixedPointNumber(1, token.decimals),
+          address,
+        });
+
+        expect(tx).toBeDefined();
+
+        const logRoute = formateRouteLogLine(e.token, e.from.display, e.to.display, "createTx");
+        logFormatedRoute("", [logRoute]);
+        outputSummary.push(logRoute);
       });
 
-      expect(tx).toBeDefined();
-      done();
-    } catch (e) {
-      // ignore error
-    }
-  });
-
-  test('transfer KUSD from basilisk to karura should work', (done) => {
-    try {
-      const adapter = bridge.findAdapter('basilisk');
-
-      expect(adapter).toBeDefined();
-
-      if (!adapter) return;
-
-      const kusd = adapter.getToken('KUSD');
-
-      const tx = adapter.createTx({
-        to: 'karura',
-        token: 'KUSD',
-        amount: new FixedPointNumber(1, kusd.decimals),
-        address
-      });
-
-      expect(tx).toBeDefined();
       done();
     } catch (e) {
       // ignore error

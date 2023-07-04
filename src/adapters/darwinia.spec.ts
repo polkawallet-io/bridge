@@ -1,29 +1,26 @@
 import { Bridge } from "../bridge";
-import { TuringAdapter } from "./oak";
-import { logFormatedRoute, formateRouteLogLine } from "../utils/unit-test";
 import { FixedPointNumber } from "@acala-network/sdk-core";
+import { formateRouteLogLine, logFormatedRoute } from "../utils/unit-test";
 import { ApiProvider } from "../api-provider";
-import { ApiPromise, WsProvider } from "@polkadot/api";
+import { firstValueFrom } from "rxjs";
+import { CrabAdapter } from "./darwinia";
 
-// TODO: turing API can not connect in test, need to be fixed
-describe.skip("oak adapter should work", () => {
+describe("crab adapter should work", () => {
   jest.setTimeout(300000);
 
   const address = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
-  const provider = new ApiProvider();
   let bridge: Bridge;
+  const provider = new ApiProvider();
   const outputSummary: string[] = [];
 
   beforeAll(async () => {
-    const turing = new TuringAdapter();
+    const crab = new CrabAdapter();
 
-    const turingApi = new ApiPromise({ provider: new WsProvider("wss://turing-rpc.dwellir.com") });
+    await firstValueFrom(provider.connectFromChain(["crab"]));
 
-    await turing.init(turingApi);
+    await crab.init(provider.getApi("crab"));
 
-    bridge = new Bridge({
-      adapters: [turing],
-    });
+    bridge = new Bridge({ adapters: [crab] });
   });
 
   afterAll(async () => {
@@ -36,7 +33,8 @@ describe.skip("oak adapter should work", () => {
     }
 
     await new Promise((resolve) => setTimeout(() => resolve(undefined), 5000));
-    logFormatedRoute("Turing summary:\n", outputSummary);
+
+    logFormatedRoute("crab summary:\n", outputSummary);
   });
 
   test("bridge sdk init should work", (done) => {
@@ -45,9 +43,9 @@ describe.skip("oak adapter should work", () => {
     done();
   });
 
-  test("transfer tokens from turing should work", (done) => {
+  test("transfer tokens out of crab should work", (done) => {
     try {
-      const adapter = bridge.findAdapter("turing");
+      const adapter = bridge.findAdapter("crab");
       expect(adapter).toBeDefined();
 
       if (!adapter) return;
