@@ -166,7 +166,7 @@ class ZeitgeistBaseAdapter extends BaseCrossChainAdapter {
           },
         },
       },
-      DEST_WEIGHT
+      "Unlimited"
     );
   }
 }
