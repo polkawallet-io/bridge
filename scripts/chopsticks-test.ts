@@ -217,6 +217,23 @@ export async function runTestCasesAndExit(
         token: router.token
     }));
 
+    // add in special cases: polkadot/kusama <=> asset hub
+    const relayId = chains.includes("polkadot") ? "polkadot" : "kusama";
+    const assetHubId = relayId === "polkadot" ? "statemint" : "statemine";
+    const token = relayId === "polkadot" ? "DOT" : "KSM";
+    testCases.push(
+        {
+            to: assetHubId as ChainName,
+            from: relayId as ChainName,
+            token
+        },
+        {
+            to: relayId as ChainName,
+            from: assetHubId as ChainName,
+            token
+        },
+    );
+
     const isSkipCase = (testCase: {to: ChainName, from: ChainName, token: string}): boolean => {
         return skipCases.some((skipCase) =>
             (skipCase.from === undefined || testCase.from === skipCase.from) &&
