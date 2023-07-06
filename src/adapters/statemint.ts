@@ -25,6 +25,14 @@ import { supportsV0V1Multilocation } from "../utils/xcm-versioned-multilocation-
 
 export const statemintRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
+    to: "polkadot",
+    token: "DOT",
+    xcm: {
+      fee: { token: "DOT", amount: "421500000" },
+      weightLimit: "Unlimited",
+    },
+  },
+  {
     to: "interlay",
     token: "USDT",
     // from recent transfer: 9_510 atomic units, add a minimum of 2x buffer
@@ -33,6 +41,14 @@ export const statemintRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
 ];
 
 export const statemineRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+  {
+    to: "kusama",
+    token: "KSM",
+    xcm: {
+      fee: { token: "KSM", amount: "90049287" },
+      weightLimit: "Unlimited",
+    },
+  },
   {
     to: "kintsugi",
     token: "USDT",
@@ -46,7 +62,7 @@ export const statemineTokensConfig: Record<
   Record<string, BasicToken>
 > = {
   statemine: {
-    KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "3333333" },
+    KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "79999999" },
     // ED set according to minBalance value of assets.asset(1984)
     USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "1000" },
   },
