@@ -189,7 +189,42 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    const [dst, acc, ass] = supportsV0V1Multilocation(this.api)
+    const doesSupportV0V1 = supportsV0V1Multilocation(this.api);
+
+    // to statemine
+    if (to === "statemine" || to === "statemint") {
+      const dst = {
+        interior: { X1: { ParaChain: toChain.paraChainId } },
+        parents: 0,
+      };
+      const acc = {
+        interior: {
+          X1: {
+            AccountId32: {
+              id: accountId,
+              network: doesSupportV0V1 ? "Any" : undefined,
+            },
+          },
+        },
+        parents: 0,
+      };
+      const ass = [
+        {
+          fun: { Fungible: amount.toChainData() },
+          id: { Concrete: { interior: "Here", parents: 0 } },
+        },
+      ];
+
+      return this.api?.tx.xcmPallet.limitedTeleportAssets(
+        { [doesSupportV0V1 ? "V1" : "V3"]: dst },
+        { [doesSupportV0V1 ? "V1" : "V3"]: acc },
+        { [doesSupportV0V1 ? "V1" : "V3"]: ass },
+        0,
+        "Unlimited"
+      );
+    }
+
+    const [dst, acc, ass] = doesSupportV0V1
       ? [
           { V0: { X1: { Parachain: toChain.paraChainId } } },
           { V0: { X1: { AccountId32: { id: accountId, network: "Any" } } } },
