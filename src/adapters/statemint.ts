@@ -253,6 +253,35 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       throw new DestinationWeightNotFound(this.chain.id, to, token);
     }
 
+    // to relay chain, support native token
+    if (to === "kusama" || to === "polkadot") {
+      if (token !== this.balanceAdapter?.nativeToken) {
+        throw new CurrencyNotFound(token);
+      }
+
+      const dst = { interior: "Here", parents: 1 };
+      const acc = {
+        interior: { X1: { AccountId32: { id: accountId } } },
+        parents: 0,
+      };
+      const ass = [
+        {
+          id: {
+            Concrete: { interior: "Here", parents: 1 },
+          },
+          fun: { Fungible: amount.toChainData() },
+        },
+      ];
+
+      return this.api?.tx.polkadotXcm.limitedTeleportAssets(
+        { V3: dst } as any,
+        { V3: acc } as any,
+        { V3: ass } as any,
+        0,
+        this.getDestWeight(token, to)?.toString() as any
+      );
+    }
+
     const assetId = SUPPORTED_TOKENS[token];
     if (
       (to !== "kintsugi" && to !== "interlay") ||
