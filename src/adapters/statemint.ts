@@ -28,7 +28,8 @@ export const statemintRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "polkadot",
     token: "DOT",
     xcm: {
-      fee: { token: "DOT", amount: "421500000" },
+      // chopsticks test: 364_421_524 - use 10x buffer
+      fee: { token: "DOT", amount: "3644215240" },
       weightLimit: "Unlimited",
     },
   },
@@ -45,7 +46,8 @@ export const statemineRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "kusama",
     token: "KSM",
     xcm: {
-      fee: { token: "KSM", amount: "90049287" },
+      // chopsticks test: 91_761_280 - use 10x buffer
+      fee: { token: "KSM", amount: "917612800" },
       weightLimit: "Unlimited",
     },
   },
