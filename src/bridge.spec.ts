@@ -46,7 +46,7 @@ describe.skip("Bridge sdk usage", () => {
     const tx = availableAdapters[fromChain].createTx({
       to: toChain,
       token,
-      amount: FN.fromInner("100000", 10),
+      amount: FN.fromInner("1000000000", 10),
       address: testAddress,
       signer: testAddress,
     });
@@ -175,18 +175,20 @@ describe.skip("Bridge sdk usage", () => {
     // printBidirectionalTxs("kintsugi", "karura", "KBTC");
     // printBidirectionalTxs("kintsugi", "karura", "LKSM");
     // printBidirectionalTxs("kintsugi", "bifrost", "VKSM");
+    printBidirectionalTxs("kusama", "statemine", "KSM");
 
     // interlay
     // printBidirectionalTxs("interlay", "polkadot", "DOT");
     // printBidirectionalTxs("interlay", "statemint", "USDT");
     // printBidirectionalTxs("interlay", "hydra", "IBTC");
-    printBidirectionalTxs("interlay", "hydra", "INTR");
+    // printBidirectionalTxs("interlay", "hydra", "INTR");
     // printBidirectionalTxs("interlay", "acala", "INTR");
     // printBidirectionalTxs("interlay", "acala", "IBTC");
     // printBidirectionalTxs("interlay", "parallel", "INTR");
     // printBidirectionalTxs("interlay", "parallel", "IBTC");
     // printBidirectionalTxs("interlay", "astar", "INTR");
     // printBidirectionalTxs("interlay", "astar", "IBTC");
+    printBidirectionalTxs("polkadot", "statemint", "DOT");
   });
 
   test("5. getNativeToken should work", () => {

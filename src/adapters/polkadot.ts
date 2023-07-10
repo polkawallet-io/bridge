@@ -16,7 +16,6 @@ import {
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
-import { supportsV0V1Multilocation } from "../utils/xcm-versioned-multilocation-check";
 
 export const polkadotRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
@@ -24,6 +23,15 @@ export const polkadotRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     token: "DOT",
     xcm: {
       fee: { token: "DOT", amount: "1000000000" },
+      weightLimit: "Unlimited",
+    },
+  },
+  {
+    to: "statemint",
+    token: "DOT",
+    xcm: {
+      // recent transfer: 1_433_579 - add 10x buffer
+      fee: { token: "DOT", amount: "14335790" },
       weightLimit: "Unlimited",
     },
   },
@@ -38,13 +46,19 @@ export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: "Unlimited",
     },
   },
+  {
+    to: "statemine",
+    token: "KSM",
+    xcm: {
+      // recent transfer: 4_778_331 - add 10x buffer
+      fee: { token: "KSM", amount: "47783310" },
+      weightLimit: "Unlimited",
+    },
+  },
 ];
 
 const polkadotTokensConfig: Record<string, Record<string, BasicToken>> = {
   polkadot: {
-    DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "10000000000" },
-  },
-  interlay: {
     DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "10000000000" },
   },
   kusama: {
@@ -174,34 +188,60 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    const [dst, acc, ass] = supportsV0V1Multilocation(this.api)
-      ? [
-          { V0: { X1: { Parachain: toChain.paraChainId } } },
-          { V0: { X1: { AccountId32: { id: accountId, network: "Any" } } } },
-          { V0: [{ ConcreteFungible: { amount: amount.toChainData() } }] },
-        ]
-      : [
-          {
-            V3: {
-              parents: 0,
-              interior: { X1: { Parachain: toChain.paraChainId } },
+    // to statemine
+    if (to === "statemine" || to === "statemint") {
+      const dst = {
+        interior: { X1: { ParaChain: toChain.paraChainId } },
+        parents: 0,
+      };
+      const acc = {
+        interior: {
+          X1: {
+            AccountId32: {
+              id: accountId,
             },
           },
+        },
+        parents: 0,
+      };
+      const ass = [
+        {
+          fun: { Fungible: amount.toChainData() },
+          id: { Concrete: { interior: "Here", parents: 0 } },
+        },
+      ];
+
+      return this.api?.tx.xcmPallet.limitedTeleportAssets(
+        { V3: dst },
+        { V3: acc },
+        { V3: ass },
+        0,
+        "Unlimited"
+      );
+    }
+
+    const [dst, acc, ass] = [
+      {
+        V3: {
+          parents: 0,
+          interior: { X1: { Parachain: toChain.paraChainId } },
+        },
+      },
+      {
+        V3: {
+          parents: 0,
+          interior: { X1: { AccountId32: { id: accountId } } },
+        },
+      },
+      {
+        V3: [
           {
-            V3: {
-              parents: 0,
-              interior: { X1: { AccountId32: { id: accountId } } },
-            },
+            fun: { Fungible: amount.toChainData() },
+            id: { Concrete: { parents: 0, interior: "Here" } },
           },
-          {
-            V3: [
-              {
-                fun: { Fungible: amount.toChainData() },
-                id: { Concrete: { parents: 0, interior: "Here" } },
-              },
-            ],
-          },
-        ];
+        ],
+      },
+    ];
 
     if (to === "kintsugi") {
       return this.api?.tx.xcmPallet.reserveTransferAssets(dst, acc, ass, 0);

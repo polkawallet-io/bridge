@@ -25,6 +25,15 @@ import { supportsV0V1Multilocation } from "../utils/xcm-versioned-multilocation-
 
 export const statemintRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
+    to: "polkadot",
+    token: "DOT",
+    xcm: {
+      // chopsticks test: 364_421_524 - use 10x buffer
+      fee: { token: "DOT", amount: "3644215240" },
+      weightLimit: "Unlimited",
+    },
+  },
+  {
     to: "interlay",
     token: "USDT",
     // from recent transfer: 9_510 atomic units, add a minimum of 2x buffer
@@ -33,6 +42,15 @@ export const statemintRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
 ];
 
 export const statemineRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+  {
+    to: "kusama",
+    token: "KSM",
+    xcm: {
+      // chopsticks test: 91_761_280 - use 10x buffer
+      fee: { token: "KSM", amount: "917612800" },
+      weightLimit: "Unlimited",
+    },
+  },
   {
     to: "kintsugi",
     token: "USDT",
@@ -46,7 +64,7 @@ export const statemineTokensConfig: Record<
   Record<string, BasicToken>
 > = {
   statemine: {
-    KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "3333333" },
+    KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "33333333" },
     // ED set according to minBalance value of assets.asset(1984)
     USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "1000" },
   },
@@ -235,6 +253,35 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
     const destWeight = this.getDestWeight(token, to);
     if (destWeight === undefined) {
       throw new DestinationWeightNotFound(this.chain.id, to, token);
+    }
+
+    // to relay chain, support native token
+    if (to === "kusama" || to === "polkadot") {
+      if (token !== this.balanceAdapter?.nativeToken) {
+        throw new CurrencyNotFound(token);
+      }
+
+      const dst = { interior: "Here", parents: 1 };
+      const acc = {
+        interior: { X1: { AccountId32: { id: accountId } } },
+        parents: 0,
+      };
+      const ass = [
+        {
+          id: {
+            Concrete: { interior: "Here", parents: 1 },
+          },
+          fun: { Fungible: amount.toChainData() },
+        },
+      ];
+
+      return this.api?.tx.polkadotXcm.limitedTeleportAssets(
+        { V3: dst } as any,
+        { V3: acc } as any,
+        { V3: ass } as any,
+        0,
+        this.getDestWeight(token, to)?.toString() as any
+      );
     }
 
     const assetId = SUPPORTED_TOKENS[token];
