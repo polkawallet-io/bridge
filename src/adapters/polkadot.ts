@@ -16,7 +16,6 @@ import {
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
-import { supportsV0V1Multilocation } from "../utils/xcm-versioned-multilocation-check";
 
 export const polkadotRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
@@ -189,8 +188,6 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    const doesSupportV0V1 = supportsV0V1Multilocation(this.api);
-
     // to statemine
     if (to === "statemine" || to === "statemint") {
       const dst = {
@@ -202,7 +199,6 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
           X1: {
             AccountId32: {
               id: accountId,
-              network: doesSupportV0V1 ? "Any" : undefined,
             },
           },
         },
@@ -216,42 +212,36 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
       ];
 
       return this.api?.tx.xcmPallet.limitedTeleportAssets(
-        { [doesSupportV0V1 ? "V1" : "V3"]: dst },
-        { [doesSupportV0V1 ? "V1" : "V3"]: acc },
-        { [doesSupportV0V1 ? "V1" : "V3"]: ass },
+        { V3: dst },
+        { V3: acc },
+        { V3: ass },
         0,
         "Unlimited"
       );
     }
 
-    const [dst, acc, ass] = doesSupportV0V1
-      ? [
-          { V0: { X1: { Parachain: toChain.paraChainId } } },
-          { V0: { X1: { AccountId32: { id: accountId, network: "Any" } } } },
-          { V0: [{ ConcreteFungible: { amount: amount.toChainData() } }] },
-        ]
-      : [
+    const [dst, acc, ass] = [
+      {
+        V3: {
+          parents: 0,
+          interior: { X1: { Parachain: toChain.paraChainId } },
+        },
+      },
+      {
+        V3: {
+          parents: 0,
+          interior: { X1: { AccountId32: { id: accountId } } },
+        },
+      },
+      {
+        V3: [
           {
-            V3: {
-              parents: 0,
-              interior: { X1: { Parachain: toChain.paraChainId } },
-            },
+            fun: { Fungible: amount.toChainData() },
+            id: { Concrete: { parents: 0, interior: "Here" } },
           },
-          {
-            V3: {
-              parents: 0,
-              interior: { X1: { AccountId32: { id: accountId } } },
-            },
-          },
-          {
-            V3: [
-              {
-                fun: { Fungible: amount.toChainData() },
-                id: { Concrete: { parents: 0, interior: "Here" } },
-              },
-            ],
-          },
-        ];
+        ],
+      },
+    ];
 
     if (to === "kintsugi") {
       return this.api?.tx.xcmPallet.reserveTransferAssets(dst, acc, ass, 0);
