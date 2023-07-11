@@ -31,6 +31,18 @@ All channels support transfers in both directions.
 | kusama           | KSM            |
 | kusama asset hub | USDT           |
 
+#### Polkadot:
+
+| channel            | tokens |
+| ------------------ | ------ |
+| polkadot asset hub | DOT    |
+
+#### Kusama:
+
+| channel          | tokens |
+| ---------------- | ------ |
+| kusama asset hub | KSM    |
+
 ## Usage
 
 Example: [src/bridge.spec.ts](src/bridge.spec.ts)
