@@ -18,7 +18,7 @@ All channels support transfers in both directions.
 | astar              | INTR IBTC |
 | parallel           | INTR IBTC |
 | polkadot           | DOT       |
-| polkadot asset hub | DOT, USDT |
+| polkadot asset hub | USDT      |
 | hydradx            | IBTC      |
 
 #### Kintsugi:
@@ -29,7 +29,19 @@ All channels support transfers in both directions.
 | heiko            | KBTC KINT      |
 | karura           | KBTC KINT LKSM |
 | kusama           | KSM            |
-| kusama asset hub | KSM, USDT      |
+| kusama asset hub | USDT           |
+
+#### Polkadot:
+
+| channel            | tokens |
+| ------------------ | ------ |
+| polkadot asset hub | DOT    |
+
+#### Kusama:
+
+| channel          | tokens |
+| ---------------- | ------ |
+| kusama asset hub | KSM    |
 
 ## Usage
 
