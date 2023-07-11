@@ -125,7 +125,7 @@ export const karuraRouteConfigs = createRouteConfigs("karura", [
     to: "kintsugi",
     token: "KINT",
     xcm: {
-      fee: { token: "KINT", amount: "170666666" },
+      fee: { token: "KINT", amount: "220000000" },
     },
   },
   {
@@ -139,7 +139,7 @@ export const karuraRouteConfigs = createRouteConfigs("karura", [
     to: "kintsugi",
     token: "LKSM",
     xcm: {
-      fee: { token: "LKSM", amount: "186480000" },
+      fee: { token: "LKSM", amount: "190000000" },
     },
   },
   {
