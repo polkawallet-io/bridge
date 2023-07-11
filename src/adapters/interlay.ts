@@ -19,7 +19,7 @@ export const interlayRouteConfigs = createRouteConfigs("interlay", [
     to: "acala",
     token: "INTR",
     xcm: {
-      fee: { token: "INTR", amount: "92696000" },
+      fee: { token: "INTR", amount: "81000000" },
     },
   },
   {
@@ -39,7 +39,7 @@ export const kintsugiRouteConfigs = createRouteConfigs("kintsugi", [
     to: "karura",
     token: "KINT",
     xcm: {
-      fee: { token: "KINT", amount: "170666666" },
+      fee: { token: "KINT", amount: "210000000" },
       weightLimit: DEST_WEIGHT,
     },
   },
@@ -52,7 +52,7 @@ export const kintsugiRouteConfigs = createRouteConfigs("kintsugi", [
     to: "karura",
     token: "LKSM",
     xcm: {
-      fee: { token: "LKSM", amount: "647055467" },
+      fee: { token: "LKSM", amount: "270000000" },
       weightLimit: DEST_WEIGHT,
     },
   },
