@@ -1,4 +1,3 @@
-import { options } from "@acala-network/api";
 import { combineLatest, map, Observable, race } from "rxjs";
 
 import { ApiPromise, ApiRx, WsProvider } from "@polkadot/api";
@@ -87,10 +86,11 @@ export class ApiProvider {
 
     const wsProvider = new WsProvider(nodes);
 
-    const apiOptions = options({
+    const apiOptions = {
       provider: wsProvider,
       noInitWarn: true,
-    });
+    };
+
     const promiseApi = ApiPromise.create(apiOptions);
 
     return ApiRx.create(apiOptions).pipe(
