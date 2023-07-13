@@ -249,13 +249,6 @@ export const karuraRouteConfigs = createRouteConfigs("karura", [
   },
   {
     to: "heiko",
-    token: "KUSD",
-    xcm: {
-      fee: { token: "KUSD", amount: "19200000000" },
-    },
-  },
-  {
-    to: "heiko",
     token: "LKSM",
     xcm: {
       fee: { token: "LKSM", amount: "48000000" },

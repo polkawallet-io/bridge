@@ -34,14 +34,6 @@ export const parallelRouteConfigs = createRouteConfigs("parallel", [
   },
   {
     to: "acala",
-    token: "AUSD",
-    xcm: {
-      fee: { token: "AUSD", amount: "3721109059" },
-      weightLimit: DEST_WEIGHT,
-    },
-  },
-  {
-    to: "acala",
     token: "LDOT",
     xcm: {
       fee: { token: "LDOT", amount: "24037893" },
@@ -64,14 +56,6 @@ export const heikoRouteConfigs = createRouteConfigs("heiko", [
     token: "KAR",
     xcm: {
       fee: { token: "KAR", amount: "6400000000" },
-      weightLimit: DEST_WEIGHT,
-    },
-  },
-  {
-    to: "karura",
-    token: "KUSD",
-    xcm: {
-      fee: { token: "KUSD", amount: "8305746640" },
       weightLimit: DEST_WEIGHT,
     },
   },
