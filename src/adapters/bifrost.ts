@@ -127,10 +127,10 @@ class BifrostBalanceAdapter extends BalanceAdapter {
       return storage.observable.pipe(
         map(({ data }) => ({
           free: FN.fromInner(data.free.toString(), this.decimals),
-          locked: FN.fromInner(data.miscFrozen.toString(), this.decimals),
+          locked: FN.fromInner(data.frozen.toString(), this.decimals),
           reserved: FN.fromInner(data.reserved.toString(), this.decimals),
           available: FN.fromInner(
-            data.free.sub(data.miscFrozen).toString(),
+            data.free.sub(data.frozen).toString(),
             this.decimals
           ),
         }))
