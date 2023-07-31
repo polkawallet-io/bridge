@@ -69,7 +69,7 @@ export const kusamaChains = {
     paraChainId: 2107,
     ss58Prefix: 42,
   },
-  shadow: {
+  crustShadow: {
     display: "Crust Shadow",
     type: "substrate",
     icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fcrust%20shadow.png&w=96&q=75",

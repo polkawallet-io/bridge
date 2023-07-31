@@ -2,8 +2,8 @@ import { Bridge } from "../bridge";
 import { FixedPointNumber } from "@acala-network/sdk-core";
 import { formateRouteLogLine, logFormatedRoute } from "../utils/unit-test";
 import { ApiProvider } from "../api-provider";
-import { firstValueFrom } from "rxjs";
 import { ShadowAdapter } from "./crust";
+import { ApiPromise, WsProvider } from "@polkadot/api";
 
 describe("shadow adapter should work", () => {
   jest.setTimeout(300000);
@@ -16,9 +16,9 @@ describe("shadow adapter should work", () => {
   beforeAll(async () => {
     const shadow = new ShadowAdapter();
 
-    await firstValueFrom(provider.connectFromChain(["shadow"]));
+    const shadowApi = new ApiPromise({ provider: new WsProvider("wss://rpc-shadow.crust.network/") });
 
-    await shadow.init(provider.getApi("shadow"));
+    await shadow.init(shadowApi);
 
     bridge = new Bridge({ adapters: [shadow] });
   });
@@ -34,7 +34,7 @@ describe("shadow adapter should work", () => {
 
     await new Promise((resolve) => setTimeout(() => resolve(undefined), 5000));
 
-    logFormatedRoute("shadow summary:\n", outputSummary);
+    logFormatedRoute("crustShadow summary:\n", outputSummary);
   });
 
   test("bridge sdk init should work", (done) => {
@@ -43,9 +43,9 @@ describe("shadow adapter should work", () => {
     done();
   });
 
-  test("transfer tokens out of shadow should work", (done) => {
+  test("transfer tokens out of crustShadow should work", (done) => {
     try {
-      const adapter = bridge.findAdapter("shadow");
+      const adapter = bridge.findAdapter("crustShadow");
       expect(adapter).toBeDefined();
 
       if (!adapter) return;

@@ -15,7 +15,7 @@ import { createRouteConfigs } from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
-const shadowRouteConfigs = createRouteConfigs("shadow", [
+const shadowRouteConfigs = createRouteConfigs("crustShadow", [
   {
     to: "karura",
     token: "CSM",
@@ -214,6 +214,6 @@ class BaseCrustAdapter extends BaseCrossChainAdapter {
 
 export class ShadowAdapter extends BaseCrustAdapter {
   constructor() {
-    super(chains.shadow, shadowRouteConfigs, shadowTokensConfig);
+    super(chains.crustShadow, shadowRouteConfigs, shadowTokensConfig);
   }
 }

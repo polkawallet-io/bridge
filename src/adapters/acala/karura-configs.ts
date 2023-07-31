@@ -87,21 +87,21 @@ export const karuraRouteConfigs = createRouteConfigs("karura", [
     },
   },
   {
-    to: "shadow",
+    to: "crustShadow",
     token: "CSM",
     xcm: {
       fee: { token: "CSM", amount: "4000000000" },
     },
   },
   {
-    to: "shadow",
+    to: "crustShadow",
     token: "KAR",
     xcm: {
       fee: { token: "KAR", amount: "4000" },
     },
   },
   {
-    to: "shadow",
+    to: "crustShadow",
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "4000" },

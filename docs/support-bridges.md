@@ -12,7 +12,6 @@
 | acala | moonbeam | DOT |
 | acala | parallel | PARA |
 | acala | parallel | ACA |
-| acala | parallel | AUSD |
 | acala | parallel | LDOT |
 | acala | astar | ASTR |
 | acala | astar | ACA |
@@ -21,9 +20,11 @@
 | acala | interlay | INTR |
 | acala | interlay | IBTC |
 | acala | hydradx | DAI |
+| acala | hydradx | DOT |
 | acala | hydradx | WETH |
 | acala | hydradx | WBTC |
 | acala | unique | UNQ |
+| acala | statemint | USDT |
 | karura | kusama | KSM |
 | karura | statemine | RMRK |
 | karura | statemine | ARIS |
@@ -36,9 +37,9 @@
 | karura | bifrost | VSKSM |
 | karura | altair | AIR |
 | karura | altair | KUSD |
-| karura | shadow | CSM |
-| karura | shadow | KAR |
-| karura | shadow | KUSD |
+| karura | crustShadow | CSM |
+| karura | crustShadow | KAR |
+| karura | crustShadow | KUSD |
 | karura | crab | CRAB |
 | karura | integritee | TEER |
 | karura | kintsugi | KINT |
@@ -59,7 +60,6 @@
 | karura | moonriver | KUSD |
 | karura | heiko | HKO |
 | karura | heiko | KAR |
-| karura | heiko | KUSD |
 | karura | heiko | LKSM |
 | karura | pichiu | PCHU |
 | karura | pichiu | KAR |
@@ -70,6 +70,7 @@
 | karura | turing | KUSD |
 | karura | turing | LKSM |
 | karura | basilisk | BSX |
+| karura | basilisk | KSM |
 | karura | basilisk | KUSD |
 | karura | basilisk | DAI |
 | karura | basilisk | USDCet |
@@ -95,14 +96,15 @@
 | basilisk | kusama | KSM |
 | basilisk | karura | BSX |
 | basilisk | karura | KUSD |
+| basilisk | karura | aUSD |
 | basilisk | karura | KSM |
 | basilisk | karura | DAI |
 | basilisk | karura | USDCet |
 | basilisk | karura | WETH |
 | basilisk | karura | WBTC |
-| hydradx | acala | DAI |
-| hydradx | acala | WETH |
-| hydradx | acala | WBTC |
+| basilisk | statemine | USDT |
+| basilisk | tinkernet | TNKR |
+| basilisk | robonomics | XRT |
 | integritee | karura | TEER |
 | interlay | acala | INTR |
 | interlay | acala | IBTC |
@@ -132,11 +134,9 @@
 | turing | karura | LKSM |
 | parallel | acala | PARA |
 | parallel | acala | ACA |
-| parallel | acala | AUSD |
 | parallel | acala | LDOT |
 | heiko | karura | HKO |
 | heiko | karura | KAR |
-| heiko | karura | KUSD |
 | heiko | karura | LKSM |
 | khala | karura | PHA |
 | khala | karura | KUSD |
@@ -149,6 +149,7 @@
 | kusama | statemine | KSM |
 | statemint | polkadot | DOT |
 | statemint | hydradx | USDT |
+| statemint | acala | USDT |
 | statemine | kusama | KSM |
 | statemine | karura | RMRK |
 | statemine | karura | ARIS |
