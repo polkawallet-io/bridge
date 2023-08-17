@@ -85,29 +85,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@acala-network/sdk-core@npm:^4.1.9-2":
-  version: 4.1.9-2
-  resolution: "@acala-network/sdk-core@npm:4.1.9-2"
+"@acala-network/sdk-core@npm:^4.1.9-7":
+  version: 4.1.9-7
+  resolution: "@acala-network/sdk-core@npm:4.1.9-7"
   dependencies:
     "@acala-network/types": ^5.1.1
-    "@polkadot/api": ^10.7.3
+    "@polkadot/api": ^10.9.1
     bignumber.js: ^9.0.0
     lodash: ^4.17.20
   peerDependencies:
     "@acala-network/types": ^5
     "@polkadot/api": ^10
-  checksum: 76a2ce8f90929f7ce95480483fc956b9506d47ddb7ca2cf77da42af49970112319af249b13f1f9911d06789e5f99400d51c6ac04a4a704fce6333c5e5f986c31
+  checksum: 8a327e4c8ce0d7fdc72f21d549322f787a643c831c286e36a26a68e0004ec7b91207980eb67c3bf90c231ca0feba41b0984f5fc0c7d686c7aadea352c3c3a9db
   languageName: node
   linkType: hard
 
-"@acala-network/sdk@npm:^4.1.9-2":
-  version: 4.1.9-2
-  resolution: "@acala-network/sdk@npm:4.1.9-2"
+"@acala-network/sdk@npm:^4.1.9-7":
+  version: 4.1.9-7
+  resolution: "@acala-network/sdk@npm:4.1.9-7"
   dependencies:
     "@acala-network/api": ^5.1.1
     "@acala-network/eth-providers": ~2.7.3
-    "@acala-network/sdk-core": 4.1.9-2
-    "@polkadot/api": ^10.7.3
+    "@acala-network/sdk-core": 4.1.9-7
+    "@polkadot/api": ^10.9.1
     axios: ^0.24.0
     ethers: ~5.7.0
     graphql: ^16.3.0
@@ -120,7 +120,7 @@ __metadata:
     "@acala-network/eth-providers": ~2.7.3
     "@polkadot/api": ^10
     ethers: ~5.7.0
-  checksum: 169c542052177967c37fa3b551ca8271e4a86d9614fc9a992f63cefee811daf586b45b26550644cb304ecad78b0e4d0422c23a1aa2c87b86b55d9158005c6cd3
+  checksum: 7937d1c7ac4674471b6a240d06dcb86cbdbccd5a83768a1de97ee9a1c8c860b98f0ddf460ab3c440fbaad41cb4bac02f8590639208f0aa93738eac3d2d4fa44b
   languageName: node
   linkType: hard
 
@@ -4667,8 +4667,8 @@ __metadata:
   dependencies:
     "@acala-network/api": ^5
     "@acala-network/eth-providers": ^2.7.1
-    "@acala-network/sdk": ^4.1.9-2
-    "@acala-network/sdk-core": ^4.1.9-2
+    "@acala-network/sdk": ^4.1.9-7
+    "@acala-network/sdk-core": ^4.1.9-7
     "@open-web3/dev-config": ^0.2.3
     "@polkadot/api": ^10.9.1
     "@polkadot/apps-config": ^0.131.4

@@ -37,13 +37,6 @@ export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
   },
   {
     to: "karura",
-    token: "KUSD",
-    xcm: {
-      fee: { token: "KUSD", amount: "5060238106" },
-    },
-  },
-  {
-    to: "karura",
     token: "aUSD",
     xcm: {
       fee: { token: "aUSD", amount: "5060238106" },
@@ -114,13 +107,6 @@ export const basiliskTokensConfig: Record<string, ExtendedToken> = {
     decimals: 12,
     ed: "1000000000000",
     toRaw: () => 0,
-  },
-  KUSD: {
-    name: "KUSD",
-    symbol: "KUSD",
-    decimals: 12,
-    ed: "10000000000",
-    toRaw: () => 2,
   },
   aUSD: {
     name: "aUSD",
