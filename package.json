@@ -30,15 +30,15 @@
   },
   "resolutions": {
     "@acala-network/api": "^5.1.1",
-    "@acala-network/sdk": "^4.1.9-2",
-    "@acala-network/sdk-core": "^4.1.9-2",
+    "@acala-network/sdk": "^4.1.9-7",
+    "@acala-network/sdk-core": "^4.1.9-7",
     "@polkadot/api": "^10.9.1",
     "@polkadot/types": "^10.9.1"
   },
   "dependencies": {
     "@acala-network/api": "^5",
-    "@acala-network/sdk": "^4.1.9-2",
-    "@acala-network/sdk-core": "^4.1.9-2",
+    "@acala-network/sdk": "^4.1.9-7",
+    "@acala-network/sdk-core": "^4.1.9-7",
     "@polkadot/api": "^10.9.1",
     "@polkadot/apps-config": "^0.131.4",
     "@polkadot/types": "^10.9.1",
