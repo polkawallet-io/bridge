@@ -14,38 +14,10 @@ import { createRouteConfigs, validateAddress } from "../utils";
 
 export const bifrostRouteConfigs = createRouteConfigs("bifrost", [
   {
-    to: "karura",
+    to: "hydradx",
     token: "BNC",
     xcm: {
-      fee: { token: "BNC", amount: "5120000000" },
-    },
-  },
-  {
-    to: "karura",
-    token: "VSKSM",
-    xcm: {
-      fee: { token: "VSKSM", amount: "64000000" },
-    },
-  },
-  {
-    to: "karura",
-    token: "KSM",
-    xcm: {
-      fee: { token: "KSM", amount: "64000000" },
-    },
-  },
-  {
-    to: "karura",
-    token: "KAR",
-    xcm: {
-      fee: { token: "KAR", amount: "6400000000" },
-    },
-  },
-  {
-    to: "karura",
-    token: "KUSD",
-    xcm: {
-      fee: { token: "KUSD", amount: "10011896008" },
+      fee: { token: "BNC", amount: "14645000000" },
     },
   },
 ]);
@@ -57,34 +29,6 @@ export const bifrostTokensConfig: Record<string, ExtendedToken> = {
     decimals: 12,
     ed: "10000000000",
     toRaw: () => ({ Native: "BNC" }),
-  },
-  VSKSM: {
-    name: "VSKSM",
-    symbol: "VSKSM",
-    decimals: 12,
-    ed: "100000000",
-    toRaw: () => ({ VSToken: "KSM" }),
-  },
-  KSM: {
-    name: "KSM",
-    symbol: "KSM",
-    decimals: 12,
-    ed: "100000000",
-    toRaw: () => ({ Token: "KSM" }),
-  },
-  KAR: {
-    name: "KAR",
-    symbol: "KAR",
-    decimals: 12,
-    ed: "148000000",
-    toRaw: () => ({ Token: "KAR" }),
-  },
-  KUSD: {
-    name: "KUSD",
-    symbol: "KUSD",
-    decimals: 12,
-    ed: "100000000",
-    toRaw: () => ({ Stable: "KUSD" }),
   },
 };
 
@@ -127,10 +71,10 @@ class BifrostBalanceAdapter extends BalanceAdapter {
       return storage.observable.pipe(
         map(({ data }) => ({
           free: FN.fromInner(data.free.toString(), this.decimals),
-          locked: FN.fromInner(data.miscFrozen.toString(), this.decimals),
+          locked: FN.fromInner(data.frozen.toString(), this.decimals),
           reserved: FN.fromInner(data.reserved.toString(), this.decimals),
           available: FN.fromInner(
-            data.free.sub(data.miscFrozen).toString(),
+            data.free.sub(data.frozen).toString(),
             this.decimals
           ),
         }))
