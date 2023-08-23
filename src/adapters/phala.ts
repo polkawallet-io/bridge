@@ -253,7 +253,7 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
       };
     }
 
-    return this.api.tx.xTransfer.transfer(asset, dst);
+    return this.api.tx.xTransfer.transfer(asset, dst, undefined);
   }
 }
 
