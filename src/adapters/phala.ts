@@ -50,14 +50,14 @@ export const khalaTokensConfig: Record<string, ExtendedToken> = {
     symbol: "KAR",
     decimals: 12,
     ed: "10000000000",
-    toRaw: () => "0x0080",
+    toRaw: () => "0x00800000000000000000000000000000",
   },
   KUSD: {
     name: "KUSD",
     symbol: "KUSD",
     decimals: 12,
     ed: "10000000000",
-    toRaw: () => "0x0081",
+    toRaw: () => "0x00810000000000000000000000000000",
   },
 };
 
@@ -244,7 +244,7 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
             interior: {
               X2: [
                 { Parachain: toChain.paraChainId },
-                { GeneralKey: tokenData.toRaw() },
+                { GeneralKey: { length: 2, data: tokenData.toRaw() } },
               ],
             },
           },
