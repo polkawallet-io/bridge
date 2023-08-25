@@ -36,14 +36,14 @@
     "chopsticks-test:interlay": "ts-node scripts/interlay-chopsticks-test"
   },
   "peerDependencies": {
-    "@polkadot/api": ">9"
+    "@polkadot/api": "^10"
   },
   "dependencies": {
     "@acala-network/api": "^5",
     "@acala-network/sdk": "^4.1.9-7",
     "@acala-network/sdk-core": "^4.1.9-7",
     "@polkadot/api": "^10.9.1",
-    "@polkadot/apps-config": "^0.131.4",
+    "@polkadot/apps-config": "^0.132.1",
     "@polkadot/types": "^10.9.1",
     "axios": "^0.27.2",
     "lodash": "^4.17.20"
@@ -52,6 +52,7 @@
     "@open-web3/dev-config": "^0.2.3",
     "@types/jest": "^28.1.1",
     "@types/lodash": "^4.14.161",
+    "@types/node": "^20.5.4",
     "eslint-plugin-unused-imports": "^2.0.0",
     "jest": "^28.1.1",
     "ts-node": "^10.9.1",
@@ -59,26 +60,7 @@
   },
   "resolutions": {
     "@polkadot/api": "^10.9.1",
-    "@polkadot/api-augment": "^10.9.1",
-    "@polkadot/api-base": "^10.9.1",
-    "@polkadot/api-contract": "^10.9.1",
-    "@polkadot/api-derive": "^10.9.1",
-    "@polkadot/hw-ledger": "^10.2.4",
-    "@polkadot/keyring": "^10.2.4",
-    "@polkadot/networks": "^10.2.4",
-    "@polkadot/phishing": "^0.18.10",
-    "@polkadot/rpc-augment": "^10.9.1",
-    "@polkadot/rpc-core": "^10.9.1",
-    "@polkadot/rpc-provider": "^10.9.1",
     "@polkadot/types": "^10.9.1",
-    "@polkadot/types-augment": "^10.9.1",
-    "@polkadot/types-codec": "^10.9.1",
-    "@polkadot/types-create": "^10.9.1",
-    "@polkadot/types-known": "^10.9.1",
-    "@polkadot/types-support": "^10.9.1",
-    "@polkadot/util": "^10.2.4",
-    "@polkadot/util-crypto": "^10.2.4",
-    "@polkadot/wasm-crypto": "^6.3.1",
     "babel-core": "^7.0.0-bridge.0",
     "styled-components": "^5.3.1",
     "typescript": "^4.8.4",
