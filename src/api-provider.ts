@@ -44,18 +44,19 @@ export class ApiProvider {
             );
           } else if (chain === "statemine") {
             nodes = Object.values(
-              prodParasKusamaCommon.find((e) => e.info === chain)?.providers ||
-                {}
+              prodParasKusamaCommon.find((e) => e.info === "KusamaAssetHub")
+                ?.providers || {}
             ).filter((e) => e.startsWith("wss://"));
           } else if (chain === "statemint") {
             nodes = Object.values(
-              prodParasPolkadotCommon.find((e) => e.info === chain)
+              prodParasPolkadotCommon.find((e) => e.info === "PolkadotAssetHub")
                 ?.providers || {}
             ).filter((e) => e.startsWith("wss://"));
           } else {
+            const chainInfo = chain === "hydra" ? "hydradx" : chain;
             nodes = Object.values(
               [...prodParasKusama, ...prodParasPolkadot].find(
-                (e) => e.info === chain
+                (e) => e.info === chainInfo
               )?.providers || {}
             ).filter((e) => e.startsWith("wss://"));
           }
@@ -92,7 +93,6 @@ export class ApiProvider {
     };
 
     const promiseApi = ApiPromise.create(apiOptions);
-
     return ApiRx.create(apiOptions).pipe(
       map((api) => {
         // connect success
