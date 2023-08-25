@@ -24,13 +24,13 @@ describe.skip("Bridge sdk usage", () => {
     kusama: new KusamaAdapter(),
     interlay: new InterlayAdapter(),
     kintsugi: new KintsugiAdapter(),
+    acala: new AcalaAdapter(),
     karura: new KaruraAdapter(),
     statemint: new StatemintAdapter(),
     statemine: new StatemineAdapter(),
     heiko: new HeikoAdapter(),
     bifrost: new BifrostAdapter(),
     hydra: new HydraAdapter(),
-    acala: new AcalaAdapter(),
     parallel: new ParallelAdapter(),
     astar: new AstarAdapter(),
   };
@@ -85,7 +85,10 @@ describe.skip("Bridge sdk usage", () => {
 
     // connect all adapters
     const connected = await firstValueFrom(
-      provider.connectFromChain(chains, undefined)
+      provider.connectFromChain(chains, {
+        karura: ["wss://karura-rpc.dwellir.com"],
+        acala: ["wss://acala-rpc.dwellir.com"],
+      })
     );
     // and set apiProvider for each adapter
     await Promise.all(
