@@ -1,6 +1,6 @@
 {
   "name": "@interlay/bridge",
-  "version": "0.3.15",
+  "version": "0.3.16",
   "description": "polkawallet bridge sdk",
   "main": "build/index.js",
   "typings": "build/index.d.ts",
