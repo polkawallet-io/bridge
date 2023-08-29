@@ -11,13 +11,9 @@ import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import { BalanceData, ExtendedToken, TransferParams } from "../types";
-import {
-  createPolkadotXCMAccount,
-  createPolkadotXCMAsset,
-  createPolkadotXCMDest,
-  validateAddress,
-  createRouteConfigs,
-} from "../utils";
+import { validateAddress, createRouteConfigs } from "../utils";
+
+type TokenData = ExtendedToken & { toQuery: () => string };
 
 export const astarRouteConfigs = createRouteConfigs("astar", [
   {
@@ -81,39 +77,40 @@ export const shidenRouteConfigs = createRouteConfigs("shiden", [
   },
 ]);
 
-export const astarTokensConfig: Record<
-  string,
-  Record<string, ExtendedToken>
-> = {
+export const astarTokensConfig: Record<string, Record<string, TokenData>> = {
   astar: {
     ASTR: {
       name: "ASTR",
       symbol: "ASTR",
       decimals: 18,
       ed: "1000000",
-      // just for type check
-      toRaw: () => undefined,
-    },
+    } as TokenData,
     ACA: {
       name: "ACA",
       symbol: "ACA",
       decimals: 12,
       ed: "1",
-      toRaw: () => "18446744073709551616",
+      toRaw: () =>
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+      toQuery: () => "18446744073709551616",
     },
     AUSD: {
       name: "AUSD",
       symbol: "AUSD",
       decimals: 12,
       ed: "1",
-      toRaw: () => "18446744073709551617",
+      toRaw: () =>
+        "0x0001000000000000000000000000000000000000000000000000000000000000",
+      toQuery: () => "18446744073709551617",
     },
     LDOT: {
       name: "LDOT",
       symbol: "LDOT",
       decimals: 10,
       ed: "1",
-      toRaw: () => "18446744073709551618",
+      toRaw: () =>
+        "0x0003000000000000000000000000000000000000000000000000000000000000",
+      toQuery: () => "18446744073709551618",
     },
   },
   shiden: {
@@ -122,15 +119,15 @@ export const astarTokensConfig: Record<
       symbol: "SDN",
       decimals: 18,
       ed: "1000000",
-      // just for type check
-      toRaw: () => undefined,
-    },
+    } as TokenData,
     KUSD: {
       name: "KUSD",
       symbol: "KUSD",
       decimals: 12,
       ed: "1",
-      toRaw: () => "18446744073709551616",
+      toRaw: () =>
+        "0x0081000000000000000000000000000000000000000000000000000000000000",
+      toQuery: () => "18446744073709551616",
     },
   },
 };
@@ -184,11 +181,11 @@ class AstarBalanceAdapter extends BalanceAdapter {
       );
     }
 
-    const tokenData: ExtendedToken = this.getToken(token);
+    const tokenData: TokenData = this.getToken(token);
 
     if (!tokenData) throw new TokenNotFound(token);
 
-    return this.storages.assets(tokenData.toRaw(), address).observable.pipe(
+    return this.storages.assets(tokenData.toQuery(), address).observable.pipe(
       map((balance) => {
         const amount = FN.fromInner(
           balance.unwrapOrDefault()?.balance?.toString() || "0",
@@ -285,42 +282,70 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
     if (!validateAddress(address)) throw new InvalidAddress(address);
 
     const toChain = chains[to];
-
     const accountId = this.api?.createType("AccountId32", address).toHex();
-    const rawAmount = amount.toChainData();
 
     if (token === this.balanceAdapter?.nativeToken) {
-      return this.api?.tx.polkadotXcm.reserveTransferAssets(
-        createPolkadotXCMDest(this.api, toChain.paraChainId) as any,
-        createPolkadotXCMAccount(this.api, accountId) as any,
-        createPolkadotXCMAsset(this.api, rawAmount, "NATIVE") as any,
-        0
+      return this.api.tx.xtokens.transferMultiasset(
+        {
+          V3: {
+            id: { Concrete: { parents: 0, interior: "Here" } },
+            fun: { Fungible: amount.toChainData() },
+          },
+        },
+        {
+          V3: {
+            parents: 1,
+            interior: {
+              X2: [
+                { Parachain: toChain.paraChainId },
+                {
+                  AccountId32: {
+                    id: accountId,
+                  },
+                },
+              ],
+            },
+          },
+        },
+        "Unlimited"
       );
     }
 
-    const tokenIds: Record<string, string> = {
-      // to karura
-      KUSD: "0x0081000000000000000000000000000000000000000000000000000000000000",
-      // to acala
-      ACA: "0x0000000000000000000000000000000000000000000000000000000000000000",
-      AUSD: "0x0001000000000000000000000000000000000000000000000000000000000000",
-      LDOT: "0x0003000000000000000000000000000000000000000000000000000000000000",
-    };
+    const tokenData: TokenData = this.getToken(params.token);
 
-    const tokenId = tokenIds[token];
-
-    if (!tokenId) throw new TokenNotFound(token);
-
-    const paraChainId = toChain.paraChainId;
-
-    return this.api?.tx.polkadotXcm.reserveWithdrawAssets(
-      createPolkadotXCMDest(this.api, toChain.paraChainId),
-      createPolkadotXCMAccount(this.api, accountId),
-      createPolkadotXCMAsset(this.api, rawAmount, [
-        { Parachain: paraChainId },
-        { GeneralKey: { length: 2, data: tokenId } },
-      ]),
-      0
+    return this.api.tx.xtokens.transferMultiasset(
+      {
+        V3: {
+          fun: { Fungible: amount.toChainData() },
+          id: {
+            Concrete: {
+              parents: 1,
+              interior: {
+                X2: [
+                  { Parachain: toChain.paraChainId },
+                  { GeneralKey: { length: 2, data: tokenData.toRaw() } },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        V3: {
+          parents: 1,
+          interior: {
+            X2: [
+              { Parachain: toChain.paraChainId },
+              {
+                AccountId32: {
+                  id: accountId,
+                },
+              },
+            ],
+          },
+        },
+      },
+      "Unlimited"
     );
   }
 }
