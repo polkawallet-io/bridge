@@ -334,7 +334,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
     if (!this.api) throw new ApiNotFound(this.chain.id);
 
-    if (this.chain.id === "astar") {
+    if (this.chain.id === "astar" || !this.api.tx.xtokens) {
       return this.oldCreateTx(params);
     }
 
