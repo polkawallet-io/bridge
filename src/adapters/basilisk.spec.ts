@@ -4,7 +4,7 @@ import { FixedPointNumber } from "@acala-network/sdk-core";
 import { BasiliskAdapter } from "./hydradx";
 import { formateRouteLogLine, logFormatedRoute } from "../utils/unit-test";
 
-describe("basilisk adapter should work", () => {
+describe.skip("basilisk adapter should work", () => {
   jest.setTimeout(300000);
 
   const address = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";

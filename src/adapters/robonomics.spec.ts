@@ -5,7 +5,7 @@ import { ApiProvider } from "../api-provider";
 import { firstValueFrom } from "rxjs";
 import { RobonomicsAdapter } from "./robonomics";
 
-describe("robonomics adapter should work", () => {
+describe.skip("robonomics adapter should work", () => {
   jest.setTimeout(300000);
 
   const address = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";

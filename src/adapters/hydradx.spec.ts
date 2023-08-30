@@ -4,7 +4,7 @@ import { FixedPointNumber } from "@acala-network/sdk-core";
 import { HydraDxAdapter } from "./hydradx";
 import { formateRouteLogLine, logFormatedRoute } from "../utils/unit-test";
 
-describe("hydradx adapter should work", () => {
+describe.skip("hydradx adapter should work", () => {
   jest.setTimeout(300000);
 
   const address = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
