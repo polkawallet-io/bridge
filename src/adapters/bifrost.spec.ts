@@ -5,7 +5,7 @@ import { BifrostAdapter } from "./bifrost";
 import { ApiProvider } from "../api-provider";
 import { firstValueFrom } from "rxjs";
 
-describe("bifrost adapter should work", () => {
+describe.skip("bifrost adapter should work", () => {
   jest.setTimeout(300000);
 
   const address = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";

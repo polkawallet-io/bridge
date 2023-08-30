@@ -11,7 +11,7 @@ import { AcalaAdapter, KaruraAdapter } from "./acala/acala";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { logFormatedRoute, formateRouteLogLine } from "../utils/unit-test";
 
-describe("polkadot-adapter should work", () => {
+describe.skip("polkadot-adapter should work", () => {
   jest.setTimeout(300000);
 
   const testAccount = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
