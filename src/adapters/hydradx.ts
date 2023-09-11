@@ -263,6 +263,13 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
       fee: { token: "BNC", amount: "563136000" },
     },
   },
+  {
+    to: "bifrost",
+    token: "vDOT",
+    xcm: {
+      fee: { token: "vDOT", amount: "703" },
+    },
+  },
 ]);
 
 export const hydradxTokensConfig: Record<string, ExtendedToken> = {
@@ -336,6 +343,13 @@ export const hydradxTokensConfig: Record<string, ExtendedToken> = {
     decimals: 12,
     ed: "68795189840",
     toRaw: () => 14,
+  },
+  vDOT: {
+    name: "vDOT",
+    symbol: "vDOT",
+    decimals: 10,
+    ed: "15576324",
+    toRaw: () => 15,
   },
 };
 

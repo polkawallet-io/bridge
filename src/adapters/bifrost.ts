@@ -20,6 +20,13 @@ export const bifrostRouteConfigs = createRouteConfigs("bifrost", [
       fee: { token: "BNC", amount: "14645000000" },
     },
   },
+  {
+    to: "hydradx",
+    token: "vDOT",
+    xcm: {
+      fee: { token: "vDOT", amount: "5550000" },
+    },
+  },
 ]);
 
 export const bifrostTokensConfig: Record<string, ExtendedToken> = {
@@ -29,6 +36,13 @@ export const bifrostTokensConfig: Record<string, ExtendedToken> = {
     decimals: 12,
     ed: "10000000000",
     toRaw: () => ({ Native: "BNC" }),
+  },
+  vDOT: {
+    name: "vDOT",
+    symbol: "vDOT",
+    decimals: 10,
+    ed: "1000000",
+    toRaw: () => ({ VToken2: "0" }),
   },
 };
 
