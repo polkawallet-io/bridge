@@ -19,7 +19,10 @@ import { xTokensHelper } from "../utils/xtokens-helper";
 
 const DEST_WEIGHT = "Unlimited";
 
-export const bifrostRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const bifrostKusamaRoutersConfig: Omit<
+  CrossChainRouterConfigs,
+  "from"
+>[] = [
   {
     to: "kintsugi",
     token: "VKSM",
@@ -31,12 +34,41 @@ export const bifrostRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   },
 ];
 
-export const bifrostTokensConfig: Record<string, BasicToken> = {
+export const bifrostPolkadotRoutersConfig: Omit<
+  CrossChainRouterConfigs,
+  "from"
+>[] = [
+  {
+    to: "interlay",
+    token: "VDOT",
+    xcm: {
+      // taken from transaction: fees were 18_012_501. Add 10x margin
+      fee: { token: "VDOT", amount: "180125010" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+];
+
+export const bifrostKusamaTokensConfig: Record<string, BasicToken> = {
   VKSM: { name: "VKSM", symbol: "VKSM", decimals: 12, ed: "100000000" },
 };
 
-const SUPPORTED_TOKENS: Record<string, unknown> = {
+export const bifrostPolkadotTokensConfig: Record<string, BasicToken> = {
+  VDOT: { name: "VDOT", symbol: "VDOT", decimals: 10, ed: "1000000" },
+};
+
+const SUPPORTED_KUSAMA_TOKENS: Record<string, unknown> = {
   VKSM: { VToken: "KSM" },
+};
+
+const SUPPORTED_POLKADOT_TOKENS: Record<string, unknown> = {
+  VDOT: { VToken2: 0 },
+};
+
+const getSupportedTokens = (chainname: string): Record<string, unknown> => {
+  return chainname === "bifrost_polkadot"
+    ? SUPPORTED_POLKADOT_TOKENS
+    : SUPPORTED_KUSAMA_TOKENS;
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -85,7 +117,7 @@ class BifrostBalanceAdapter extends BalanceAdapter {
       );
     }
 
-    const tokenId = SUPPORTED_TOKENS[token];
+    const tokenId = getSupportedTokens(this.chain)[token];
 
     if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
@@ -117,10 +149,15 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
+    const tokensConfig =
+      this.chain.id === "bifrost_polkadot"
+        ? bifrostPolkadotTokensConfig
+        : bifrostKusamaTokensConfig;
+
     this.balanceAdapter = new BifrostBalanceAdapter({
       chain: this.chain.id as ChainName,
       api,
-      tokens: bifrostTokensConfig,
+      tokens: tokensConfig,
     });
   }
 
@@ -188,7 +225,7 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api.createType("AccountId32", address).toHex();
 
-    const tokenId = SUPPORTED_TOKENS[token];
+    const tokenId = getSupportedTokens(this.chain.id)[token];
 
     if (tokenId === undefined) {
       throw new CurrencyNotFound(token);
@@ -207,8 +244,22 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
   }
 }
 
-export class BifrostAdapter extends BaseBifrostAdapter {
+export class BifrostKusamaAdapter extends BaseBifrostAdapter {
   constructor() {
-    super(chains.bifrost, bifrostRoutersConfig, bifrostTokensConfig);
+    super(
+      chains.bifrost,
+      bifrostKusamaRoutersConfig,
+      bifrostKusamaTokensConfig
+    );
+  }
+}
+
+export class BifrostPolkadotAdapter extends BaseBifrostAdapter {
+  constructor() {
+    super(
+      chains.bifrost_polkadot,
+      bifrostPolkadotRoutersConfig,
+      bifrostPolkadotTokensConfig
+    );
   }
 }

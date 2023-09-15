@@ -97,6 +97,15 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
+  {
+    to: "bifrost_polkadot",
+    token: "VDOT",
+    xcm: {
+      // from actual transaction: fee = 703. Add 10x margin
+      fee: { token: "VDOT", amount: "7030" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
 ];
 
 export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
@@ -182,6 +191,7 @@ export const interlayTokensConfig: Record<
     IBTC: { name: "IBTC", symbol: "IBTC", decimals: 8, ed: "0" },
     INTR: { name: "INTR", symbol: "INTR", decimals: 10, ed: "0" },
     USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
+    VDOT: { name: "VDOT", symbol: "VDOT", decimals: 10, ed: "0" },
   },
   kintsugi: {
     KBTC: { name: "KBTC", symbol: "KBTC", decimals: 8, ed: "0" },
@@ -207,6 +217,7 @@ const INTERLAY_SUPPORTED_TOKENS: Record<string, unknown> = {
   IBTC: { Token: "IBTC" },
   INTR: { Token: "INTR" },
   USDT: { ForeignAsset: 2 },
+  VDOT: { ForeignAsset: 3 },
 };
 
 const getSupportedTokens = (chainname: string): Record<string, unknown> => {

@@ -10,7 +10,7 @@ import { KusamaAdapter, PolkadotAdapter } from "./adapters/polkadot";
 import { StatemineAdapter, StatemintAdapter } from "./adapters/statemint";
 import { HeikoAdapter, ParallelAdapter } from "./adapters/parallel";
 import { AcalaAdapter, KaruraAdapter } from "./adapters/acala";
-import { BifrostAdapter } from "./adapters/bifrost";
+import { BifrostKusamaAdapter, BifrostPolkadotAdapter } from "./adapters/bifrost";
 import { HydraAdapter } from "./adapters/hydradx";
 import { AstarAdapter } from "./adapters/astar";
 
@@ -29,7 +29,8 @@ describe.skip("Bridge sdk usage", () => {
     statemint: new StatemintAdapter(),
     statemine: new StatemineAdapter(),
     heiko: new HeikoAdapter(),
-    bifrost: new BifrostAdapter(),
+    bifrost_polkadot: new BifrostPolkadotAdapter(),
+    bifrost: new BifrostKusamaAdapter(),
     hydra: new HydraAdapter(),
     parallel: new ParallelAdapter(),
     astar: new AstarAdapter(),
@@ -178,7 +179,7 @@ describe.skip("Bridge sdk usage", () => {
     // printBidirectionalTxs("kintsugi", "karura", "KBTC");
     // printBidirectionalTxs("kintsugi", "karura", "LKSM");
     // printBidirectionalTxs("kintsugi", "bifrost", "VKSM");
-    printBidirectionalTxs("kusama", "statemine", "KSM");
+    // printBidirectionalTxs("kusama", "statemine", "KSM");
 
     // interlay
     // printBidirectionalTxs("interlay", "polkadot", "DOT");
@@ -191,7 +192,8 @@ describe.skip("Bridge sdk usage", () => {
     // printBidirectionalTxs("interlay", "parallel", "IBTC");
     // printBidirectionalTxs("interlay", "astar", "INTR");
     // printBidirectionalTxs("interlay", "astar", "IBTC");
-    printBidirectionalTxs("polkadot", "statemint", "DOT");
+    printBidirectionalTxs("interlay", "bifrost_polkadot", "VDOT");
+    // printBidirectionalTxs("polkadot", "statemint", "DOT");
   });
 
   test("5. getNativeToken should work", () => {
@@ -209,6 +211,7 @@ describe.skip("Bridge sdk usage", () => {
       ["acala", "ACA"],
       ["hydra", "HDX"],
       ["parallel", "PARA"],
+      ["bifrost_polkadot", "BNC"],
       ["statemint", "DOT"],
     ];
 

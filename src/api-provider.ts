@@ -52,6 +52,16 @@ export class ApiProvider {
               prodParasPolkadotCommon.find((e) => e.info === "PolkadotAssetHub")
                 ?.providers || {}
             ).filter((e) => e.startsWith("wss://"));
+          } else if (chain === "bifrost_polkadot" || chain === "bifrost") {
+            const chainInfoName = "bifrost";
+            const haystack =
+              chain === "bifrost_polkadot"
+                ? prodParasPolkadot
+                : prodParasKusama;
+
+            nodes = Object.values(
+              haystack.find((e) => e.info === chainInfoName)?.providers || {}
+            ).filter((e) => e.startsWith("wss://"));
           } else {
             const chainInfo = chain === "hydra" ? "hydradx" : chain;
             nodes = Object.values(

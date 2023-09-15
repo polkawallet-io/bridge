@@ -53,6 +53,14 @@ export const polkadotChains = {
     paraChainId: 2006,
     ss58Prefix: 5,
   },
+  bifrost_polkadot: {
+    id: "bifrost_polkadot",
+    display: "Bifrost",
+    type: typeSubstrate,
+    icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fbifrost.png&w=96&q=75",
+    paraChainId: 2030,
+    ss58Prefix: 6,
+  },
   interlay: {
     id: "interlay",
     display: "Interlay",

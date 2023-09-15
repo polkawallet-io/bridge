@@ -9,7 +9,7 @@ import { StatemineAdapter, StatemintAdapter } from "./statemint";
 import { AcalaAdapter, KaruraAdapter } from "./acala";
 import { HeikoAdapter, ParallelAdapter } from "./parallel";
 import { buildTestTxWithConfigData } from "../utils/shared-spec-methods";
-import { BifrostAdapter } from "./bifrost";
+import { BifrostKusamaAdapter } from "./bifrost";
 import { HydraAdapter } from "./hydradx";
 import { AstarAdapter } from "./astar";
 
@@ -79,7 +79,7 @@ describe.skip("interlay-adapter should work", () => {
     const kintsugi = new KintsugiAdapter();
     const karura = new KaruraAdapter();
     const heiko = new HeikoAdapter();
-    const bifrost = new BifrostAdapter();
+    const bifrost = new BifrostKusamaAdapter();
     const statemine = new StatemineAdapter();
     const kusama = new KusamaAdapter();
 

@@ -88,6 +88,7 @@ jobs:
               --parachain=configs/hydradx.yml \
               --parachain=configs/acala.yml \
               --parachain=configs/parallel.yml \
+              --parachain=configs/bifrost-polkadot.yml \
               &> log.txt &
             echo "Waiting for log to show chopsticks is ready..."
             tail -f log.txt | grep -q "Connected parachains"
