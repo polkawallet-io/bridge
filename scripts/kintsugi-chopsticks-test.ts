@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* tslint:disable:no-unused-variable */
 import { KaruraAdapter } from "../src/adapters/acala";
-import { BifrostAdapter } from "../src/adapters/bifrost";
+import { BifrostKusamaAdapter } from "../src/adapters/bifrost";
 import { KintsugiAdapter } from "../src/adapters/interlay";
 import { HeikoAdapter } from "../src/adapters/parallel";
 import { KusamaAdapter } from "../src/adapters/polkadot";
@@ -26,7 +26,7 @@ async function main(): Promise<void> {
         statemine:  { adapter: new StatemineAdapter(),  endpoints: ['ws://127.0.0.1:8001'] },
         karura:     { adapter: new KaruraAdapter(),     endpoints: ['ws://127.0.0.1:8002'] },
         heiko:      { adapter: new HeikoAdapter(),      endpoints: ['ws://127.0.0.1:8003'] },
-        bifrost:    { adapter: new BifrostAdapter(),    endpoints: ['ws://127.0.0.1:8004'] },
+        bifrost:    { adapter: new BifrostKusamaAdapter(),    endpoints: ['ws://127.0.0.1:8004'] },
         kusama:     { adapter: new KusamaAdapter(),     endpoints: ['ws://127.0.0.1:8005'] },
     };
 
