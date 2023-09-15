@@ -149,10 +149,15 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
+    const tokensConfig =
+      this.chain.id === "bifrost_polkadot"
+        ? bifrostPolkadotTokensConfig
+        : bifrostKusamaTokensConfig;
+
     this.balanceAdapter = new BifrostBalanceAdapter({
       chain: this.chain.id as ChainName,
       api,
-      tokens: bifrostKusamaTokensConfig,
+      tokens: tokensConfig,
     });
   }
 
