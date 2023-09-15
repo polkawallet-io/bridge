@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - master
-      - temp-polkadot-9-vdot-version
   pull_request:
     branches:
       - master
