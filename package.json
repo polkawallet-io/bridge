@@ -1,6 +1,6 @@
 {
-  "name": "@polkawallet/bridge",
-  "version": "0.1.5-3",
+  "name": "@galacticcouncil/bridge",
+  "version": "0.0.9",
   "description": "polkawallet bridge sdk",
   "main": "index.js",
   "types": "index.d.ts",
@@ -16,9 +16,9 @@
   "repository": "https://github.com/polkawallet-io/bridge.git",
   "homepage": "https://github.com/polkawallet-io/bridge",
   "scripts": {
-    "clain": "rm -rf build",
+    "clean": "rm -rf build",
     "build": "tsc",
-    "test": "jest --runInBand --detectOpenHandles --forceExit",
+    "test": "jest",
     "lint": "polkadot-dev-run-lint",
     "build:docs": "ts-node ./scripts/generate-bridge-document.ts",
     "build:release": "polkadot-ci-ghact-build"
