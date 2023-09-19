@@ -236,6 +236,13 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
     },
   },
   {
+    to: "statemint",
+    token: "USDC",
+    xcm: {
+      fee: { token: "USDC", amount: "700000" },
+    },
+  },
+  {
     to: "zeitgeist",
     token: "ZTG",
     xcm: {
@@ -315,6 +322,13 @@ export const hydradxTokensConfig: Record<string, ExtendedToken> = {
     decimals: 6,
     ed: "10000",
     toRaw: () => 10,
+  },
+  USDC: {
+    name: "USDC",
+    symbol: "USDC",
+    decimals: 6,
+    ed: "10000",
+    toRaw: () => 22,
   },
   ZTG: {
     name: "ZTG",
