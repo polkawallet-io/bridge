@@ -107,7 +107,7 @@
       "xcm": {
         "fee": {
           "token": "ASTR",
-          "amount": "4635101624603120"
+          "amount": "4006410300000000"
         }
       },
       "from": "acala"
@@ -180,6 +180,17 @@
     },
     {
       "to": "hydradx",
+      "token": "DOT",
+      "xcm": {
+        "fee": {
+          "token": "DOT",
+          "amount": "491129243"
+        }
+      },
+      "from": "acala"
+    },
+    {
+      "to": "hydradx",
       "token": "WETH",
       "xcm": {
         "fee": {
@@ -207,6 +218,17 @@
         "fee": {
           "token": "UNQ",
           "amount": ""
+        }
+      },
+      "from": "acala"
+    },
+    {
+      "to": "statemint",
+      "token": "USDT",
+      "xcm": {
+        "fee": {
+          "token": "USDT",
+          "amount": "700000"
         }
       },
       "from": "acala"
@@ -250,7 +272,7 @@
       "xcm": {
         "fee": {
           "token": "USDT",
-          "amount": "1000"
+          "amount": "1183"
         }
       },
       "from": "karura"
@@ -261,7 +283,7 @@
       "xcm": {
         "fee": {
           "token": "SDN",
-          "amount": "4662276356431024"
+          "amount": "4006410300000000"
         }
       },
       "from": "karura"
@@ -272,7 +294,7 @@
       "xcm": {
         "fee": {
           "token": "KUSD",
-          "amount": "1200000000"
+          "amount": "2080000000"
         }
       },
       "from": "karura"
@@ -719,6 +741,17 @@
     },
     {
       "to": "basilisk",
+      "token": "KSM",
+      "xcm": {
+        "fee": {
+          "token": "KSM",
+          "amount": "359882060"
+        }
+      },
+      "from": "karura"
+    },
+    {
+      "to": "basilisk",
       "token": "KUSD",
       "xcm": {
         "fee": {
@@ -835,7 +868,7 @@
       "xcm": {
         "fee": {
           "token": "ASTR",
-          "amount": "9269600000000000"
+          "amount": "8082400000000000"
         },
         "weightLimit": "Unlimited"
       },
@@ -847,7 +880,7 @@
       "xcm": {
         "fee": {
           "token": "ACA",
-          "amount": "9269600000"
+          "amount": "8082400000"
         },
         "weightLimit": "Unlimited"
       },
@@ -859,7 +892,7 @@
       "xcm": {
         "fee": {
           "token": "AUSD",
-          "amount": "2931921869"
+          "amount": "1815098681"
         },
         "weightLimit": "Unlimited"
       },
@@ -871,7 +904,7 @@
       "xcm": {
         "fee": {
           "token": "LDOT",
-          "amount": "31449750"
+          "amount": "13400229"
         },
         "weightLimit": "Unlimited"
       },
@@ -895,7 +928,7 @@
       "xcm": {
         "fee": {
           "token": "SDN",
-          "amount": "932400000000000"
+          "amount": "801280000000000"
         },
         "weightLimit": "Unlimited"
       },
@@ -907,7 +940,7 @@
       "xcm": {
         "fee": {
           "token": "KUSD",
-          "amount": "3826597686"
+          "amount": "2120203588"
         },
         "weightLimit": "Unlimited"
       },
@@ -916,56 +949,23 @@
   ],
   [
     {
-      "to": "karura",
+      "to": "hydradx",
       "token": "BNC",
       "xcm": {
         "fee": {
           "token": "BNC",
-          "amount": "5120000000"
+          "amount": "14645000000"
         }
       },
       "from": "bifrost"
     },
     {
-      "to": "karura",
-      "token": "VSKSM",
+      "to": "hydradx",
+      "token": "vDOT",
       "xcm": {
         "fee": {
-          "token": "VSKSM",
-          "amount": "64000000"
-        }
-      },
-      "from": "bifrost"
-    },
-    {
-      "to": "karura",
-      "token": "KSM",
-      "xcm": {
-        "fee": {
-          "token": "KSM",
-          "amount": "64000000"
-        }
-      },
-      "from": "bifrost"
-    },
-    {
-      "to": "karura",
-      "token": "KAR",
-      "xcm": {
-        "fee": {
-          "token": "KAR",
-          "amount": "6400000000"
-        }
-      },
-      "from": "bifrost"
-    },
-    {
-      "to": "karura",
-      "token": "KUSD",
-      "xcm": {
-        "fee": {
-          "token": "KUSD",
-          "amount": "10011896008"
+          "token": "vDOT",
+          "amount": "5550000"
         }
       },
       "from": "bifrost"
@@ -978,9 +978,8 @@
       "xcm": {
         "fee": {
           "token": "KSM",
-          "amount": "11523248"
-        },
-        "weightLimit": "800000000"
+          "amount": "104571640"
+        }
       },
       "from": "basilisk"
     },
@@ -991,8 +990,7 @@
         "fee": {
           "token": "BSX",
           "amount": "93240000000"
-        },
-        "weightLimit": "5000000000"
+        }
       },
       "from": "basilisk"
     },
@@ -1003,8 +1001,18 @@
         "fee": {
           "token": "KUSD",
           "amount": "5060238106"
-        },
-        "weightLimit": "5000000000"
+        }
+      },
+      "from": "basilisk"
+    },
+    {
+      "to": "karura",
+      "token": "aUSD",
+      "xcm": {
+        "fee": {
+          "token": "aUSD",
+          "amount": "5060238106"
+        }
       },
       "from": "basilisk"
     },
@@ -1015,8 +1023,7 @@
         "fee": {
           "token": "KSM",
           "amount": "90741527"
-        },
-        "weightLimit": "5000000000"
+        }
       },
       "from": "basilisk"
     },
@@ -1027,8 +1034,7 @@
         "fee": {
           "token": "DAI",
           "amount": "808240000000000"
-        },
-        "weightLimit": "5000000000"
+        }
       },
       "from": "basilisk"
     },
@@ -1039,8 +1045,7 @@
         "fee": {
           "token": "USDCet",
           "amount": "808"
-        },
-        "weightLimit": "5000000000"
+        }
       },
       "from": "basilisk"
     },
@@ -1051,8 +1056,7 @@
         "fee": {
           "token": "WETH",
           "amount": "449022222222"
-        },
-        "weightLimit": "5000000000"
+        }
       },
       "from": "basilisk"
     },
@@ -1063,46 +1067,42 @@
         "fee": {
           "token": "WBTC",
           "amount": "2"
-        },
-        "weightLimit": "5000000000"
+        }
       },
       "from": "basilisk"
     },
     {
-      "to": "acala",
-      "token": "DAI",
+      "to": "statemine",
+      "token": "USDT",
       "xcm": {
         "fee": {
-          "token": "DAI",
-          "amount": "808240000000000"
-        },
-        "weightLimit": "5000000000"
+          "token": "USDT",
+          "amount": "1183"
+        }
       },
-      "from": "hydradx"
+      "from": "basilisk"
     },
     {
-      "to": "acala",
-      "token": "WETH",
+      "to": "tinkernet",
+      "token": "TNKR",
       "xcm": {
         "fee": {
-          "token": "WETH",
-          "amount": "687004000000"
-        },
-        "weightLimit": "5000000000"
+          "token": "TNKR",
+          "amount": "9270203240"
+        }
       },
-      "from": "hydradx"
+      "from": "basilisk"
     },
     {
-      "to": "acala",
-      "token": "WBTC",
+      "to": "robonomics",
+      "token": "XRT",
       "xcm": {
         "fee": {
-          "token": "WBTC",
-          "amount": "4"
-        },
-        "weightLimit": "5000000000"
+          "token": "XRT",
+          "amount": "4632"
+        }
       },
-      "from": "hydradx"
+      "from": "basilisk"
     }
   ],
   [
@@ -1127,8 +1127,7 @@
         "fee": {
           "token": "INTR",
           "amount": "92696000"
-        },
-        "weightLimit": "5000000000"
+        }
       },
       "from": "interlay"
     },
@@ -1139,8 +1138,7 @@
         "fee": {
           "token": "IBTC",
           "amount": "9"
-        },
-        "weightLimit": "5000000000"
+        }
       },
       "from": "interlay"
     },
@@ -1151,8 +1149,7 @@
         "fee": {
           "token": "IBTC",
           "amount": "7"
-        },
-        "weightLimit": "5000000000"
+        }
       },
       "from": "interlay"
     },
@@ -1670,6 +1667,30 @@
         "fee": {
           "token": "USDT",
           "amount": "2200"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "statemint"
+    },
+    {
+      "to": "hydradx",
+      "token": "USDC",
+      "xcm": {
+        "fee": {
+          "token": "USDC",
+          "amount": "2200"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "statemint"
+    },
+    {
+      "to": "acala",
+      "token": "USDT",
+      "xcm": {
+        "fee": {
+          "token": "USDT",
+          "amount": "808"
         },
         "weightLimit": "Unlimited"
       },
