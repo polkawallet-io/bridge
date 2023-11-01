@@ -11,13 +11,7 @@ import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import { BalanceData, ExtendedToken, TransferParams } from "../types";
-import {
-  validateAddress,
-  createRouteConfigs,
-  createPolkadotXCMDest,
-  createPolkadotXCMAccount,
-  createPolkadotXCMAsset,
-} from "../utils";
+import { validateAddress, createRouteConfigs } from "../utils";
 
 type TokenData = ExtendedToken & { toQuery: () => string };
 
@@ -276,67 +270,12 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
     );
   }
 
-  public oldCreateTx(
-    params: TransferParams
-  ):
-    | SubmittableExtrinsic<"promise", ISubmittableResult>
-    | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (!this.api) throw new ApiNotFound(this.chain.id);
-
-    const { address, amount, to, token } = params;
-
-    if (!validateAddress(address)) throw new InvalidAddress(address);
-
-    const toChain = chains[to];
-
-    const accountId = this.api?.createType("AccountId32", address).toHex();
-    const rawAmount = amount.toChainData();
-
-    if (token === this.balanceAdapter?.nativeToken) {
-      return this.api?.tx.polkadotXcm.reserveTransferAssets(
-        createPolkadotXCMDest(this.api, toChain.paraChainId) as any,
-        createPolkadotXCMAccount(this.api, accountId) as any,
-        createPolkadotXCMAsset(this.api, rawAmount, "NATIVE") as any,
-        0
-      );
-    }
-
-    const tokenIds: Record<string, string> = {
-      // to karura
-      KUSD: "0x0081000000000000000000000000000000000000000000000000000000000000",
-      // to acala
-      ACA: "0x0000000000000000000000000000000000000000000000000000000000000000",
-      AUSD: "0x0001000000000000000000000000000000000000000000000000000000000000",
-      LDOT: "0x0003000000000000000000000000000000000000000000000000000000000000",
-    };
-
-    const tokenId = tokenIds[token];
-
-    if (!tokenId) throw new TokenNotFound(token);
-
-    const paraChainId = toChain.paraChainId;
-
-    return this.api?.tx.polkadotXcm.reserveWithdrawAssets(
-      createPolkadotXCMDest(this.api, toChain.paraChainId),
-      createPolkadotXCMAccount(this.api, accountId),
-      createPolkadotXCMAsset(this.api, rawAmount, [
-        { Parachain: paraChainId },
-        { GeneralKey: { length: 2, data: tokenId } },
-      ]),
-      0
-    );
-  }
-
   public createTx(
     params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
     if (!this.api) throw new ApiNotFound(this.chain.id);
-
-    if (this.chain.id === "astar" || !this.api.tx.xtokens) {
-      return this.oldCreateTx(params);
-    }
 
     const { address, amount, to, token } = params;
 
