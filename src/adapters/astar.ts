@@ -11,13 +11,7 @@ import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import { BalanceData, ExtendedToken, TransferParams } from "../types";
-import {
-  validateAddress,
-  createRouteConfigs,
-  createPolkadotXCMDest,
-  createPolkadotXCMAccount,
-  createPolkadotXCMAsset,
-} from "../utils";
+import { validateAddress, createRouteConfigs } from "../utils";
 
 type TokenData = ExtendedToken & { toQuery: () => string };
 
