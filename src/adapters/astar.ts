@@ -306,7 +306,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
               ],
             },
           },
-        },
+        } as any,
         "Unlimited"
       );
     }
@@ -344,7 +344,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
             ],
           },
         },
-      },
+      } as any,
       "Unlimited"
     );
   }
