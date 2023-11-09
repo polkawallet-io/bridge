@@ -7,6 +7,14 @@ export function checkMessageVersionIsV3(api: AnyApi) {
 
     return keys.includes("V3");
   } catch (e) {
+    try {
+      const keys = (api?.createType("StagingXcmVersionedMultiLocation") as any)
+        .defKeys as string[];
+
+      return keys.includes("V3");
+    } catch (e) {
+      // ignore
+    }
     // ignore error
   }
 
