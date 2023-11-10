@@ -52,7 +52,6 @@ jobs:
         if: failure()
         run: |
           tail -n 100 /app/log.txt
-
       - name: Report status to Discord
         uses: sarisia/actions-status-discord@v1
         if: failure()
@@ -67,7 +66,7 @@ jobs:
           retention-days: 14
 
   chopsticks_interlay_test:
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     container:
       image: ghcr.io/interlay/chopsticks:master
@@ -103,6 +102,10 @@ jobs:
             yarn install --frozen-lockfile
             npx ts-node scripts/interlay-chopsticks-test.ts
 
+      - name: Show error log
+        if: failure()
+        run: |
+          tail -n 100 /app/log.txt
       - name: Report status to Discord
         uses: sarisia/actions-status-discord@v1
         if: failure()
