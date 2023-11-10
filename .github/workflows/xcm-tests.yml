@@ -48,6 +48,11 @@ jobs:
             yarn install --frozen-lockfile
             npx ts-node scripts/kintsugi-chopsticks-test.ts
 
+      - name: Show error log
+        if: failure()
+        run: |
+          tail -n 100 /app/log.txt
+
       - name: Report status to Discord
         uses: sarisia/actions-status-discord@v1
         if: failure()
