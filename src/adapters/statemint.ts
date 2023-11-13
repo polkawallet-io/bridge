@@ -54,8 +54,8 @@ export const statemineRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
     to: "kintsugi",
     token: "USDT",
-    // fees from tests on chopsticks: 9_510 atomic units
-    xcm: { fee: { token: "USDT", amount: "15000" }, weightLimit: "Unlimited" },
+    // fees from tests on chopsticks: 8_153 planck, add a minimum of 2x buffer
+    xcm: { fee: { token: "USDT", amount: "20000" }, weightLimit: "Unlimited" },
   },
 ];
 
