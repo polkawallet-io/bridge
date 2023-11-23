@@ -38,6 +38,13 @@ export const acalaRouteConfigs = createRouteConfigs("acala", [
     },
   },
   {
+    to: "moonbeam",
+    token: "LDOT",
+    xcm: {
+      fee: { token: "LDOT", amount: "45977011" },
+    },
+  },
+  {
     to: "parallel",
     token: "PARA",
     xcm: {
