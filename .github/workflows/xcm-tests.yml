@@ -21,33 +21,27 @@ jobs:
 
       - name: Run Kintsugi tests
         uses: nick-fields/retry@v2
-        with:
-          max_attempts: 3
-          retry_on: error
-          timeout_minutes: 10
-          on_retry_command: pkill node; sleep 2
-          command: |
-            echo "Launching chopsticks..."
-            npx --yes @acala-network/chopsticks@0.9.3 \
-              xcm \
-              --relaychain=scripts/configs/kusama.yml \
-              -p scripts/configs/kintsugi.yml \
-              -p scripts/configs/statemine.yml \
-              -p scripts/configs/karura.yml \
-              -p scripts/configs/parallel-heiko.yml \
-              -p scripts/configs/bifrost.yml \
-              &> log.txt &
-            echo "Waiting for log to show chopsticks is ready..."
-            tail -f log.txt | grep -q "Connected parachains"
-            echo "Chopsticks launched, start tests."
+        run: |
+          echo "Launching chopsticks..."
+          npx --yes @acala-network/chopsticks@0.9.3 \
+            xcm \
+            --relaychain=scripts/configs/kusama.yml \
+            -p scripts/configs/kintsugi.yml \
+            -p scripts/configs/statemine.yml \
+            -p scripts/configs/karura.yml \
+            -p scripts/configs/parallel-heiko.yml \
+            -p scripts/configs/bifrost.yml \
+            &> log.txt &
+          echo "Waiting for log to show chopsticks is ready..."
+          tail -f log.txt | grep -q "Connected parachains"
+          echo "Chopsticks launched, start tests."
 
-            yarn install --frozen-lockfile
-            npx ts-node scripts/kintsugi-chopsticks-test.ts
-
+          yarn install --frozen-lockfile
+          npx ts-node scripts/kintsugi-chopsticks-test.ts
       - name: Show error log
         if: failure()
         run: |
-          tail -n 100 /app/log.txt
+          tail -n 100 log.txt
       - name: Report status to Discord
         uses: sarisia/actions-status-discord@v1
         if: failure()
