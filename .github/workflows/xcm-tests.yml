@@ -32,6 +32,7 @@ jobs:
             &> log.txt &
           echo "Waiting for log to show chopsticks is ready..."
           tail -f log.txt | grep -q "Connected parachains"
+          echo "... detected chopsticks is ready."
 
       - name: Run Kintsugi tests
         run: |
@@ -75,6 +76,7 @@ jobs:
             &> log.txt &
           echo "Waiting for log to show chopsticks is ready..."
           tail -f log.txt | grep -q "Connected parachains"
+          echo "... detected chopsticks is ready."
 
       - name: Run Interlay tests
         run: |
