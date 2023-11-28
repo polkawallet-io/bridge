@@ -28,7 +28,8 @@ jobs:
           on_retry_command: pkill node; sleep 2
           command: |
             echo "Launching chopsticks..."
-            npx @acala-network/chopsticks@0.3.9 xcm \
+            npx --yes @acala-network/chopsticks@0.3.9 \
+              xcm \
               -r scripts/configs/kusama.yml \
               -p scripts/configs/kintsugi.yml \
               -p scripts/configs/statemine.yml \
