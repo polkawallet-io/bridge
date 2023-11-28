@@ -1,0 +1,41 @@
+endpoint:
+  - wss://acala-rpc.aca-api.network
+  - wss://acala-rpc.dwellir.com
+mock-signature-host: true
+block: ${env.ACALA_BLOCK_NUMBER}
+db: ./db.sqlite
+# wasm-override: acala-2150.wasm
+
+import-storage:
+  Sudo:
+    Key: 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice
+  System:
+    Account:
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+        - providers: 1
+          data:
+            free: '1000000000000000'
+  Tokens:
+    Accounts:
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+          - token: AUSD
+        - free: '1000000000000000'
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+          - token: DOT
+        - free: '1000000000000000'
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+          - foreignAsset: 4 # INTR
+        - free: '500000000000000'
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+          - foreignAsset: 3 # IBTC
+        - free: '10000000000'

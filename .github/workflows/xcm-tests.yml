@@ -15,43 +15,33 @@ jobs:
   chopsticks_kintsugi_test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    container:
-      image: ghcr.io/interlay/chopsticks:master
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Launch chopsticks
+        run: |
+          npx --yes @acala-network/chopsticks@0.9.3 \
+            xcm \
+            -r scripts/configs/kusama.yml \
+            -p scripts/configs/kintsugi.yml \
+            -p scripts/configs/statemine.yml \
+            -p scripts/configs/karura.yml \
+            -p scripts/configs/parallel-heiko.yml \
+            -p scripts/configs/bifrost.yml \
+            &> log.txt &
+          echo "Waiting for log to show chopsticks is ready..."
+          tail -f log.txt | grep -q "Connected parachains"
+          echo "... detected chopsticks is ready."
+
       - name: Run Kintsugi tests
-        uses: nick-fields/retry@v2
-        with:
-          max_attempts: 3
-          retry_on: error
-          timeout_minutes: 10
-          on_retry_command: pkill node; sleep 2
-          command: |
-            echo "Launching chopsticks..."
-            cd /app
-            echo "Start..." > log.txt
-            yarn start xcm \
-              --relaychain=configs/kusama.yml \
-              --parachain=configs/kintsugi.yml \
-              --parachain=configs/statemine.yml \
-              --parachain=configs/karura.yml \
-              --parachain=configs/parallel-heiko.yml \
-              --parachain=configs/bifrost.yml \
-              &> log.txt &
-            echo "Waiting for log to show chopsticks is ready..."
-            tail -f log.txt | grep -q "Connected parachains"
-            echo "Chopsticks launched, start tests."
-            cd -
-
-            yarn install --frozen-lockfile
-            npx ts-node scripts/kintsugi-chopsticks-test.ts
-
+        run: |
+          yarn install --frozen-lockfile
+          npx ts-node scripts/kintsugi-chopsticks-test.ts
       - name: Show error log
         if: failure()
         run: |
-          tail -n 100 /app/log.txt
+          tail -n 100 log.txt
       - name: Report status to Discord
         uses: sarisia/actions-status-discord@v1
         if: failure()
@@ -62,50 +52,41 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: kintsugi-chopsticks-logs
-          path: /app/log.txt
-          retention-days: 14
+          path: log.txt
+          retention-days: 7
 
   chopsticks_interlay_test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    container:
-      image: ghcr.io/interlay/chopsticks:master
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run Interlay tests
-        uses: nick-fields/retry@v2
-        with:
-          max_attempts: 3
-          retry_on: error
-          timeout_minutes: 10
-          on_retry_command: pkill node; sleep 2
-          command: |
-            echo "Launching chopsticks..."
-            cd /app
-            echo "Start..." > log.txt
-            yarn start xcm \
-              --relaychain=configs/polkadot.yml \
-              --parachain=configs/interlay.yml \
-              --parachain=configs/statemint.yml \
-              --parachain=configs/hydradx.yml \
-              --parachain=configs/acala.yml \
-              --parachain=configs/parallel.yml \
-              --parachain=configs/bifrost-polkadot.yml \
-              &> log.txt &
-            echo "Waiting for log to show chopsticks is ready..."
-            tail -f log.txt | grep -q "Connected parachains"
-            echo "Chopsticks launched, start tests."
-            cd -
+      - name: Launch chopsticks
+        run: |
+          npx --yes @acala-network/chopsticks@0.9.3 \
+            xcm \
+            -r scripts/configs/polkadot.yml \
+            -p scripts/configs/interlay.yml \
+            -p scripts/configs/statemint.yml \
+            -p scripts/configs/hydradx.yml \
+            -p scripts/configs/acala.yml \
+            -p scripts/configs/parallel.yml \
+            -p scripts/configs/bifrost-polkadot.yml \
+            &> log.txt &
+          echo "Waiting for log to show chopsticks is ready..."
+          tail -f log.txt | grep -q "Connected parachains"
+          echo "... detected chopsticks is ready."
 
-            yarn install --frozen-lockfile
-            npx ts-node scripts/interlay-chopsticks-test.ts
+      - name: Run Interlay tests
+        run: |
+          yarn install --frozen-lockfile
+          npx ts-node scripts/interlay-chopsticks-test.ts
 
       - name: Show error log
         if: failure()
         run: |
-          tail -n 100 /app/log.txt
+          tail -n 100 log.txt
       - name: Report status to Discord
         uses: sarisia/actions-status-discord@v1
         if: failure()
@@ -116,5 +97,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: interlay-chopsticks-logs
-          path: /app/log.txt
-          retention-days: 14
+          path: log.txt
+          retention-days: 7

@@ -1,0 +1,24 @@
+endpoint: wss://heiko-rpc.parallel.fi
+mock-signature-host: true
+
+import-storage:
+  System:
+    Account:
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice
+        - providers: 1
+          data:
+            free: '1000000000000000'
+  Assets:
+    Account:
+      -
+        -
+          - 121 # KBTC
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice
+        - balance: '1000000000000000'
+      -
+        -
+          - 119 # KINT
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice
+        - balance: '1000000000000000'

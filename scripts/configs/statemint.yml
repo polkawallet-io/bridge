@@ -1,0 +1,19 @@
+endpoint: wss://statemint-rpc.dwellir.com
+mock-signature-host: true
+
+import-storage:
+  System:
+    Account:
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # # Alice, dot
+        - providers: 1
+          data:
+            free: 1000000000000000
+  Assets:
+    Account:
+      -
+        -
+          - 1984 # Alice, usdt
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+        - balance: 10000000000
