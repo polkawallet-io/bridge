@@ -23,7 +23,7 @@ jobs:
         run: |
           npx --yes @acala-network/chopsticks@0.9.3 \
             xcm \
-            --relaychain=scripts/configs/kusama.yml \
+            -r scripts/configs/kusama.yml \
             -p scripts/configs/kintsugi.yml \
             -p scripts/configs/statemine.yml \
             -p scripts/configs/karura.yml \
