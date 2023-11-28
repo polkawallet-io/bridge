@@ -1,0 +1,16 @@
+# endpoint: wss://kusama-rpc.dwellir.com
+endpoint: wss://kusama-rpc.polkadot.io
+mock-signature-host: true
+block: ${env.KUSAMA_BLOCK_NUMBER}
+db: ./db.sqlite
+# wasm-override: kusama_runtime-v9380.compact.compressed.wasm
+
+import-storage:
+  System:
+    Account:
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+        - providers: 1
+          data:
+            free: '10000000000000000000'

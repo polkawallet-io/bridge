@@ -1,0 +1,27 @@
+endpoint: wss://hk.p.bifrost-rpc.liebi.com/ws
+# endpoint: wss://bifrost-polkadot.api.onfinality.io/public-ws
+mock-signature-host: true
+
+import-storage:
+  # Sudo:
+  #   Key: 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice
+  System:
+    Account:
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+        - providers: 1
+          data:
+            free: '1000000000000000'
+  Tokens:
+    Accounts:
+      -
+        -
+          - 5Eg2fntQS1bgCgPtXQ9Ysip6RUQkQJEMZqZ9u9qX6fcnhB4H # sibl 2032 (interlay sov)
+          - vtoken2: 0 #VDOT
+        - free: '100000000000'
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice
+          - vtoken2: 0 # VDOT
+        - free: '100000000000000000'

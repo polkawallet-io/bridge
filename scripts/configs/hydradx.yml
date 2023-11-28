@@ -1,0 +1,32 @@
+endpoint: wss://hydradx-rpc.dwellir.com
+mock-signature-host: true
+block: ${env.HYDRADX_BLOCK_NUMBER}
+db: ./db.sqlite
+# wasm-override: hydradx_runtime.compact.compressed.wasm
+
+import-storage:
+  System:
+    Account:
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+        - providers: 1
+          data:
+            free: 1000000000000000
+  Tokens:
+    Accounts:
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice
+          - 2 # DAI
+        - free: '100000000000000000000'
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice
+          - 11 # IBTC
+        - free: '10000000000'
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice
+          - 17 # INTR
+        - free: '100000000000000000000'
