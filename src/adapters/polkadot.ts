@@ -208,7 +208,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     const { address, amount, to, token } = params;
 
     let addrType: AddressType = "substract";
-    if (address.startsWith("0x")) {
+    if (address.startsWith("0x") && (to === "acala" || to === "karura")) {
       addrType = "ethereum";
     }
 
@@ -286,6 +286,10 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
         this.getDestWeight(token, to)?.toString()
       );
     } else {
+      const accountType =
+        (to === "acala" || to === "karura") && addrType === "ethereum"
+          ? "AccountKey20"
+          : "AccountId32";
       const dst = {
         parents: 0,
         interior: { X1: { Parachain: toChain.paraChainId } },
@@ -294,7 +298,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
         parents: 0,
         interior: {
           X1: {
-            [addrType === "substract" ? "AccountId32" : "AccountKey20"]: {
+            [accountType]: {
               id: accountId,
             },
           },
