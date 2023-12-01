@@ -11,7 +11,7 @@ import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import { BalanceData, BasicToken, TransferParams } from "../types";
-import { createRouteConfigs, validateAddress } from "../utils";
+import { AddressType, createRouteConfigs, validateAddress } from "../utils";
 
 export const polkadotRouteConfigs = createRouteConfigs("polkadot", [
   {
@@ -207,7 +207,12 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
 
     const { address, amount, to, token } = params;
 
-    if (!validateAddress(address)) throw new InvalidAddress(address);
+    let addrType: AddressType = "substract";
+    if (address.startsWith("0x") && (to === "acala" || to === "karura")) {
+      addrType = "ethereum";
+    }
+
+    if (!validateAddress(address, addrType)) throw new InvalidAddress(address);
 
     const toChain = chains[to];
 
@@ -216,7 +221,10 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     }
 
     const isV0V1Support = this.isV0V1;
-    const accountId = this.api?.createType("AccountId32", address).toHex();
+    const accountId =
+      addrType === "substract"
+        ? this.api?.createType("AccountId32", address).toHex()
+        : this.api?.createType("AccountId20", address).toHex();
 
     // to statemine
     if (to === "statemine" || to === "statemint") {
@@ -278,6 +286,10 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
         this.getDestWeight(token, to)?.toString()
       );
     } else {
+      const accountType =
+        (to === "acala" || to === "karura") && addrType === "ethereum"
+          ? "AccountKey20"
+          : "AccountId32";
       const dst = {
         parents: 0,
         interior: { X1: { Parachain: toChain.paraChainId } },
@@ -285,7 +297,11 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
       const acc = {
         parents: 0,
         interior: {
-          X1: { AccountId32: { id: accountId } },
+          X1: {
+            [accountType]: {
+              id: accountId,
+            },
+          },
         },
       };
       const ass = [
