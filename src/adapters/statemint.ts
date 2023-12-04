@@ -12,7 +12,11 @@ import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import { BalanceData, ExtendedToken, TransferParams } from "../types";
-import { createRouteConfigs, validateAddress } from "../utils";
+import {
+  createRouteConfigs,
+  validateAddress,
+  getDestAccountInfo,
+} from "../utils";
 
 export const statemintRouteConfigs = createRouteConfigs("statemint", [
   {
@@ -285,11 +289,16 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
 
     const { address, amount, to, token: tokenName } = params;
 
-    if (!validateAddress(address)) throw new InvalidAddress(address);
+    const { accountId, accountType, addrType } = getDestAccountInfo(
+      address,
+      tokenName,
+      this.api,
+      to
+    );
+
+    if (!validateAddress(address, addrType)) throw new InvalidAddress(address);
 
     const toChain = chains[to];
-
-    const accountId = this.api?.createType("AccountId32", address).toHex();
 
     // to relay chain, support native token
     if (to === "kusama" || to === "polkadot") {
@@ -333,7 +342,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
     };
     const acc = {
       parents: 0,
-      interior: { X1: { AccountId32: { id: accountId } } },
+      interior: { X1: { [accountType]: { id: accountId } } },
     };
     const ass = [
       {

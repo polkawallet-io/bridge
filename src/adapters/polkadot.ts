@@ -11,7 +11,11 @@ import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import { BalanceData, BasicToken, TransferParams } from "../types";
-import { AddressType, createRouteConfigs, validateAddress } from "../utils";
+import {
+  createRouteConfigs,
+  getDestAccountInfo,
+  validateAddress,
+} from "../utils";
 
 export const polkadotRouteConfigs = createRouteConfigs("polkadot", [
   {
@@ -207,10 +211,12 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
 
     const { address, amount, to, token } = params;
 
-    let addrType: AddressType = "substract";
-    if (address.startsWith("0x") && (to === "acala" || to === "karura")) {
-      addrType = "ethereum";
-    }
+    const { accountId, accountType, addrType } = getDestAccountInfo(
+      address,
+      token,
+      this.api,
+      to
+    );
 
     if (!validateAddress(address, addrType)) throw new InvalidAddress(address);
 
@@ -221,10 +227,6 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     }
 
     const isV0V1Support = this.isV0V1;
-    const accountId =
-      addrType === "substract"
-        ? this.api?.createType("AccountId32", address).toHex()
-        : this.api?.createType("AccountId20", address).toHex();
 
     // to statemine
     if (to === "statemine" || to === "statemint") {
@@ -286,10 +288,6 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
         this.getDestWeight(token, to)?.toString()
       );
     } else {
-      const accountType =
-        (to === "acala" || to === "karura") && addrType === "ethereum"
-          ? "AccountKey20"
-          : "AccountId32";
       const dst = {
         parents: 0,
         interior: { X1: { Parachain: toChain.paraChainId } },

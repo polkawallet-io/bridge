@@ -9,9 +9,13 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
-import { ApiNotFound, TokenNotFound } from "../errors";
+import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import { BalanceData, BasicToken, TransferParams } from "../types";
-import { createRouteConfigs } from "../utils";
+import {
+  createRouteConfigs,
+  validateAddress,
+  getDestAccountInfo,
+} from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
@@ -147,10 +151,18 @@ class TinkernetBaseAdapter extends BaseCrossChainAdapter {
       throw new ApiNotFound(this.chain.id);
     }
 
-    const { address, amount, to } = params;
-    const toChain = chains[to];
+    const { address, amount, to, token } = params;
 
-    const accountId = this.api?.createType("AccountId32", address).toHex();
+    const { accountId, accountType, addrType } = getDestAccountInfo(
+      address,
+      token,
+      this.api,
+      to
+    );
+
+    if (!validateAddress(address, addrType)) throw new InvalidAddress(address);
+
+    const toChain = chains[to];
 
     return this.api.tx.xTokens.transfer(
       "0",
@@ -161,7 +173,7 @@ class TinkernetBaseAdapter extends BaseCrossChainAdapter {
           interior: {
             X2: [
               { Parachain: toChain.paraChainId },
-              { AccountId32: { id: accountId, network: "Any" } },
+              { [accountType]: { id: accountId, network: "Any" } },
             ],
           },
         },
