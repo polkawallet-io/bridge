@@ -11,7 +11,7 @@ import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import { BalanceData, ExtendedToken, TransferParams } from "../types";
-import { createRouteConfigs, validateAddress } from "../utils";
+import { createRouteConfigs, validateAddress, getAccountInfo } from "../utils";
 
 export const khalaRouteConfigs = createRouteConfigs("khala", [
   {
@@ -214,17 +214,22 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
 
     const { address, amount, to, token } = params;
 
-    if (!validateAddress(address)) throw new InvalidAddress(address);
+    const { accountId, accountType, addrType } = getAccountInfo(
+      address,
+      this.api,
+      to
+    );
+
+    if (!validateAddress(address, addrType)) throw new InvalidAddress(address);
 
     const toChain = chains[to];
-    const accountId = this.api?.createType("AccountId32", address).toHex();
 
     const dst = {
       parents: 1,
       interior: {
         X2: [
           { Parachain: toChain.paraChainId },
-          { AccountId32: { id: accountId } },
+          { [accountType]: { id: accountId } },
         ],
       },
     };

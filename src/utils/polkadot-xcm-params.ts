@@ -17,7 +17,11 @@ export function createPolkadotXCMDest(
   };
 }
 
-export function createPolkadotXCMAccount(api: AnyApi, accountId: string): any {
+export function createPolkadotXCMAccount(
+  api: AnyApi,
+  accountId: string,
+  accountType = "AccountId32"
+): any {
   const isV3 = checkMessageVersionIsV3(api);
   const versionTag = isV3 ? "V3" : "V1";
 
@@ -26,7 +30,7 @@ export function createPolkadotXCMAccount(api: AnyApi, accountId: string): any {
       parents: 0,
       interior: {
         X1: {
-          AccountId32: { id: accountId, network: isV3 ? undefined : "Any" },
+          [accountType]: { id: accountId, network: isV3 ? undefined : "Any" },
         },
       },
     },

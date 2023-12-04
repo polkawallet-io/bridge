@@ -9,9 +9,9 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
-import { ApiNotFound, TokenNotFound } from "../errors";
+import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import { BalanceData, BasicToken, TransferParams } from "../types";
-import { createRouteConfigs } from "../utils";
+import { createRouteConfigs, getAccountInfo, validateAddress } from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
@@ -148,16 +148,22 @@ class RobonomicsBaseAdapter extends BaseCrossChainAdapter {
     }
 
     const { address, amount, to } = params;
-    const toChain = chains[to];
 
-    const accountId = this.api?.createType("AccountId32", address).toHex();
+    const { accountId, accountType, addrType } = getAccountInfo(
+      address,
+      this.api,
+      to
+    );
+    if (!validateAddress(address, addrType)) throw new InvalidAddress(address);
+
+    const toChain = chains[to];
 
     const dst = {
       interior: { X1: { ParaChain: toChain.paraChainId } },
       parents: 1,
     };
     const acc = {
-      interior: { X1: { AccountId32: { id: accountId, network: "Any" } } },
+      interior: { X1: { [accountType]: { id: accountId, network: "Any" } } },
       parents: 0,
     };
     const ass = [

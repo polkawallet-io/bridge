@@ -16,6 +16,7 @@ import {
   createPolkadotXCMAsset,
   createPolkadotXCMDest,
   createRouteConfigs,
+  getAccountInfo,
   validateAddress,
 } from "../utils";
 
@@ -167,7 +168,13 @@ class BaseUniqueAdapter extends BaseCrossChainAdapter {
 
     const { address, amount, to, token } = params;
 
-    if (!validateAddress(address)) throw new InvalidAddress(address);
+    const { accountId, accountType, addrType } = getAccountInfo(
+      address,
+      this.api,
+      to
+    );
+
+    if (!validateAddress(address, addrType)) throw new InvalidAddress(address);
 
     const toChain = chains[to];
 
@@ -175,13 +182,12 @@ class BaseUniqueAdapter extends BaseCrossChainAdapter {
       throw new TokenNotFound(token);
     }
 
-    const accountId = this.api?.createType("AccountId32", address).toHex();
     const paraChainId = toChain.paraChainId;
     const rawAmount = amount.toChainData();
 
     return this.api?.tx.polkadotXcm.limitedReserveTransferAssets(
       createPolkadotXCMDest(this.api, paraChainId),
-      createPolkadotXCMAccount(this.api, accountId),
+      createPolkadotXCMAccount(this.api, accountId, accountType),
       createPolkadotXCMAsset(this.api, rawAmount, "NATIVE"),
       0,
       this.getDestWeight(token, to)?.toString() as any
