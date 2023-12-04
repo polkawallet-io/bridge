@@ -44,6 +44,7 @@ import {
   createXTokensWeight,
   isChainEqual,
   validateAddress,
+  getDestAccountInfo,
 } from "./utils";
 
 const DEFAULT_TX_CHECKING_TIMEOUT = 2 * 60 * 1000;
@@ -327,11 +328,18 @@ export abstract class BaseCrossChainAdapter {
 
     const { address, amount, to, token } = params;
 
-    if (!validateAddress(address)) throw new InvalidAddress(address);
+    const { accountId, accountType, addrType } = getDestAccountInfo(
+      address,
+      token,
+      this.api,
+      to
+    );
+
+    if (!validateAddress(address, addrType)) throw new InvalidAddress(address);
 
     const tokenData: ExtendedToken = this.getToken(token);
     const toChain = chains[to];
-    const accountId = this.api?.createType("AccountId32", address).toHex();
+
     const isToRelayChain =
       isChainEqual(toChain, "kusama") || isChainEqual(toChain, "polkadot");
 
@@ -343,6 +351,7 @@ export abstract class BaseCrossChainAdapter {
         amount.toChainData(),
         createXTokensDestParam(this.api, toChain.paraChainId, accountId, {
           isToRelayChain,
+          useAccountKey20: accountType === "AccountKey20",
         }),
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         createXTokensWeight(this.api, this.getDestWeight(token, to)!)
@@ -355,6 +364,7 @@ export abstract class BaseCrossChainAdapter {
         amount.toChainData(),
         createXTokensDestParam(this.api, toChain.paraChainId, accountId, {
           isToRelayChain,
+          useAccountKey20: accountType === "AccountKey20",
         }) as any,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         createXTokensWeight(this.api, this.getDestWeight(token, to)!)

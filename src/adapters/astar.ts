@@ -11,7 +11,11 @@ import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import { BalanceData, ExtendedToken, TransferParams } from "../types";
-import { validateAddress, createRouteConfigs } from "../utils";
+import {
+  validateAddress,
+  createRouteConfigs,
+  getDestAccountInfo,
+} from "../utils";
 
 type TokenData = ExtendedToken & { toQuery: () => string };
 
@@ -279,10 +283,16 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
 
     const { address, amount, to, token } = params;
 
-    if (!validateAddress(address)) throw new InvalidAddress(address);
+    const { accountId, accountType, addrType } = getDestAccountInfo(
+      address,
+      token,
+      this.api,
+      to
+    );
+
+    if (!validateAddress(address, addrType)) throw new InvalidAddress(address);
 
     const toChain = chains[to];
-    const accountId = this.api?.createType("AccountId32", address).toHex();
 
     if (token === this.balanceAdapter?.nativeToken) {
       return this.api.tx.xTokens.transferMultiasset(
@@ -299,7 +309,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
               X2: [
                 { Parachain: toChain.paraChainId },
                 {
-                  AccountId32: {
+                  [accountType]: {
                     id: accountId,
                   },
                 },
@@ -337,7 +347,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
             X2: [
               { Parachain: toChain.paraChainId },
               {
-                AccountId32: {
+                [accountType]: {
                   id: accountId,
                 },
               },
