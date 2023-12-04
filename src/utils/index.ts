@@ -4,4 +4,4 @@ export * from "./validate-address";
 export * from "./xtokens-params";
 export * from "./polkadot-xcm-params";
 export * from "./create-route-configs";
-export * from "./account-utils";
+export * from "./destination-utils";

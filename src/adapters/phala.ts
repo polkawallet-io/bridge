@@ -11,7 +11,11 @@ import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import { BalanceData, ExtendedToken, TransferParams } from "../types";
-import { createRouteConfigs, validateAddress, getAccountInfo } from "../utils";
+import {
+  createRouteConfigs,
+  validateAddress,
+  getDestAccountInfo,
+} from "../utils";
 
 export const khalaRouteConfigs = createRouteConfigs("khala", [
   {
@@ -214,8 +218,9 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
 
     const { address, amount, to, token } = params;
 
-    const { accountId, accountType, addrType } = getAccountInfo(
+    const { accountId, accountType, addrType } = getDestAccountInfo(
       address,
+      token,
       this.api,
       to
     );

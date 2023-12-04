@@ -16,7 +16,7 @@ import {
   createPolkadotXCMAsset,
   createPolkadotXCMDest,
   createRouteConfigs,
-  getAccountInfo,
+  getDestAccountInfo,
   validateAddress,
 } from "../utils";
 
@@ -168,8 +168,9 @@ class BaseUniqueAdapter extends BaseCrossChainAdapter {
 
     const { address, amount, to, token } = params;
 
-    const { accountId, accountType, addrType } = getAccountInfo(
+    const { accountId, accountType, addrType } = getDestAccountInfo(
       address,
+      token,
       this.api,
       to
     );

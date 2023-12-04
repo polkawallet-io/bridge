@@ -11,7 +11,11 @@ import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import { BalanceData, BasicToken, TransferParams } from "../types";
-import { createRouteConfigs, getAccountInfo, validateAddress } from "../utils";
+import {
+  createRouteConfigs,
+  getDestAccountInfo,
+  validateAddress,
+} from "../utils";
 
 export const polkadotRouteConfigs = createRouteConfigs("polkadot", [
   {
@@ -207,8 +211,9 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
 
     const { address, amount, to, token } = params;
 
-    const { accountId, accountType, addrType } = getAccountInfo(
+    const { accountId, accountType, addrType } = getDestAccountInfo(
       address,
+      token,
       this.api,
       to
     );

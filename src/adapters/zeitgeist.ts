@@ -11,7 +11,11 @@ import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import { BalanceData, BasicToken, TransferParams } from "../types";
-import { createRouteConfigs, getAccountInfo, validateAddress } from "../utils";
+import {
+  createRouteConfigs,
+  getDestAccountInfo,
+  validateAddress,
+} from "../utils";
 
 const DEST_WEIGHT = "5000000000";
 
@@ -147,10 +151,11 @@ class ZeitgeistBaseAdapter extends BaseCrossChainAdapter {
       throw new ApiNotFound(this.chain.id);
     }
 
-    const { address, amount, to } = params;
+    const { address, amount, to, token } = params;
 
-    const { accountId, accountType, addrType } = getAccountInfo(
+    const { accountId, accountType, addrType } = getDestAccountInfo(
       address,
+      token,
       this.api,
       to
     );

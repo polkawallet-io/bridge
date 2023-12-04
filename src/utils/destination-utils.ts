@@ -1,19 +1,13 @@
 import { AnyApi } from "@acala-network/sdk-core";
 
-import { AddressType } from "./validate-address";
+import { getValidDestAddrType, AddressType } from "./validate-address";
 
-export const getAddressType = (address: string, to?: string): AddressType => {
-  if (address.startsWith("0x") && (to === "acala" || to === "karura")) {
-    return "ethereum";
-  }
-  return "substract";
-};
-
-export const getAccountType = (
+export const getDestAccountType = (
   address: string,
+  token: string,
   to?: string
 ): "AccountKey20" | "AccountId32" => {
-  const addrType = getAddressType(address, to);
+  const addrType = getValidDestAddrType(address, token, to);
   if (addrType === "ethereum") {
     return "AccountKey20";
   } else {
@@ -21,12 +15,13 @@ export const getAccountType = (
   }
 };
 
-export const getAccountId = (
+export const getDestAccountId = (
   address: string,
   api: AnyApi,
+  token: string,
   to?: string
 ): `0x${string}` => {
-  const addrType = getAddressType(address, to);
+  const addrType = getValidDestAddrType(address, token, to);
   if (addrType === "ethereum") {
     return api.createType("AccountId20", address).toHex();
   } else {
@@ -34,8 +29,9 @@ export const getAccountId = (
   }
 };
 
-export const getAccountInfo = (
+export const getDestAccountInfo = (
   address: string,
+  token: string,
   api: AnyApi,
   to?: string
 ): {
@@ -44,8 +40,8 @@ export const getAccountInfo = (
   accountType: "AccountKey20" | "AccountId32";
 } => {
   return {
-    addrType: getAddressType(address, to),
-    accountId: getAccountId(address, api, to),
-    accountType: getAccountType(address, to),
+    addrType: getValidDestAddrType(address, token, to),
+    accountId: getDestAccountId(address, api, token, to),
+    accountType: getDestAccountType(address, token, to),
   };
 };

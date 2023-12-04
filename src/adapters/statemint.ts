@@ -12,7 +12,11 @@ import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import { BalanceData, ExtendedToken, TransferParams } from "../types";
-import { createRouteConfigs, validateAddress, getAccountInfo } from "../utils";
+import {
+  createRouteConfigs,
+  validateAddress,
+  getDestAccountInfo,
+} from "../utils";
 
 export const statemintRouteConfigs = createRouteConfigs("statemint", [
   {
@@ -285,8 +289,9 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
 
     const { address, amount, to, token: tokenName } = params;
 
-    const { accountId, accountType, addrType } = getAccountInfo(
+    const { accountId, accountType, addrType } = getDestAccountInfo(
       address,
+      tokenName,
       this.api,
       to
     );
