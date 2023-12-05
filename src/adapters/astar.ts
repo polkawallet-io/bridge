@@ -310,7 +310,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
                 { Parachain: toChain.paraChainId },
                 {
                   [accountType]: {
-                    id: accountId,
+                    [accountType === "AccountId32" ? "id" : "key"]: accountId,
                   },
                 },
               ],
@@ -348,7 +348,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
               { Parachain: toChain.paraChainId },
               {
                 [accountType]: {
-                  id: accountId,
+                  [accountType === "AccountId32" ? "id" : "key"]: accountId,
                 },
               },
             ],
