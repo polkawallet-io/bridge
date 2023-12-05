@@ -30,7 +30,10 @@ export function createPolkadotXCMAccount(
       parents: 0,
       interior: {
         X1: {
-          [accountType]: { id: accountId, network: isV3 ? undefined : "Any" },
+          [accountType]: {
+            [accountType === "AccountId32" ? "id" : "key"]: accountId,
+            network: isV3 ? undefined : "Any",
+          },
         },
       },
     },

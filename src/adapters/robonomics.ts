@@ -168,7 +168,14 @@ class RobonomicsBaseAdapter extends BaseCrossChainAdapter {
       parents: 1,
     };
     const acc = {
-      interior: { X1: { [accountType]: { id: accountId, network: "Any" } } },
+      interior: {
+        X1: {
+          [accountType]: {
+            [accountType === "AccountId32" ? "id" : "key"]: accountId,
+            network: "Any",
+          },
+        },
+      },
       parents: 0,
     };
     const ass = [

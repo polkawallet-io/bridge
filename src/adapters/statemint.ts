@@ -342,7 +342,13 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
     };
     const acc = {
       parents: 0,
-      interior: { X1: { [accountType]: { id: accountId } } },
+      interior: {
+        X1: {
+          [accountType]: {
+            [accountType === "AccountId32" ? "id" : "key"]: accountId,
+          },
+        },
+      },
     };
     const ass = [
       {
