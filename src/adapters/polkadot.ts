@@ -297,7 +297,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
         interior: {
           X1: {
             [accountType]: {
-              id: accountId,
+              [accountType === "AccountId32" ? "id" : "key"]: accountId,
             },
           },
         },
