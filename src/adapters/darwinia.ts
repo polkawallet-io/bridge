@@ -17,6 +17,7 @@ import {
   createPolkadotXCMDest,
   createRouteConfigs,
   validateAddress,
+  getDestAccountInfo,
 } from "../utils";
 
 const crabRouteConfigs = createRouteConfigs("crab", [
@@ -154,7 +155,14 @@ class BaseDarwiniaAdapter extends BaseCrossChainAdapter {
 
     const { address, amount, to, token } = params;
 
-    if (!validateAddress(address)) throw new InvalidAddress(address);
+    const { accountId, accountType, addrType } = getDestAccountInfo(
+      address,
+      token,
+      this.api,
+      to
+    );
+
+    if (!validateAddress(address, addrType)) throw new InvalidAddress(address);
 
     const toChain = chains[to];
 
@@ -163,13 +171,12 @@ class BaseDarwiniaAdapter extends BaseCrossChainAdapter {
       throw new TokenNotFound(token);
     }
 
-    const accountId = this.api?.createType("AccountId32", address).toHex();
     const parachainId = toChain.paraChainId;
     const rawAmount = amount.toChainData();
 
     return this.api?.tx.polkadotXcm.limitedReserveTransferAssets(
       createPolkadotXCMDest(this.api, parachainId),
-      createPolkadotXCMAccount(this.api, accountId),
+      createPolkadotXCMAccount(this.api, accountId, accountType),
       createPolkadotXCMAsset(this.api, rawAmount, "NATIVE"),
       0,
       this.getDestWeight(token, to)?.toString() as any
