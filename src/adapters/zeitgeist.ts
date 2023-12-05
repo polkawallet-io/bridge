@@ -173,7 +173,12 @@ class ZeitgeistBaseAdapter extends BaseCrossChainAdapter {
           interior: {
             X2: [
               { Parachain: toChain.paraChainId },
-              { [accountType]: { id: accountId, network: "Any" } },
+              {
+                [accountType]: {
+                  [accountType === "AccountId32" ? "id" : "key"]: accountId,
+                  network: "Any",
+                },
+              },
             ],
           },
         },
