@@ -3,7 +3,7 @@ import * as ethers from "ethers";
 
 export type AddressType = "substract" | "ethereum";
 
-const SUPPORTED_TOKEN_ERC20: {
+export const SUPPORTED_TOKEN_ERC20: {
   [x in string]?: { [y: string]: string };
 } = {
   karura: {
