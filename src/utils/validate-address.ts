@@ -3,7 +3,7 @@ import * as ethers from "ethers";
 
 export type AddressType = "substract" | "ethereum";
 
-export const SUPPORTED_TOKEN_ERC20: {
+const SUPPORTED_TOKEN_ERC20: {
   [x in string]?: { [y: string]: string };
 } = {
   karura: {
@@ -28,7 +28,7 @@ export const SUPPORTED_TOKEN_ERC20: {
   mandala: {},
 };
 
-const isSupportedErc20 = (toChain: string, tokenName: string) => {
+export const isAcalaSupportedErc20 = (toChain: string, tokenName: string) => {
   const supportedTokens = Object.keys(SUPPORTED_TOKEN_ERC20[toChain] || {}).map(
     (token) => token.toUpperCase()
   );
@@ -54,7 +54,7 @@ export const getValidDestAddrType = (
   if (
     (to === "acala" || to === "karura") &&
     address.startsWith("0x") &&
-    isSupportedErc20(to, token)
+    isAcalaSupportedErc20(to, token)
   ) {
     return "ethereum";
   }
