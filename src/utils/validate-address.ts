@@ -3,7 +3,7 @@ import * as ethers from "ethers";
 
 export type AddressType = "substract" | "ethereum";
 
-const SUPPORTED_TOKEN_ERC20_ADDR: {
+const SUPPORTED_TOKEN_ERC20: {
   [x in string]?: { [y: string]: string };
 } = {
   karura: {
@@ -28,6 +28,13 @@ const SUPPORTED_TOKEN_ERC20_ADDR: {
   mandala: {},
 };
 
+const isSupportedErc20 = (toChain: string, tokenName: string) => {
+  const supportedTokens = Object.keys(SUPPORTED_TOKEN_ERC20[toChain] || {}).map(
+    (token) => token.toUpperCase()
+  );
+  return supportedTokens.includes(tokenName.toUpperCase());
+};
+
 /**
  * Get the valid destination address type for the given combination of
  * address, token name and destination chain name.
@@ -47,7 +54,7 @@ export const getValidDestAddrType = (
   if (
     (to === "acala" || to === "karura") &&
     address.startsWith("0x") &&
-    SUPPORTED_TOKEN_ERC20_ADDR[to]?.[token]
+    isSupportedErc20(to, token)
   ) {
     return "ethereum";
   }
