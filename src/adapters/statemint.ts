@@ -36,8 +36,8 @@ export const statemintRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
     to: "interlay",
     token: "USDT",
-    // from recent transfer: 9_510 atomic units, add a minimum of 2x buffer
-    xcm: { fee: { token: "USDT", amount: "20000" }, weightLimit: "Unlimited" },
+    // from recent tests: 11_888 atomic units, use a minimum of 2x buffer
+    xcm: { fee: { token: "USDT", amount: "25000" }, weightLimit: "Unlimited" },
   },
 ];
 
