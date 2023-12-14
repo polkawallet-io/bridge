@@ -1,4 +1,4 @@
-endpoint: wss://hydradx-rpc.dwellir.com
+endpoint: wss://rpc.hydradx.cloud
 mock-signature-host: true
 block: ${env.HYDRADX_BLOCK_NUMBER}
 db: ./db.sqlite
