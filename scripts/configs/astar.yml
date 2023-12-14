@@ -1,4 +1,7 @@
-endpoint: wss://rpc.astar.network
+endpoint: 
+  - wss://rpc.astar.network
+  - wss://astar-rpc.dwellir.com
+  - wss://astar.public.curie.radiumblock.co/ws
 mock-signature-host: true
 
 import-storage:

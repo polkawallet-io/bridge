@@ -1,4 +1,6 @@
-endpoint: wss://api-kusama.interlay.io/parachain
+endpoint:
+  - wss://api-kusama.interlay.io/parachain
+  - wss://kintsugi-rpc.dwellir.com
 mock-signature-host: true
 
 import-storage:

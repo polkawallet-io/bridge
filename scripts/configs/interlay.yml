@@ -1,4 +1,7 @@
-endpoint: wss://api.interlay.io/parachain
+endpoint:
+  - wss://api.interlay.io/parachain
+  - wss://interlay-rpc.dwellir.com
+  - wss://rpc-interlay.luckyfriday.io
 mock-signature-host: true
 
 import-storage:

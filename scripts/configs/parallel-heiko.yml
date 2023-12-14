@@ -1,4 +1,5 @@
-endpoint: wss://heiko-rpc.parallel.fi
+endpoint:
+  - wss://heiko-rpc.parallel.fi
 mock-signature-host: true
 
 import-storage:

@@ -1,4 +1,8 @@
-endpoint: wss://statemint-rpc.dwellir.com
+endpoint:
+  - wss://statemint-rpc.dwellir.com
+  - wss://rpc-asset-hub-polkadot.luckyfriday.io
+  - wss://statemint-rpc-tn.dwellir.com
+  - wss://polkadot-asset-hub-rpc.polkadot.io
 mock-signature-host: true
 
 import-storage:
