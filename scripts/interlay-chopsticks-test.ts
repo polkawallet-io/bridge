@@ -4,7 +4,6 @@
 import { PolkadotAdapter } from "../src/adapters/polkadot";
 import { InterlayAdapter } from "../src/adapters/interlay";
 import { StatemintAdapter } from "../src/adapters/statemint";
-import { HydraAdapter } from "../src/adapters/hydradx";
 import { AcalaAdapter } from "../src/adapters/acala";
 import { ParallelAdapter } from "../src/adapters/parallel";
 import { BifrostPolkadotAdapter } from "../src/adapters/bifrost";
