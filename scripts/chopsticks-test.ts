@@ -147,7 +147,7 @@ async function checkTransfer(fromChain: ChainName, toChain: ChainName, token: st
             amountToSend = bumpedFee.add(expectedEd).add(dust);
             ret = {
                 message: `Modified ED check for ${token} to ${toChain} - price changes in ${token}/HDX can cause false negatives. Bumped assumed fees by ${bumpRate.minus(FN.ONE).toNumber() * 100}%`,
-                result: ResultCode.WARN
+                result: ResultCode.OK
             };
         }
         await sendTx(fromChain, toChain, token, bridge, amountToSend, TestCase.ExistentialDeposit);
@@ -171,8 +171,7 @@ async function retryCheckTransfer(
   ): Promise<Awaited<ReturnType<typeof checkTransfer>>> {
     const result = await checkTransfer(fromChain, toChain, token, bridge);
 
-    // OK or WARN are fine, only retry on failures
-    if (result.result === ResultCode.OK || result.result === ResultCode.WARN) {
+    if (result.result === ResultCode.OK) {
         return result;
     }
 
@@ -274,8 +273,11 @@ export async function runTestCasesAndExit(
         process.stdout.write(`Testing ${token} transfer from ${from} to ${to}... `);
         const result = await retryCheckTransfer(from, to, token, bridge, 2);
         console.log(ResultCode[result.result]);
-        if (result.result != ResultCode.OK) {
+        if (result.message?.length > 0) {
             console.log(iconOf(result.result), result.message);
+        }
+
+        if (result.result != ResultCode.OK) {
             problematicTestCases.push({from: from as ChainName, to: to as ChainName, token, icon: iconOf(result.result), message: result.message});
             if (aggregateTestResult == ResultCode.OK || (aggregateTestResult == ResultCode.WARN && result.result == ResultCode.FAIL)) {
                 // only 'increase' the aggregate error
