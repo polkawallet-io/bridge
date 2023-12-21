@@ -142,11 +142,11 @@ async function checkTransfer(fromChain: ChainName, toChain: ChainName, token: st
         if (toChain === "hydra") {
             // bump fees in amount to send by a few percent for XCM to HydraDX
             // token/HDX price pair changes can make this fail due to pair changes from previous tx increasing fee required
-            const bumpRate = 0.1;
-            const bumpedFee = actualFee.mul(FN.fromInner(1 + bumpRate));
+            const bumpRate = new FN(1.1);
+            const bumpedFee = actualFee.mul(bumpRate);
             amountToSend = bumpedFee.add(expectedEd).add(dust);
             ret = {
-                message: `Modified ED check for ${token} to ${toChain} - price changes in ${token}/HDX can cause false negatives. Bumped assumed fees by ${bumpRate * 100}%`,
+                message: `Modified ED check for ${token} to ${toChain} - price changes in ${token}/HDX can cause false negatives. Bumped assumed fees by ${bumpRate.minus(FN.ONE).toNumber() * 100}%`,
                 result: ResultCode.WARN
             };
         }
@@ -171,7 +171,8 @@ async function retryCheckTransfer(
   ): Promise<Awaited<ReturnType<typeof checkTransfer>>> {
     const result = await checkTransfer(fromChain, toChain, token, bridge);
 
-    if (result.result === ResultCode.OK) {
+    // OK or WARN are fine, only retry on failures
+    if (result.result === ResultCode.OK || result.result === ResultCode.WARN) {
         return result;
     }
 
