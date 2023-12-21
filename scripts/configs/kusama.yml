@@ -1,6 +1,6 @@
 endpoint:
-  - wss://kusama-rpc.polkadot.io
   - wss://kusama-rpc.dwellir.com
+  - wss://kusama-rpc.polkadot.io
   - wss://rpc-kusama.luckyfriday.io
   - wss://kusama-rpc-tn.dwellir.com
 mock-signature-host: true
