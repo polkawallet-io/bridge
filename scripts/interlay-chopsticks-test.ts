@@ -4,6 +4,7 @@
 import { PolkadotAdapter } from "../src/adapters/polkadot";
 import { InterlayAdapter } from "../src/adapters/interlay";
 import { StatemintAdapter } from "../src/adapters/statemint";
+import { HydraAdapter } from "../src/adapters/hydradx";
 import { AcalaAdapter } from "../src/adapters/acala";
 import { ParallelAdapter } from "../src/adapters/parallel";
 import { BifrostPolkadotAdapter } from "../src/adapters/bifrost";
@@ -24,21 +25,18 @@ async function main(): Promise<void> {
         //           relaychain gets its port last after all parachains.
         interlay: { adapter: new InterlayAdapter(), endpoints: ['ws://127.0.0.1:8000'] },
         statemint: { adapter: new StatemintAdapter(), endpoints: ['ws://127.0.0.1:8001'] },
-        // disable hydra - rpc too flaky to use in regular test runs
-        // hydra: { adapter: new HydraAdapter(), endpoints: ['ws://127.0.0.1:8002'] },
-        acala: { adapter: new AcalaAdapter(), endpoints: ['ws://127.0.0.1:8002'] },
+        hydra: { adapter: new HydraAdapter(), endpoints: ['ws://127.0.0.1:8002'] },
+        acala: { adapter: new AcalaAdapter(), endpoints: ['ws://127.0.0.1:8003'] },
         // disable astar - rpc currently is too fragile for use in recurring tests
         // astar:      { adapter: new AstarAdapter(),      endpoints: ['ws://127.0.0.1:8004'] },
-        parallel: { adapter: new ParallelAdapter(), endpoints: ['ws://127.0.0.1:8003'] },
-        bifrost_polkadot: { adapter: new BifrostPolkadotAdapter(), endpoints: ['ws://127.0.0.1:8004']},
-        polkadot: { adapter: new PolkadotAdapter(), endpoints: ['ws://127.0.0.1:8005'] },
+        parallel: { adapter: new ParallelAdapter(), endpoints: ['ws://127.0.0.1:8004'] },
+        bifrost_polkadot: { adapter: new BifrostPolkadotAdapter(), endpoints: ['ws://127.0.0.1:8005']},
+        polkadot: { adapter: new PolkadotAdapter(), endpoints: ['ws://127.0.0.1:8006'] },
     };
 
     const filterCases: Partial<RouterTestCase>[] = [
         {from: "astar"},
         {to: "astar"},
-        {from: "hydra"},
-        {to: "hydra"},
     ];
 
     await runTestCasesAndExit(adaptersEndpoints, filterCases);

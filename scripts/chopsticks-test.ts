@@ -136,7 +136,20 @@ async function checkTransfer(fromChain: ChainName, toChain: ChainName, token: st
 
         // check existential deposit by sending exactly `actualFee + ed + [1 planck]`. The function
         // will throw an error if the ed is set too low.
-        let amountToSend = actualFee.add(expectedEd).add(FN.fromInner("1", actualFee.getPrecision()));
+        const dust = FN.fromInner("1", actualFee.getPrecision());
+        let amountToSend = actualFee.add(expectedEd).add(dust);
+
+        if (toChain === "hydra") {
+            // bump fees in amount to send by a few percent for XCM to HydraDX
+            // token/HDX price pair changes can make this fail due to pair changes from previous tx increasing fee required
+            const bumpRate = new FN(1.1);
+            const bumpedFee = actualFee.mul(bumpRate);
+            amountToSend = bumpedFee.add(expectedEd).add(dust);
+            ret = {
+                message: `Modified ED check for ${token} to ${toChain} - price changes in ${token}/HDX can cause false negatives. Bumped assumed fees by ${bumpRate.minus(FN.ONE).toNumber() * 100}%`,
+                result: ResultCode.OK
+            };
+        }
         await sendTx(fromChain, toChain, token, bridge, amountToSend, TestCase.ExistentialDeposit);
         
         return ret;
@@ -260,8 +273,11 @@ export async function runTestCasesAndExit(
         process.stdout.write(`Testing ${token} transfer from ${from} to ${to}... `);
         const result = await retryCheckTransfer(from, to, token, bridge, 2);
         console.log(ResultCode[result.result]);
-        if (result.result != ResultCode.OK) {
+        if (result.message?.length > 0) {
             console.log(iconOf(result.result), result.message);
+        }
+
+        if (result.result != ResultCode.OK) {
             problematicTestCases.push({from: from as ChainName, to: to as ChainName, token, icon: iconOf(result.result), message: result.message});
             if (aggregateTestResult == ResultCode.OK || (aggregateTestResult == ResultCode.WARN && result.result == ResultCode.FAIL)) {
                 // only 'increase' the aggregate error

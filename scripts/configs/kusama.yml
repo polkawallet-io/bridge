@@ -1,5 +1,6 @@
-# endpoint: wss://kusama-rpc.dwellir.com
-endpoint: wss://kusama-rpc.polkadot.io
+endpoint:
+  - wss://kusama-rpc.dwellir.com
+  - wss://kusama-rpc.dwellir.com
 mock-signature-host: true
 block: ${env.KUSAMA_BLOCK_NUMBER}
 db: ./db.sqlite

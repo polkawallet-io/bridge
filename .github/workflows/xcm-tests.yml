@@ -69,6 +69,7 @@ jobs:
             -r scripts/configs/polkadot.yml \
             -p scripts/configs/interlay.yml \
             -p scripts/configs/statemint.yml \
+            -p scripts/configs/hydradx.yml \
             -p scripts/configs/acala.yml \
             -p scripts/configs/parallel.yml \
             -p scripts/configs/bifrost-polkadot.yml \
