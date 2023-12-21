@@ -6,6 +6,8 @@ block: ${env.HYDRADX_BLOCK_NUMBER}
 db: ./db.sqlite
 # wasm-override: hydradx_runtime.compact.compressed.wasm
 
+# runtime-log-level: 5
+
 import-storage:
   System:
     Account:
