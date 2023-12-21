@@ -136,15 +136,17 @@ async function checkTransfer(fromChain: ChainName, toChain: ChainName, token: st
 
         // check existential deposit by sending exactly `actualFee + ed + [1 planck]`. The function
         // will throw an error if the ed is set too low.
-        let amountToSend = actualFee.add(expectedEd).add(FN.fromInner("1", actualFee.getPrecision()));
+        const dust = FN.fromInner("1", actualFee.getPrecision());
+        let amountToSend = actualFee.add(expectedEd).add(dust);
 
         if (toChain === "hydra") {
-            // bump amount to send by a few percent for XCM to HydraDX
-            // token/HDX price pair changes can make this fail due to change from previous tx
+            // bump fees in amount to send by a few percent for XCM to HydraDX
+            // token/HDX price pair changes can make this fail due to pair changes from previous tx increasing fee required
             const bumpRate = 0.1;
-            amountToSend = amountToSend.mul(FN.fromInner(1 + bumpRate));
+            const bumpedFee = actualFee.mul(FN.fromInner(1 + bumpRate));
+            amountToSend = bumpedFee.add(expectedEd).add(dust);
             ret = {
-                message: `Modified ED check for ${token} to ${toChain} - price changes in ${token}/HDX can cause false negatives. Bumped test amount by ${bumpRate * 100}%`,
+                message: `Modified ED check for ${token} to ${toChain} - price changes in ${token}/HDX can cause false negatives. Bumped assumed fees by ${bumpRate * 100}%`,
                 result: ResultCode.WARN
             };
         }
