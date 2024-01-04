@@ -1,8 +1,12 @@
-endpoint: wss://rpc.hydradx.cloud
+endpoint:
+  - wss://rpc.hydradx.cloud
+  - wss://hydradx-rpc.dwellir.com
 mock-signature-host: true
 block: ${env.HYDRADX_BLOCK_NUMBER}
 db: ./db.sqlite
 # wasm-override: hydradx_runtime.compact.compressed.wasm
+
+# runtime-log-level: 5
 
 import-storage:
   System:

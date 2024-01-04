@@ -1,5 +1,7 @@
-endpoint: wss://hk.p.bifrost-rpc.liebi.com/ws
-# endpoint: wss://bifrost-polkadot.api.onfinality.io/public-ws
+endpoint:
+  - wss://hk.p.bifrost-rpc.liebi.com/ws
+  - wss://bifrost-polkadot-rpc.dwellir.com
+  - wss://eu.bifrost-polkadot-rpc.liebi.com/ws
 mock-signature-host: true
 
 import-storage:
