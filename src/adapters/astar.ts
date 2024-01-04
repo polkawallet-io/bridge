@@ -222,7 +222,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
     if (token === this.balanceAdapter?.nativeToken) {
-      return this.api.tx.xtokens.transferMultiasset(
+      return this.api.tx.xTokens.transferMultiasset(
         {
           V3: {
             id: { Concrete: { parents: 0, interior: "Here" } },
@@ -243,14 +243,14 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
               ],
             },
           },
-        },
+        } as any,
         "Unlimited"
       );
     }
 
     const tokenData: TokenData = this.getToken(params.token);
 
-    return this.api.tx.xtokens.transferMultiasset(
+    return this.api.tx.xTokens.transferMultiasset(
       {
         V3: {
           fun: { Fungible: amount.toChainData() },
@@ -281,7 +281,7 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
             ],
           },
         },
-      },
+      } as any,
       "Unlimited"
     );
   }
