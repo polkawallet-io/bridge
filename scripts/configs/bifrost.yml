@@ -1,0 +1,29 @@
+endpoint: 
+  - wss://bifrost-rpc.dwellir.com
+  - wss://bifrost-rpc.liebi.com/ws
+  - wss://us.bifrost-rpc.liebi.com/ws
+mock-signature-host: true
+
+import-storage:
+  # Sudo:
+  #   Key: 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice
+  System:
+    Account:
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+        - providers: 1
+          data:
+            free: '1000000000000000'
+  Tokens:
+    Accounts:
+      -
+        -
+          - 5Eg2fnsjADUqvPPTJ17bGgphuxi754R7LsCCqPjt7M5MqVKB # sibl 2092 (kintsugi sov)
+          - vtoken: KSM #VKSM
+        - free: '10000000000000'
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice
+          - vtoken: KSM # VKSM
+        - free: '10000000000000000000'

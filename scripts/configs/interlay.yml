@@ -1,0 +1,36 @@
+endpoint:
+  - wss://api.interlay.io/parachain
+  - wss://interlay-rpc.dwellir.com
+  - wss://rpc-interlay.luckyfriday.io
+mock-signature-host: true
+
+import-storage:
+  # Sudo:
+  #   Key: 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice
+  Tokens:
+    Accounts:
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice
+          - token: INTR
+        - free: '500000000000000'
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice
+          - token: IBTC
+        - free: '10000000000'
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice
+          - token: DOT
+        - free: '500000000000000'
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice, usdt
+          - foreignAsset: 2
+        - free: '500000000000000'
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice, vdot
+          - foreignAsset: 3
+        - free: '100000000000000000'

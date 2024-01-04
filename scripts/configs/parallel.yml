@@ -1,0 +1,26 @@
+endpoint:
+  - wss://parallel-rpc.dwellir.com
+  - wss://polkadot-rpc.parallel.fi
+mock-signature-host: true
+
+import-storage:
+  System:
+    Account:
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice
+        - providers: 1
+          data:
+            free: '1000000000000000'
+  Assets:
+    Account:
+      -
+        -
+          - 122 # IBTC
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice
+        - balance: '1000000000000000'
+      -
+        -
+          - 120 # INTR
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice
+        - balance: '1000000000000000'
