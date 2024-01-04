@@ -1,6 +1,6 @@
 endpoint:
   - wss://parallel-rpc.dwellir.com
-  - wss://rpc.parallel.fi
+  - wss://polkadot-rpc.parallel.fi
 mock-signature-host: true
 
 import-storage:
