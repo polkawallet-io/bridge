@@ -49,7 +49,7 @@ jobs:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
       - name: Upload logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: kintsugi-chopsticks-logs
           path: log.txt
@@ -95,7 +95,7 @@ jobs:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
       - name: Upload logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: interlay-chopsticks-logs
           path: log.txt
