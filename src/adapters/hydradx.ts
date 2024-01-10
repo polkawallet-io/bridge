@@ -12,7 +12,7 @@ import { ChainName, chains } from "../configs";
 import { ApiNotFound, CurrencyNotFound } from "../errors";
 import {
   BalanceData,
-  ExpandToken,
+  ExtendedToken,
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
@@ -41,27 +41,27 @@ export const hydraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   },
 ];
 
-export const hydraTokensConfig: Record<string, ExpandToken> = {
+export const hydraTokensConfig: Record<string, ExtendedToken> = {
   HDX: {
     name: "HDX",
     symbol: "HDX",
     decimals: 12,
     ed: "1000000000000",
-    toChainData: () => 0,
+    toRaw: () => 0,
   },
   IBTC: {
     name: "IBTC",
     symbol: "IBTC",
     decimals: 8,
     ed: "36",
-    toChainData: () => 11,
+    toRaw: () => 11,
   },
   INTR: {
     name: "INTR",
     symbol: "INTR",
     decimals: 10,
     ed: "6164274209",
-    toChainData: () => 17,
+    toRaw: () => 17,
   },
 };
 
@@ -114,9 +114,9 @@ class HydradxBalanceAdapter extends BalanceAdapter {
       );
     }
 
-    const token = this.getToken<ExpandToken>(tokenName);
+    const token = this.getToken<ExtendedToken>(tokenName);
 
-    return this.storages.assets(token.toChainData(), address).observable.pipe(
+    return this.storages.assets(token.toRaw(), address).observable.pipe(
       map((balance) => {
         const amount = FN.fromInner(
           balance.free?.toString() || "0",
@@ -210,13 +210,13 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
 
     const { address, amount, to, token: tokenName } = params;
 
-    const token = this.getToken<ExpandToken>(tokenName);
+    const token = this.getToken<ExtendedToken>(tokenName);
 
     if (!token) {
       throw new CurrencyNotFound(token);
     }
 
-    const tokenId = token.toChainData();
+    const tokenId = token.toRaw();
     const toChain = chains[to];
     const accountId = this.api.createType("AccountId32", address).toHex();
 

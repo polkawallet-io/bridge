@@ -12,14 +12,12 @@ import { ChainName, chains } from "../configs";
 import { ApiNotFound, CurrencyNotFound } from "../errors";
 import {
   BalanceData,
-  BasicToken,
   CrossChainRouterConfigs,
   CrossChainTransferParams,
+  ExtendedToken,
 } from "../types";
-import {
-  XCM_V3_GENERAL_KEY_DATA_BYTES,
-  supportsV0V1Multilocation,
-} from "../utils/xcm-versioned-multilocation-check";
+
+type TokenData = ExtendedToken & { toQuery: () => string };
 
 export const astarRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
@@ -42,18 +40,33 @@ export const astarRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   },
 ];
 
-export const astarTokensConfig: Record<string, Record<string, BasicToken>> = {
+export const astarTokensConfig: Record<string, Record<string, TokenData>> = {
   astar: {
-    ASTR: { name: "ASTR", symbol: "ASTR", decimals: 18, ed: "1000000" },
-    IBTC: { name: "IBTC", symbol: "IBTC", decimals: 8, ed: "1" },
-    INTR: { name: "INTR", symbol: "INTR", decimals: 10, ed: "1" },
+    ASTR: {
+      name: "ASTR",
+      symbol: "ASTR",
+      decimals: 18,
+      ed: "1000000",
+    } as TokenData,
+    IBTC: {
+      name: "IBTC",
+      symbol: "IBTC",
+      decimals: 8,
+      ed: "1",
+      toRaw: () =>
+        "0x0001000000000000000000000000000000000000000000000000000000000000",
+      toQuery: () => "18446744073709551620",
+    },
+    INTR: {
+      name: "INTR",
+      symbol: "INTR",
+      decimals: 10,
+      ed: "1",
+      toRaw: () =>
+        "0x0002000000000000000000000000000000000000000000000000000000000000",
+      toQuery: () => "18446744073709551621",
+    },
   },
-};
-
-const SUPPORTED_TOKENS: Record<string, string> = {
-  // to interlay
-  IBTC: "18446744073709551620",
-  INTR: "18446744073709551621",
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -105,13 +118,13 @@ class AstarBalanceAdapter extends BalanceAdapter {
       );
     }
 
-    const tokenId = SUPPORTED_TOKENS[token];
+    const tokenData: TokenData = this.getToken(token);
 
-    if (tokenId === undefined) {
+    if (!tokenData) {
       throw new CurrencyNotFound(token);
     }
 
-    return this.storages.assets(tokenId, address).observable.pipe(
+    return this.storages.assets(tokenData.toQuery(), address).observable.pipe(
       map((balance) => {
         const amount = FN.fromInner(
           balance.unwrapOrDefault()?.balance?.toString() || "0",
@@ -201,135 +214,76 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
+    if (!this.api) throw new ApiNotFound(this.chain.id);
 
     const { address, amount, to, token } = params;
-    const toChain = chains[to];
 
+    const toChain = chains[to];
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    const supportsV1 = supportsV0V1Multilocation(this.api);
-
-    let [dst, acc, ass] = supportsV1
-      ? [
-          {
-            V1: {
-              parents: 1,
-              interior: { X1: { Parachain: toChain.paraChainId } },
-            },
-          },
-          {
-            V1: {
-              parents: 0,
-              interior: {
-                X1: { AccountId32: { id: accountId, network: "Any" } },
-              },
-            },
-          },
-          {
-            V1: [
-              {
-                id: { Concrete: { parents: 0, interior: "Here" } },
-                fun: { Fungible: amount.toChainData() },
-              },
-            ],
-          },
-        ]
-      : [
-          {
-            V3: {
-              parents: 1,
-              interior: { X1: { Parachain: toChain.paraChainId } },
-            },
-          } as any,
-          {
-            V3: {
-              parents: 0,
-              interior: { X1: { AccountId32: { id: accountId } } },
-            },
-          } as any,
-          {
-            V3: [
-              {
-                id: { Concrete: { parents: 0, interior: "Here" } },
-                fun: { Fungible: amount.toChainData() },
-              },
-            ],
-          } as any,
-        ];
-
     if (token === this.balanceAdapter?.nativeToken) {
-      return this.api?.tx.polkadotXcm.reserveTransferAssets(dst, acc, ass, 0);
+      return this.api.tx.xTokens.transferMultiasset(
+        {
+          V3: {
+            id: { Concrete: { parents: 0, interior: "Here" } },
+            fun: { Fungible: amount.toChainData() },
+          },
+        },
+        {
+          V3: {
+            parents: 1,
+            interior: {
+              X2: [
+                { Parachain: toChain.paraChainId },
+                {
+                  AccountId32: {
+                    id: accountId,
+                  },
+                },
+              ],
+            },
+          },
+        } as any,
+        "Unlimited"
+      );
     }
 
-    const tokenIds: Record<string, string> = {
-      // ids taken from https://github.com/colorfulnotion/xcm-global-registry/blob/main/assets/polkadot/polkadot_2000_assets.json
-      // to interlay
-      IBTC: "0x0001",
-      INTR: "0x0002",
-    };
+    const tokenData: TokenData = this.getToken(params.token);
 
-    const tokenId = tokenIds[token];
-
-    if (tokenId === undefined) {
-      throw new CurrencyNotFound(token);
-    }
-
-    // count bytes without the leading '0x'
-    const tokenIdByteCount = tokenId.replace("0x", "").length / 2;
-    const paddedTokenId = tokenId.padEnd(
-      // pad for a total length of required bytes plus '0x'
-      2 * XCM_V3_GENERAL_KEY_DATA_BYTES + 2,
-      "00"
+    return this.api.tx.xTokens.transferMultiasset(
+      {
+        V3: {
+          fun: { Fungible: amount.toChainData() },
+          id: {
+            Concrete: {
+              parents: 1,
+              interior: {
+                X2: [
+                  { Parachain: toChain.paraChainId },
+                  { GeneralKey: { length: 2, data: tokenData.toRaw() } },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        V3: {
+          parents: 1,
+          interior: {
+            X2: [
+              { Parachain: toChain.paraChainId },
+              {
+                AccountId32: {
+                  id: accountId,
+                },
+              },
+            ],
+          },
+        },
+      } as any,
+      "Unlimited"
     );
-
-    // not native token: reconstruct asset argument
-    ass = supportsV1
-      ? {
-          V1: [
-            {
-              id: {
-                Concrete: {
-                  parents: 1,
-                  interior: {
-                    X2: [
-                      { Parachain: toChain.paraChainId },
-                      { GeneralKey: tokenId },
-                    ],
-                  },
-                },
-              },
-              fun: { Fungible: amount.toChainData() },
-            },
-          ],
-        }
-      : {
-          V3: [
-            {
-              id: {
-                Concrete: {
-                  parents: 1,
-                  interior: {
-                    X2: [
-                      { Parachain: toChain.paraChainId },
-                      {
-                        GeneralKey: {
-                          length: tokenIdByteCount,
-                          data: paddedTokenId,
-                        },
-                      },
-                    ],
-                  },
-                },
-              },
-              fun: { Fungible: amount.toChainData() },
-            },
-          ],
-        };
-
-    return this.api?.tx.polkadotXcm.reserveWithdrawAssets(dst, acc, ass, 0);
   }
 }
 
