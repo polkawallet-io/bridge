@@ -146,7 +146,7 @@ export const acalaRouteConfigs = createRouteConfigs("acala", [
     to: "statemint",
     token: "USDT",
     xcm: {
-      fee: { token: "USDT", amount: "700000" },
+      fee: { token: "DOT", amount: "100000000" },
     },
   },
   {
