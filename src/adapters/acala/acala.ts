@@ -154,11 +154,38 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
       throw new InvalidAddress(address);
     }
 
+    if (isChainEqual(toChain, "statemint")) {
+      const tokenData = statemintTokensConfig[token];
+
+      if (!token) throw new TokenNotFound(token);
+
+      return this.api.tx.xTokens.transferMultiassetWithFee(
+        createXTokensAssetsParam(
+          this.api,
+          toChain.paraChainId,
+          tokenData.toRaw(),
+          amount.toChainData()
+        ),
+        {
+          V3: {
+            id: {
+              Concrete: {
+                parents: 1,
+                interior: "Here",
+              },
+            },
+            fun: {
+              Fungible: "100000000",
+            },
+          },
+        },
+        createXTokensDestParam(this.api, toChain.paraChainId, accountId) as any,
+        "Unlimited"
+      );
+    }
+
     // for statemine
-    if (
-      isChainEqual(toChain, "statemine") ||
-      isChainEqual(toChain, "statemint")
-    ) {
+    if (isChainEqual(toChain, "statemine")) {
       const tokenData: ExtendedToken = isChainEqual(toChain, "statemine")
         ? statemineTokensConfig[token]
         : statemintTokensConfig[token];
