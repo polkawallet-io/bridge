@@ -71,7 +71,6 @@ jobs:
             -p scripts/configs/hydradx.yml \
             -p scripts/configs/acala.yml \
             -p scripts/configs/astar.yml \
-            -p scripts/configs/parallel.yml \
             -p scripts/configs/bifrost-polkadot.yml \
             &> log.txt &
           echo "Waiting for log to show chopsticks is ready..."
