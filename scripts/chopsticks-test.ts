@@ -191,13 +191,13 @@ async function retryCheckTransfer(
  * Can skip specific test cases provided by the skipCases filter, and will also skip routes if no matching adapter has been provided.
  * 
  * @param adapterEndpoints Records containing ChainName as key, an instantiated adapter and a list of ws(s) links as endpoints for each.
- * @param includeAssetHubSepcialCases Boolean value whether to add realy chaing to/from assethub test cases (true) or not (false).
+ * @param includeAssetHubSpecialCases Boolean value whether to add relay chain to/from assethub test cases (true) or not (false).
  * @param skipCases An array of xcm test cases to skip.
  */
 export async function runTestCasesAndExit(
     // record key is chainname
     adapterEndpoints: Record<ChainName, { adapter: BaseCrossChainAdapter, endpoints: Array<string> }>,
-    includeAssetHubSepcialCases: boolean = false,
+    includeAssetHubSpecialCases: boolean = false,
     // skip cases: array of to, from and/or token to skip tests for
     skipCases: Partial<RouterTestCase>[] = []
 ): Promise<void> {
@@ -233,7 +233,7 @@ export async function runTestCasesAndExit(
     }));
 
     // add in special cases: polkadot/kusama <=> asset hub
-    if (includeAssetHubSepcialCases) {
+    if (includeAssetHubSpecialCases) {
         const relayId = chains.includes("polkadot") ? "polkadot" : "kusama";
         const assetHubId = relayId === "polkadot" ? "statemint" : "statemine";
         const token = relayId === "polkadot" ? "DOT" : "KSM";
