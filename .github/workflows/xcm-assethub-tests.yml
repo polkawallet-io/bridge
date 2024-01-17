@@ -1,8 +1,8 @@
 ---
-name: XCM tests
+name: AssetHub XCM tests
 on:
   schedule:
-    - cron: '12 */2 * * *' # Run every 2 hours
+    - cron: '38 */2 * * *' # Run every 2 hours
   push:
     branches:
       - master
@@ -11,9 +11,9 @@ on:
       - master
 
 jobs:
-  chopsticks_kintsugi_test:
+  chopsticks_kusama_assethub_test:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,18 +25,16 @@ jobs:
             xcm \
             -r scripts/configs/kusama.yml \
             -p scripts/configs/kintsugi.yml \
-            -p scripts/configs/karura.yml \
-            -p scripts/configs/parallel-heiko.yml \
-            -p scripts/configs/bifrost.yml \
+            -p scripts/configs/statemine.yml \
             &> log.txt &
           echo "Waiting for log to show chopsticks is ready..."
           tail -f log.txt | grep -q "Connected parachains"
           echo "... detected chopsticks is ready."
 
-      - name: Run Kintsugi tests
+      - name: Run Kusama AssetHub tests
         run: |
           yarn install --frozen-lockfile
-          npx ts-node scripts/kintsugi-chopsticks-test.ts
+          npx ts-node scripts/kusama-chopsticks-assethub-test.ts
       - name: Show error log
         if: failure()
         run: |
@@ -46,17 +44,10 @@ jobs:
         if: failure()
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
-      - name: Upload logs
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: kintsugi-chopsticks-logs
-          path: log.txt
-          retention-days: 7
 
-  chopsticks_interlay_test:
+  chopsticks_polkadot_assethub_test:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -68,21 +59,16 @@ jobs:
             xcm \
             -r scripts/configs/polkadot.yml \
             -p scripts/configs/interlay.yml \
-            -p scripts/configs/hydradx.yml \
-            -p scripts/configs/acala.yml \
-            -p scripts/configs/astar.yml \
-            -p scripts/configs/parallel.yml \
-            -p scripts/configs/bifrost-polkadot.yml \
+            -p scripts/configs/statemint.yml \
             &> log.txt &
           echo "Waiting for log to show chopsticks is ready..."
           tail -f log.txt | grep -q "Connected parachains"
           echo "... detected chopsticks is ready."
 
-      - name: Run Interlay tests
+      - name: Run Polkadot AssetHub tests
         run: |
           yarn install --frozen-lockfile
-          npx ts-node scripts/interlay-chopsticks-test.ts
-
+          npx ts-node scripts/polkadot-chopsticks-assethub-test.ts
       - name: Show error log
         if: failure()
         run: |
@@ -92,10 +78,3 @@ jobs:
         if: failure()
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
-      - name: Upload logs
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: interlay-chopsticks-logs
-          path: log.txt
-          retention-days: 7
