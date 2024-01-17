@@ -2,7 +2,7 @@
 name: Daily XCM tests
 on:
   schedule:
-    - cron: '5 * * * *' # Run hourly
+    - cron: '12 */2 * * *' # Run every 2 hours
   push:
     branches:
       - master
@@ -13,7 +13,7 @@ on:
 jobs:
   chopsticks_kintsugi_test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -55,7 +55,7 @@ jobs:
 
   chopsticks_kusama_assethub_test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -88,7 +88,7 @@ jobs:
 
   chopsticks_interlay_test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -133,7 +133,7 @@ jobs:
 
   chopsticks_polkadot_assethub_test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
