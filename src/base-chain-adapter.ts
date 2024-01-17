@@ -104,6 +104,9 @@ export abstract class BaseCrossChainAdapter {
       ...params,
       amount: new FN("10000000000"),
     });
+    const fromApi = this.api as AnyApi;
+    const paymentToken = fromApi.registry.chainTokens[0];
+    const decimals = fromApi.registry.chainDecimals[0];
 
     return combineLatest({
       minInput: minInput$,
@@ -116,7 +119,10 @@ export abstract class BaseCrossChainAdapter {
           maxInput: maxInput.max(FN.ZERO),
           ss58Prefix: chains[to].ss58Prefix,
           destFee,
-          estimateFee,
+          estimateFee: {
+            token: paymentToken,
+            balance: FN.fromInner(estimateFee, decimals),
+          },
         };
       })
     );
