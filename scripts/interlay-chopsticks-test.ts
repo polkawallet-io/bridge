@@ -9,7 +9,7 @@ import { AstarAdapter } from "../src/adapters/astar";
 import { ParallelAdapter } from "../src/adapters/parallel";
 import { BifrostPolkadotAdapter } from "../src/adapters/bifrost";
 import { BaseCrossChainAdapter } from "../src/base-chain-adapter";
-import { RouterTestCase, runTestCasesAndExit } from "./chopsticks-test";
+import { runTestCasesAndExit } from "./chopsticks-test";
 
 main().catch((err) => {
     console.log("Error thrown by script:");
