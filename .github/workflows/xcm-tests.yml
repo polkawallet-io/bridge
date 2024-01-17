@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Launch chopsticks
-        timeout-minutes: 3
+        timeout-minutes: 5
         run: |
           npx --yes @acala-network/chopsticks@0.9.3 \
             xcm \
@@ -62,7 +62,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Launch chopsticks
-        timeout-minutes: 3
+        timeout-minutes: 5
         run: |
           npx --yes @acala-network/chopsticks@0.9.3 \
             xcm \
