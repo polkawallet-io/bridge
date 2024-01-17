@@ -1,13 +1,11 @@
 /* eslint @typescript-eslint/no-var-requires: "off" */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* tslint:disable:no-unused-variable */
-import { KaruraAdapter } from "../src/adapters/acala";
-import { BifrostKusamaAdapter } from "../src/adapters/bifrost";
 import { KintsugiAdapter } from "../src/adapters/interlay";
-import { HeikoAdapter } from "../src/adapters/parallel";
+import { StatemineAdapter } from "../src/adapters/statemint";
 import { KusamaAdapter } from "../src/adapters/polkadot";
 import { BaseCrossChainAdapter } from "../src/base-chain-adapter";
-import { runTestCasesAndExit } from "./chopsticks-test";
+import { RouterTestCase, runTestCasesAndExit } from "./chopsticks-test";
 
 main().catch((err) => {
     console.log("Error thrown by script:");
@@ -22,11 +20,21 @@ async function main(): Promise<void> {
         // reminder: parachains get ports in oder of arguments, starting with 8000 and incremented for each following one; 
         //           relaychain gets its port last after all parachains.
         kintsugi:   { adapter: new KintsugiAdapter(),   endpoints: ['ws://127.0.0.1:8000'] },
-        karura:     { adapter: new KaruraAdapter(),     endpoints: ['ws://127.0.0.1:8001'] },
-        heiko:      { adapter: new HeikoAdapter(),      endpoints: ['ws://127.0.0.1:8002'] },
-        bifrost:    { adapter: new BifrostKusamaAdapter(),    endpoints: ['ws://127.0.0.1:8003'] },
-        kusama:     { adapter: new KusamaAdapter(),     endpoints: ['ws://127.0.0.1:8004'] },
+        statemine: { adapter: new StatemineAdapter(), endpoints: ['ws://127.0.0.1:8001'] },
+        kusama:     { adapter: new KusamaAdapter(),     endpoints: ['ws://127.0.0.1:8002'] },
     };
 
-    await runTestCasesAndExit(adaptersEndpoints);
+    // already tested in kintsugi-chopsticks-test
+    const skipCases: Partial<RouterTestCase>[] = [
+        {
+            from: "kintsugi",
+            to: "kusama",
+        },
+        {
+            from: "kusama",
+            to: "kintsugi",
+        },
+    ];
+
+    await runTestCasesAndExit(adaptersEndpoints, true, skipCases);
 }

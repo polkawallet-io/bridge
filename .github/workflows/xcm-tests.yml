@@ -10,7 +10,6 @@ on:
     branches:
       - master
 
-
 jobs:
   chopsticks_kintsugi_test:
     runs-on: ubuntu-latest
@@ -25,7 +24,6 @@ jobs:
             xcm \
             -r scripts/configs/kusama.yml \
             -p scripts/configs/kintsugi.yml \
-            -p scripts/configs/statemine.yml \
             -p scripts/configs/karura.yml \
             -p scripts/configs/parallel-heiko.yml \
             -p scripts/configs/bifrost.yml \
@@ -55,6 +53,39 @@ jobs:
           path: log.txt
           retention-days: 7
 
+  chopsticks_kusama_assethub_test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Launch chopsticks
+        run: |
+          npx --yes @acala-network/chopsticks@0.9.3 \
+            xcm \
+            -r scripts/configs/kusama.yml \
+            -p scripts/configs/kintsugi.yml \
+            -p scripts/configs/statemine.yml \
+            &> log.txt &
+          echo "Waiting for log to show chopsticks is ready..."
+          tail -f log.txt | grep -q "Connected parachains"
+          echo "... detected chopsticks is ready."
+
+      - name: Run Kusama AssetHub tests
+        run: |
+          yarn install --frozen-lockfile
+          npx ts-node scripts/kusama-chopsticks-assethub-test.ts
+      - name: Show error log
+        if: failure()
+        run: |
+          tail -n 100 log.txt
+      # - name: Report status to Discord
+      #   uses: sarisia/actions-status-discord@v1
+      #   if: failure()
+      #   with:
+      #     webhook: ${{ secrets.DISCORD_WEBHOOK }}
+
   chopsticks_interlay_test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -68,7 +99,6 @@ jobs:
             xcm \
             -r scripts/configs/polkadot.yml \
             -p scripts/configs/interlay.yml \
-            -p scripts/configs/statemint.yml \
             -p scripts/configs/hydradx.yml \
             -p scripts/configs/acala.yml \
             -p scripts/configs/astar.yml \
@@ -100,3 +130,36 @@ jobs:
           name: interlay-chopsticks-logs
           path: log.txt
           retention-days: 7
+
+  chopsticks_polkadot_assethub_test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Launch chopsticks
+        run: |
+          npx --yes @acala-network/chopsticks@0.9.3 \
+            xcm \
+            -r scripts/configs/polkadot.yml \
+            -p scripts/configs/interlay.yml \
+            -p scripts/configs/statemint.yml \
+            &> log.txt &
+          echo "Waiting for log to show chopsticks is ready..."
+          tail -f log.txt | grep -q "Connected parachains"
+          echo "... detected chopsticks is ready."
+
+      - name: Run Polkadot AssetHub tests
+        run: |
+          yarn install --frozen-lockfile
+          npx ts-node scripts/polkadot-chopsticks-assethub-test.ts
+      - name: Show error log
+        if: failure()
+        run: |
+          tail -n 100 log.txt
+      # - name: Report status to Discord
+      #   uses: sarisia/actions-status-discord@v1
+      #   if: failure()
+      #   with:
+      #     webhook: ${{ secrets.DISCORD_WEBHOOK }}
