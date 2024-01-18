@@ -191,11 +191,13 @@ async function retryCheckTransfer(
  * Can skip specific test cases provided by the skipCases filter, and will also skip routes if no matching adapter has been provided.
  * 
  * @param adapterEndpoints Records containing ChainName as key, an instantiated adapter and a list of ws(s) links as endpoints for each.
+ * @param includeAssetHubSpecialCases Boolean value whether to add relay chain to/from assethub test cases (true) or not (false).
  * @param skipCases An array of xcm test cases to skip.
  */
 export async function runTestCasesAndExit(
     // record key is chainname
     adapterEndpoints: Record<ChainName, { adapter: BaseCrossChainAdapter, endpoints: Array<string> }>,
+    includeAssetHubSpecialCases: boolean = false,
     // skip cases: array of to, from and/or token to skip tests for
     skipCases: Partial<RouterTestCase>[] = []
 ): Promise<void> {
@@ -231,21 +233,23 @@ export async function runTestCasesAndExit(
     }));
 
     // add in special cases: polkadot/kusama <=> asset hub
-    const relayId = chains.includes("polkadot") ? "polkadot" : "kusama";
-    const assetHubId = relayId === "polkadot" ? "statemint" : "statemine";
-    const token = relayId === "polkadot" ? "DOT" : "KSM";
-    testCases.push(
-        {
-            to: assetHubId as ChainName,
-            from: relayId as ChainName,
-            token
-        },
-        {
-            to: relayId as ChainName,
-            from: assetHubId as ChainName,
-            token
-        },
-    );
+    if (includeAssetHubSpecialCases) {
+        const relayId = chains.includes("polkadot") ? "polkadot" : "kusama";
+        const assetHubId = relayId === "polkadot" ? "statemint" : "statemine";
+        const token = relayId === "polkadot" ? "DOT" : "KSM";
+        testCases.push(
+            {
+                to: assetHubId as ChainName,
+                from: relayId as ChainName,
+                token
+            },
+            {
+                to: relayId as ChainName,
+                from: assetHubId as ChainName,
+                token
+            },
+        );
+    }
 
     const isSkipCase = (testCase: {to: ChainName, from: ChainName, token: string}): boolean => {
         return skipCases.some((skipCase) =>

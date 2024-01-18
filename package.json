@@ -33,7 +33,9 @@
     "test:ci": "jest --forceExit",
     "lint": "polkadot-dev-run-lint",
     "chopsticks-test:kintsugi": "ts-node scripts/kintsugi-chopsticks-test",
-    "chopsticks-test:interlay": "ts-node scripts/interlay-chopsticks-test"
+    "chopsticks-test:interlay": "ts-node scripts/interlay-chopsticks-test",
+    "chopsticks-test:kusama-assethub": "ts-node scripts/kusama-chopsticks-assethub-test",
+    "chopsticks-test:polkadot-assethub": "ts-node scripts/polkadot-chopsticks-assethub-test"
   },
   "peerDependencies": {
     "@polkadot/api": "^10"
