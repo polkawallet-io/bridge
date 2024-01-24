@@ -50,8 +50,8 @@ export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "statemine",
     token: "KSM",
     xcm: {
-      // recent transfer: 4_778_331 - add 10x buffer
-      fee: { token: "KSM", amount: "47783310" },
+      // recent transfer: 119_766_667 - add 10x buffer
+      fee: { token: "KSM", amount: "1197666670" },
       weightLimit: "Unlimited",
     },
   },
