@@ -12,7 +12,7 @@ import { ChainId, chains } from "../configs";
 /**
  * Only for polkadot and kusama dmp
  */
-export async function getPolkadotXcmDeleveryFee(
+export async function getPolkadotXcmDeliveryFee(
   from: ChainId,
   to: ChainId,
   fromApi?: AnyApi

@@ -14,7 +14,7 @@ import { BalanceData, BasicToken, TransferParams } from "../types";
 import {
   createRouteConfigs,
   getDestAccountInfo,
-  getPolkadotXcmDeleveryFee,
+  getPolkadotXcmDeliveryFee,
   validateAddress,
 } from "../utils";
 
@@ -173,7 +173,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
       balance: this.balanceAdapter
         .subscribeBalance(token, address)
         .pipe(map((i) => i.available)),
-      deliveryFee: from(getPolkadotXcmDeleveryFee(this.chain.id, to, this.api)),
+      deliveryFee: from(getPolkadotXcmDeliveryFee(this.chain.id, to, this.api)),
     }).pipe(
       map(({ balance, txFee, deliveryFee }) => {
         const tokenMeta = this.balanceAdapter?.getToken(token);
