@@ -53,13 +53,6 @@ export async function getPolkadotXcmDeleveryFee(
     convDeliveryFeeFactor *
     (baseDeliveryFee + BigInt(xcmBytes.length) * byteFee);
 
-  console.log(
-    fee,
-    FixedPointNumber.fromInner(fee.toString(), decimal)
-      .mul(new FixedPointNumber(1.2))
-      .toString()
-  );
-
   return FixedPointNumber.fromInner(fee.toString(), decimal).mul(
     new FixedPointNumber(1.2) // add some buffer
   );
