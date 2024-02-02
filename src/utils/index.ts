@@ -5,3 +5,4 @@ export * from "./xtokens-params";
 export * from "./polkadot-xcm-params";
 export * from "./create-route-configs";
 export * from "./destination-utils";
+export * from "./get-xcm-delivery-fee";

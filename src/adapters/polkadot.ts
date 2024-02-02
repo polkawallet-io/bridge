@@ -1,6 +1,6 @@
 import { Storage } from "@acala-network/sdk/utils/storage";
 import { AnyApi, FixedPointNumber as FN } from "@acala-network/sdk-core";
-import { combineLatest, map, Observable } from "rxjs";
+import { combineLatest, map, Observable, from } from "rxjs";
 
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
@@ -14,6 +14,7 @@ import { BalanceData, BasicToken, TransferParams } from "../types";
 import {
   createRouteConfigs,
   getDestAccountInfo,
+  getPolkadotXcmDeliveryFee,
   validateAddress,
 } from "../utils";
 
@@ -172,8 +173,9 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
       balance: this.balanceAdapter
         .subscribeBalance(token, address)
         .pipe(map((i) => i.available)),
+      deliveryFee: from(getPolkadotXcmDeliveryFee(this.chain.id, to, this.api)),
     }).pipe(
-      map(({ balance, txFee }) => {
+      map(({ balance, txFee, deliveryFee }) => {
         const tokenMeta = this.balanceAdapter?.getToken(token);
         const feeFactor = 1.2;
         const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(
@@ -183,6 +185,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
         // always minus ed
         return balance
           .minus(fee)
+          .minus(deliveryFee)
           .minus(FN.fromInner(tokenMeta?.ed || "0", tokenMeta?.decimals));
       })
     );
