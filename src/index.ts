@@ -4,4 +4,3 @@ export * from "./api-provider";
 export * from "./adapters";
 export * from "./configs/index";
 export * from "./types";
-export * from "./utils";

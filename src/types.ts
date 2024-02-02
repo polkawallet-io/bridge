@@ -88,6 +88,7 @@ export interface InputConfig {
   ss58Prefix: number;
   destFee: TokenBalance;
   estimateFee: TokenBalance;
+  xcmFee: TokenBalance | null;
 }
 
 export interface RouterFilter {

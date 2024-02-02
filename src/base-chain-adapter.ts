@@ -45,6 +45,7 @@ import {
   isChainEqual,
   validateAddress,
   getDestAccountInfo,
+  getPolkadotXcmDeliveryFee,
 } from "./utils";
 
 const DEFAULT_TX_CHECKING_TIMEOUT = 2 * 60 * 1000;
@@ -107,13 +108,18 @@ export abstract class BaseCrossChainAdapter {
     const fromApi = this.api as AnyApi;
     const paymentToken = fromApi.registry.chainTokens[0];
     const decimals = fromApi.registry.chainDecimals[0];
+    // TODO: only kusama and polkadot have it for now, refactor when other chains have this
+    const xcmDeliveryFee$ = ["polkadot", "kusama"].includes(this.chain.id)
+      ? from(getPolkadotXcmDeliveryFee(this.chain.id, to, this.api))
+      : of(null);
 
     return combineLatest({
       minInput: minInput$,
       maxInput: maxInput$,
       estimateFee: estimateFee$,
+      xcmDeliveryFee: xcmDeliveryFee$,
     }).pipe(
-      map(({ estimateFee, maxInput, minInput }) => {
+      map(({ estimateFee, maxInput, minInput, xcmDeliveryFee }) => {
         return {
           minInput: minInput.max(FN.ZERO),
           maxInput: maxInput.max(FN.ZERO),
@@ -123,6 +129,12 @@ export abstract class BaseCrossChainAdapter {
             token: paymentToken,
             balance: FN.fromInner(estimateFee, decimals),
           },
+          xcmFee: xcmDeliveryFee
+            ? {
+                token: paymentToken,
+                balance: xcmDeliveryFee,
+              }
+            : null,
         };
       })
     );
