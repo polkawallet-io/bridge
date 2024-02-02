@@ -10,7 +10,7 @@ import { ChainId, chains } from "../configs";
 // TODO: when most chains added xcm delivery fee, may move these to bridge package
 
 /**
- * Only for polkadot and kusama dmp
+ * Only for polkadot and kusama dmp for now
  */
 export async function getPolkadotXcmDeliveryFee(
   from: ChainId,
