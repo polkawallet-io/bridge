@@ -18,7 +18,7 @@ import {
 } from "../types";
 import { xTokensHelper } from "../utils/xtokens-helper";
 
-const DEST_WEIGHT = "5000000000";
+const DEST_WEIGHT = "Unlimited";
 
 export const hydraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
