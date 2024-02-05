@@ -149,7 +149,8 @@ export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "statemine",
     token: "USDT",
     xcm: {
-      fee: { token: "USDT", amount: "10000" },
+      // fees in tests: 7_186, need a minimum of 2x as safe buffer
+      fee: { token: "USDT", amount: "20000" },
       weightLimit: DEST_WEIGHT,
     },
   },
