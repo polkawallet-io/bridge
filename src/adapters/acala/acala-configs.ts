@@ -151,6 +151,13 @@ export const acalaRouteConfigs = createRouteConfigs("acala", [
   },
   {
     to: "statemint",
+    token: "USDC",
+    xcm: {
+      fee: { token: "DOT", amount: "100000000" },
+    },
+  },
+  {
+    to: "statemint",
     token: "PINK",
     xcm: {
       fee: { token: "DOT", amount: "100000000" },
@@ -207,6 +214,12 @@ export const acalaTokensConfig: Record<string, BasicToken> = {
     symbol: "USDT",
     decimals: 6,
     ed: "700000",
+  },
+  USDC: {
+    name: "USDC",
+    symbol: "USDC",
+    decimals: 6,
+    ed: "10000",
   },
   PINK: {
     name: "PINK",

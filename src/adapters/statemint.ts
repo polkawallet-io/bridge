@@ -45,6 +45,14 @@ export const statemintRouteConfigs = createRouteConfigs("statemint", [
   },
   {
     to: "acala",
+    token: "USDC",
+    xcm: {
+      fee: { token: "USDC", amount: "803" },
+      weightLimit: "Unlimited",
+    },
+  },
+  {
+    to: "acala",
     token: "PINK",
     xcm: {
       fee: { token: "PINK", amount: "80370000" },
@@ -99,6 +107,13 @@ export const statemintTokensConfig: Record<string, ExtendedToken> = {
     decimals: 6,
     ed: "700000",
     toRaw: () => new BN(1984),
+  },
+  USDC: {
+    name: "USDC",
+    symbol: "USDC",
+    decimals: 6,
+    ed: "700000",
+    toRaw: () => new BN(1337),
   },
   PINK: {
     name: "PINK",
