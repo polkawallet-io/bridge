@@ -53,6 +53,13 @@ export const karuraRouteConfigs = createRouteConfigs("karura", [
   },
   {
     to: "bifrost",
+    token: "KSM",
+    xcm: {
+      fee: { token: "KSM", amount: "5120000000" },
+    },
+  },
+  {
+    to: "bifrost",
     token: "KAR",
     xcm: {
       fee: { token: "KAR", amount: "4800000000" },
@@ -186,6 +193,13 @@ export const karuraRouteConfigs = createRouteConfigs("karura", [
   },
   {
     to: "calamari",
+    token: "KSM",
+    xcm: {
+      fee: { token: "KSM", amount: "100000000000" },
+    },
+  },
+  {
+    to: "calamari",
     token: "KMA",
     xcm: {
       fee: { token: "KMA", amount: "4000000" },
@@ -252,6 +266,13 @@ export const karuraRouteConfigs = createRouteConfigs("karura", [
     token: "LKSM",
     xcm: {
       fee: { token: "LKSM", amount: "48000000" },
+    },
+  },
+  {
+    to: "heiko",
+    token: "KUSD",
+    xcm: {
+      fee: { token: "KUSD", amount: "48000000" },
     },
   },
   {

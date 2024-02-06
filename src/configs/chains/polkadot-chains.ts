@@ -76,4 +76,12 @@ export const polkadotChains = {
     paraChainId: 2031,
     ss58Prefix: 36,
   },
+  subsocial: {
+    id: "subsocial",
+    display: "Subsocial",
+    type: "substrate",
+    icon: "https://sub.id/images/subsocial.svg",
+    paraChainId: 2101,
+    ss58Prefix: 28,
+  },
 };

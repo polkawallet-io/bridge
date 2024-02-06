@@ -59,6 +59,38 @@ export const statemintRouteConfigs = createRouteConfigs("statemint", [
       weightLimit: "Unlimited",
     },
   },
+  {
+    to: "astar",
+    token: "USDT",
+    xcm: {
+      fee: { token: "USDT", amount: "808" },
+      weightLimit: "Unlimited",
+    },
+  },
+  {
+    to: "interlay",
+    token: "USDT",
+    xcm: {
+      fee: { token: "USDT", amount: "808" },
+      weightLimit: "Unlimited",
+    },
+  },
+  {
+    to: "moonbeam",
+    token: "USDT",
+    xcm: {
+      fee: { token: "USDT", amount: "808" },
+      weightLimit: "Unlimited",
+    },
+  },
+  {
+    to: "parallel",
+    token: "USDT",
+    xcm: {
+      fee: { token: "USDT", amount: "808" },
+      weightLimit: "Unlimited",
+    },
+  },
 ]);
 
 export const statemineRouteConfigs = createRouteConfigs("statemine", [

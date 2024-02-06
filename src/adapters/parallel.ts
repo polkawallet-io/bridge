@@ -34,9 +34,25 @@ export const parallelRouteConfigs = createRouteConfigs("parallel", [
   },
   {
     to: "acala",
+    token: "AUSD",
+    xcm: {
+      fee: { token: "AUSD", amount: "6400000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "acala",
     token: "LDOT",
     xcm: {
       fee: { token: "LDOT", amount: "24037893" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "statemint",
+    token: "USDT",
+    xcm: {
+      fee: { token: "USDT", amount: "24037893" },
       weightLimit: DEST_WEIGHT,
     },
   },
@@ -94,6 +110,13 @@ export const parallelTokensConfig: Record<
       decimals: 12,
       ed: "100000000000",
       toRaw: () => "104",
+    },
+    UDST: {
+      name: "UDST",
+      symbol: "UDST",
+      decimals: 6,
+      ed: "100000000000",
+      toRaw: () => "102",
     },
     LDOT: {
       name: "LDOT",

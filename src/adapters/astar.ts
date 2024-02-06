@@ -15,6 +15,8 @@ import {
   validateAddress,
   createRouteConfigs,
   getDestAccountInfo,
+  createXTokensAssetsParam,
+  createXTokensDestParam,
 } from "../utils";
 
 type TokenData = ExtendedToken & { toQuery: () => string };
@@ -57,6 +59,14 @@ export const astarRouteConfigs = createRouteConfigs("astar", [
     token: "ASTR",
     xcm: {
       fee: { token: "ASTR", amount: "44306118000000000" },
+      weightLimit: "Unlimited",
+    },
+  },
+  {
+    to: "statemint",
+    token: "USDT",
+    xcm: {
+      fee: { token: "USDT", amount: "44306118000000000" },
       weightLimit: "Unlimited",
     },
   },
@@ -107,13 +117,21 @@ export const astarTokensConfig: Record<string, Record<string, TokenData>> = {
         "0x0001000000000000000000000000000000000000000000000000000000000000",
       toQuery: () => "18446744073709551617",
     },
+    USDT: {
+      name: "USDT",
+      symbol: "USDT",
+      decimals: 6,
+      ed: "1",
+      toRaw: () =>
+        "0x0001000000000000000000000000000000000000000000000000000000000000", // TODO: update
+      toQuery: () => "4294969280",
+    },
     LDOT: {
       name: "LDOT",
       symbol: "LDOT",
       decimals: 10,
       ed: "1",
-      toRaw: () =>
-        "0x0003000000000000000000000000000000000000000000000000000000000000",
+      toRaw: () => "1984",
       toQuery: () => "18446744073709551618",
     },
   },
@@ -322,6 +340,19 @@ class BaseAstarAdapter extends BaseCrossChainAdapter {
     }
 
     const tokenData: TokenData = this.getToken(params.token);
+
+    if (tokenData.symbol === "USDT") {
+      return this.api.tx.xTokens.transferMultiasset(
+        createXTokensAssetsParam(
+          this.api,
+          toChain.paraChainId,
+          tokenData.toRaw(),
+          amount.toChainData()
+        ),
+        createXTokensDestParam(this.api, toChain.paraChainId, accountId) as any,
+        "Unlimited"
+      );
+    }
 
     return this.api.tx.xTokens.transferMultiasset(
       {
