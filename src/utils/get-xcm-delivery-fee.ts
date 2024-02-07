@@ -42,9 +42,13 @@ export async function getPolkadotXcmDeliveryFee(
   ) as any;
   const xcmBytes = exampleXcm.toU8a();
 
-  const deliveryFeeFactor: Codec = await firstValueFrom(
-    fromApi?.query.dmp.deliveryFeeFactor(BigInt(paraID)) as Observable<Codec>
-  );
+  const deliveryFeeFactor: Codec = await (fromApi?.type === "rxjs"
+    ? firstValueFrom(
+        fromApi?.query.dmp.deliveryFeeFactor(
+          BigInt(paraID)
+        ) as Observable<Codec>
+      )
+    : (fromApi?.query.dmp.deliveryFeeFactor(BigInt(paraID)) as Promise<Codec>));
 
   const convDeliveryFeeFactor =
     BigInt(deliveryFeeFactor.toString()) / BigInt(10 ** 18);
