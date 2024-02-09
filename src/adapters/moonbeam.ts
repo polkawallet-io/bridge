@@ -10,12 +10,17 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
-import { BalanceData, ExtendedToken, TransferParams } from "../types";
 import {
   createRouteConfigs,
   getDestAccountInfo,
   validateAddress,
 } from "src/utils";
+import {
+  BalanceData,
+  BasicToken,
+  ExtendedToken,
+  TransferParams,
+} from "src/types";
 
 export const moonbeamRouteConfigs = createRouteConfigs("moonbeam", [
   {
@@ -108,6 +113,12 @@ const moonbeamTokensConfig: Record<string, ExtendedToken> = {
       ForeignAsset: "311091173110107856861649819128533077277",
     }),
   },
+};
+
+export const moonriverTokensConfig: Record<string, BasicToken> = {
+  MOVR: { name: "MOVR", symbol: "MOVR", decimals: 18, ed: "1000000000000000" },
+  KAR: { name: "KAR", symbol: "KAR", decimals: 12, ed: "0" },
+  KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "0" },
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -264,5 +275,11 @@ class MoonbeamBaseAdapter extends BaseCrossChainAdapter {
 export class MoonbeamAdapter extends MoonbeamBaseAdapter {
   constructor() {
     super(chains.moonbeam, moonbeamRouteConfigs, moonbeamTokensConfig);
+  }
+}
+
+export class MoonriverAdapter extends MoonbeamBaseAdapter {
+  constructor() {
+    super(chains.moonriver, [], moonriverTokensConfig);
   }
 }
