@@ -28,6 +28,11 @@ export const interlayRouteConfigs = createRouteConfigs("interlay", [
     xcm: { fee: { token: "IBTC", amount: "9" } },
   },
   {
+    to: "statemint",
+    token: "USDT",
+    xcm: { fee: { token: "USDT", amount: "9" } },
+  },
+  {
     to: "hydradx",
     token: "IBTC",
     xcm: { fee: { token: "IBTC", amount: "7" } },
@@ -76,6 +81,13 @@ export const interlayTokensConfig: Record<
       decimals: 8,
       ed: "0",
       toRaw: () => ({ Token: "IBTC" }),
+    },
+    USDT: {
+      name: "USDT",
+      symbol: "USDT",
+      decimals: 6,
+      ed: "0",
+      toRaw: () => ({ Token: "USDT" }),
     },
   },
   kintsugi: {

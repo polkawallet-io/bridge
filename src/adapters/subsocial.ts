@@ -10,115 +10,36 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
+import { BalanceData, BasicToken, TransferParams } from "../types";
 import {
+  createPolkadotXCMAccount,
+  createPolkadotXCMAsset,
+  createPolkadotXCMDest,
   createRouteConfigs,
-  getDestAccountInfo,
+  getDestAccountType,
+  getValidDestAddrType,
   validateAddress,
-} from "src/utils";
-import {
-  BalanceData,
-  BasicToken,
-  ExtendedToken,
-  TransferParams,
-} from "src/types";
+} from "../utils";
 
-export const moonbeamRouteConfigs = createRouteConfigs("moonbeam", [
+export const subsocialRouteConfigs = createRouteConfigs("subsocial" as any, [
   {
-    to: "subsocial",
-    token: "xcSUB",
+    to: "hydradx",
+    token: "SUB",
     xcm: {
-      fee: { token: "SUB", amount: "1000000000" },
+      fee: { token: "SUB", amount: "65000000" },
     },
   },
   {
-    to: "acala",
-    token: "GLMR",
+    to: "moonbeam",
+    token: "SUB",
     xcm: {
-      fee: { token: "GLMR", amount: "1000000000" },
-    },
-  },
-  {
-    to: "acala",
-    token: "xcACA",
-    xcm: {
-      fee: { token: "ACA", amount: "1000000000" },
-    },
-  },
-  {
-    to: "acala",
-    token: "xcaUSD",
-    xcm: {
-      fee: { token: "AUSD", amount: "1000000000" },
-    },
-  },
-  {
-    to: "acala",
-    token: "xcDOT",
-    xcm: {
-      fee: { token: "DOT", amount: "1000000000" },
-    },
-  },
-  {
-    to: "statemint",
-    token: "xcUSDT",
-    xcm: {
-      fee: { token: "USDT", amount: "1000000000" },
+      fee: { token: "SUB", amount: "65000000" },
     },
   },
 ]);
 
-const moonbeamTokensConfig: Record<string, ExtendedToken> = {
-  SUB: {
-    name: "SUB",
-    symbol: "SUB",
-    decimals: 10,
-    ed: "100000000000",
-    toRaw: () => ({
-      ForeignAsset: "89994634370519791027168048838578580624",
-    }),
-  },
-  DOT: {
-    name: "DOT",
-    symbol: "DOT",
-    decimals: 10,
-    ed: "10000000000",
-    toRaw: () => ({
-      ForeignAsset: "42259045809535163221576417993425387648",
-    }),
-  },
-  ACA: {
-    name: "ACA",
-    symbol: "ACA",
-    decimals: 12,
-    ed: "10000000000",
-    toRaw: () => ({
-      ForeignAsset: "224821240862170613278369189818311486111",
-    }),
-  },
-  AUSD: {
-    name: "AUSD",
-    symbol: "AUSD",
-    decimals: 12,
-    ed: "10000000000",
-    toRaw: () => ({
-      ForeignAsset: "110021739665376159354538090254163045594",
-    }),
-  },
-  USDT: {
-    name: "USDT",
-    symbol: "USDT",
-    decimals: 6,
-    ed: "10000000000",
-    toRaw: () => ({
-      ForeignAsset: "311091173110107856861649819128533077277",
-    }),
-  },
-};
-
-export const moonriverTokensConfig: Record<string, BasicToken> = {
-  MOVR: { name: "MOVR", symbol: "MOVR", decimals: 18, ed: "1000000000000000" },
-  KAR: { name: "KAR", symbol: "KAR", decimals: 12, ed: "0" },
-  KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "0" },
+export const subsocialTokensConfig: Record<string, BasicToken> = {
+  SUB: { name: "SUB", symbol: "SUB", decimals: 10, ed: "100000000" },
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -133,7 +54,7 @@ const createBalanceStorages = (api: AnyApi) => {
   };
 };
 
-class MoonbeamBalanceAdapter extends BalanceAdapter {
+class SubsocialBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
   constructor({ api, chain, tokens }: BalanceAdapterConfigs) {
@@ -165,8 +86,8 @@ class MoonbeamBalanceAdapter extends BalanceAdapter {
   }
 }
 
-class MoonbeamBaseAdapter extends BaseCrossChainAdapter {
-  private balanceAdapter?: MoonbeamBalanceAdapter;
+class SubsocialBaseAdapter extends BaseCrossChainAdapter {
+  private balanceAdapter?: SubsocialBalanceAdapter;
 
   public async init(api: AnyApi) {
     this.api = api;
@@ -175,10 +96,10 @@ class MoonbeamBaseAdapter extends BaseCrossChainAdapter {
 
     const chain = this.chain.id as ChainId;
 
-    this.balanceAdapter = new MoonbeamBalanceAdapter({
+    this.balanceAdapter = new SubsocialBalanceAdapter({
       chain,
       api,
-      tokens: moonbeamTokensConfig,
+      tokens: subsocialTokensConfig,
     });
   }
 
@@ -234,52 +155,43 @@ class MoonbeamBaseAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
+    if (!this.api) throw new ApiNotFound(this.chain.id);
 
     const { address, amount, to, token } = params;
 
-    const { accountId, accountType, addrType } = getDestAccountInfo(
-      address,
-      token,
-      this.api,
-      to
-    );
+    const addrType = getValidDestAddrType(address, token, to);
 
-    const tokenData = moonbeamTokensConfig[token.replace("xc", "")];
+    const accountId =
+      addrType === "ethereum"
+        ? address
+        : this.api.createType("AccountId32", address).toHex();
+
+    const accountType = getDestAccountType(address, token, to);
 
     if (!validateAddress(address, addrType)) throw new InvalidAddress(address);
 
     const toChain = chains[to];
 
-    return this.api.tx.xTokens.transfer(
-      tokenData.toRaw(),
-      amount.toChainData(),
-      {
-        V3: {
-          parents: 1,
-          interior: {
-            X2: [
-              { Parachain: toChain.paraChainId },
-              { [accountType]: { id: accountId, network: undefined } },
-            ],
-          },
-        },
-      } as any,
-      "Unlimited"
+    if (token !== this.balanceAdapter?.nativeToken) {
+      throw new TokenNotFound(token);
+    }
+
+    // const accountId = this.api?.createType('AccountId32', address).toHex()
+    const paraChainId = toChain.paraChainId;
+    const rawAmount = amount.toChainData();
+
+    return this.api?.tx.polkadotXcm.limitedReserveTransferAssets(
+      createPolkadotXCMDest(this.api, paraChainId),
+      createPolkadotXCMAccount(this.api, accountId, accountType),
+      createPolkadotXCMAsset(this.api, rawAmount, "NATIVE"),
+      0,
+      this.getDestWeight(token, to)?.toString() as any
     );
   }
 }
 
-export class MoonbeamAdapter extends MoonbeamBaseAdapter {
+export class SubsocialAdapter extends SubsocialBaseAdapter {
   constructor() {
-    super(chains.moonbeam, moonbeamRouteConfigs, moonbeamTokensConfig);
-  }
-}
-
-export class MoonriverAdapter extends MoonbeamBaseAdapter {
-  constructor() {
-    super(chains.moonriver, [], moonriverTokensConfig);
+    super(chains.subsocial, subsocialRouteConfigs, subsocialTokensConfig);
   }
 }
