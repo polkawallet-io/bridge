@@ -30,8 +30,8 @@ export const polkadotRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "statemint",
     token: "DOT",
     xcm: {
-      // recent transfer: 1_433_579 - add 10x buffer
-      fee: { token: "DOT", amount: "14335790" },
+      // recent transfer: 35_930_000 - use 10x as buffer
+      fee: { token: "DOT", amount: "359300000" },
       weightLimit: "Unlimited",
     },
   },
