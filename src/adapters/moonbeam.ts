@@ -14,7 +14,7 @@ import {
   createRouteConfigs,
   getDestAccountInfo,
   validateAddress,
-} from "src/utils";
+} from "../utils";
 import {
   BalanceData,
   BasicToken,
