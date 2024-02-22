@@ -34,3 +34,8 @@ import-storage:
           - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice, vdot
           - foreignAsset: 3
         - free: '100000000000000000'
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice, usdc
+          - foreignAsset: 12
+        - free: '1000000000'
