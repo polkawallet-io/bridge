@@ -14,7 +14,7 @@ import {
   createRouteConfigs,
   getDestAccountInfo,
   validateAddress,
-} from "src/utils";
+} from "../utils";
 import {
   BalanceData,
   BasicToken,
@@ -118,6 +118,7 @@ const moonbeamTokensConfig: Record<string, ExtendedToken> = {
 export const moonriverTokensConfig: Record<string, BasicToken> = {
   MOVR: { name: "MOVR", symbol: "MOVR", decimals: 18, ed: "1000000000000000" },
   KAR: { name: "KAR", symbol: "KAR", decimals: 12, ed: "0" },
+  KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "10000000000" },
   KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "0" },
 };
 
