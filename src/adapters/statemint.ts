@@ -39,6 +39,12 @@ export const statemintRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     // from recent tests: 11_888 atomic units, use a minimum of 2x buffer
     xcm: { fee: { token: "USDT", amount: "25000" }, weightLimit: "Unlimited" },
   },
+  {
+    to: "interlay",
+    token: "USDC",
+    // currently unknown until registered, assume similar to USDT for now
+    xcm: { fee: { token: "USDC", amount: "25000" }, weightLimit: "Unlimited" },
+  },
 ];
 
 export const statemineRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
@@ -70,14 +76,17 @@ export const statemineTokensConfig: Record<
   },
   statemint: {
     DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "1000000000" },
+    // ED set according to minBalance value of assets.asset(1337)
+    USDC: { name: "USDC", symbol: "USDC", decimals: 6, ed: "70000" },
     // ED set according to minBalance value of assets.asset(1984)
-    USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "700000" },
+    USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "70000" },
   },
 };
 
 const SUPPORTED_TOKENS: Record<string, BN> = {
   RMRK: new BN(8),
   ARIS: new BN(16),
+  USDC: new BN(1337),
   USDT: new BN(1984),
 };
 
