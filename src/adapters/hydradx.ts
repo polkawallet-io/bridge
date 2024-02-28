@@ -18,7 +18,10 @@ import {
   createRouteConfigs,
 } from "../utils";
 
-import { statemineTokensConfig, statemintTokensConfig } from "./statemint";
+import {
+  assetHubKusamaTokensConfig,
+  assetHubPolkadotTokensConfig,
+} from "./assethub";
 
 export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
   {
@@ -78,7 +81,7 @@ export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
     },
   },
   {
-    to: "statemine",
+    to: "assetHubKusama",
     token: "USDT",
     xcm: {
       fee: { token: "USDT", amount: "1183" },
@@ -225,7 +228,7 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
     xcm: { fee: { token: "IBTC", amount: "62" } },
   },
   {
-    to: "statemint",
+    to: "assetHubPolkadot",
     token: "USDT",
     xcm: {
       fee: { token: "USDT", amount: "700000" },
@@ -472,14 +475,14 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
     const { amount, to, token, address } = params;
     const toChain = chains[to];
 
-    // For statemine & statemint
+    // For Asset Hub
     if (
-      isChainEqual(toChain, "statemine") ||
-      isChainEqual(toChain, "statemint")
+      isChainEqual(toChain, "assetHubKusama") ||
+      isChainEqual(toChain, "assetHubPolkadot")
     ) {
-      const tokenData: ExtendedToken = isChainEqual(toChain, "statemine")
-        ? statemineTokensConfig[token]
-        : statemintTokensConfig[token];
+      const tokenData: ExtendedToken = isChainEqual(toChain, "assetHubKusama")
+        ? assetHubKusamaTokensConfig[token]
+        : assetHubPolkadotTokensConfig[token];
 
       const accountId = this.api?.createType("AccountId32", address).toHex();
 

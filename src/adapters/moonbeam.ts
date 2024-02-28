@@ -59,7 +59,7 @@ export const moonbeamRouteConfigs = createRouteConfigs("moonbeam", [
     },
   },
   {
-    to: "statemint",
+    to: "assetHubPolkadot",
     token: "xcUSDT",
     xcm: {
       fee: { token: "USDT", amount: "1000000000" },

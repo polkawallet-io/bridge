@@ -28,7 +28,7 @@ export const interlayRouteConfigs = createRouteConfigs("interlay", [
     xcm: { fee: { token: "IBTC", amount: "9" } },
   },
   {
-    to: "statemint",
+    to: "assetHubPolkadot",
     token: "USDT",
     xcm: { fee: { token: "USDT", amount: "9" } },
   },

@@ -63,7 +63,7 @@ export const astarRouteConfigs = createRouteConfigs("astar", [
     },
   },
   {
-    to: "statemint",
+    to: "assetHubPolkadot",
     token: "USDT",
     xcm: {
       fee: { token: "USDT", amount: "44306118000000000" },

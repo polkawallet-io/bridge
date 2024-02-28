@@ -33,7 +33,7 @@ export const polkadotRouteConfigs = createRouteConfigs("polkadot", [
     },
   },
   {
-    to: "statemint",
+    to: "assetHubPolkadot",
     token: "DOT",
     xcm: {
       fee: { token: "DOT", amount: "15800000" },
@@ -60,7 +60,7 @@ export const kusamaRouteConfigs = createRouteConfigs("kusama", [
     },
   },
   {
-    to: "statemine",
+    to: "assetHubKusama",
     token: "KSM",
     xcm: {
       fee: { token: "KSM", amount: "34368318" },
@@ -231,8 +231,8 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
 
     const isV0V1Support = this.isV0V1;
 
-    // to statemine
-    if (to === "statemine" || to === "statemint") {
+    // to asset hub
+    if (to === "assetHubKusama" || to === "assetHubPolkadot") {
       const dst = {
         interior: { X1: { ParaChain: toChain.paraChainId } },
         parents: 0,

@@ -42,7 +42,7 @@ export class ApiProvider {
             nodes = Object.values(prodRelayPolkadot.providers).filter((e) =>
               e.startsWith("wss://")
             );
-          } else if (chain === "statemine") {
+          } else if (chain === "assetHubKusama") {
             nodes = Object.values(
               prodParasKusamaCommon.find((e) => e.info === chain)?.providers ||
                 {}

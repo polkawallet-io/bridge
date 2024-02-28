@@ -6,8 +6,8 @@ export const kusamaChains = {
     paraChainId: -1,
     ss58Prefix: 2,
   },
-  statemine: {
-    display: "Statemine",
+  assetHubKusama: {
+    display: "Asset Hub Kusama",
     type: "substrate",
     icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fstatemine.png&w=96&q=75",
     paraChainId: 1000,

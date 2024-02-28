@@ -25,7 +25,7 @@ describe("cross-chain-router-manager", () => {
         { from: chains.khala.id, to: chains.karura.id, token: "AUSD" },
         { from: chains.khala.id, to: chains.karura.id, token: "LKSM" },
         { from: chains.kusama.id, to: chains.karura.id, token: "KSM" },
-        { from: chains.statemine.id, to: chains.karura.id, token: "RMRK" },
+        { from: chains.assetHubKusama.id, to: chains.karura.id, token: "RMRK" },
       ] as RouteConfigs[],
       false
     );
@@ -73,7 +73,7 @@ describe("cross-chain-router-manager", () => {
     expect(r2.length).toEqual(3);
     expect(r2[0].display).toEqual("Khala");
     expect(r2[1].display).toEqual("Kusama");
-    expect(r2[2].display).toEqual("Statemine");
+    expect(r2[2].display).toEqual("Asset Hub Kusama");
   });
 
   test("filter by disabled routers should be ok", async () => {

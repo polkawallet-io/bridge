@@ -18,7 +18,10 @@ import { ChainId, chains } from "../../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../../errors";
 import { BalanceData, ExtendedToken, TransferParams } from "../../types";
 import { isChainEqual } from "../../utils/is-chain-equal";
-import { statemineTokensConfig, statemintTokensConfig } from "../statemint";
+import {
+  assetHubKusamaTokensConfig,
+  assetHubPolkadotTokensConfig,
+} from "../assethub";
 import {
   createXTokensAssetsParam,
   createXTokensDestParam,
@@ -154,8 +157,8 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
       throw new InvalidAddress(address);
     }
 
-    if (isChainEqual(toChain, "statemint")) {
-      const tokenData = statemintTokensConfig[token];
+    if (isChainEqual(toChain, "assetHubPolkadot")) {
+      const tokenData = assetHubPolkadotTokensConfig[token];
 
       if (!token) throw new TokenNotFound(token);
 
@@ -184,11 +187,11 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
       );
     }
 
-    // for statemine
-    if (isChainEqual(toChain, "statemine")) {
-      const tokenData: ExtendedToken = isChainEqual(toChain, "statemine")
-        ? statemineTokensConfig[token]
-        : statemintTokensConfig[token];
+    // for asset hub
+    if (isChainEqual(toChain, "assetHubKusama")) {
+      const tokenData: ExtendedToken = isChainEqual(toChain, "assetHubKusama")
+        ? assetHubKusamaTokensConfig[token]
+        : assetHubPolkadotTokensConfig[token];
 
       if (!token) throw new TokenNotFound(token);
 

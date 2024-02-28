@@ -3,7 +3,7 @@ import { Bridge } from "../../bridge";
 import { KaruraAdapter } from "./acala";
 import { KusamaAdapter } from "../polkadot";
 import { MoonriverAdapter } from "../moonbeam";
-import { StatemineAdapter } from "../statemint";
+import { AssetHubKusamaAdapter } from "../assethub";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { ApiPromise, WsProvider } from "@polkadot/api";
@@ -35,18 +35,18 @@ describe.skip("acala-adapter", () => {
     const karura = new KaruraAdapter();
     const kusama = new KusamaAdapter();
     const moonriver = new MoonriverAdapter();
-    const statemine = new StatemineAdapter();
+    const assetHubKusama = new AssetHubKusamaAdapter();
 
     const karuraApi = new ApiPromise({ provider: new WsProvider('wss://karura.api.onfinality.io/public-ws') });
     const kusmaApi = new ApiPromise({ provider: new WsProvider('wss://kusama.api.onfinality.io/public-ws') });
-    const statemineApi = new ApiPromise({ provider: new WsProvider('wss://statemine-rpc.dwellir.com') });
+    const assetHubApi = new ApiPromise({ provider: new WsProvider('wss://statemine-rpc.dwellir.com') });
 
     await karura.init(karuraApi);
     await kusama.init(kusmaApi);
-    await statemine.init(statemineApi);
+    await assetHubKusama.init(assetHubApi);
 
     bridge = new Bridge({
-      adapters: [karura, kusama, moonriver, statemine],
+      adapters: [karura, kusama, moonriver, assetHubKusama],
     });
   });
 
@@ -149,7 +149,7 @@ describe.skip("acala-adapter", () => {
     }
   });
 
-  test('transfer from karura to statemine should be ok', (done) => {
+  test('transfer from karura to asset hub should be ok', (done) => {
     try {
 
       const adapter = bridge.findAdapter('karura');
@@ -164,7 +164,7 @@ describe.skip("acala-adapter", () => {
 
       const amount = new FixedPointNumber(1, rmrk.decimals);
       const tx = adapter.createTx({
-        to: 'statemine',
+        to: 'assetHubKusama',
         token: 'RMRK',
         amount,
         address
