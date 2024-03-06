@@ -11,7 +11,7 @@ import { ChainId, chains } from "../configs";
 /**
  * Only for polkadot and kusama dmp for now
  *
- * FIXME: This is not accurate, need to get the real xcm message from client. Currecntly use the hardcoded value in each route config
+ * FIXME: This is not accurate, need to get the real xcm message from client. Currently use the hardcoded value in each route config
  */
 export async function getPolkadotXcmDeliveryFee(
   from: ChainId,
