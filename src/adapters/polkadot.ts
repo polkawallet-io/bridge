@@ -1,6 +1,6 @@
 import { Storage } from "@acala-network/sdk/utils/storage";
 import { AnyApi, FixedPointNumber as FN } from "@acala-network/sdk-core";
-import { combineLatest, map, Observable, from } from "rxjs";
+import { combineLatest, map, Observable } from "rxjs";
 
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
@@ -14,7 +14,6 @@ import { BalanceData, BasicToken, TransferParams } from "../types";
 import {
   createRouteConfigs,
   getDestAccountInfo,
-  getPolkadotXcmDeliveryFee,
   validateAddress,
 } from "../utils";
 
@@ -22,7 +21,11 @@ export const polkadotRouteConfigs = createRouteConfigs("polkadot", [
   {
     to: "acala",
     token: "DOT",
-    xcm: { fee: { token: "DOT", amount: "3549633" }, weightLimit: "Unlimited" },
+    xcm: {
+      fee: { token: "DOT", amount: "1222070" },
+      deliveryFee: { token: "DOT", amount: "399000000" },
+      weightLimit: "Unlimited",
+    },
   },
   {
     to: "hydradx",
@@ -48,6 +51,7 @@ export const kusamaRouteConfigs = createRouteConfigs("kusama", [
     token: "KSM",
     xcm: {
       fee: { token: "KSM", amount: "44163610" },
+      deliveryFee: { token: "KSM", amount: "1336666329" },
       weightLimit: "Unlimited",
     },
   },
@@ -162,6 +166,8 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
       throw new ApiNotFound(this.chain.id);
     }
 
+    const xcmDeliveryFee = this.getXcmDeliveryFee(token, to);
+
     return combineLatest({
       txFee: this.estimateTxFee({
         amount: FN.ZERO,
@@ -173,14 +179,14 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
       balance: this.balanceAdapter
         .subscribeBalance(token, address)
         .pipe(map((i) => i.available)),
-      deliveryFee: from(getPolkadotXcmDeliveryFee(this.chain.id, to, this.api)),
     }).pipe(
-      map(({ balance, txFee, deliveryFee }) => {
+      map(({ balance, txFee }) => {
         const tokenMeta = this.balanceAdapter?.getToken(token);
         const feeFactor = 1.2;
         const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(
           new FN(feeFactor)
         );
+        const deliveryFee = xcmDeliveryFee?.balance || FN.ZERO;
 
         // always minus ed
         return balance

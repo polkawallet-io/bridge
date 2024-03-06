@@ -6,7 +6,7 @@ export const acalaRouteConfigs = createRouteConfigs("acala", [
     to: "polkadot",
     token: "DOT",
     xcm: {
-      fee: { token: "DOT", amount: "469417452" },
+      fee: { token: "DOT", amount: "19978738" },
     },
   },
   {
