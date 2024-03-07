@@ -7,10 +7,11 @@ import { ChainId, chains } from "../configs";
 
 // refer to https://github.com/albertov19/xcmTools/blob/main/calculateKusamaDeliveryFees.ts
 // delivery_fee_factor * (base_fee + encoded_msg_len * per_byte_fee)
-// TODO: when most chains added xcm delivery fee, may move these to bridge package
 
 /**
  * Only for polkadot and kusama dmp for now
+ *
+ * FIXME: This is not accurate, need to get the real xcm message from client. Currently use the hardcoded value in each route config
  */
 export async function getPolkadotXcmDeliveryFee(
   from: ChainId,

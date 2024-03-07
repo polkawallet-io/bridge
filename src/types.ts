@@ -63,6 +63,11 @@ export interface XCMTransferConfigs {
     token: string;
     amount: string;
   };
+  // XCM delivery fee charged by `from chain`
+  deliveryFee?: {
+    token: string;
+    amount: string;
+  };
 }
 
 export interface NetworkProps {

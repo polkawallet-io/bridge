@@ -45,7 +45,6 @@ import {
   isChainEqual,
   validateAddress,
   getDestAccountInfo,
-  getPolkadotXcmDeliveryFee,
 } from "./utils";
 
 const DEFAULT_TX_CHECKING_TIMEOUT = 2 * 60 * 1000;
@@ -97,6 +96,7 @@ export abstract class BaseCrossChainAdapter {
     const { signer, to, token } = params;
 
     const destFee = this.getCrossChainFee(token, to);
+    const xcmDeliveryFee = this.getXcmDeliveryFee(token, to);
 
     // subscribe destination min receive
     const minInput$ = this.subscribeMinInput(token, to);
@@ -108,18 +108,13 @@ export abstract class BaseCrossChainAdapter {
     const fromApi = this.api as AnyApi;
     const paymentToken = fromApi.registry.chainTokens[0];
     const decimals = fromApi.registry.chainDecimals[0];
-    // TODO: only kusama and polkadot have it for now, refactor when other chains have this
-    const xcmDeliveryFee$ = ["polkadot", "kusama"].includes(this.chain.id)
-      ? from(getPolkadotXcmDeliveryFee(this.chain.id, to, this.api))
-      : of(null);
 
     return combineLatest({
       minInput: minInput$,
       maxInput: maxInput$,
       estimateFee: estimateFee$,
-      xcmDeliveryFee: xcmDeliveryFee$,
     }).pipe(
-      map(({ estimateFee, maxInput, minInput, xcmDeliveryFee }) => {
+      map(({ estimateFee, maxInput, minInput }) => {
         return {
           minInput: minInput.max(FN.ZERO),
           maxInput: maxInput.max(FN.ZERO),
@@ -129,12 +124,7 @@ export abstract class BaseCrossChainAdapter {
             token: paymentToken,
             balance: FN.fromInner(estimateFee, decimals),
           },
-          xcmFee: xcmDeliveryFee
-            ? {
-                token: paymentToken,
-                balance: xcmDeliveryFee,
-              }
-            : null,
+          xcmFee: xcmDeliveryFee || null,
         };
       })
     );
@@ -209,6 +199,35 @@ export abstract class BaseCrossChainAdapter {
         router.xcm?.fee?.amount || 0,
         this.getToken(feeToken, destChain).decimals
       ),
+    };
+  }
+
+  public getXcmDeliveryFee(
+    token: string,
+    destChain: ChainId
+  ): TokenBalance | null {
+    const router = this.routers.find(
+      (e) => e.to === destChain && e.token === token
+    );
+
+    if (!router) {
+      throw new RouterConfigNotFound(token, destChain, this.chain.id);
+    }
+
+    const deliveryFee = router.xcm?.deliveryFee;
+
+    if (!deliveryFee) {
+      return null;
+    }
+
+    const feeToken = deliveryFee?.token || token;
+
+    return {
+      token: feeToken,
+      balance: FN.fromInner(
+        deliveryFee?.amount || 0,
+        this.getToken(feeToken, destChain).decimals
+      ).mul(new FN(1.1)),
     };
   }
 
