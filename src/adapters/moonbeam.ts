@@ -86,6 +86,15 @@ const moonbeamTokensConfig: Record<string, ExtendedToken> = {
       ForeignAsset: "42259045809535163221576417993425387648",
     }),
   },
+  LDOT: {
+    name: "LDOT",
+    symbol: "LDOT",
+    decimals: 10,
+    ed: "500000000",
+    toRaw: () => ({
+      ForeignAsset: "22571952218199846829411730904177935381",
+    }),
+  },
   ACA: {
     name: "ACA",
     symbol: "ACA",
