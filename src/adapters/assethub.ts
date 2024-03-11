@@ -18,82 +18,85 @@ import {
   getDestAccountInfo,
 } from "../utils";
 
-export const statemintRouteConfigs = createRouteConfigs("statemint", [
-  {
-    to: "polkadot",
-    token: "DOT",
-    xcm: {
-      fee: { token: "DOT", amount: "421500000" },
-      weightLimit: "Unlimited",
+export const assetHubPolkadotRouteConfigs = createRouteConfigs(
+  "assetHubPolkadot",
+  [
+    {
+      to: "polkadot",
+      token: "DOT",
+      xcm: {
+        fee: { token: "DOT", amount: "421500000" },
+        weightLimit: "Unlimited",
+      },
     },
-  },
-  {
-    to: "hydradx",
-    token: "USDT",
-    xcm: {
-      fee: { token: "USDT", amount: "2200" },
-      weightLimit: "Unlimited",
+    {
+      to: "hydradx",
+      token: "USDT",
+      xcm: {
+        fee: { token: "USDT", amount: "2200" },
+        weightLimit: "Unlimited",
+      },
     },
-  },
-  {
-    to: "acala",
-    token: "USDT",
-    xcm: {
-      fee: { token: "USDT", amount: "808" },
-      weightLimit: "Unlimited",
+    {
+      to: "acala",
+      token: "USDT",
+      xcm: {
+        fee: { token: "USDT", amount: "808" },
+        weightLimit: "Unlimited",
+      },
     },
-  },
-  {
-    to: "acala",
-    token: "USDC",
-    xcm: {
-      fee: { token: "USDC", amount: "803" },
-      weightLimit: "Unlimited",
+    {
+      to: "acala",
+      token: "USDC",
+      xcm: {
+        fee: { token: "USDC", amount: "803" },
+        weightLimit: "Unlimited",
+      },
     },
-  },
-  {
-    to: "acala",
-    token: "PINK",
-    xcm: {
-      fee: { token: "PINK", amount: "80370000" },
-      weightLimit: "Unlimited",
+    {
+      to: "acala",
+      token: "PINK",
+      xcm: {
+        fee: { token: "PINK", amount: "80370000" },
+        weightLimit: "Unlimited",
+      },
     },
-  },
-  {
-    to: "astar",
-    token: "USDT",
-    xcm: {
-      fee: { token: "USDT", amount: "808" },
-      weightLimit: "Unlimited",
+    {
+      to: "astar",
+      token: "USDT",
+      xcm: {
+        fee: { token: "USDT", amount: "808" },
+        weightLimit: "Unlimited",
+      },
     },
-  },
-  {
-    to: "interlay",
-    token: "USDT",
-    xcm: {
-      fee: { token: "USDT", amount: "808" },
-      weightLimit: "Unlimited",
+    {
+      to: "interlay",
+      token: "USDT",
+      xcm: {
+        fee: { token: "USDT", amount: "808" },
+        weightLimit: "Unlimited",
+      },
     },
-  },
-  {
-    to: "moonbeam",
-    token: "USDT",
-    xcm: {
-      fee: { token: "USDT", amount: "808" },
-      weightLimit: "Unlimited",
+    {
+      to: "moonbeam",
+      token: "USDT",
+      xcm: {
+        fee: { token: "USDT", amount: "808" },
+        weightLimit: "Unlimited",
+      },
     },
-  },
-  {
-    to: "parallel",
-    token: "USDT",
-    xcm: {
-      fee: { token: "USDT", amount: "808" },
-      weightLimit: "Unlimited",
+    {
+      to: "parallel",
+      token: "USDT",
+      xcm: {
+        fee: { token: "USDT", amount: "808" },
+        weightLimit: "Unlimited",
+      },
     },
-  },
-]);
+  ]
+);
 
-export const statemineRouteConfigs = createRouteConfigs("statemine", [
+export const assetHubKusamaRouteConfigs = createRouteConfigs("assetHubKusama", [
   {
     to: "kusama",
     token: "KSM",
@@ -125,7 +128,7 @@ export const statemineRouteConfigs = createRouteConfigs("statemine", [
   },
 ]);
 
-export const statemintTokensConfig: Record<string, ExtendedToken> = {
+export const assetHubPolkadotTokensConfig: Record<string, ExtendedToken> = {
   DOT: {
     name: "DOT",
     symbol: "DOT",
@@ -156,7 +159,7 @@ export const statemintTokensConfig: Record<string, ExtendedToken> = {
   },
 };
 
-export const statemineTokensConfig: Record<string, ExtendedToken> = {
+export const assetHubKusamaTokensConfig: Record<string, ExtendedToken> = {
   KSM: {
     name: "KSM",
     symbol: "KSM",
@@ -217,7 +220,7 @@ const createBalanceStorages = (api: AnyApi) => {
   };
 };
 
-class StatemintBalanceAdapter extends BalanceAdapter {
+class AssetHubBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
 
   constructor({ api, chain, tokens }: BalanceAdapterConfigs) {
@@ -275,8 +278,8 @@ class StatemintBalanceAdapter extends BalanceAdapter {
   }
 }
 
-class BaseStatemintAdapter extends BaseCrossChainAdapter {
-  private balanceAdapter?: StatemintBalanceAdapter;
+class BaseAssetHubAdapter extends BaseCrossChainAdapter {
+  private balanceAdapter?: AssetHubBalanceAdapter;
 
   public async init(api: AnyApi) {
     this.api = api;
@@ -285,7 +288,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
 
     const chain = this.chain.id as ChainId;
 
-    this.balanceAdapter = new StatemintBalanceAdapter({
+    this.balanceAdapter = new AssetHubBalanceAdapter({
       api,
       chain,
       tokens: this.tokens,
@@ -438,14 +441,22 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
   }
 }
 
-export class StatemintAdapter extends BaseStatemintAdapter {
+export class AssetHubPolkadotAdapter extends BaseAssetHubAdapter {
   constructor() {
-    super(chains.statemint, statemintRouteConfigs, statemintTokensConfig);
+    super(
+      chains.assetHubPolkadot,
+      assetHubPolkadotRouteConfigs,
+      assetHubPolkadotTokensConfig
+    );
   }
 }
 
-export class StatemineAdapter extends BaseStatemintAdapter {
+export class AssetHubKusamaAdapter extends BaseAssetHubAdapter {
   constructor() {
-    super(chains.statemine, statemineRouteConfigs, statemineTokensConfig);
+    super(
+      chains.assetHubKusama,
+      assetHubKusamaRouteConfigs,
+      assetHubKusamaTokensConfig
+    );
   }
 }

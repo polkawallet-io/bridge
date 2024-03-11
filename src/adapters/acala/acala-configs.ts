@@ -150,21 +150,21 @@ export const acalaRouteConfigs = createRouteConfigs("acala", [
     },
   },
   {
-    to: "statemint",
+    to: "assetHubPolkadot",
     token: "USDT",
     xcm: {
       fee: { token: "DOT", amount: "160000000" },
     },
   },
   {
-    to: "statemint",
+    to: "assetHubPolkadot",
     token: "USDC",
     xcm: {
       fee: { token: "DOT", amount: "100000000" },
     },
   },
   {
-    to: "statemint",
+    to: "assetHubPolkadot",
     token: "PINK",
     xcm: {
       fee: { token: "DOT", amount: "100000000" },

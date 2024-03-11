@@ -6,7 +6,7 @@ import { chains, ChainId } from "../configs";
 import { Bridge } from "../bridge";
 import { KusamaAdapter, PolkadotAdapter } from "./polkadot";
 import { BasiliskAdapter, HydraDxAdapter } from "./hydradx";
-import { StatemineAdapter, StatemintAdapter } from "./statemint";
+import { AssetHubKusamaAdapter, AssetHubPolkadotAdapter } from "./assethub";
 import { AcalaAdapter, KaruraAdapter } from "./acala/acala";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { logFormatedRoute, formateRouteLogLine } from "../utils/unit-test";
@@ -19,11 +19,11 @@ describe.skip("polkadot-adapter should work", () => {
     kusama: new KusamaAdapter(),
     karura: new KaruraAdapter(),
     basilisk: new BasiliskAdapter(),
-    statemine: new StatemineAdapter(),
+    assetHubKusama: new AssetHubKusamaAdapter(),
     polkadot: new PolkadotAdapter(),
     acala: new AcalaAdapter(),
     hydradx: new HydraDxAdapter(),
-    statemint: new StatemintAdapter(),
+    assetHubPolkadot: new AssetHubPolkadotAdapter(),
   };
   const provider = new ApiProvider();
   let bridge: Bridge;
@@ -111,7 +111,7 @@ describe.skip("polkadot-adapter should work", () => {
 
         expect(tx).toBeDefined();
         expect(tx.method.section).toEqual("xcmPallet");
-        if (e.to === "statemine" || e.to === "statemint") {
+        if (e.to === "assetHubKusama" || e.to === "assetHubPolkadot") {
           expect(tx.method.method).toEqual("limitedTeleportAssets");
         } else {
           expect(tx.method.method).toEqual("limitedReserveTransferAssets");

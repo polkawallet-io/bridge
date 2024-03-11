@@ -6,8 +6,8 @@ export const polkadotChains = {
     paraChainId: -1,
     ss58Prefix: 0,
   },
-  statemint: {
-    display: "Statemint",
+  assetHubPolkadot: {
+    display: "Asset Hub Polkadot",
     type: "substrate",
     icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fstatemine.png&w=96&q=75",
     paraChainId: 1000,

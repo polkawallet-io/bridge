@@ -15,7 +15,7 @@ describe("Bridge sdk usage", () => {
     // kusama: new KusamaAdapter(),
     acala: new AcalaAdapter(),
     // karura: new KaruraAdapter(),
-    // statemine: new StatemineAdapter(),
+    // assetHubKusama: new AssetHubKusamaAdapter(),
     // altair: new AltairAdapter(),
     // shiden: new ShidenAdapter(),
     // bifrost: new BifrostAdapter(),

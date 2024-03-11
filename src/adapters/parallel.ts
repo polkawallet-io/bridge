@@ -49,7 +49,7 @@ export const parallelRouteConfigs = createRouteConfigs("parallel", [
     },
   },
   {
-    to: "statemint",
+    to: "assetHubPolkadot",
     token: "USDT",
     xcm: {
       fee: { token: "USDT", amount: "24037893" },
