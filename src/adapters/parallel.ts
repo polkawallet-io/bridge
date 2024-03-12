@@ -56,6 +56,22 @@ export const parallelRouteConfigs = createRouteConfigs("parallel", [
       weightLimit: DEST_WEIGHT,
     },
   },
+  {
+    to: "interlay",
+    token: "IBTC",
+    xcm: {
+      fee: { token: "IBTC", amount: "72" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "interlay",
+    token: "INTR",
+    xcm: {
+      fee: { token: "INTR", amount: "20000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
 ]);
 
 export const heikoRouteConfigs = createRouteConfigs("heiko", [
@@ -80,6 +96,22 @@ export const heikoRouteConfigs = createRouteConfigs("heiko", [
     token: "LKSM",
     xcm: {
       fee: { token: "LKSM", amount: "589618748" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "kintsugi",
+    token: "KBTC",
+    xcm: {
+      fee: { token: "KBTC", amount: "110" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "kintsugi",
+    token: "KINT",
+    xcm: {
+      fee: { token: "KINT", amount: "225000000" },
       weightLimit: DEST_WEIGHT,
     },
   },
@@ -125,6 +157,20 @@ export const parallelTokensConfig: Record<
       ed: "500000000",
       toRaw: () => "110",
     },
+    IBTC: {
+      name: "IBTC",
+      symbol: "IBTC",
+      decimals: 8,
+      ed: "1",
+      toRaw: () => 122,
+    },
+    INTR: {
+      name: "INTR",
+      symbol: "INTR",
+      decimals: 10,
+      ed: "1",
+      toRaw: () => 120,
+    },
   },
   heiko: {
     HKO: {
@@ -154,6 +200,20 @@ export const parallelTokensConfig: Record<
       decimals: 12,
       ed: "0",
       toRaw: () => "109",
+    },
+    KBTC: {
+      name: "KBTC",
+      symbol: "KBTC",
+      decimals: 8,
+      ed: "0",
+      toRaw: () => 121,
+    },
+    KINT: {
+      name: "Kintsugi",
+      symbol: "KINT",
+      decimals: 12,
+      ed: "0",
+      toRaw: () => 119,
     },
   },
 };

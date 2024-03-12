@@ -73,7 +73,15 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
       to: "interlay",
       token: "USDT",
       xcm: {
-        fee: { token: "USDT", amount: "808" },
+        fee: { token: "USDT", amount: "25000" },
+        weightLimit: "Unlimited",
+      },
+    },
+    {
+      to: "interlay",
+      token: "USDC",
+      xcm: {
+        fee: { token: "USDC", amount: "25000" },
         weightLimit: "Unlimited",
       },
     },
@@ -125,6 +133,14 @@ export const assetHubKusamaRouteConfigs = createRouteConfigs("assetHubKusama", [
     to: "karura",
     token: "USDT",
     xcm: { fee: { token: "USDT", amount: "808" }, weightLimit: "Unlimited" },
+  },
+  {
+    to: "kintsugi",
+    token: "USDT",
+    xcm: {
+      fee: { token: "USDT", amount: "20000" },
+      weightLimit: "Unlimited",
+    },
   },
 ]);
 

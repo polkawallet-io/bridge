@@ -70,6 +70,22 @@ export const astarRouteConfigs = createRouteConfigs("astar", [
       weightLimit: "Unlimited",
     },
   },
+  {
+    to: "interlay",
+    token: "IBTC",
+    xcm: {
+      fee: { token: "IBTC", amount: "75" },
+      weightLimit: "Unlimited",
+    },
+  },
+  {
+    to: "interlay",
+    token: "INTR",
+    xcm: {
+      fee: { token: "INTR", amount: "20000000" },
+      weightLimit: "Unlimited",
+    },
+  },
 ]);
 
 export const shidenRouteConfigs = createRouteConfigs("shiden", [
@@ -133,6 +149,24 @@ export const astarTokensConfig: Record<string, Record<string, TokenData>> = {
       ed: "1",
       toRaw: () => "1984",
       toQuery: () => "18446744073709551618",
+    },
+    IBTC: {
+      name: "IBTC",
+      symbol: "IBTC",
+      decimals: 8,
+      ed: "1",
+      toRaw: () =>
+        "0x0001000000000000000000000000000000000000000000000000000000000000",
+      toQuery: () => "18446744073709551620",
+    },
+    INTR: {
+      name: "INTR",
+      symbol: "INTR",
+      decimals: 10,
+      ed: "1",
+      toRaw: () =>
+        "0x0002000000000000000000000000000000000000000000000000000000000000",
+      toQuery: () => "18446744073709551621",
     },
   },
   shiden: {
