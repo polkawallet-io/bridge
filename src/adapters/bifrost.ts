@@ -275,7 +275,7 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
   }
 }
 
-export class BifrostKusamaAdapter extends BaseBifrostAdapter {
+export class BifrostAdapter extends BaseBifrostAdapter {
   constructor() {
     super(chains.bifrost, bifrostKusamaRouteConfigs, bifrostKusamaTokensConfig);
   }
