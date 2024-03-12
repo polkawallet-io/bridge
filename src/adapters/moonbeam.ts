@@ -72,10 +72,8 @@ const moonbeamTokensConfig: Record<string, ExtendedToken> = {
     name: "GLMR",
     symbol: "GLMR",
     decimals: 18,
-    ed: "10000000000000000000",
-    toRaw: () => ({
-      ForeignAsset: "0x0000000000000000000000000000000000000802",
-    }),
+    ed: "100000000000000000",
+    toRaw: () => null,
   },
   SUB: {
     name: "SUB",
