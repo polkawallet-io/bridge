@@ -178,7 +178,7 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
               },
             },
             fun: {
-              Fungible: "100000000",
+              Fungible: "160000000",
             },
           },
         },
