@@ -68,6 +68,13 @@ export const moonbeamRouteConfigs = createRouteConfigs("moonbeam", [
 ]);
 
 const moonbeamTokensConfig: Record<string, ExtendedToken> = {
+  GLMR: {
+    name: "GLMR",
+    symbol: "GLMR",
+    decimals: 18,
+    ed: "100000000000000000",
+    toRaw: () => null,
+  },
   SUB: {
     name: "SUB",
     symbol: "SUB",
