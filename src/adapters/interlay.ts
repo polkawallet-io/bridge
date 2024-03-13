@@ -120,6 +120,14 @@ export const kintsugiRouteConfigs = createRouteConfigs("kintsugi", [
     },
   },
   {
+    to: "kusama",
+    token: "KSM",
+    xcm: {
+      fee: { token: "KSM", amount: "100000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
     to: "assetHubKusama",
     token: "USDT",
     xcm: {
@@ -172,6 +180,13 @@ export const interlayTokensConfig: Record<
       ed: "0",
       toRaw: () => ({ Token: "IBTC" }),
     },
+    DOT: {
+      name: "DOT",
+      symbol: "DOT",
+      decimals: 10,
+      ed: "0",
+      toRaw: () => ({ Token: "DOT" }),
+    },
     USDC: {
       name: "USDC",
       symbol: "USDC",
@@ -208,6 +223,13 @@ export const interlayTokensConfig: Record<
       decimals: 8,
       ed: "0",
       toRaw: () => ({ Token: "KBTC" }),
+    },
+    KSM: {
+      name: "KSM",
+      symbol: "KSM",
+      decimals: 12,
+      ed: "0",
+      toRaw: () => ({ Token: "DOT" }),
     },
     LKSM: {
       name: "LKSM",
