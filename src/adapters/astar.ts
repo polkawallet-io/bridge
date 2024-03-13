@@ -131,7 +131,8 @@ export const astarTokensConfig: Record<string, Record<string, TokenData>> = {
       symbol: "LDOT",
       decimals: 10,
       ed: "1",
-      toRaw: () => "1984",
+      toRaw: () =>
+        "0x0003000000000000000000000000000000000000000000000000000000000000",
       toQuery: () => "18446744073709551618",
     },
   },
