@@ -6,12 +6,18 @@ import {
   prodParasKusama,
   prodParasKusamaCommon,
   prodParasPolkadot,
+  prodParasPolkadotCommon,
   prodRelayKusama,
   prodRelayPolkadot,
 } from "@polkadot/apps-config/endpoints";
 
 import { isChainEqual } from "./utils/is-chain-equal";
-import { ChainId } from "./configs";
+import { ChainId, chains } from "./configs";
+import { polkadotChains } from "./configs/chains/polkadot-chains";
+import { kusamaChains } from "./configs/chains/kusama-chains";
+
+const kusamaChainIds = new Set(Object.keys(kusamaChains));
+const polkadotChainIds = new Set(Object.keys(polkadotChains));
 
 export class ApiProvider {
   protected apis: Record<string, ApiRx> = {};
@@ -54,6 +60,24 @@ export class ApiProvider {
               )?.providers || {}
             ).filter((e) => e.startsWith("wss://"));
           }
+        }
+
+        if (!nodes?.length) {
+          const paraId = chains[chain].paraChainId;
+
+          const haystack = [];
+          if (kusamaChainIds.has(chain)) {
+            haystack.push(...prodParasKusamaCommon);
+            haystack.push(...prodParasKusama);
+          } else if (polkadotChainIds.has(chain)) {
+            haystack.push(...prodParasPolkadotCommon);
+            haystack.push(...prodParasPolkadot);
+          }
+
+          // find by parachain id
+          nodes = Object.values(
+            haystack.find((e) => e.paraId === paraId)?.providers || {}
+          ).filter((e) => e.startsWith("wss://"));
         }
 
         if (nodes.length > 1) {

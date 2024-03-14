@@ -12,7 +12,7 @@ import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import { BalanceData, ExtendedToken, TransferParams } from "../types";
 import { createRouteConfigs, validateAddress } from "../utils";
 
-export const bifrostRouteConfigs = createRouteConfigs("bifrost", [
+export const bifrostKusamaRouteConfigs = createRouteConfigs("bifrost", [
   {
     to: "karura",
     token: "BNC",
@@ -48,9 +48,29 @@ export const bifrostRouteConfigs = createRouteConfigs("bifrost", [
       fee: { token: "KUSD", amount: "10011896008" },
     },
   },
+  {
+    to: "kintsugi",
+    token: "VKSM",
+    xcm: {
+      fee: { token: "VKSM", amount: "175000000" },
+    },
+  },
 ]);
 
-export const bifrostTokensConfig: Record<string, ExtendedToken> = {
+export const bifrostPolkadotRoutersConfig = createRouteConfigs(
+  "bifrostPolkadot",
+  [
+    {
+      to: "interlay",
+      token: "VDOT",
+      xcm: {
+        fee: { token: "VDOT", amount: "20000000" },
+      },
+    },
+  ]
+);
+
+export const bifrostKusamaTokensConfig: Record<string, ExtendedToken> = {
   BNC: {
     name: "BNC",
     symbol: "BNC",
@@ -85,6 +105,30 @@ export const bifrostTokensConfig: Record<string, ExtendedToken> = {
     decimals: 12,
     ed: "100000000",
     toRaw: () => ({ Stable: "KUSD" }),
+  },
+  VKSM: {
+    name: "VKSM",
+    symbol: "VKSM",
+    decimals: 12,
+    ed: "100000000",
+    toRaw: () => ({ VToken: "KSM" }),
+  },
+};
+
+export const bifrostPolkadotTokensConfig: Record<string, ExtendedToken> = {
+  BNC: {
+    name: "BNC",
+    symbol: "BNC",
+    decimals: 12,
+    ed: "10000000000",
+    toRaw: () => ({ Native: "BNC" }),
+  },
+  VDOT: {
+    name: "VDOT",
+    symbol: "VDOT",
+    decimals: 10,
+    ed: "1000000",
+    toRaw: () => ({ VToken2: 0 }),
   },
 };
 
@@ -168,7 +212,7 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
     this.balanceAdapter = new BifrostBalanceAdapter({
       chain: this.chain.id as ChainId,
       api,
-      tokens: bifrostTokensConfig,
+      tokens: bifrostKusamaTokensConfig,
     });
   }
 
@@ -233,6 +277,16 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
 
 export class BifrostAdapter extends BaseBifrostAdapter {
   constructor() {
-    super(chains.bifrost, bifrostRouteConfigs, bifrostTokensConfig);
+    super(chains.bifrost, bifrostKusamaRouteConfigs, bifrostKusamaTokensConfig);
+  }
+}
+
+export class BifrostPolkadotAdapter extends BaseBifrostAdapter {
+  constructor() {
+    super(
+      chains.bifrostPolkadot,
+      bifrostPolkadotRoutersConfig,
+      bifrostPolkadotTokensConfig
+    );
   }
 }

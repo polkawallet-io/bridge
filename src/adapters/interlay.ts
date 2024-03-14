@@ -28,14 +28,72 @@ export const interlayRouteConfigs = createRouteConfigs("interlay", [
     xcm: { fee: { token: "IBTC", amount: "9" } },
   },
   {
+    to: "astar",
+    token: "INTR",
+    xcm: {
+      fee: { token: "INTR", amount: "40000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "astar",
+    token: "IBTC",
+    xcm: { fee: { token: "IBTC", amount: "5" }, weightLimit: DEST_WEIGHT },
+  },
+  {
+    to: "parallel",
+    token: "INTR",
+    xcm: {
+      fee: { token: "INTR", amount: "7000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "parallel",
+    token: "IBTC",
+    xcm: { fee: { token: "IBTC", amount: "110" }, weightLimit: DEST_WEIGHT },
+  },
+  {
+    to: "polkadot",
+    token: "DOT",
+    xcm: {
+      fee: { token: "DOT", amount: "1000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "assetHubPolkadot",
+    token: "USDC",
+    xcm: {
+      fee: { token: "USDC", amount: "80000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
     to: "assetHubPolkadot",
     token: "USDT",
-    xcm: { fee: { token: "USDT", amount: "9" } },
+    xcm: { fee: { token: "USDT", amount: "80000" } },
   },
   {
     to: "hydradx",
     token: "IBTC",
-    xcm: { fee: { token: "IBTC", amount: "7" } },
+    xcm: { fee: { token: "IBTC", amount: "15" } },
+  },
+  {
+    to: "hydradx",
+    token: "INTR",
+    xcm: {
+      fee: { token: "INTR", amount: "1500000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "bifrostPolkadot",
+    token: "VDOT",
+    xcm: {
+      fee: { token: "VDOT", amount: "725" },
+      weightLimit: DEST_WEIGHT,
+    },
   },
 ]);
 
@@ -61,6 +119,46 @@ export const kintsugiRouteConfigs = createRouteConfigs("kintsugi", [
       weightLimit: DEST_WEIGHT,
     },
   },
+  {
+    to: "kusama",
+    token: "KSM",
+    xcm: {
+      fee: { token: "KSM", amount: "100000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "assetHubKusama",
+    token: "USDT",
+    xcm: {
+      fee: { token: "USDT", amount: "10000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "heiko",
+    token: "KBTC",
+    xcm: {
+      fee: { token: "KBTC", amount: "110" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "heiko",
+    token: "KINT",
+    xcm: {
+      fee: { token: "KINT", amount: "18000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "bifrost",
+    token: "VKSM",
+    xcm: {
+      fee: { token: "VKSM", amount: "85000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
 ]);
 
 export const interlayTokensConfig: Record<
@@ -82,12 +180,33 @@ export const interlayTokensConfig: Record<
       ed: "0",
       toRaw: () => ({ Token: "IBTC" }),
     },
+    DOT: {
+      name: "DOT",
+      symbol: "DOT",
+      decimals: 10,
+      ed: "0",
+      toRaw: () => ({ Token: "DOT" }),
+    },
+    USDC: {
+      name: "USDC",
+      symbol: "USDC",
+      decimals: 6,
+      ed: "0",
+      toRaw: () => ({ ForeignAsset: 12 }),
+    },
     USDT: {
       name: "USDT",
       symbol: "USDT",
       decimals: 6,
       ed: "0",
-      toRaw: () => ({ Token: "USDT" }),
+      toRaw: () => ({ ForeignAsset: 2 }),
+    },
+    VDOT: {
+      name: "VDOT",
+      symbol: "VDOT",
+      decimals: 10,
+      ed: "0",
+      toRaw: () => ({ ForeignAsset: 3 }),
     },
   },
   kintsugi: {
@@ -105,12 +224,33 @@ export const interlayTokensConfig: Record<
       ed: "0",
       toRaw: () => ({ Token: "KBTC" }),
     },
+    KSM: {
+      name: "KSM",
+      symbol: "KSM",
+      decimals: 12,
+      ed: "0",
+      toRaw: () => ({ Token: "DOT" }),
+    },
     LKSM: {
       name: "LKSM",
       symbol: "LKSM",
       decimals: 12,
       ed: "0",
       toRaw: () => ({ ForeignAsset: 2 }),
+    },
+    USDT: {
+      name: "USDT",
+      symbol: "USDT",
+      decimals: 6,
+      ed: "0",
+      toRaw: () => ({ ForeignAsset: 3 }),
+    },
+    VKSM: {
+      name: "VKSM",
+      symbol: "VKSM",
+      decimals: 12,
+      ed: "0",
+      toRaw: () => ({ ForeignAsset: 5 }),
     },
   },
 };

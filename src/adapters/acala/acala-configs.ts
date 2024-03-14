@@ -104,7 +104,7 @@ export const acalaRouteConfigs = createRouteConfigs("acala", [
     to: "interlay",
     token: "INTR",
     xcm: {
-      fee: { token: "INTR", amount: "19000000" },
+      fee: { token: "INTR", amount: "20000000" },
     },
   },
   {
