@@ -124,6 +124,15 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
+  {
+    to: "bifrost_polkadot",
+    token: "BNC",
+    xcm: {
+      // TODO: test in chopsticks, value below is from subscan x10
+      fee: { token: "BNC", amount: "5143680000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
 ];
 
 export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
@@ -212,6 +221,7 @@ export const interlayTokensConfig: Record<
     USDC: { name: "USDC", symbol: "USDC", decimals: 6, ed: "0" },
     USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
     VDOT: { name: "VDOT", symbol: "VDOT", decimals: 10, ed: "0" },
+    BNC: { name: "BNC", symbol: "BNC", decimals: 12, ed: "0" },
   },
   kintsugi: {
     KBTC: { name: "KBTC", symbol: "KBTC", decimals: 8, ed: "0" },
@@ -238,6 +248,7 @@ const INTERLAY_SUPPORTED_TOKENS: Record<string, unknown> = {
   INTR: { Token: "INTR" },
   USDT: { ForeignAsset: 2 },
   VDOT: { ForeignAsset: 3 },
+  BNC: { ForeignAsset: 11 },
   USDC: { ForeignAsset: 12 },
 };
 

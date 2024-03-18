@@ -47,21 +47,34 @@ export const bifrostPolkadotRoutersConfig: Omit<
       weightLimit: DEST_WEIGHT,
     },
   },
+  {
+    to: "interlay",
+    token: "BNC",
+    xcm: {
+      // TODO: test in chopsticks
+      fee: { token: "BNC", amount: "50000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
 ];
 
 export const bifrostKusamaTokensConfig: Record<string, BasicToken> = {
+  BNC: { name: "BNC", symbol: "BNC", decimals: 12, ed: "10000000000" },
   VKSM: { name: "VKSM", symbol: "VKSM", decimals: 12, ed: "100000000" },
 };
 
 export const bifrostPolkadotTokensConfig: Record<string, BasicToken> = {
+  BNC: { name: "BNC", symbol: "BNC", decimals: 12, ed: "10000000000" },
   VDOT: { name: "VDOT", symbol: "VDOT", decimals: 10, ed: "1000000" },
 };
 
 const SUPPORTED_KUSAMA_TOKENS: Record<string, unknown> = {
+  BNC: { Native: "BNC" },
   VKSM: { VToken: "KSM" },
 };
 
 const SUPPORTED_POLKADOT_TOKENS: Record<string, unknown> = {
+  BNC: { Native: "BNC" },
   VDOT: { VToken2: 0 },
 };
 
