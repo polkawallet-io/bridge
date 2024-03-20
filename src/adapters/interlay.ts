@@ -128,8 +128,8 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "bifrost_polkadot",
     token: "BNC",
     xcm: {
-      // TODO: test in chopsticks, value below is from subscan x10
-      fee: { token: "BNC", amount: "5143680000" },
+      // chopsticks test value: 514_368_000, add buffer
+      fee: { token: "BNC", amount: "5000000000" },
       weightLimit: DEST_WEIGHT,
     },
   },
