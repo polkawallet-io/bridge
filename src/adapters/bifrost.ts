@@ -51,7 +51,7 @@ export const bifrostPolkadotRoutersConfig: Omit<
     to: "interlay",
     token: "BNC",
     xcm: {
-      // TODO: test in chopsticks
+      // chopsticks test value: 48_800_000_000, add buffer
       fee: { token: "BNC", amount: "50000000000" },
       weightLimit: DEST_WEIGHT,
     },
