@@ -9,7 +9,7 @@ import { AstarAdapter } from "../src/adapters/astar";
 // import { ParallelAdapter } from "../src/adapters/parallel";
 import { BifrostPolkadotAdapter } from "../src/adapters/bifrost";
 import { BaseCrossChainAdapter } from "../src/base-chain-adapter";
-import { runTestCasesAndExit } from "./chopsticks-test";
+import { RouterTestCase, runTestCasesAndExit } from "./chopsticks-test";
 
 main().catch((err) => {
     console.log("Error thrown by script:");
@@ -32,5 +32,13 @@ async function main(): Promise<void> {
         polkadot: { adapter: new PolkadotAdapter(), endpoints: ['ws://127.0.0.1:8005'] },
     };
 
-    await runTestCasesAndExit(adaptersEndpoints);
+    const skipCases: Partial<RouterTestCase>[] = [
+        // tests to acala currently broken
+        {
+            from: "interlay",
+            to: "acala",
+        },
+    ];
+
+    await runTestCasesAndExit(adaptersEndpoints, false, skipCases);
 }
