@@ -21,7 +21,7 @@ jobs:
       - name: Launch chopsticks
         timeout-minutes: 3
         run: |
-          npx --yes @acala-network/chopsticks@0.9.3 \
+          npx --yes @acala-network/chopsticks@0.9.10 \
             xcm \
             -r scripts/configs/kusama.yml \
             -p scripts/configs/kintsugi.yml \
@@ -55,7 +55,7 @@ jobs:
       - name: Launch chopsticks
         timeout-minutes: 3
         run: |
-          npx --yes @acala-network/chopsticks@0.9.3 \
+          npx --yes @acala-network/chopsticks@0.9.10 \
             xcm \
             -r scripts/configs/polkadot.yml \
             -p scripts/configs/interlay.yml \
