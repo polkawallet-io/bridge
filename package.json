@@ -16,8 +16,9 @@
   "repository": "https://github.com/polkawallet-io/bridge.git",
   "homepage": "https://github.com/polkawallet-io/bridge",
   "scripts": {
-    "clain": "rm -rf build",
+    "clean": "rm -rf build",
     "build": "tsc",
+    "prepack": "tsc",
     "test": "jest --runInBand --detectOpenHandles --forceExit",
     "lint": "polkadot-dev-run-lint",
     "build:docs": "ts-node ./scripts/generate-bridge-document.ts",
