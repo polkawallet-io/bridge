@@ -149,7 +149,7 @@ export const assetHubPolkadotTokensConfig: Record<string, ExtendedToken> = {
     name: "DOT",
     symbol: "DOT",
     decimals: 10,
-    ed: "10000000000",
+    ed: "100000000",
     toRaw: () => "NATIVE",
   },
   USDT: {
