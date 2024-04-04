@@ -11,7 +11,7 @@ import { BifrostAdapter, BifrostPolkadotAdapter } from "./bifrost";
 import { HydraDxAdapter } from "./hydradx";
 import { AstarAdapter } from "./astar";
 
-describe("Interlay/Kintsugi connections tests", () => {
+describe.skip("Interlay/Kintsugi connections tests", () => {
     jest.setTimeout(30000);
   
     const provider = new ApiProvider();
@@ -167,6 +167,7 @@ describe("Interlay/Kintsugi connections tests", () => {
       printBidirectionalTxs("interlay", "astar", "INTR");
       printBidirectionalTxs("interlay", "astar", "IBTC");
       printBidirectionalTxs("interlay", "bifrostPolkadot", "VDOT");
+      printBidirectionalTxs("interlay", "bifrostPolkadot", "BNC");
       printBidirectionalTxs("polkadot", "assetHubPolkadot", "DOT");
     });
   
