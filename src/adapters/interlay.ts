@@ -95,6 +95,14 @@ export const interlayRouteConfigs = createRouteConfigs("interlay", [
       weightLimit: DEST_WEIGHT,
     },
   },
+  {
+    to: "bifrostPolkadot",
+    token: "BNC",
+    xcm: {
+      fee: { token: "BNC", amount: "550000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
 ]);
 
 export const kintsugiRouteConfigs = createRouteConfigs("kintsugi", [
@@ -207,6 +215,13 @@ export const interlayTokensConfig: Record<
       decimals: 10,
       ed: "0",
       toRaw: () => ({ ForeignAsset: 3 }),
+    },
+    BNC: {
+      name: "BNC",
+      symbol: "BNC",
+      decimals: 12,
+      ed: "0",
+      toRaw: () => ({ ForeignAsset: 11 }),
     },
   },
   kintsugi: {
