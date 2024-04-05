@@ -88,6 +88,13 @@ export const interlayRouteConfigs = createRouteConfigs("interlay", [
     },
   },
   {
+    to: "hydradx",
+    token: "HDX",
+    xcm: {
+      fee: { token: "HDX", amount: "100000000000" },
+    },
+  },
+  {
     to: "bifrostPolkadot",
     token: "VDOT",
     xcm: {
@@ -193,6 +200,13 @@ export const interlayTokensConfig: Record<
       decimals: 6,
       ed: "0",
       toRaw: () => ({ ForeignAsset: 12 }),
+    },
+    HDX: {
+      name: "HDX",
+      symbol: "HDX",
+      decimals: 12,
+      ed: "0",
+      toRaw: () => ({ ForeignAsset: 13 }),
     },
     USDT: {
       name: "USDT",
