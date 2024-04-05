@@ -160,6 +160,7 @@ describe("Interlay/Kintsugi connections tests", () => {
       printBidirectionalTxs("interlay", "assetHubPolkadot", "USDT");
       printBidirectionalTxs("interlay", "hydradx", "IBTC");
       printBidirectionalTxs("interlay", "hydradx", "INTR");
+      printBidirectionalTxs("interlay", "hydradx", "HDX");
       printBidirectionalTxs("interlay", "acala", "INTR");
       printBidirectionalTxs("interlay", "acala", "IBTC");
       printBidirectionalTxs("interlay", "parallel", "INTR");
