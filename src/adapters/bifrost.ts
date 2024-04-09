@@ -52,7 +52,7 @@ export const bifrostPolkadotRoutersConfig: Omit<
     token: "BNC",
     xcm: {
       // chopsticks test value: 48_800_000_000, add buffer
-      fee: { token: "BNC", amount: "50000000000" },
+      fee: { token: "BNC", amount: "500000000000" },
       weightLimit: DEST_WEIGHT,
     },
   },
