@@ -224,6 +224,11 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
   },
   {
     to: "interlay",
+    token: "HDX",
+    xcm: { fee: { token: "HDX", amount: "500000000000" } },
+  },
+  {
+    to: "interlay",
     token: "IBTC",
     xcm: { fee: { token: "IBTC", amount: "62" } },
   },
