@@ -11,7 +11,13 @@ import-storage:
     Account:
       -
         -
-          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice
+        - providers: 1
+          data:
+            free: '1000000000000000'
+      -
+        -
+          - 5Eg2fntQS1bgCgPtXQ9Ysip6RUQkQJEMZqZ9u9qX6fcnhB4H # sibl 2032 (interlay sov)
         - providers: 1
           data:
             free: '1000000000000000'
