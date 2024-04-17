@@ -116,7 +116,6 @@ class BifrostBalanceAdapter extends BalanceAdapter {
   ): Observable<BalanceData> {
     const storage = this.storages.balances(address);
 
-    console.log("inside subscribe balance");
     if (token === this.nativeToken) {
       return storage.observable.pipe(
         map(({ data }) => ({
