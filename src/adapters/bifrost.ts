@@ -47,21 +47,34 @@ export const bifrostPolkadotRoutersConfig: Omit<
       weightLimit: DEST_WEIGHT,
     },
   },
+  {
+    to: "interlay",
+    token: "BNC",
+    xcm: {
+      // chopsticks test value: 48_800_000_000, add buffer
+      fee: { token: "BNC", amount: "500000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
 ];
 
 export const bifrostKusamaTokensConfig: Record<string, BasicToken> = {
+  BNC: { name: "BNC", symbol: "BNC", decimals: 12, ed: "10000000000" },
   VKSM: { name: "VKSM", symbol: "VKSM", decimals: 12, ed: "100000000" },
 };
 
 export const bifrostPolkadotTokensConfig: Record<string, BasicToken> = {
+  BNC: { name: "BNC", symbol: "BNC", decimals: 12, ed: "10000000000" },
   VDOT: { name: "VDOT", symbol: "VDOT", decimals: 10, ed: "1000000" },
 };
 
 const SUPPORTED_KUSAMA_TOKENS: Record<string, unknown> = {
+  BNC: { Native: "BNC" },
   VKSM: { VToken: "KSM" },
 };
 
 const SUPPORTED_POLKADOT_TOKENS: Record<string, unknown> = {
+  BNC: { Native: "BNC" },
   VDOT: { VToken2: 0 },
 };
 
@@ -107,10 +120,10 @@ class BifrostBalanceAdapter extends BalanceAdapter {
       return storage.observable.pipe(
         map(({ data }) => ({
           free: FN.fromInner(data.free.toString(), this.decimals),
-          locked: FN.fromInner(data.miscFrozen.toString(), this.decimals),
+          locked: FN.fromInner(data.frozen.toString(), this.decimals),
           reserved: FN.fromInner(data.reserved.toString(), this.decimals),
           available: FN.fromInner(
-            data.free.sub(data.miscFrozen).toString(),
+            data.free.sub(data.frozen).toString(),
             this.decimals
           ),
         }))

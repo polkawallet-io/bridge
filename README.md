@@ -16,7 +16,7 @@ All channels support transfers in both directions.
 | ------------------ | --------- |
 | acala              | INTR IBTC |
 | astar              | INTR IBTC |
-| bifrost            | VDOT      |
+| bifrost            | BNC VDOT  |
 | parallel           | INTR IBTC |
 | polkadot           | DOT       |
 | polkadot asset hub | USDT      |
