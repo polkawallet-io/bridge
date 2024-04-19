@@ -23,6 +23,15 @@ const DEST_WEIGHT = "Unlimited";
 export const hydraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
     to: "interlay",
+    token: "HDX",
+    xcm: {
+      // recent transfer cost: 405_777_777_777 - 5x margin for fee estimate
+      fee: { token: "HDX", amount: "1000000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "interlay",
     token: "IBTC",
     xcm: {
       // recent transfer cost: 62 - add 10x margin to fee estimate

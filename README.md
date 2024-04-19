@@ -20,7 +20,7 @@ All channels support transfers in both directions.
 | parallel           | INTR IBTC |
 | polkadot           | DOT       |
 | polkadot asset hub | USDT      |
-| hydradx            | IBTC      |
+| hydradx            | HDX IBTC  |
 
 #### Kintsugi:
 

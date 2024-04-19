@@ -106,6 +106,15 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
+  {
+    to: "hydra",
+    token: "HDX",
+    // from recent transfer: 80_376_806_468 - add 5x safety margin
+    xcm: {
+      fee: { token: "HDX", amount: "400000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
   // {
   //   to: "hydra",
   //   token: "USDC",
@@ -222,6 +231,7 @@ export const interlayTokensConfig: Record<
     USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "0" },
     VDOT: { name: "VDOT", symbol: "VDOT", decimals: 10, ed: "0" },
     BNC: { name: "BNC", symbol: "BNC", decimals: 12, ed: "0" },
+    HDX: { name: "HDX", symbol: "HDX", decimals: 12, ed: "0" },
   },
   kintsugi: {
     KBTC: { name: "KBTC", symbol: "KBTC", decimals: 8, ed: "0" },
@@ -250,6 +260,7 @@ const INTERLAY_SUPPORTED_TOKENS: Record<string, unknown> = {
   VDOT: { ForeignAsset: 3 },
   BNC: { ForeignAsset: 11 },
   USDC: { ForeignAsset: 12 },
+  HDX: { ForeignAsset: 13 },
 };
 
 const getSupportedTokens = (chainname: string): Record<string, unknown> => {
