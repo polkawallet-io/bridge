@@ -34,6 +34,18 @@ async function main(): Promise<void> {
             from: "polkadot",
             to: "interlay",
         },
+        // USDC and USDC test cases broken since latest changes
+        // on statemint where those are converted to DOT before sending fees.
+        {
+            from: "interlay",
+            to: "statemint",
+            token: "USDC"
+        },
+        {
+            from: "interlay",
+            to: "statemint",
+            token: "USDT"
+        },
     ];
 
     await runTestCasesAndExit(adaptersEndpoints, true, skipCases);
