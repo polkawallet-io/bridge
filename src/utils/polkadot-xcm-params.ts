@@ -1,16 +1,15 @@
 import { AnyApi } from "@acala-network/sdk-core";
-import { checkMessageVersionIsV3 } from "./check-message-version";
+import { checkMessageVersion } from "./check-message-version";
 
 export function createPolkadotXCMDest(
   api: AnyApi,
   parachainId: number,
   parents = 1
 ): any {
-  const isV3 = checkMessageVersionIsV3(api);
-  const versionTag = isV3 ? "V3" : "V1";
+  const version = checkMessageVersion(api);
 
   return {
-    [versionTag]: {
+    [version]: {
       parents,
       interior: { X1: { Parachain: parachainId } },
     },
@@ -22,17 +21,16 @@ export function createPolkadotXCMAccount(
   accountId: string,
   accountType = "AccountId32"
 ): any {
-  const isV3 = checkMessageVersionIsV3(api);
-  const versionTag = isV3 ? "V3" : "V1";
+  const version = checkMessageVersion(api);
 
   return {
-    [versionTag]: {
+    [version]: {
       parents: 0,
       interior: {
         X1: {
           [accountType]: {
             [accountType === "AccountId32" ? "id" : "key"]: accountId,
-            network: isV3 ? undefined : "Any",
+            network: version === "V1" ? "Any" : undefined,
           },
         },
       },
@@ -45,7 +43,7 @@ export function createPolkadotXCMAsset(
   amount: string,
   position: "NATIVE" | any[]
 ): any {
-  const isV3 = checkMessageVersionIsV3(api);
+  const version = checkMessageVersion(api);
   const tokenPosition =
     position === "NATIVE"
       ? {
@@ -61,10 +59,9 @@ export function createPolkadotXCMAsset(
             },
           },
         };
-  const versionTag = isV3 ? "V3" : "V1";
 
   return {
-    [versionTag]: [
+    [version]: [
       {
         ...tokenPosition,
         fun: { Fungible: amount },
