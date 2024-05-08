@@ -16,6 +16,15 @@ function createToRelayChainDestParam(version: XCMVersion, accountId: string) {
     };
   }
 
+  if (version === "V4") {
+    return {
+      [version]: {
+        parents: 1,
+        interior: { X1: [{ AccountId32: { id: accountId } }] },
+      },
+    };
+  }
+
   return {
     [version]: {
       parents: 1,
@@ -58,9 +67,9 @@ export function createXTokensDestParam(
     };
   }
 
-  // for message version v3
+  // for message version v3 & v4
   return {
-    V3: {
+    [version]: {
       parents: 1,
       interior: {
         X2: [

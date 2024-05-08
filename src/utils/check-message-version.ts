@@ -3,6 +3,8 @@ import { AnyApi } from "@acala-network/sdk-core";
 export type XCMVersion = "V1" | "V3" | "V4";
 
 export function checkMessageVersion(api: AnyApi) {
+  return "V4";
+
   let version: XCMVersion = "V1";
 
   try {
@@ -28,7 +30,7 @@ export function checkMessageVersion(api: AnyApi) {
   }
 
   try {
-    api?.createType("StagingXcmVersionedLocation") as any;
+    api?.createType("XcmVersionedLocation") as any;
 
     version = "V4";
   } catch (e) {

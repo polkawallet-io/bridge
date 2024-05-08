@@ -8,7 +8,7 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 
-describe.skip("acala-adapter", () => {
+describe("acala-adapter", () => {
   jest.setTimeout(50000);
 
   let bridge: Bridge;
@@ -37,8 +37,8 @@ describe.skip("acala-adapter", () => {
     const moonriver = new MoonriverAdapter();
     const assetHubKusama = new AssetHubKusamaAdapter();
 
-    const karuraApi = new ApiPromise({ provider: new WsProvider('wss://karura.api.onfinality.io/public-ws') });
-    const kusmaApi = new ApiPromise({ provider: new WsProvider('wss://kusama.api.onfinality.io/public-ws') });
+    const karuraApi = new ApiPromise({ provider: new WsProvider('wss://karura-rpc-1.aca-api.network') });
+    const kusmaApi = new ApiPromise({ provider: new WsProvider('wss://kusama-public-rpc.blockops.network/ws') });
     const assetHubApi = new ApiPromise({ provider: new WsProvider('wss://statemine-rpc.dwellir.com') });
 
     await karura.init(karuraApi);
@@ -86,10 +86,10 @@ describe.skip("acala-adapter", () => {
     });
 
     // DONT MODIFY THIS, THE OBJECT IS VALID, UNLESS YOU KNOW WHAT YOU ARE DOING
-    const location = api.createType('XcmVersionedMultiLocation', {
-      V3: {
+    const location = api.createType('XcmVersionedLocation', {
+      V4: {
         parents: '1',
-        interior: { X1: { AccountId32: { id: addressId, network: null } } }
+        interior: { X1: [{ AccountId32: { id: addressId, network: null } }] }
       }
     });
 
@@ -123,7 +123,7 @@ describe.skip("acala-adapter", () => {
       });
 
       // DONT MODIFY THIS, THE OBJECT IS VALID, UNLESS YOU KNOW WHAT YOU ARE DOING
-      const location = api.createType('XcmVersionedMultiLocation', {
+      const location = api.createType('XcmVersionedLocation', {
         V3: {
           parents: "1",
           interior: {
@@ -171,7 +171,7 @@ describe.skip("acala-adapter", () => {
       });
 
       // DONT MODIFY THIS, THE OBJECT IS VALID, UNLESS YOU KNOW WHAT YOU ARE DOING
-      const location = api.createType('XcmVersionedMultiLocation', {
+      const location = api.createType('XcmVersionedLocation', {
         V3: {
           parents: "1",
           interior: {
@@ -184,7 +184,7 @@ describe.skip("acala-adapter", () => {
       });
 
       // DONT MODIFY THIS, THE OBJECT IS VALID, UNLESS YOU KNOW WHAT YOU ARE DOING
-      const assets = api.createType('XcmVersionedMultiAsset', {
+      const assets = api.createType('XcmVersionedAsset', {
         V3: {
           fun: {
             Fungible: amount.toChainData(),
