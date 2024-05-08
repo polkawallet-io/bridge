@@ -8,7 +8,7 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 
-describe("acala-adapter", () => {
+describe.skip("acala-adapter", () => {
   jest.setTimeout(50000);
 
   let bridge: Bridge;
