@@ -1,13 +1,13 @@
 import { AnyApi } from "@acala-network/sdk-core";
-import { checkMessageVersionIsV3 } from "./check-message-version";
+import { XCMVersion, checkMessageVersion } from "./check-message-version";
 
 interface DestConfigs {
   useAccountKey20?: boolean;
   isToRelayChain?: boolean;
 }
 
-function createToRelayChainDestParam(isV3: boolean, accountId: string) {
-  if (!isV3) {
+function createToRelayChainDestParam(version: XCMVersion, accountId: string) {
+  if (version === "V1") {
     return {
       V1: {
         parents: 1,
@@ -17,7 +17,7 @@ function createToRelayChainDestParam(isV3: boolean, accountId: string) {
   }
 
   return {
-    V3: {
+    [version]: {
       parents: 1,
       interior: { X1: { AccountId32: { id: accountId } } },
     },
@@ -30,16 +30,16 @@ export function createXTokensDestParam(
   accountId: string,
   configs?: DestConfigs
 ) {
-  const isV3 = checkMessageVersionIsV3(api);
+  const version = checkMessageVersion(api);
   const { useAccountKey20, isToRelayChain } = configs || {};
 
   const accountKeyName = useAccountKey20 ? "AccountKey20" : "AccountId32";
 
   if (isToRelayChain) {
-    return createToRelayChainDestParam(isV3, accountId);
+    return createToRelayChainDestParam(version, accountId);
   }
 
-  if (!isV3) {
+  if (version === "V1") {
     return {
       V1: {
         parents: 1,
@@ -82,9 +82,9 @@ export function createXTokensAssetsParam(
   assetId: any,
   amount: string
 ) {
-  const isV3 = checkMessageVersionIsV3(api);
+  const version = checkMessageVersion(api);
 
-  if (!isV3) {
+  if (version === "V1") {
     return {
       V1: {
         fun: {
@@ -107,7 +107,7 @@ export function createXTokensAssetsParam(
   }
 
   return {
-    V3: {
+    [version]: {
       fun: {
         Fungible: amount,
       },

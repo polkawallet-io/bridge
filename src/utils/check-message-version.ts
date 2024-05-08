@@ -1,22 +1,39 @@
 import { AnyApi } from "@acala-network/sdk-core";
 
-export function checkMessageVersionIsV3(api: AnyApi) {
+export type XCMVersion = "V1" | "V3" | "V4";
+
+export function checkMessageVersion(api: AnyApi) {
+  let version: XCMVersion = "V1";
+
   try {
     const keys = (api?.createType("XcmVersionedMultiLocation") as any)
       .defKeys as string[];
 
-    return keys.includes("V3");
-  } catch (e) {
-    try {
-      const keys = (api?.createType("StagingXcmVersionedMultiLocation") as any)
-        .defKeys as string[];
-
-      return keys.includes("V3");
-    } catch (e) {
-      // ignore
+    if (keys.includes("V3")) {
+      version = "V3";
     }
-    // ignore error
+  } catch (e) {
+    // ignore
   }
 
-  return false;
+  try {
+    const keys = (api?.createType("StagingXcmVersionedMultiLocation") as any)
+      .defKeys as string[];
+
+    if (keys.includes("V3")) {
+      version = "V3";
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  try {
+    api?.createType("StagingXcmVersionedLocation") as any;
+
+    version = "V4";
+  } catch (e) {
+    // ignore
+  }
+
+  return version;
 }
