@@ -67,6 +67,13 @@ export const bifrostPolkadotRoutersConfig = createRouteConfigs(
         fee: { token: "VDOT", amount: "20000000" },
       },
     },
+    {
+      to: "interlay",
+      token: "BNC",
+      xcm: {
+        fee: { token: "BNC", amount: "50000000000" },
+      },
+    },
   ]
 );
 

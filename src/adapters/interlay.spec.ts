@@ -168,6 +168,7 @@ describe.skip("Interlay/Kintsugi connections tests", () => {
       printBidirectionalTxs("interlay", "astar", "INTR");
       printBidirectionalTxs("interlay", "astar", "IBTC");
       printBidirectionalTxs("interlay", "bifrostPolkadot", "VDOT");
+      printBidirectionalTxs("interlay", "bifrostPolkadot", "BNC");
       printBidirectionalTxs("polkadot", "assetHubPolkadot", "DOT");
     });
   
