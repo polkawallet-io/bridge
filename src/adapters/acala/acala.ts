@@ -123,12 +123,20 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
     }).pipe(
       map(({ balance, txFee }) => {
         const feeFactor = 1.2;
+        const tokenMeta = this.getToken(token);
         const fee = FixedPointNumber.fromInner(
           txFee,
           nativeToken.decimals || 12
         ).mul(new FixedPointNumber(feeFactor));
 
-        return balance.minus(fee);
+        return balance
+          .minus(fee)
+          .minus(
+            FixedPointNumber.fromInner(
+              tokenMeta?.ed || "0",
+              tokenMeta?.decimals
+            )
+          );
       })
     );
   }
