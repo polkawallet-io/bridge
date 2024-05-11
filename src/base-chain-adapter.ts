@@ -349,6 +349,16 @@ export abstract class BaseCrossChainAdapter {
     return firstValueFrom(this.subscribeMaxInput(token, address, to));
   }
 
+  public async getMaxInputIgnoreED(
+    token: string,
+    address: string,
+    to: ChainId
+  ): Promise<FN> {
+    const maxInputKeepEd = await this.getMaxInput(token, address, to);
+    const { ed, decimals } = this.getToken(token);
+    return maxInputKeepEd.plus(FN.fromInner(ed, decimals));
+  }
+
   public abstract createTx(
     params: TransferParams
   ):
