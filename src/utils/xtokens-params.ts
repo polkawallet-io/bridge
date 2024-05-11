@@ -115,6 +115,26 @@ export function createXTokensAssetsParam(
     };
   }
 
+  if (version === "V4") {
+    return {
+      V4: {
+        fun: {
+          Fungible: amount,
+        },
+        id: {
+          parents: 1,
+          interior: {
+            X3: [
+              { Parachain: paraChainId },
+              { PalletInstance: 50 },
+              { GeneralIndex: assetId },
+            ],
+          },
+        },
+      },
+    };
+  }
+
   return {
     [version]: {
       fun: {
