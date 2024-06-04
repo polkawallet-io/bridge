@@ -29,7 +29,7 @@ export const polkadotChains = {
   },
   moonbeam: {
     display: "Moonbeam",
-    type: "substrate",
+    type: "ethereum",
     icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fmoonbeam.png&w=96&q=75",
     paraChainId: 2004,
     ss58Prefix: 1284,
