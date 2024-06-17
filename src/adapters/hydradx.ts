@@ -223,6 +223,13 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
     },
   },
   {
+    to: "acala",
+    token: "LDOT",
+    xcm: {
+      fee: { token: "LDOT", amount: "7143397" },
+    },
+  },
+  {
     to: "interlay",
     token: "HDX",
     xcm: { fee: { token: "HDX", amount: "500000000000" } },
@@ -312,6 +319,13 @@ export const hydradxTokensConfig: Record<string, ExtendedToken> = {
     decimals: 10,
     ed: "17540000",
     toRaw: () => 5,
+  },
+  LDOT: {
+    name: "LDOT",
+    symbol: "LDOT",
+    decimals: 10,
+    ed: "100200401",
+    toRaw: () => 1000100,
   },
   DAI: {
     name: "DAI",
