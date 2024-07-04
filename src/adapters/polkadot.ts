@@ -59,7 +59,7 @@ export const kusamaRouteConfigs = createRouteConfigs("kusama", [
     token: "KSM",
     xcm: {
       fee: { token: "KSM", amount: "44163610" },
-      deliveryFee: { token: "KSM", amount: "1336666329" },
+      deliveryFee: { token: "KSM", amount: "1323333009" },
       weightLimit: "Unlimited",
     },
   },
@@ -68,6 +68,7 @@ export const kusamaRouteConfigs = createRouteConfigs("kusama", [
     token: "KSM",
     xcm: {
       fee: { token: "KSM", amount: "72711796" },
+      deliveryFee: { token: "KSM", amount: "1323333009" },
       weightLimit: "Unlimited",
     },
   },
@@ -76,6 +77,7 @@ export const kusamaRouteConfigs = createRouteConfigs("kusama", [
     token: "KSM",
     xcm: {
       fee: { token: "KSM", amount: "34368318" },
+      deliveryFee: { token: "KSM", amount: "1323333009" },
       weightLimit: "Unlimited",
     },
   },
@@ -84,6 +86,7 @@ export const kusamaRouteConfigs = createRouteConfigs("kusama", [
     token: "KSM",
     xcm: {
       fee: { token: "KSM", amount: "250000000" },
+      deliveryFee: { token: "KSM", amount: "1323333009" },
       weightLimit: "Unlimited",
     },
   },
