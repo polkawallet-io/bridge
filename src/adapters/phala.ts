@@ -41,10 +41,7 @@ export const phalaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   },
 ];
 
-export const phalaTokensConfig: Record<
-  string,
-  Record<string, TokenData>
-> = {
+export const phalaTokensConfig: Record<string, Record<string, TokenData>> = {
   phala: {
     PHA: {
       name: "PHA",
@@ -272,10 +269,6 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
 
 export class PhalaAdapter extends BasePhalaAdapter {
   constructor() {
-    super(
-      chains.phala,
-      phalaRoutersConfig,
-      phalaTokensConfig.parallel
-    );
+    super(chains.phala, phalaRoutersConfig, phalaTokensConfig.phala);
   }
 }
