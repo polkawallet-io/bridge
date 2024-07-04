@@ -339,6 +339,8 @@ class BaseAssetHubAdapter extends BaseCrossChainAdapter {
       throw new ApiNotFound(this.chain.id);
     }
 
+    const xcmDeliveryFee = this.getXcmDeliveryFee(token, to);
+
     return combineLatest({
       txFee:
         token === this.balanceAdapter?.nativeToken
@@ -360,10 +362,12 @@ class BaseAssetHubAdapter extends BaseCrossChainAdapter {
         const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(
           new FN(feeFactor)
         );
+        const deliveryFee = xcmDeliveryFee?.balance || FN.ZERO;
 
         // always minus ed
         return balance
           .minus(fee)
+          .minus(deliveryFee)
           .minus(FN.fromInner(tokenMeta?.ed || "0", tokenMeta?.decimals));
       })
     );
