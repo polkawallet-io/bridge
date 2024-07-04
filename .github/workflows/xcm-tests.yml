@@ -72,6 +72,7 @@ jobs:
             -p scripts/configs/acala.yml \
             -p scripts/configs/astar.yml \
             -p scripts/configs/bifrost-polkadot.yml \
+            -p scripts/configs/phala.yml \
             &> log.txt &
           echo "Waiting for log to show chopsticks is ready..."
           tail -f log.txt | grep -q "Connected parachains"
