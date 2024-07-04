@@ -110,6 +110,7 @@ export const assetHubKusamaRouteConfigs = createRouteConfigs("assetHubKusama", [
     token: "KSM",
     xcm: {
       fee: { token: "KSM", amount: "90049287" },
+      deliveryFee: { token: "KSM", amount: "1032333300" },
       weightLimit: "Unlimited",
     },
   },
@@ -117,6 +118,7 @@ export const assetHubKusamaRouteConfigs = createRouteConfigs("assetHubKusama", [
     to: "karura",
     token: "RMRK",
     xcm: {
+      deliveryFee: { token: "KSM", amount: "1036333296" },
       fee: { token: "RMRK", amount: "9918117" },
       weightLimit: "Unlimited",
     },
@@ -126,19 +128,25 @@ export const assetHubKusamaRouteConfigs = createRouteConfigs("assetHubKusama", [
     token: "ARIS",
     xcm: {
       fee: { token: "ARIS", amount: "6400000" },
+      deliveryFee: { token: "KSM", amount: "1036333296" },
       weightLimit: "Unlimited",
     },
   },
   {
     to: "karura",
     token: "USDT",
-    xcm: { fee: { token: "USDT", amount: "808" }, weightLimit: "Unlimited" },
+    xcm: {
+      fee: { token: "USDT", amount: "808" },
+      deliveryFee: { token: "KSM", amount: "1036333296" },
+      weightLimit: "Unlimited",
+    },
   },
   {
     to: "kintsugi",
     token: "USDT",
     xcm: {
       fee: { token: "USDT", amount: "20000" },
+      deliveryFee: { token: "KSM", amount: "1036333296" },
       weightLimit: "Unlimited",
     },
   },
