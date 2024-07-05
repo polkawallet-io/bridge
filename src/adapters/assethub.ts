@@ -25,6 +25,7 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
       to: "polkadot",
       token: "DOT",
       xcm: {
+        deliveryFee: { token: "KSM", amount: "309700000" },
         fee: { token: "DOT", amount: "421500000" },
         weightLimit: "Unlimited",
       },
@@ -33,6 +34,7 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
       to: "hydradx",
       token: "USDT",
       xcm: {
+        deliveryFee: { token: "KSM", amount: "311100000" },
         fee: { token: "USDT", amount: "2200" },
         weightLimit: "Unlimited",
       },
@@ -41,6 +43,7 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
       to: "acala",
       token: "USDT",
       xcm: {
+        deliveryFee: { token: "KSM", amount: "311100000" },
         fee: { token: "USDT", amount: "808" },
         weightLimit: "Unlimited",
       },
@@ -49,6 +52,7 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
       to: "acala",
       token: "USDC",
       xcm: {
+        deliveryFee: { token: "KSM", amount: "311100000" },
         fee: { token: "USDC", amount: "803" },
         weightLimit: "Unlimited",
       },
@@ -57,6 +61,7 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
       to: "acala",
       token: "PINK",
       xcm: {
+        deliveryFee: { token: "KSM", amount: "311100000" },
         fee: { token: "PINK", amount: "80370000" },
         weightLimit: "Unlimited",
       },
@@ -65,6 +70,7 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
       to: "astar",
       token: "USDT",
       xcm: {
+        deliveryFee: { token: "KSM", amount: "311100000" },
         fee: { token: "USDT", amount: "808" },
         weightLimit: "Unlimited",
       },
@@ -73,6 +79,7 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
       to: "interlay",
       token: "USDT",
       xcm: {
+        deliveryFee: { token: "KSM", amount: "311100000" },
         fee: { token: "USDT", amount: "25000" },
         weightLimit: "Unlimited",
       },
@@ -81,6 +88,7 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
       to: "interlay",
       token: "USDC",
       xcm: {
+        deliveryFee: { token: "KSM", amount: "311100000" },
         fee: { token: "USDC", amount: "25000" },
         weightLimit: "Unlimited",
       },
@@ -89,6 +97,7 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
       to: "moonbeam",
       token: "USDT",
       xcm: {
+        deliveryFee: { token: "KSM", amount: "311100000" },
         fee: { token: "USDT", amount: "808" },
         weightLimit: "Unlimited",
       },
@@ -97,6 +106,7 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
       to: "parallel",
       token: "USDT",
       xcm: {
+        deliveryFee: { token: "KSM", amount: "311100000" },
         fee: { token: "USDT", amount: "808" },
         weightLimit: "Unlimited",
       },
