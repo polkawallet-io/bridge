@@ -23,7 +23,7 @@ export const polkadotRouteConfigs = createRouteConfigs("polkadot", [
     token: "DOT",
     xcm: {
       fee: { token: "DOT", amount: "1222070" },
-      deliveryFee: { token: "DOT", amount: "399000000" },
+      deliveryFee: { token: "DOT", amount: "397000000" },
       weightLimit: "Unlimited",
     },
   },
@@ -31,6 +31,7 @@ export const polkadotRouteConfigs = createRouteConfigs("polkadot", [
     to: "hydradx",
     token: "DOT",
     xcm: {
+      deliveryFee: { token: "DOT", amount: "397000000" },
       fee: { token: "DOT", amount: "21711791" },
       weightLimit: "Unlimited",
     },
@@ -39,6 +40,7 @@ export const polkadotRouteConfigs = createRouteConfigs("polkadot", [
     to: "assetHubPolkadot",
     token: "DOT",
     xcm: {
+      deliveryFee: { token: "DOT", amount: "397000000" },
       fee: { token: "DOT", amount: "15800000" },
       weightLimit: "Unlimited",
     },
@@ -47,6 +49,7 @@ export const polkadotRouteConfigs = createRouteConfigs("polkadot", [
     to: "interlay",
     token: "DOT",
     xcm: {
+      deliveryFee: { token: "DOT", amount: "397000000" },
       fee: { token: "DOT", amount: "25000000" },
       weightLimit: "Unlimited",
     },
