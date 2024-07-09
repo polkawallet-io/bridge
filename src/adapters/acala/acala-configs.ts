@@ -150,6 +150,13 @@ export const acalaRouteConfigs = createRouteConfigs("acala", [
     },
   },
   {
+    to: "hydradx",
+    token: "ACA",
+    xcm: {
+      fee: { token: "ACA", amount: "10429291793" },
+    },
+  },
+  {
     to: "unique",
     token: "UNQ",
     xcm: {
