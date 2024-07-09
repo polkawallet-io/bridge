@@ -230,6 +230,13 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
     },
   },
   {
+    to: "acala",
+    token: "ACA",
+    xcm: {
+      fee: { token: "ACA", amount: "6429600000" },
+    },
+  },
+  {
     to: "interlay",
     token: "HDX",
     xcm: { fee: { token: "HDX", amount: "500000000000" } },
@@ -277,6 +284,13 @@ export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
 ]);
 
 export const hydradxTokensConfig: Record<string, ExtendedToken> = {
+  ACA: {
+    name: "ACA",
+    symbol: "ACA",
+    decimals: 12,
+    ed: "90744101633",
+    toRaw: () => 1000099,
+  },
   HDX: {
     name: "HDX",
     symbol: "HDX",
