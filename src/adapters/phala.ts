@@ -25,8 +25,8 @@ export const phalaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "interlay",
     token: "PHA",
     xcm: {
-      // TODO: confirm via chopsticks test, best guess: 8_000_0000_000_000
-      fee: { token: "PHA", amount: "5000000000000000" },
+      // chopsticks test: fees 78_600_800_000_000, use a small buffer (too expensive to use a standard buffer)
+      fee: { token: "PHA", amount: "100000000000000" },
       weightLimit: DEST_WEIGHT,
     },
   },
