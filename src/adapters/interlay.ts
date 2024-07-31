@@ -70,7 +70,7 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     token: "PHA",
     xcm: {
       // TODO: get chopsticks test data
-      fee: { token: "PHA", amount: "51200000000" },
+      fee: { token: "PHA", amount: "101200000000" },
       weightLimit: DEST_WEIGHT,
     },
   },
@@ -86,8 +86,8 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
     to: "phala",
     token: "IBTC",
-    // TODO: get chopsticks test: fee = 103 Add 10x margin
-    xcm: { fee: { token: "IBTC", amount: "1030" }, weightLimit: DEST_WEIGHT },
+    // chopsticks test: fee = 6429600. Add ~3x margin
+    xcm: { fee: { token: "IBTC", amount: "20000000" }, weightLimit: DEST_WEIGHT },
   },
   {
     to: "polkadot",
