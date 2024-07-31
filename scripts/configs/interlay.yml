@@ -49,3 +49,8 @@ import-storage:
           - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice, hdx
           - foreignAsset: 13
         - free: '1000000000000000'
+      -
+        -
+          - 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY # Alice, pha
+          - foreignAsset: 14
+        - free: '1000000000000000'

@@ -25,8 +25,8 @@ export const phalaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "interlay",
     token: "PHA",
     xcm: {
-      // TODO: confirm via chopsticks test
-      fee: { token: "PHA", amount: "1016604720" },
+      // TODO: confirm via chopsticks test, best guess: 8_000_0000_000_000
+      fee: { token: "PHA", amount: "5000000000000000" },
       weightLimit: DEST_WEIGHT,
     },
   },
@@ -34,8 +34,8 @@ export const phalaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "interlay",
     token: "IBTC",
     xcm: {
-      // during chopsticks test: fee = 71 Add 10x margin
-      fee: { token: "IBTC", amount: "710" },
+      // during chopsticks test: fee = 63, use ~10x buffer
+      fee: { token: "IBTC", amount: "600" },
       weightLimit: DEST_WEIGHT,
     },
   },
@@ -43,8 +43,8 @@ export const phalaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "interlay",
     token: "INTR",
     xcm: {
-      // during chopsticks test: fee = 21_660_472 Add 10x margin
-      fee: { token: "INTR", amount: "216604720" },
+      // during chopsticks test: fee = 19_213_457, use ~10x buffer
+      fee: { token: "INTR", amount: "200000000" },
       weightLimit: DEST_WEIGHT,
     },
   },
