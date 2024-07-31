@@ -89,7 +89,7 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     xcm: {
       // chopsticks test: fee = 6429600. Use ~3x buffer
       fee: { token: "IBTC", amount: "20000000" },
-      weightLimit: DEST_WEIGHT
+      weightLimit: DEST_WEIGHT,
     },
   },
   {
