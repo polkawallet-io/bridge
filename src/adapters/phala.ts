@@ -23,6 +23,15 @@ type TokenData = ExtendedToken & { toQuery: () => string };
 export const phalaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
     to: "interlay",
+    token: "PHA",
+    xcm: {
+      // TODO: confirm via chopsticks test
+      fee: { token: "PHA", amount: "216604720" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "interlay",
     token: "IBTC",
     xcm: {
       // during chopsticks test: fee = 71 Add 10x margin
@@ -54,7 +63,7 @@ export const phalaTokensConfig: Record<string, Record<string, TokenData>> = {
       name: "IBTC",
       symbol: "IBTC",
       decimals: 8,
-      ed: "1,000,000",
+      ed: "1000000",
       toRaw: () =>
         "0x0001000000000000000000000000000000000000000000000000000000000000",
       toQuery: () => "14",
@@ -63,7 +72,7 @@ export const phalaTokensConfig: Record<string, Record<string, TokenData>> = {
       name: "INTR",
       symbol: "INTR",
       decimals: 10,
-      ed: "100,000,000",
+      ed: "100000000",
       toRaw: () =>
         "0x0002000000000000000000000000000000000000000000000000000000000000",
       toQuery: () => "13",

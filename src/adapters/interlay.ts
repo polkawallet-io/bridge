@@ -67,6 +67,15 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   },
   {
     to: "phala",
+    token: "PHA",
+    xcm: {
+      // TODO: get chopsticks test data
+      fee: { token: "PHA", amount: "51200000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "phala",
     token: "INTR",
     xcm: {
       // TODO: get chopsticks test data: fee = 6_535_947_712 Add 10x margin
@@ -247,6 +256,7 @@ export const interlayTokensConfig: Record<
     VDOT: { name: "VDOT", symbol: "VDOT", decimals: 10, ed: "0" },
     BNC: { name: "BNC", symbol: "BNC", decimals: 12, ed: "0" },
     HDX: { name: "HDX", symbol: "HDX", decimals: 12, ed: "0" },
+    PHA: { name: "PHA", symbol: "PHA", decimals: 12, ed: "10000000000" },
   },
   kintsugi: {
     KBTC: { name: "KBTC", symbol: "KBTC", decimals: 8, ed: "0" },
@@ -276,6 +286,7 @@ const INTERLAY_SUPPORTED_TOKENS: Record<string, unknown> = {
   BNC: { ForeignAsset: 11 },
   USDC: { ForeignAsset: 12 },
   HDX: { ForeignAsset: 13 },
+  PHA: { ForeignAsset: 14 },
 };
 
 const getSupportedTokens = (chainname: string): Record<string, unknown> => {
