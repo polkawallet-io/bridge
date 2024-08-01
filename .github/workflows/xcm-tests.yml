@@ -26,7 +26,6 @@ jobs:
             -r scripts/configs/kusama.yml \
             -p scripts/configs/kintsugi.yml \
             -p scripts/configs/karura.yml \
-            -p scripts/configs/parallel-heiko.yml \
             -p scripts/configs/bifrost.yml \
             &> log.txt &
           echo "Waiting for log to show chopsticks is ready..."
