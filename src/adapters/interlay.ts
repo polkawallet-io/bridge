@@ -54,6 +54,21 @@ export const interlayRouteConfigs = createRouteConfigs("interlay", [
     xcm: { fee: { token: "IBTC", amount: "110" }, weightLimit: DEST_WEIGHT },
   },
   {
+    to: "phala",
+    token: "PHA",
+    xcm: { fee: { token: "PHA", amount: "65000000000" } },
+  },
+  {
+    to: "phala",
+    token: "INTR",
+    xcm: { fee: { token: "INTR", amount: "650000000" } },
+  },
+  {
+    to: "phala",
+    token: "IBTC",
+    xcm: { fee: { token: "IBTC", amount: "6500000" } },
+  },
+  {
     to: "polkadot",
     token: "DOT",
     xcm: {
@@ -236,6 +251,13 @@ export const interlayTokensConfig: Record<
       decimals: 12,
       ed: "0",
       toRaw: () => ({ ForeignAsset: 11 }),
+    },
+    PHA: {
+      name: "PHA",
+      symbol: "PHA",
+      decimals: 12,
+      ed: "10000000000",
+      toRaw: () => ({ ForeignAsset: 14 }),
     },
   },
   kintsugi: {

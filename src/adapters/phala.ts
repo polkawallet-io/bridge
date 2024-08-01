@@ -17,6 +17,31 @@ import {
   getDestAccountInfo,
 } from "../utils";
 
+export const phalaRouteConfigs = createRouteConfigs("phala", [
+  {
+    to: "interlay",
+    token: "PHA",
+    xcm: {
+      fee: { token: "PHA", amount: "80000000000000" },
+    },
+  },
+  {
+    to: "interlay",
+    token: "IBTC",
+    xcm: {
+      fee: { token: "IBTC", amount: "70" },
+    },
+  },
+  {
+    to: "interlay",
+    token: "INTR",
+    xcm: {
+      fee: { token: "INTR", amount: "20000000" },
+    },
+  },
+]);
+
+
 export const khalaRouteConfigs = createRouteConfigs("khala", [
   {
     to: "karura",
@@ -40,6 +65,32 @@ export const khalaRouteConfigs = createRouteConfigs("khala", [
     },
   },
 ]);
+
+export const phalaTokensConfig: Record<string, ExtendedToken> = {
+  PHA: {
+    name: "PHA",
+    symbol: "PHA",
+    decimals: 12,
+    ed: "10000000000",
+    toRaw: () => undefined,
+  },
+  IBTC: {
+    name: "IBTC",
+    symbol: "IBTC",
+    decimals: 8,
+    ed: "1000000",
+    toRaw: () =>
+      "0x0001000000000000000000000000000000000000000000000000000000000000",
+  },
+  INTR: {
+    name: "INTR",
+    symbol: "INTR",
+    decimals: 10,
+    ed: "100000000",
+    toRaw: () =>
+      "0x0002000000000000000000000000000000000000000000000000000000000000",
+  },
+};
 
 export const khalaTokensConfig: Record<string, ExtendedToken> = {
   PHA: {
@@ -65,6 +116,14 @@ export const khalaTokensConfig: Record<string, ExtendedToken> = {
     toRaw: () =>
       "0x0081000000000000000000000000000000000000000000000000000000000000",
   },
+};
+
+const tokensConfig: Record<
+  string,
+  Record<string, ExtendedToken>
+> = {
+  khala: khalaTokensConfig,
+  phala: phalaTokensConfig,
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -119,6 +178,8 @@ class PhalaBalanceAdapter extends BalanceAdapter {
     const SUPPORTED_TOKENS: Record<string, number> = {
       KAR: 1,
       KUSD: 4,
+      INTR: 13,
+      IBTC: 14
     };
     const tokenId = SUPPORTED_TOKENS[token];
 
@@ -155,7 +216,7 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
     this.balanceAdapter = new PhalaBalanceAdapter({
       chain: this.chain.id as ChainId,
       api,
-      tokens: khalaTokensConfig,
+      tokens: tokensConfig[this.chain.id],
     });
   }
 
@@ -270,6 +331,12 @@ class BasePhalaAdapter extends BaseCrossChainAdapter {
     }
 
     return this.api.tx.xTransfer.transfer(asset, dst, undefined);
+  }
+}
+
+export class PhalaAdapter extends BasePhalaAdapter {
+  constructor() {
+    super(chains.phala, phalaRouteConfigs, phalaTokensConfig);
   }
 }
 
