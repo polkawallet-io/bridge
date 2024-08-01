@@ -69,8 +69,8 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "phala",
     token: "PHA",
     xcm: {
-      // chopsticks test data: 2_810_000_095, use ~10x buffer
-      fee: { token: "PHA", amount: "28000000000" },
+      // chopsticks test data: 64_296_000_000, use ~2.5x buffer
+      fee: { token: "PHA", amount: "150000000000" },
       weightLimit: DEST_WEIGHT,
     },
   },
