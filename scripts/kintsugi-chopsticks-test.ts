@@ -4,7 +4,7 @@
 import { KaruraAdapter } from "../src/adapters/acala";
 import { BifrostKusamaAdapter } from "../src/adapters/bifrost";
 import { KintsugiAdapter } from "../src/adapters/interlay";
-import { HeikoAdapter } from "../src/adapters/parallel";
+// import { HeikoAdapter } from "../src/adapters/parallel";
 import { KusamaAdapter } from "../src/adapters/polkadot";
 import { BaseCrossChainAdapter } from "../src/base-chain-adapter";
 import { RouterTestCase, runTestCasesAndExit } from "./chopsticks-test";
