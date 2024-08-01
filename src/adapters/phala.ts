@@ -41,7 +41,6 @@ export const phalaRouteConfigs = createRouteConfigs("phala", [
   },
 ]);
 
-
 export const khalaRouteConfigs = createRouteConfigs("khala", [
   {
     to: "karura",
@@ -118,10 +117,7 @@ export const khalaTokensConfig: Record<string, ExtendedToken> = {
   },
 };
 
-const tokensConfig: Record<
-  string,
-  Record<string, ExtendedToken>
-> = {
+const tokensConfig: Record<string, Record<string, ExtendedToken>> = {
   khala: khalaTokensConfig,
   phala: phalaTokensConfig,
 };
@@ -179,7 +175,7 @@ class PhalaBalanceAdapter extends BalanceAdapter {
       KAR: 1,
       KUSD: 4,
       INTR: 13,
-      IBTC: 14
+      IBTC: 14,
     };
     const tokenId = SUPPORTED_TOKENS[token];
 
