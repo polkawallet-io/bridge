@@ -77,4 +77,12 @@ export const polkadotChains = {
     paraChainId: 2034,
     ss58Prefix: 63,
   },
+  phala: {
+    id: "phala",
+    display: "Phala",
+    type: typeSubstrate,
+    icon: "",
+    paraChainId: 2035,
+    ss58Prefix: 30,
+  },
 };

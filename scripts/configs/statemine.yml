@@ -1,5 +1,5 @@
 endpoint:
-  - wss://statemine-rpc.dwellir.com
+  - wss://asset-hub-kusama-rpc.dwellir.com
   - wss://rpc-asset-hub-kusama.luckyfriday.io
   - wss://statemine-rpc-tn.dwellir.com
   - wss://kusama-asset-hub-rpc.polkadot.io

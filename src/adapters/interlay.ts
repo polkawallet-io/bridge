@@ -66,6 +66,33 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     xcm: { fee: { token: "IBTC", amount: "1030" }, weightLimit: DEST_WEIGHT },
   },
   {
+    to: "phala",
+    token: "PHA",
+    xcm: {
+      // chopsticks test data: 64_296_000_000, use ~2.5x buffer
+      fee: { token: "PHA", amount: "150000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "phala",
+    token: "INTR",
+    xcm: {
+      // chopsticks test data: fee = 642_960_000, use ~10x buffer
+      fee: { token: "INTR", amount: "6400000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "phala",
+    token: "IBTC",
+    xcm: {
+      // chopsticks test: fee = 6429600. Use ~3x buffer
+      fee: { token: "IBTC", amount: "20000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
     to: "polkadot",
     token: "DOT",
     xcm: {
@@ -232,6 +259,7 @@ export const interlayTokensConfig: Record<
     VDOT: { name: "VDOT", symbol: "VDOT", decimals: 10, ed: "0" },
     BNC: { name: "BNC", symbol: "BNC", decimals: 12, ed: "0" },
     HDX: { name: "HDX", symbol: "HDX", decimals: 12, ed: "0" },
+    PHA: { name: "PHA", symbol: "PHA", decimals: 12, ed: "10000000000" },
   },
   kintsugi: {
     KBTC: { name: "KBTC", symbol: "KBTC", decimals: 8, ed: "0" },
@@ -261,6 +289,7 @@ const INTERLAY_SUPPORTED_TOKENS: Record<string, unknown> = {
   BNC: { ForeignAsset: 11 },
   USDC: { ForeignAsset: 12 },
   HDX: { ForeignAsset: 13 },
+  PHA: { ForeignAsset: 14 },
 };
 
 const getSupportedTokens = (chainname: string): Record<string, unknown> => {

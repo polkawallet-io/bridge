@@ -6,8 +6,8 @@ import { InterlayAdapter } from "../src/adapters/interlay";
 import { HydraAdapter } from "../src/adapters/hydradx";
 import { AcalaAdapter } from "../src/adapters/acala";
 import { AstarAdapter } from "../src/adapters/astar";
-// import { ParallelAdapter } from "../src/adapters/parallel";
 import { BifrostPolkadotAdapter } from "../src/adapters/bifrost";
+import { PhalaAdapter } from "../src/adapters/phala";
 import { BaseCrossChainAdapter } from "../src/base-chain-adapter";
 import { RouterTestCase, runTestCasesAndExit } from "./chopsticks-test";
 
@@ -27,9 +27,9 @@ async function main(): Promise<void> {
         hydra: { adapter: new HydraAdapter(), endpoints: ['ws://127.0.0.1:8001'] },
         acala: { adapter: new AcalaAdapter(), endpoints: ['ws://127.0.0.1:8002'] },
         astar: { adapter: new AstarAdapter(), endpoints: ['ws://127.0.0.1:8003'] },
-        // parallel: { adapter: new ParallelAdapter(), endpoints: ['ws://127.0.0.1:8004'] },
         bifrost_polkadot: { adapter: new BifrostPolkadotAdapter(), endpoints: ['ws://127.0.0.1:8004']},
-        polkadot: { adapter: new PolkadotAdapter(), endpoints: ['ws://127.0.0.1:8005'] },
+        phala: { adapter: new PhalaAdapter(), endpoints: ['ws://127.0.0.1:8005']},
+        polkadot: { adapter: new PolkadotAdapter(), endpoints: ['ws://127.0.0.1:8006'] },
     };
 
     const skipCases: Partial<RouterTestCase>[] = [

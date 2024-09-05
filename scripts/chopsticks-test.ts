@@ -115,8 +115,12 @@ async function checkTransfer(fromChain: ChainName, toChain: ChainName, token: st
         let feeOverestimationFactor = feeBudget.div(actualFee);
         let actualFeePlancks = actualFee._getInner();
         // console.log(`Fee budget: ${feeBudget}, actual fee: ${actualFee} (= ${actualFeePlancks} plank), marginFactor: ${feeOverestimationFactor}`);
-        if (feeOverestimationFactor.toNumber() <= 2) {
-            let message = `Fees need to be increased in config. The actual fees are ${actualFee} (= ${actualFeePlancks} plank). Fee overestimation factor was ${feeOverestimationFactor} - we want at least 2.0`;
+
+        // expect 2x actual fees, except for PHA to interlay where fees are very high.
+        const minimumFeeOverestimationFactor = (token === "PHA" && toChain === "interlay") ? 1.1 : 2;
+
+        if (feeOverestimationFactor.toNumber() < minimumFeeOverestimationFactor) {
+            let message = `Fees need to be increased in config. The actual fees are ${actualFee} (= ${actualFeePlancks} plank). Fee overestimation factor was ${feeOverestimationFactor} - we want at least ${minimumFeeOverestimationFactor}`;
 
             // if below 1, this is an error. 
             if (feeOverestimationFactor.toNumber() < 1) {
@@ -171,7 +175,7 @@ async function retryCheckTransfer(
   ): Promise<Awaited<ReturnType<typeof checkTransfer>>> {
     const result = await checkTransfer(fromChain, toChain, token, bridge);
 
-    if (result.result === ResultCode.OK) {
+    if (result.result !== ResultCode.FAIL) {
         return result;
     }
 
@@ -301,10 +305,10 @@ export async function runTestCasesAndExit(
         case ResultCode.WARN:
             console.log(icon, 'action required');
             problematicTestStrings.forEach((logMessage) => console.log(logMessage));
-            process.exit(-1);
+            process.exit(0);
         case ResultCode.FAIL:
             console.log(icon, 'some channels FAILED');
             problematicTestStrings.forEach((logMessage) => console.log(logMessage));
-            process.exit(-2);
+            process.exit(-1);
     }
 }

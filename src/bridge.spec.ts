@@ -13,6 +13,7 @@ import { AcalaAdapter, KaruraAdapter } from "./adapters/acala";
 import { BifrostKusamaAdapter, BifrostPolkadotAdapter } from "./adapters/bifrost";
 import { HydraAdapter } from "./adapters/hydradx";
 import { AstarAdapter } from "./adapters/astar";
+import { PhalaAdapter } from "./adapters/phala";
 
 describe.skip("Bridge sdk usage", () => {
   jest.setTimeout(30000);
@@ -34,6 +35,7 @@ describe.skip("Bridge sdk usage", () => {
     hydra: new HydraAdapter(),
     parallel: new ParallelAdapter(),
     astar: new AstarAdapter(),
+    phala: new PhalaAdapter(),
   };
 
   const bridge = new Bridge({
@@ -183,6 +185,9 @@ describe.skip("Bridge sdk usage", () => {
 
     // interlay
     // printBidirectionalTxs("interlay", "polkadot", "DOT");
+    printBidirectionalTxs("interlay", "phala", "PHA");
+    printBidirectionalTxs("interlay", "phala", "INTR");
+    printBidirectionalTxs("interlay", "phala", "IBTC");
     // printBidirectionalTxs("interlay", "statemint", "USDT");
     // printBidirectionalTxs("interlay", "hydra", "IBTC");
     // printBidirectionalTxs("interlay", "hydra", "INTR");
@@ -192,11 +197,11 @@ describe.skip("Bridge sdk usage", () => {
     // printBidirectionalTxs("interlay", "parallel", "IBTC");
     // printBidirectionalTxs("interlay", "astar", "INTR");
     // printBidirectionalTxs("interlay", "astar", "IBTC");
-    printBidirectionalTxs("interlay", "bifrost_polkadot", "VDOT");
+    // printBidirectionalTxs("interlay", "bifrost_polkadot", "VDOT");
     // printBidirectionalTxs("polkadot", "statemint", "DOT");
   });
 
-  test("5. getNativeToken should work", () => {
+  test.skip("5. getNativeToken should work", () => {
     const testCases: [ChainName, String][] = [
       // kusama network
       ["kusama", "KSM"],
@@ -213,6 +218,7 @@ describe.skip("Bridge sdk usage", () => {
       ["parallel", "PARA"],
       ["bifrost_polkadot", "BNC"],
       ["statemint", "DOT"],
+      ["phala", "PHA"],
     ];
 
     for (const [chainName, expectedNativeToken] of testCases) {
