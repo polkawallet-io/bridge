@@ -1,5 +1,5 @@
 import { createRouteConfigs } from "../../utils";
-import { BasicToken } from "../../types";
+import { BasicToken, ExtendedToken } from "../../types";
 
 export const acalaRouteConfigs = createRouteConfigs("acala", [
   {
@@ -186,10 +186,31 @@ export const acalaRouteConfigs = createRouteConfigs("acala", [
   },
 ]);
 
-export const acalaTokensConfig: Record<string, BasicToken> = {
-  ACA: { name: "ACA", symbol: "ACA", decimals: 12, ed: "100000000000" },
-  AUSD: { name: "AUSD", symbol: "AUSD", decimals: 12, ed: "100000000000" },
-  LDOT: { name: "LDOT", symbol: "LDOT", decimals: 10, ed: "500000000" },
+export const acalaTokensConfig: Record<string, ExtendedToken | BasicToken> = {
+  ACA: {
+    name: "ACA",
+    symbol: "ACA",
+    decimals: 12,
+    ed: "100000000000",
+    toRaw: () =>
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
+  },
+  AUSD: {
+    name: "AUSD",
+    symbol: "AUSD",
+    decimals: 12,
+    ed: "100000000000",
+    toRaw: () =>
+      "0x0001000000000000000000000000000000000000000000000000000000000000",
+  },
+  LDOT: {
+    name: "LDOT",
+    symbol: "LDOT",
+    decimals: 10,
+    ed: "500000000",
+    toRaw: () =>
+      "0x0003000000000000000000000000000000000000000000000000000000000000",
+  },
   INTR: { name: "INTR", symbol: "INTR", decimals: 10, ed: "1000000000" },
   IBTC: { name: "IBTC", symbol: "IBTC", decimals: 8, ed: "100" },
   GLMR: {
@@ -197,6 +218,8 @@ export const acalaTokensConfig: Record<string, BasicToken> = {
     symbol: "GLMR",
     decimals: 18,
     ed: "100000000000000000",
+    toRaw: () =>
+      "0x0500000000000000000000000000000000000000000000000000000000000000",
   },
   PARA: { name: "PARA", symbol: "PARA", decimals: 12, ed: "100000000000" },
   ASTR: {
@@ -205,7 +228,14 @@ export const acalaTokensConfig: Record<string, BasicToken> = {
     decimals: 18,
     ed: "100000000000000000",
   },
-  DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "100000000" },
+  DOT: {
+    name: "DOT",
+    symbol: "DOT",
+    decimals: 10,
+    ed: "100000000",
+    toRaw: () =>
+      "0x0002000000000000000000000000000000000000000000000000000000000000",
+  },
   DAI: {
     name: "DAI",
     symbol: "DAI",
