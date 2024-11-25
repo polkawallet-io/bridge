@@ -11,6 +11,9 @@ import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import {
+  createPolkadotXCMAccount,
+  createPolkadotXCMAsset,
+  createPolkadotXCMDest,
   createRouteConfigs,
   getDestAccountInfo,
   validateAddress,
@@ -23,13 +26,13 @@ import {
 } from "src/types";
 
 export const moonbeamRouteConfigs = createRouteConfigs("moonbeam", [
-  {
-    to: "subsocial",
-    token: "xcSUB",
-    xcm: {
-      fee: { token: "SUB", amount: "1000000000" },
-    },
-  },
+  // {
+  //   to: "subsocial",
+  //   token: "xcSUB",
+  //   xcm: {
+  //     fee: { token: "SUB", amount: "1000000000" },
+  //   },
+  // },
   {
     to: "acala",
     token: "GLMR",
@@ -58,13 +61,13 @@ export const moonbeamRouteConfigs = createRouteConfigs("moonbeam", [
       fee: { token: "DOT", amount: "1000000000" },
     },
   },
-  {
-    to: "assetHubPolkadot",
-    token: "xcUSDT",
-    xcm: {
-      fee: { token: "USDT", amount: "1000000000" },
-    },
-  },
+  // {
+  //   to: "assetHubPolkadot",
+  //   token: "xcUSDT",
+  //   xcm: {
+  //     fee: { token: "USDT", amount: "1000000000" },
+  //   },
+  // },
 ]);
 
 const moonbeamTokensConfig: Record<string, ExtendedToken> = {
@@ -264,26 +267,63 @@ class MoonbeamBaseAdapter extends BaseCrossChainAdapter {
       to
     );
 
-    const tokenData = moonbeamTokensConfig[token.replace("xc", "")];
-
+    // FIXME: just for acala
     if (!validateAddress(address, addrType)) throw new InvalidAddress(address);
 
     const toChain = chains[to];
 
-    return this.api.tx.xTokens.transfer(
-      tokenData.toRaw(),
-      amount.toChainData(),
+    const destToken = (
+      this.getToken(token, to) as unknown as ExtendedToken
+    ).toRaw?.();
+
+    if (!destToken) throw new Error("destToken not found");
+
+    console.log(accountId, accountType);
+
+    return this.api.tx.polkadotXcm.transferAssets(
+      // dest,
       {
-        V3: {
+        V4: {
           parents: 1,
+          interior: { X1: [{ Parachain: toChain.paraChainId }] },
+        },
+      },
+      // beneficiary,
+      {
+        V4: {
+          parents: 0,
           interior: {
-            X2: [
-              { Parachain: toChain.paraChainId },
-              { [accountType]: { id: accountId, network: undefined } },
+            X1: [
+              {
+                [accountType]: {
+                  [accountType === "AccountId32" ? "id" : "key"]: accountId,
+                  network: undefined,
+                },
+              },
             ],
           },
         },
-      } as any,
+      },
+      // assets,
+      {
+        V4: [
+          {
+            id: {
+              parents: 1,
+              interior: {
+                X2: [
+                  { Parachain: toChain.paraChainId },
+                  { GeneralKey: { length: 2, data: destToken } },
+                ],
+              },
+            },
+            fun: { Fungible: amount },
+          },
+        ],
+      },
+      // feeAssetItem,
+      0,
+      // weightLimit
       "Unlimited"
     );
   }

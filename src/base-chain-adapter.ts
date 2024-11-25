@@ -55,7 +55,7 @@ export abstract class BaseCrossChainAdapter {
   protected api?: AnyApi;
   readonly chain: Chain;
   // @ts-ignore
-  private findAdapter!: (chain: Chain | ChainId) => BaseCrossChainAdapter;
+  protected findAdapter!: (chain: Chain | ChainId) => BaseCrossChainAdapter;
 
   constructor(
     chain: Chain,

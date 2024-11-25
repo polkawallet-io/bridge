@@ -30,7 +30,7 @@ export interface BasicToken {
 }
 
 export interface ExtendedToken extends BasicToken {
-  toRaw: () => any;
+  toRaw?: () => any;
 }
 
 export interface RouteConfigs {
