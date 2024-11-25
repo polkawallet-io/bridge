@@ -186,7 +186,7 @@ export const acalaRouteConfigs = createRouteConfigs("acala", [
   },
 ]);
 
-export const acalaTokensConfig: Record<string, ExtendedToken> = {
+export const acalaTokensConfig: Record<string, ExtendedToken | BasicToken> = {
   ACA: {
     name: "ACA",
     symbol: "ACA",

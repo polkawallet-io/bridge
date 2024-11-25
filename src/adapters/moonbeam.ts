@@ -11,9 +11,6 @@ import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import {
-  createPolkadotXCMAccount,
-  createPolkadotXCMAsset,
-  createPolkadotXCMDest,
   createRouteConfigs,
   getDestAccountInfo,
   validateAddress,
