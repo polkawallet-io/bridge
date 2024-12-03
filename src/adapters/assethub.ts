@@ -102,15 +102,6 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
         weightLimit: "Unlimited",
       },
     },
-    {
-      to: "parallel",
-      token: "USDT",
-      xcm: {
-        deliveryFee: { token: "DOT", amount: "311100000" },
-        fee: { token: "USDT", amount: "808" },
-        weightLimit: "Unlimited",
-      },
-    },
   ]
 );
 
