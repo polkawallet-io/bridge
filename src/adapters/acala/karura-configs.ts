@@ -171,27 +171,6 @@ export const karuraRouteConfigs = createRouteConfigs("karura", [
     },
   },
   {
-    to: "kico",
-    token: "KICO",
-    xcm: {
-      fee: { token: "KICO", amount: "96000000000" },
-    },
-  },
-  {
-    to: "kico",
-    token: "KAR",
-    xcm: {
-      fee: { token: "KAR", amount: "160000000000" },
-    },
-  },
-  {
-    to: "kico",
-    token: "KUSD",
-    xcm: {
-      fee: { token: "KUSD", amount: "320000000000" },
-    },
-  },
-  {
     to: "calamari",
     token: "KSM",
     xcm: {
@@ -252,62 +231,6 @@ export const karuraRouteConfigs = createRouteConfigs("karura", [
     token: "KUSD",
     xcm: {
       fee: { token: "KUSD", amount: "16536000000" },
-    },
-  },
-  {
-    to: "heiko",
-    token: "HKO",
-    xcm: {
-      fee: { token: "HKO", amount: "1440000000" },
-    },
-  },
-  {
-    to: "heiko",
-    token: "KAR",
-    xcm: {
-      fee: { token: "KAR", amount: "2400000000" },
-    },
-  },
-  {
-    to: "heiko",
-    token: "LKSM",
-    xcm: {
-      fee: { token: "LKSM", amount: "48000000" },
-    },
-  },
-  {
-    to: "heiko",
-    token: "KUSD",
-    xcm: {
-      fee: { token: "KUSD", amount: "48000000" },
-    },
-  },
-  {
-    to: "pichiu",
-    token: "PCHU",
-    xcm: {
-      fee: { token: "PCHU", amount: "400000000000000" },
-    },
-  },
-  {
-    to: "pichiu",
-    token: "KAR",
-    xcm: {
-      fee: { token: "KAR", amount: "400000000" },
-    },
-  },
-  {
-    to: "pichiu",
-    token: "KUSD",
-    xcm: {
-      fee: { token: "KUSD", amount: "400000000" },
-    },
-  },
-  {
-    to: "pichiu",
-    token: "LKSM",
-    xcm: {
-      fee: { token: "LKSM", amount: "400000000" },
     },
   },
   {

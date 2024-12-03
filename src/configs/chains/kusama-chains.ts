@@ -55,20 +55,6 @@ export const kusamaChains = {
     paraChainId: 2023,
     ss58Prefix: 1285,
   },
-  heiko: {
-    display: "Parallel Heiko",
-    type: "substrate",
-    icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fparallel.png&w=96&q=75",
-    paraChainId: 2085,
-    ss58Prefix: 110,
-  },
-  kico: {
-    display: "KICO",
-    type: "substrate",
-    icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fkico.png&w=96&q=75",
-    paraChainId: 2107,
-    ss58Prefix: 42,
-  },
   shadow: {
     display: "Crust Shadow",
     type: "substrate",
@@ -117,13 +103,6 @@ export const kusamaChains = {
     icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fshiden.png&w=96&q=75",
     paraChainId: 2007,
     ss58Prefix: 5,
-  },
-  pichiu: {
-    display: "Pichiu",
-    type: "substrate",
-    icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fpichiu.png&w=96&q=75",
-    paraChainId: 2102,
-    ss58Prefix: 42,
   },
   basilisk: {
     display: "Basilisk",

@@ -11,7 +11,7 @@ import { AcalaAdapter, KaruraAdapter } from "./acala/acala";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { logFormatedRoute, formateRouteLogLine } from "../utils/unit-test";
 
-describe.skip("polkadot-adapter should work", () => {
+describe("polkadot-adapter should work", () => {
   jest.setTimeout(300000);
 
   const testAccount = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
@@ -60,7 +60,12 @@ describe.skip("polkadot-adapter should work", () => {
         adapters: Object.values(adapters),
       });
 
-      expect(bridge.router.getDestinationChains({ from: chains.kusama, token: "KSM" }).length).toBeGreaterThanOrEqual(1);
+      expect(
+        bridge.router.getDestinationChains({
+          from: chains.kusama,
+          token: "KSM",
+        }).length
+      ).toBeGreaterThanOrEqual(1);
     } catch (err) {
       // ignore node disconnected error
     }
@@ -75,28 +80,56 @@ describe.skip("polkadot-adapter should work", () => {
         // TODO: add DOT to hydradx tokensConfig to fix this
         if (e.token === "DOT" && e.to === "hydradx") return;
 
-        const balance = await firstValueFrom(adapter.subscribeTokenBalance(e.token, testAccount));
+        const balance = await firstValueFrom(
+          adapter.subscribeTokenBalance(e.token, testAccount)
+        );
 
-        const balanceLog = formateRouteLogLine(e.token, e.from, e.to, "balance");
+        const balanceLog = formateRouteLogLine(
+          e.token,
+          e.from,
+          e.to,
+          "balance"
+        );
         logFormatedRoute("", [balanceLog]);
         outputSummary.push(balanceLog);
         expect(balance.available.toNumber()).toBeGreaterThanOrEqual(0);
-        expect(balance.free.toNumber()).toBeGreaterThanOrEqual(balance.available.toNumber());
-        expect(balance.free.toNumber()).toEqual(balance.locked.add(balance.available).toNumber());
-
-        const inputConfig = await firstValueFrom(
-          adapter.subscribeInputConfig({ to: e.to, token: e.token, address: testAccount, signer: testAccount })
+        expect(balance.free.toNumber()).toBeGreaterThanOrEqual(
+          balance.available.toNumber()
+        );
+        expect(balance.free.toNumber()).toEqual(
+          balance.locked.add(balance.available).toNumber()
         );
 
-        const inputConfigLog = formateRouteLogLine(e.token, e.from, e.to, "inputConfig");
+        const inputConfig = await firstValueFrom(
+          adapter.subscribeInputConfig({
+            to: e.to,
+            token: e.token,
+            address: testAccount,
+            signer: testAccount,
+          })
+        );
+
+        const inputConfigLog = formateRouteLogLine(
+          e.token,
+          e.from,
+          e.to,
+          "inputConfig"
+        );
         logFormatedRoute("", [inputConfigLog]);
         outputSummary.push(inputConfigLog);
         expect(inputConfig.minInput.toNumber()).toBeGreaterThan(0);
-        expect(inputConfig.maxInput.toNumber()).toBeLessThanOrEqual(balance.available.toNumber());
+        expect(inputConfig.maxInput.toNumber()).toBeLessThanOrEqual(
+          balance.available.toNumber()
+        );
 
         const destFee = adapter.getCrossChainFee(e.token, e.to);
 
-        const destFeeLog = formateRouteLogLine(e.token, e.from, e.to, "destFee");
+        const destFeeLog = formateRouteLogLine(
+          e.token,
+          e.from,
+          e.to,
+          "destFee"
+        );
         logFormatedRoute("", [destFeeLog]);
         outputSummary.push(destFeeLog);
         expect(destFee.balance.toNumber()).toBeGreaterThan(0);
@@ -117,7 +150,12 @@ describe.skip("polkadot-adapter should work", () => {
           expect(tx.method.method).toEqual("limitedReserveTransferAssets");
         }
 
-        const createTxLog = formateRouteLogLine(e.token, e.from, e.to, "createTx");
+        const createTxLog = formateRouteLogLine(
+          e.token,
+          e.from,
+          e.to,
+          "createTx"
+        );
         logFormatedRoute("", [createTxLog]);
         outputSummary.push(createTxLog);
       };

@@ -20,13 +20,6 @@ export const polkadotChains = {
     paraChainId: 2000,
     ss58Prefix: 10,
   },
-  parallel: {
-    display: "Parallel",
-    type: "substrate",
-    icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fparallel.png&w=96&q=75",
-    paraChainId: 2012,
-    ss58Prefix: 172,
-  },
   phala: {
     display: "Phala",
     type: "substrate",

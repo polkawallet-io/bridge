@@ -1,6 +1,6 @@
 {
   "name": "@polkawallet/bridge",
-  "version": "0.1.7-12",
+  "version": "0.1.7-13",
   "description": "polkawallet bridge sdk",
   "main": "index.js",
   "types": "index.d.ts",
@@ -33,16 +33,17 @@
     "@acala-network/sdk": "^4.1.9-13",
     "@acala-network/sdk-core": "^4.1.9-13",
     "@polkadot/api": "^14.0.1",
-    "@polkadot/types": "^14.0.1",
-    "@polkadot/util": "^13.2.3"
+    "@polkadot/types": "^14.0.1"
   },
   "dependencies": {
     "@acala-network/api": "^5",
     "@acala-network/sdk": "^4.1.9-13",
     "@acala-network/sdk-core": "^4.1.9-13",
     "@polkadot/api": "^14.0.1",
-    "@polkadot/apps-config": "^0.133.1",
+    "@polkadot/apps-config": "0.146.1",
+    "@polkadot/keyring": "^13.2.3",
     "@polkadot/types": "^14.0.1",
+    "@polkadot/util": "^13.2.3",
     "axios": "^0.27.2",
     "ethers": "^5",
     "lodash": "^4.17.20"
@@ -54,6 +55,7 @@
     "@types/lodash": "^4.14.161",
     "eslint-plugin-unused-imports": "^2.0.0",
     "jest": "^28.1.1",
+    "ts-node": "^10.9.2",
     "typescript": "^4.7.4"
   },
   "stableVersion": "0.1.7-11"

@@ -8,7 +8,7 @@
       "xcm": {
         "fee": {
           "token": "DOT",
-          "amount": "469417452"
+          "amount": "19978738"
         }
       },
       "from": "acala"
@@ -58,45 +58,12 @@
       "from": "acala"
     },
     {
-      "to": "parallel",
-      "token": "PARA",
-      "xcm": {
-        "fee": {
-          "token": "PARA",
-          "amount": "9600000000"
-        }
-      },
-      "from": "acala"
-    },
-    {
-      "to": "parallel",
-      "token": "ACA",
-      "xcm": {
-        "fee": {
-          "token": "ACA",
-          "amount": "1920000000"
-        }
-      },
-      "from": "acala"
-    },
-    {
-      "to": "parallel",
-      "token": "AUSD",
-      "xcm": {
-        "fee": {
-          "token": "AUSD",
-          "amount": "2880000000"
-        }
-      },
-      "from": "acala"
-    },
-    {
-      "to": "parallel",
+      "to": "moonbeam",
       "token": "LDOT",
       "xcm": {
         "fee": {
           "token": "LDOT",
-          "amount": "96000000"
+          "amount": "45977011"
         }
       },
       "from": "acala"
@@ -107,7 +74,7 @@
       "xcm": {
         "fee": {
           "token": "ASTR",
-          "amount": "4635101624603120"
+          "amount": "4006410300000000"
         }
       },
       "from": "acala"
@@ -151,7 +118,7 @@
       "xcm": {
         "fee": {
           "token": "INTR",
-          "amount": "21787589"
+          "amount": "20000000"
         }
       },
       "from": "acala"
@@ -180,6 +147,17 @@
     },
     {
       "to": "hydradx",
+      "token": "DOT",
+      "xcm": {
+        "fee": {
+          "token": "DOT",
+          "amount": "491129243"
+        }
+      },
+      "from": "acala"
+    },
+    {
+      "to": "hydradx",
       "token": "WETH",
       "xcm": {
         "fee": {
@@ -201,12 +179,67 @@
       "from": "acala"
     },
     {
+      "to": "hydradx",
+      "token": "LDOT",
+      "xcm": {
+        "fee": {
+          "token": "LDOT",
+          "amount": "11516111"
+        }
+      },
+      "from": "acala"
+    },
+    {
+      "to": "hydradx",
+      "token": "ACA",
+      "xcm": {
+        "fee": {
+          "token": "ACA",
+          "amount": "10429291793"
+        }
+      },
+      "from": "acala"
+    },
+    {
       "to": "unique",
       "token": "UNQ",
       "xcm": {
         "fee": {
           "token": "UNQ",
           "amount": ""
+        }
+      },
+      "from": "acala"
+    },
+    {
+      "to": "assetHubPolkadot",
+      "token": "USDT",
+      "xcm": {
+        "fee": {
+          "token": "DOT",
+          "amount": "160000000"
+        }
+      },
+      "from": "acala"
+    },
+    {
+      "to": "assetHubPolkadot",
+      "token": "USDC",
+      "xcm": {
+        "fee": {
+          "token": "DOT",
+          "amount": "160000000"
+        }
+      },
+      "from": "acala"
+    },
+    {
+      "to": "assetHubPolkadot",
+      "token": "PINK",
+      "xcm": {
+        "fee": {
+          "token": "DOT",
+          "amount": "160000000"
         }
       },
       "from": "acala"
@@ -223,7 +256,7 @@
       "from": "karura"
     },
     {
-      "to": "statemine",
+      "to": "assetHubKusama",
       "token": "RMRK",
       "xcm": {
         "fee": {
@@ -234,7 +267,7 @@
       "from": "karura"
     },
     {
-      "to": "statemine",
+      "to": "assetHubKusama",
       "token": "ARIS",
       "xcm": {
         "fee": {
@@ -245,12 +278,12 @@
       "from": "karura"
     },
     {
-      "to": "statemine",
+      "to": "assetHubKusama",
       "token": "USDT",
       "xcm": {
         "fee": {
           "token": "USDT",
-          "amount": "1000"
+          "amount": "1183"
         }
       },
       "from": "karura"
@@ -261,7 +294,7 @@
       "xcm": {
         "fee": {
           "token": "SDN",
-          "amount": "4662276356431024"
+          "amount": "3519949300000000"
         }
       },
       "from": "karura"
@@ -272,7 +305,7 @@
       "xcm": {
         "fee": {
           "token": "KUSD",
-          "amount": "1200000000"
+          "amount": "2080000000"
         }
       },
       "from": "karura"
@@ -283,6 +316,17 @@
       "xcm": {
         "fee": {
           "token": "BNC",
+          "amount": "5120000000"
+        }
+      },
+      "from": "karura"
+    },
+    {
+      "to": "bifrost",
+      "token": "KSM",
+      "xcm": {
+        "fee": {
+          "token": "KSM",
           "amount": "5120000000"
         }
       },
@@ -404,7 +448,7 @@
       "xcm": {
         "fee": {
           "token": "KINT",
-          "amount": "170666666"
+          "amount": "220000000"
         }
       },
       "from": "karura"
@@ -426,7 +470,7 @@
       "xcm": {
         "fee": {
           "token": "LKSM",
-          "amount": "186480000"
+          "amount": "190000000"
         }
       },
       "from": "karura"
@@ -465,34 +509,12 @@
       "from": "karura"
     },
     {
-      "to": "kico",
-      "token": "KICO",
+      "to": "calamari",
+      "token": "KSM",
       "xcm": {
         "fee": {
-          "token": "KICO",
-          "amount": "96000000000"
-        }
-      },
-      "from": "karura"
-    },
-    {
-      "to": "kico",
-      "token": "KAR",
-      "xcm": {
-        "fee": {
-          "token": "KAR",
-          "amount": "160000000000"
-        }
-      },
-      "from": "karura"
-    },
-    {
-      "to": "kico",
-      "token": "KUSD",
-      "xcm": {
-        "fee": {
-          "token": "KUSD",
-          "amount": "320000000000"
+          "token": "KSM",
+          "amount": "100000000000"
         }
       },
       "from": "karura"
@@ -554,6 +576,17 @@
     },
     {
       "to": "moonriver",
+      "token": "KSM",
+      "xcm": {
+        "fee": {
+          "token": "KSM",
+          "amount": "353666600"
+        }
+      },
+      "from": "karura"
+    },
+    {
+      "to": "moonriver",
       "token": "KAR",
       "xcm": {
         "fee": {
@@ -570,94 +603,6 @@
         "fee": {
           "token": "KUSD",
           "amount": "16536000000"
-        }
-      },
-      "from": "karura"
-    },
-    {
-      "to": "heiko",
-      "token": "HKO",
-      "xcm": {
-        "fee": {
-          "token": "HKO",
-          "amount": "1440000000"
-        }
-      },
-      "from": "karura"
-    },
-    {
-      "to": "heiko",
-      "token": "KAR",
-      "xcm": {
-        "fee": {
-          "token": "KAR",
-          "amount": "2400000000"
-        }
-      },
-      "from": "karura"
-    },
-    {
-      "to": "heiko",
-      "token": "KUSD",
-      "xcm": {
-        "fee": {
-          "token": "KUSD",
-          "amount": "19200000000"
-        }
-      },
-      "from": "karura"
-    },
-    {
-      "to": "heiko",
-      "token": "LKSM",
-      "xcm": {
-        "fee": {
-          "token": "LKSM",
-          "amount": "48000000"
-        }
-      },
-      "from": "karura"
-    },
-    {
-      "to": "pichiu",
-      "token": "PCHU",
-      "xcm": {
-        "fee": {
-          "token": "PCHU",
-          "amount": "400000000000000"
-        }
-      },
-      "from": "karura"
-    },
-    {
-      "to": "pichiu",
-      "token": "KAR",
-      "xcm": {
-        "fee": {
-          "token": "KAR",
-          "amount": "400000000"
-        }
-      },
-      "from": "karura"
-    },
-    {
-      "to": "pichiu",
-      "token": "KUSD",
-      "xcm": {
-        "fee": {
-          "token": "KUSD",
-          "amount": "400000000"
-        }
-      },
-      "from": "karura"
-    },
-    {
-      "to": "pichiu",
-      "token": "LKSM",
-      "xcm": {
-        "fee": {
-          "token": "LKSM",
-          "amount": "400000000"
         }
       },
       "from": "karura"
@@ -713,6 +658,17 @@
         "fee": {
           "token": "BSX",
           "amount": "22000000000000"
+        }
+      },
+      "from": "karura"
+    },
+    {
+      "to": "basilisk",
+      "token": "KSM",
+      "xcm": {
+        "fee": {
+          "token": "KSM",
+          "amount": "359882060"
         }
       },
       "from": "karura"
@@ -830,12 +786,238 @@
   ],
   [
     {
+      "to": "polkadot",
+      "token": "DOT",
+      "xcm": {
+        "deliveryFee": {
+          "token": "DOT",
+          "amount": "309700000"
+        },
+        "fee": {
+          "token": "DOT",
+          "amount": "421500000"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "assetHubPolkadot"
+    },
+    {
+      "to": "hydradx",
+      "token": "USDT",
+      "xcm": {
+        "deliveryFee": {
+          "token": "DOT",
+          "amount": "311100000"
+        },
+        "fee": {
+          "token": "USDT",
+          "amount": "2200"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "assetHubPolkadot"
+    },
+    {
+      "to": "acala",
+      "token": "USDT",
+      "xcm": {
+        "deliveryFee": {
+          "token": "DOT",
+          "amount": "311100000"
+        },
+        "fee": {
+          "token": "USDT",
+          "amount": "808"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "assetHubPolkadot"
+    },
+    {
+      "to": "acala",
+      "token": "USDC",
+      "xcm": {
+        "deliveryFee": {
+          "token": "DOT",
+          "amount": "311100000"
+        },
+        "fee": {
+          "token": "USDC",
+          "amount": "803"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "assetHubPolkadot"
+    },
+    {
+      "to": "acala",
+      "token": "PINK",
+      "xcm": {
+        "deliveryFee": {
+          "token": "DOT",
+          "amount": "311100000"
+        },
+        "fee": {
+          "token": "PINK",
+          "amount": "80370000"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "assetHubPolkadot"
+    },
+    {
+      "to": "astar",
+      "token": "USDT",
+      "xcm": {
+        "deliveryFee": {
+          "token": "DOT",
+          "amount": "311100000"
+        },
+        "fee": {
+          "token": "USDT",
+          "amount": "808"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "assetHubPolkadot"
+    },
+    {
+      "to": "interlay",
+      "token": "USDT",
+      "xcm": {
+        "deliveryFee": {
+          "token": "DOT",
+          "amount": "311100000"
+        },
+        "fee": {
+          "token": "USDT",
+          "amount": "25000"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "assetHubPolkadot"
+    },
+    {
+      "to": "interlay",
+      "token": "USDC",
+      "xcm": {
+        "deliveryFee": {
+          "token": "DOT",
+          "amount": "311100000"
+        },
+        "fee": {
+          "token": "USDC",
+          "amount": "25000"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "assetHubPolkadot"
+    },
+    {
+      "to": "moonbeam",
+      "token": "USDT",
+      "xcm": {
+        "deliveryFee": {
+          "token": "DOT",
+          "amount": "311100000"
+        },
+        "fee": {
+          "token": "USDT",
+          "amount": "808"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "assetHubPolkadot"
+    },
+    {
+      "to": "kusama",
+      "token": "KSM",
+      "xcm": {
+        "fee": {
+          "token": "KSM",
+          "amount": "90049287"
+        },
+        "deliveryFee": {
+          "token": "KSM",
+          "amount": "1032333300"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "assetHubKusama"
+    },
+    {
+      "to": "karura",
+      "token": "RMRK",
+      "xcm": {
+        "deliveryFee": {
+          "token": "KSM",
+          "amount": "1036333296"
+        },
+        "fee": {
+          "token": "RMRK",
+          "amount": "9918117"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "assetHubKusama"
+    },
+    {
+      "to": "karura",
+      "token": "ARIS",
+      "xcm": {
+        "fee": {
+          "token": "ARIS",
+          "amount": "6400000"
+        },
+        "deliveryFee": {
+          "token": "KSM",
+          "amount": "1036333296"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "assetHubKusama"
+    },
+    {
+      "to": "karura",
+      "token": "USDT",
+      "xcm": {
+        "fee": {
+          "token": "USDT",
+          "amount": "808"
+        },
+        "deliveryFee": {
+          "token": "KSM",
+          "amount": "1036333296"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "assetHubKusama"
+    },
+    {
+      "to": "kintsugi",
+      "token": "USDT",
+      "xcm": {
+        "fee": {
+          "token": "USDT",
+          "amount": "20000"
+        },
+        "deliveryFee": {
+          "token": "KSM",
+          "amount": "1036333296"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "assetHubKusama"
+    }
+  ],
+  [
+    {
       "to": "acala",
       "token": "ASTR",
       "xcm": {
         "fee": {
           "token": "ASTR",
-          "amount": "9269600000000000"
+          "amount": "8082400000000000"
         },
         "weightLimit": "Unlimited"
       },
@@ -847,7 +1029,7 @@
       "xcm": {
         "fee": {
           "token": "ACA",
-          "amount": "9269600000"
+          "amount": "8082400000"
         },
         "weightLimit": "Unlimited"
       },
@@ -859,7 +1041,7 @@
       "xcm": {
         "fee": {
           "token": "AUSD",
-          "amount": "2931921869"
+          "amount": "1815098681"
         },
         "weightLimit": "Unlimited"
       },
@@ -871,7 +1053,7 @@
       "xcm": {
         "fee": {
           "token": "LDOT",
-          "amount": "31449750"
+          "amount": "13400229"
         },
         "weightLimit": "Unlimited"
       },
@@ -890,12 +1072,48 @@
       "from": "astar"
     },
     {
+      "to": "assetHubPolkadot",
+      "token": "USDT",
+      "xcm": {
+        "fee": {
+          "token": "USDT",
+          "amount": "44306118000000000"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "astar"
+    },
+    {
+      "to": "interlay",
+      "token": "IBTC",
+      "xcm": {
+        "fee": {
+          "token": "IBTC",
+          "amount": "75"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "astar"
+    },
+    {
+      "to": "interlay",
+      "token": "INTR",
+      "xcm": {
+        "fee": {
+          "token": "INTR",
+          "amount": "20000000"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "astar"
+    },
+    {
       "to": "karura",
       "token": "SDN",
       "xcm": {
         "fee": {
           "token": "SDN",
-          "amount": "932400000000000"
+          "amount": "801280000000000"
         },
         "weightLimit": "Unlimited"
       },
@@ -907,7 +1125,7 @@
       "xcm": {
         "fee": {
           "token": "KUSD",
-          "amount": "3826597686"
+          "amount": "2120203588"
         },
         "weightLimit": "Unlimited"
       },
@@ -969,6 +1187,17 @@
         }
       },
       "from": "bifrost"
+    },
+    {
+      "to": "kintsugi",
+      "token": "VKSM",
+      "xcm": {
+        "fee": {
+          "token": "VKSM",
+          "amount": "175000000"
+        }
+      },
+      "from": "bifrost"
     }
   ],
   [
@@ -978,9 +1207,8 @@
       "xcm": {
         "fee": {
           "token": "KSM",
-          "amount": "11523248"
-        },
-        "weightLimit": "800000000"
+          "amount": "104571640"
+        }
       },
       "from": "basilisk"
     },
@@ -991,20 +1219,18 @@
         "fee": {
           "token": "BSX",
           "amount": "93240000000"
-        },
-        "weightLimit": "5000000000"
+        }
       },
       "from": "basilisk"
     },
     {
       "to": "karura",
-      "token": "KUSD",
+      "token": "aUSD",
       "xcm": {
         "fee": {
-          "token": "KUSD",
+          "token": "aUSD",
           "amount": "5060238106"
-        },
-        "weightLimit": "5000000000"
+        }
       },
       "from": "basilisk"
     },
@@ -1015,8 +1241,7 @@
         "fee": {
           "token": "KSM",
           "amount": "90741527"
-        },
-        "weightLimit": "5000000000"
+        }
       },
       "from": "basilisk"
     },
@@ -1027,8 +1252,7 @@
         "fee": {
           "token": "DAI",
           "amount": "808240000000000"
-        },
-        "weightLimit": "5000000000"
+        }
       },
       "from": "basilisk"
     },
@@ -1039,8 +1263,7 @@
         "fee": {
           "token": "USDCet",
           "amount": "808"
-        },
-        "weightLimit": "5000000000"
+        }
       },
       "from": "basilisk"
     },
@@ -1051,8 +1274,7 @@
         "fee": {
           "token": "WETH",
           "amount": "449022222222"
-        },
-        "weightLimit": "5000000000"
+        }
       },
       "from": "basilisk"
     },
@@ -1063,46 +1285,42 @@
         "fee": {
           "token": "WBTC",
           "amount": "2"
-        },
-        "weightLimit": "5000000000"
+        }
       },
       "from": "basilisk"
     },
     {
-      "to": "acala",
-      "token": "DAI",
+      "to": "assetHubKusama",
+      "token": "USDT",
       "xcm": {
         "fee": {
-          "token": "DAI",
-          "amount": "808240000000000"
-        },
-        "weightLimit": "5000000000"
+          "token": "USDT",
+          "amount": "1183"
+        }
       },
-      "from": "hydradx"
+      "from": "basilisk"
     },
     {
-      "to": "acala",
-      "token": "WETH",
+      "to": "tinkernet",
+      "token": "TNKR",
       "xcm": {
         "fee": {
-          "token": "WETH",
-          "amount": "687004000000"
-        },
-        "weightLimit": "5000000000"
+          "token": "TNKR",
+          "amount": "9270203240"
+        }
       },
-      "from": "hydradx"
+      "from": "basilisk"
     },
     {
-      "to": "acala",
-      "token": "WBTC",
+      "to": "robonomics",
+      "token": "XRT",
       "xcm": {
         "fee": {
-          "token": "WBTC",
-          "amount": "4"
-        },
-        "weightLimit": "5000000000"
+          "token": "XRT",
+          "amount": "4632"
+        }
       },
-      "from": "hydradx"
+      "from": "basilisk"
     }
   ],
   [
@@ -1126,9 +1344,8 @@
       "xcm": {
         "fee": {
           "token": "INTR",
-          "amount": "92696000"
-        },
-        "weightLimit": "5000000000"
+          "amount": "81000000"
+        }
       },
       "from": "interlay"
     },
@@ -1139,8 +1356,99 @@
         "fee": {
           "token": "IBTC",
           "amount": "9"
+        }
+      },
+      "from": "interlay"
+    },
+    {
+      "to": "astar",
+      "token": "INTR",
+      "xcm": {
+        "fee": {
+          "token": "INTR",
+          "amount": "40000000"
         },
         "weightLimit": "5000000000"
+      },
+      "from": "interlay"
+    },
+    {
+      "to": "astar",
+      "token": "IBTC",
+      "xcm": {
+        "fee": {
+          "token": "IBTC",
+          "amount": "5"
+        },
+        "weightLimit": "5000000000"
+      },
+      "from": "interlay"
+    },
+    {
+      "to": "phala",
+      "token": "PHA",
+      "xcm": {
+        "fee": {
+          "token": "PHA",
+          "amount": "65000000000"
+        }
+      },
+      "from": "interlay"
+    },
+    {
+      "to": "phala",
+      "token": "INTR",
+      "xcm": {
+        "fee": {
+          "token": "INTR",
+          "amount": "650000000"
+        }
+      },
+      "from": "interlay"
+    },
+    {
+      "to": "phala",
+      "token": "IBTC",
+      "xcm": {
+        "fee": {
+          "token": "IBTC",
+          "amount": "6500000"
+        }
+      },
+      "from": "interlay"
+    },
+    {
+      "to": "polkadot",
+      "token": "DOT",
+      "xcm": {
+        "fee": {
+          "token": "DOT",
+          "amount": "1000000000"
+        },
+        "weightLimit": "5000000000"
+      },
+      "from": "interlay"
+    },
+    {
+      "to": "assetHubPolkadot",
+      "token": "USDC",
+      "xcm": {
+        "fee": {
+          "token": "USDC",
+          "amount": "80000"
+        },
+        "weightLimit": "5000000000"
+      },
+      "from": "interlay"
+    },
+    {
+      "to": "assetHubPolkadot",
+      "token": "USDT",
+      "xcm": {
+        "fee": {
+          "token": "USDT",
+          "amount": "80000"
+        }
       },
       "from": "interlay"
     },
@@ -1150,7 +1458,53 @@
       "xcm": {
         "fee": {
           "token": "IBTC",
-          "amount": "7"
+          "amount": "15"
+        }
+      },
+      "from": "interlay"
+    },
+    {
+      "to": "hydradx",
+      "token": "INTR",
+      "xcm": {
+        "fee": {
+          "token": "INTR",
+          "amount": "1500000000"
+        },
+        "weightLimit": "5000000000"
+      },
+      "from": "interlay"
+    },
+    {
+      "to": "hydradx",
+      "token": "HDX",
+      "xcm": {
+        "fee": {
+          "token": "HDX",
+          "amount": "100000000000"
+        }
+      },
+      "from": "interlay"
+    },
+    {
+      "to": "bifrostPolkadot",
+      "token": "VDOT",
+      "xcm": {
+        "fee": {
+          "token": "VDOT",
+          "amount": "725"
+        },
+        "weightLimit": "5000000000"
+      },
+      "from": "interlay"
+    },
+    {
+      "to": "bifrostPolkadot",
+      "token": "BNC",
+      "xcm": {
+        "fee": {
+          "token": "BNC",
+          "amount": "550000000"
         },
         "weightLimit": "5000000000"
       },
@@ -1162,7 +1516,7 @@
       "xcm": {
         "fee": {
           "token": "KINT",
-          "amount": "170666666"
+          "amount": "210000000"
         },
         "weightLimit": "5000000000"
       },
@@ -1186,99 +1540,47 @@
       "xcm": {
         "fee": {
           "token": "LKSM",
-          "amount": "647055467"
+          "amount": "270000000"
         },
         "weightLimit": "5000000000"
       },
       "from": "kintsugi"
-    }
-  ],
-  [
-    {
-      "to": "karura",
-      "token": "KICO",
-      "xcm": {
-        "fee": {
-          "token": "KICO",
-          "amount": "6400000000000"
-        },
-        "weightLimit": "5000000000"
-      },
-      "from": "kico"
     },
     {
-      "to": "karura",
-      "token": "KAR",
+      "to": "kusama",
+      "token": "KSM",
       "xcm": {
         "fee": {
-          "token": "KAR",
-          "amount": "6400000000"
+          "token": "KSM",
+          "amount": "100000000"
         },
         "weightLimit": "5000000000"
       },
-      "from": "kico"
+      "from": "kintsugi"
     },
     {
-      "to": "karura",
-      "token": "KUSD",
+      "to": "assetHubKusama",
+      "token": "USDT",
       "xcm": {
         "fee": {
-          "token": "KUSD",
-          "amount": "10011896008"
+          "token": "USDT",
+          "amount": "10000"
         },
         "weightLimit": "5000000000"
       },
-      "from": "kico"
-    }
-  ],
-  [
-    {
-      "to": "karura",
-      "token": "PCHU",
-      "xcm": {
-        "fee": {
-          "token": "PCHU",
-          "amount": "9324000000000000"
-        },
-        "weightLimit": "5000000000"
-      },
-      "from": "pichiu"
+      "from": "kintsugi"
     },
     {
-      "to": "karura",
-      "token": "KAR",
+      "to": "bifrost",
+      "token": "VKSM",
       "xcm": {
         "fee": {
-          "token": "KAR",
-          "amount": "9324000000"
+          "token": "VKSM",
+          "amount": "85000000"
         },
         "weightLimit": "5000000000"
       },
-      "from": "pichiu"
-    },
-    {
-      "to": "karura",
-      "token": "KUSD",
-      "xcm": {
-        "fee": {
-          "token": "KUSD",
-          "amount": "5060238106"
-        },
-        "weightLimit": "5000000000"
-      },
-      "from": "pichiu"
-    },
-    {
-      "to": "karura",
-      "token": "LKSM",
-      "xcm": {
-        "fee": {
-          "token": "LKSM",
-          "amount": "700170039"
-        },
-        "weightLimit": "5000000000"
-      },
-      "from": "pichiu"
+      "from": "kintsugi"
     }
   ],
   [
@@ -1395,6 +1697,52 @@
   ],
   [
     {
+      "to": "acala",
+      "token": "GLMR",
+      "xcm": {
+        "fee": {
+          "token": "GLMR",
+          "amount": "1000000000"
+        }
+      },
+      "from": "moonbeam"
+    },
+    {
+      "to": "acala",
+      "token": "xcACA",
+      "xcm": {
+        "fee": {
+          "token": "ACA",
+          "amount": "1000000000"
+        }
+      },
+      "from": "moonbeam"
+    },
+    {
+      "to": "acala",
+      "token": "xcaUSD",
+      "xcm": {
+        "fee": {
+          "token": "AUSD",
+          "amount": "1000000000"
+        }
+      },
+      "from": "moonbeam"
+    },
+    {
+      "to": "acala",
+      "token": "xcDOT",
+      "xcm": {
+        "fee": {
+          "token": "DOT",
+          "amount": "1000000000"
+        }
+      },
+      "from": "moonbeam"
+    }
+  ],
+  [
+    {
       "to": "karura",
       "token": "TUR",
       "xcm": {
@@ -1445,103 +1793,38 @@
   ],
   [
     {
-      "to": "acala",
-      "token": "PARA",
+      "to": "interlay",
+      "token": "PHA",
       "xcm": {
         "fee": {
-          "token": "PARA",
-          "amount": "6400000000"
-        },
-        "weightLimit": "Unlimited"
+          "token": "PHA",
+          "amount": "80000000000000"
+        }
       },
-      "from": "parallel"
+      "from": "phala"
     },
     {
-      "to": "acala",
-      "token": "ACA",
+      "to": "interlay",
+      "token": "IBTC",
       "xcm": {
         "fee": {
-          "token": "ACA",
-          "amount": "6400000000"
-        },
-        "weightLimit": "Unlimited"
+          "token": "IBTC",
+          "amount": "70"
+        }
       },
-      "from": "parallel"
+      "from": "phala"
     },
     {
-      "to": "acala",
-      "token": "AUSD",
+      "to": "interlay",
+      "token": "INTR",
       "xcm": {
         "fee": {
-          "token": "AUSD",
-          "amount": "3721109059"
-        },
-        "weightLimit": "Unlimited"
+          "token": "INTR",
+          "amount": "20000000"
+        }
       },
-      "from": "parallel"
+      "from": "phala"
     },
-    {
-      "to": "acala",
-      "token": "LDOT",
-      "xcm": {
-        "fee": {
-          "token": "LDOT",
-          "amount": "24037893"
-        },
-        "weightLimit": "Unlimited"
-      },
-      "from": "parallel"
-    },
-    {
-      "to": "karura",
-      "token": "HKO",
-      "xcm": {
-        "fee": {
-          "token": "HKO",
-          "amount": "6400000000"
-        },
-        "weightLimit": "Unlimited"
-      },
-      "from": "heiko"
-    },
-    {
-      "to": "karura",
-      "token": "KAR",
-      "xcm": {
-        "fee": {
-          "token": "KAR",
-          "amount": "6400000000"
-        },
-        "weightLimit": "Unlimited"
-      },
-      "from": "heiko"
-    },
-    {
-      "to": "karura",
-      "token": "KUSD",
-      "xcm": {
-        "fee": {
-          "token": "KUSD",
-          "amount": "8305746640"
-        },
-        "weightLimit": "Unlimited"
-      },
-      "from": "heiko"
-    },
-    {
-      "to": "karura",
-      "token": "LKSM",
-      "xcm": {
-        "fee": {
-          "token": "LKSM",
-          "amount": "589618748"
-        },
-        "weightLimit": "Unlimited"
-      },
-      "from": "heiko"
-    }
-  ],
-  [
     {
       "to": "karura",
       "token": "PHA",
@@ -1583,7 +1866,11 @@
       "xcm": {
         "fee": {
           "token": "DOT",
-          "amount": "3549633"
+          "amount": "1222070"
+        },
+        "deliveryFee": {
+          "token": "DOT",
+          "amount": "397000000"
         },
         "weightLimit": "Unlimited"
       },
@@ -1593,6 +1880,10 @@
       "to": "hydradx",
       "token": "DOT",
       "xcm": {
+        "deliveryFee": {
+          "token": "DOT",
+          "amount": "397000000"
+        },
         "fee": {
           "token": "DOT",
           "amount": "21711791"
@@ -1602,12 +1893,32 @@
       "from": "polkadot"
     },
     {
-      "to": "statemint",
+      "to": "assetHubPolkadot",
       "token": "DOT",
       "xcm": {
+        "deliveryFee": {
+          "token": "DOT",
+          "amount": "397000000"
+        },
         "fee": {
           "token": "DOT",
           "amount": "15800000"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "polkadot"
+    },
+    {
+      "to": "interlay",
+      "token": "DOT",
+      "xcm": {
+        "deliveryFee": {
+          "token": "DOT",
+          "amount": "397000000"
+        },
+        "fee": {
+          "token": "DOT",
+          "amount": "25000000"
         },
         "weightLimit": "Unlimited"
       },
@@ -1621,6 +1932,10 @@
           "token": "KSM",
           "amount": "44163610"
         },
+        "deliveryFee": {
+          "token": "KSM",
+          "amount": "1323333009"
+        },
         "weightLimit": "Unlimited"
       },
       "from": "kusama"
@@ -1633,17 +1948,41 @@
           "token": "KSM",
           "amount": "72711796"
         },
+        "deliveryFee": {
+          "token": "KSM",
+          "amount": "1323333009"
+        },
         "weightLimit": "Unlimited"
       },
       "from": "kusama"
     },
     {
-      "to": "statemine",
+      "to": "assetHubKusama",
       "token": "KSM",
       "xcm": {
         "fee": {
           "token": "KSM",
           "amount": "34368318"
+        },
+        "deliveryFee": {
+          "token": "KSM",
+          "amount": "1323333009"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "kusama"
+    },
+    {
+      "to": "kintsugi",
+      "token": "KSM",
+      "xcm": {
+        "fee": {
+          "token": "KSM",
+          "amount": "250000000"
+        },
+        "deliveryFee": {
+          "token": "KSM",
+          "amount": "1323333009"
         },
         "weightLimit": "Unlimited"
       },
@@ -1652,76 +1991,26 @@
   ],
   [
     {
-      "to": "polkadot",
-      "token": "DOT",
-      "xcm": {
-        "fee": {
-          "token": "DOT",
-          "amount": "421500000"
-        },
-        "weightLimit": "Unlimited"
-      },
-      "from": "statemint"
-    },
-    {
       "to": "hydradx",
-      "token": "USDT",
+      "token": "SUB",
       "xcm": {
         "fee": {
-          "token": "USDT",
-          "amount": "2200"
-        },
-        "weightLimit": "Unlimited"
+          "token": "SUB",
+          "amount": "65000000"
+        }
       },
-      "from": "statemint"
+      "from": "subsocial"
     },
     {
-      "to": "kusama",
-      "token": "KSM",
+      "to": "moonbeam",
+      "token": "SUB",
       "xcm": {
         "fee": {
-          "token": "KSM",
-          "amount": "90049287"
-        },
-        "weightLimit": "Unlimited"
+          "token": "SUB",
+          "amount": "65000000"
+        }
       },
-      "from": "statemine"
-    },
-    {
-      "to": "karura",
-      "token": "RMRK",
-      "xcm": {
-        "fee": {
-          "token": "RMRK",
-          "amount": "9918117"
-        },
-        "weightLimit": "Unlimited"
-      },
-      "from": "statemine"
-    },
-    {
-      "to": "karura",
-      "token": "ARIS",
-      "xcm": {
-        "fee": {
-          "token": "ARIS",
-          "amount": "6400000"
-        },
-        "weightLimit": "Unlimited"
-      },
-      "from": "statemine"
-    },
-    {
-      "to": "karura",
-      "token": "USDT",
-      "xcm": {
-        "fee": {
-          "token": "USDT",
-          "amount": "808"
-        },
-        "weightLimit": "Unlimited"
-      },
-      "from": "statemine"
+      "from": "subsocial"
     }
   ],
   [

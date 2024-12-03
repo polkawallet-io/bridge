@@ -219,20 +219,6 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     );
   }
 
-  // TODO: should remove after kusama upgrade
-  private get isV0V1() {
-    try {
-      const keys = (this.api?.createType("XcmVersionedMultiLocation") as any)
-        .defKeys as string[];
-
-      return keys.includes("V0");
-    } catch (e) {
-      // ignore error
-    }
-
-    return false;
-  }
-
   public createTx(
     params: TransferParams
   ):
@@ -257,8 +243,6 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
       throw new TokenNotFound(token);
     }
 
-    const isV0V1Support = this.isV0V1;
-
     // to asset hub
     if (to === "assetHubKusama" || to === "assetHubPolkadot") {
       const dst = {
@@ -270,7 +254,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
           X1: {
             AccountId32: {
               id: accountId,
-              network: isV0V1Support ? "Any" : undefined,
+              network: undefined,
             },
           },
         },
@@ -284,70 +268,42 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
       ];
 
       return this.api?.tx.xcmPallet.limitedTeleportAssets(
-        { [isV0V1Support ? "V1" : "V3"]: dst },
-        { [isV0V1Support ? "V1" : "V3"]: acc },
-        { [isV0V1Support ? "V1" : "V3"]: ass },
+        { V3: dst },
+        { V3: acc },
+        { V3: ass },
         0,
         "Unlimited"
       );
     }
 
-    // to acala or karura which is support V0/V1 (old version)
-    if ((to === "acala" || to === "karura") && isV0V1Support) {
-      const dst = { X1: { Parachain: toChain.paraChainId } };
-      const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
-      const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
-
-      return this.api?.tx.xcmPallet.reserveTransferAssets(
-        { V0: dst },
-        { V0: acc },
-        { V0: ass },
-        0
-      );
-    }
-
-    if (isV0V1Support) {
-      const dst = { X1: { Parachain: toChain.paraChainId } };
-      const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
-      const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
-
-      return this.api?.tx.xcmPallet.limitedReserveTransferAssets(
-        { V0: dst },
-        { V0: acc },
-        { V0: ass },
-        0,
-        this.getDestWeight(token, to)?.toString()
-      );
-    } else {
-      const dst = {
-        parents: 0,
-        interior: { X1: { Parachain: toChain.paraChainId } },
-      };
-      const acc = {
-        parents: 0,
-        interior: {
-          X1: {
-            [accountType]: {
-              [accountType === "AccountId32" ? "id" : "key"]: accountId,
-            },
+    const dst = {
+      parents: 0,
+      interior: { X1: { Parachain: toChain.paraChainId } },
+    };
+    const acc = {
+      parents: 0,
+      interior: {
+        X1: {
+          [accountType]: {
+            [accountType === "AccountId32" ? "id" : "key"]: accountId,
           },
         },
-      };
-      const ass = [
-        {
-          id: { Concrete: { parents: 0, interior: "Here" } },
-          fun: { Fungible: amount.toChainData() },
-        },
-      ];
+      },
+    };
+    const ass = [
+      {
+        id: { Concrete: { parents: 0, interior: "Here" } },
+        fun: { Fungible: amount.toChainData() },
+      },
+    ];
 
-      return this.api?.tx.xcmPallet.limitedReserveTransferAssets(
-        { V3: dst },
-        { V3: acc },
-        { V3: ass },
-        0,
-        this.getDestWeight(token, to)?.toString()
-      );
-    }
+    return this.api?.tx.xcmPallet.limitedReserveTransferAssets(
+      { V3: dst },
+      { V3: acc },
+      { V3: ass },
+      0,
+      this.getDestWeight(token, to)?.toString()
+    );
   }
 }
 

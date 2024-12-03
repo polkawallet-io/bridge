@@ -41,19 +41,6 @@ export const interlayRouteConfigs = createRouteConfigs("interlay", [
     xcm: { fee: { token: "IBTC", amount: "5" }, weightLimit: DEST_WEIGHT },
   },
   {
-    to: "parallel",
-    token: "INTR",
-    xcm: {
-      fee: { token: "INTR", amount: "7000000000" },
-      weightLimit: DEST_WEIGHT,
-    },
-  },
-  {
-    to: "parallel",
-    token: "IBTC",
-    xcm: { fee: { token: "IBTC", amount: "110" }, weightLimit: DEST_WEIGHT },
-  },
-  {
     to: "phala",
     token: "PHA",
     xcm: { fee: { token: "PHA", amount: "65000000000" } },
@@ -162,22 +149,6 @@ export const kintsugiRouteConfigs = createRouteConfigs("kintsugi", [
     token: "USDT",
     xcm: {
       fee: { token: "USDT", amount: "10000" },
-      weightLimit: DEST_WEIGHT,
-    },
-  },
-  {
-    to: "heiko",
-    token: "KBTC",
-    xcm: {
-      fee: { token: "KBTC", amount: "110" },
-      weightLimit: DEST_WEIGHT,
-    },
-  },
-  {
-    to: "heiko",
-    token: "KINT",
-    xcm: {
-      fee: { token: "KINT", amount: "18000000000" },
       weightLimit: DEST_WEIGHT,
     },
   },
