@@ -5,7 +5,7 @@ import { ApiProvider } from "../api-provider";
 import { firstValueFrom } from "rxjs";
 import { CrabAdapter } from "./darwinia";
 
-describe.skip("crab adapter should work", () => {
+describe("crab adapter should work", () => {
   jest.setTimeout(300000);
 
   const address = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
@@ -19,6 +19,8 @@ describe.skip("crab adapter should work", () => {
     await firstValueFrom(provider.connectFromChain(["crab"]));
 
     await crab.init(provider.getApi("crab"));
+
+    console.log("init crab adapter done");
 
     bridge = new Bridge({ adapters: [crab] });
   });
@@ -63,7 +65,12 @@ describe.skip("crab adapter should work", () => {
 
         expect(tx).toBeDefined();
 
-        const logRoute = formateRouteLogLine(e.token, e.from.display, e.to.display, "createTx");
+        const logRoute = formateRouteLogLine(
+          e.token,
+          e.from.display,
+          e.to.display,
+          "createTx"
+        );
         logFormatedRoute("", [logRoute]);
         outputSummary.push(logRoute);
       });
