@@ -175,9 +175,9 @@ class BaseDarwiniaAdapter extends BaseCrossChainAdapter {
     const rawAmount = amount.toChainData();
 
     return this.api?.tx.polkadotXcm.limitedReserveTransferAssets(
-      createPolkadotXCMDest(this.api, parachainId),
-      createPolkadotXCMAccount(this.api, accountId, accountType),
-      createPolkadotXCMAsset(this.api, rawAmount, "NATIVE"),
+      createPolkadotXCMDest(this.api, parachainId, 1, "V4"),
+      createPolkadotXCMAccount(this.api, accountId, accountType, "V4"),
+      createPolkadotXCMAsset(this.api, rawAmount, "NATIVE", "V4"),
       0,
       this.getDestWeight(token, to)?.toString() as any
     );
