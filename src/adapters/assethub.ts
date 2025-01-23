@@ -62,7 +62,7 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
       token: "LOVA",
       xcm: {
         deliveryFee: { token: "DOT", amount: "311100000" },
-        fee: { token: "LOVA", amount: "803" },
+        fee: { token: "LOVA", amount: "0" },
         weightLimit: "Unlimited",
       },
     },
@@ -71,7 +71,7 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
       token: "DAMN",
       xcm: {
         deliveryFee: { token: "DOT", amount: "311100000" },
-        fee: { token: "DAMN", amount: "803" },
+        fee: { token: "DAMN", amount: "0" },
         weightLimit: "Unlimited",
       },
     },
@@ -155,7 +155,7 @@ export const assetHubKusamaRouteConfigs = createRouteConfigs("assetHubKusama", [
     to: "karura",
     token: "USDT",
     xcm: {
-      fee: { token: "USDT", amount: "0" },
+      fee: { token: "USDT", amount: "808" },
       deliveryFee: { token: "KSM", amount: "1036333296" },
       weightLimit: "Unlimited",
     },
@@ -164,7 +164,7 @@ export const assetHubKusamaRouteConfigs = createRouteConfigs("assetHubKusama", [
     to: "kintsugi",
     token: "USDT",
     xcm: {
-      fee: { token: "USDT", amount: "0" },
+      fee: { token: "USDT", amount: "20000" },
       deliveryFee: { token: "KSM", amount: "1036333296" },
       weightLimit: "Unlimited",
     },
