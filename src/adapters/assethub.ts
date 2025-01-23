@@ -155,7 +155,7 @@ export const assetHubKusamaRouteConfigs = createRouteConfigs("assetHubKusama", [
     to: "karura",
     token: "USDT",
     xcm: {
-      fee: { token: "USDT", amount: "808" },
+      fee: { token: "USDT", amount: "0" },
       deliveryFee: { token: "KSM", amount: "1036333296" },
       weightLimit: "Unlimited",
     },
@@ -164,7 +164,7 @@ export const assetHubKusamaRouteConfigs = createRouteConfigs("assetHubKusama", [
     to: "kintsugi",
     token: "USDT",
     xcm: {
-      fee: { token: "USDT", amount: "20000" },
+      fee: { token: "USDT", amount: "0" },
       deliveryFee: { token: "KSM", amount: "1036333296" },
       weightLimit: "Unlimited",
     },
