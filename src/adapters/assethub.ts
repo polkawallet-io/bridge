@@ -59,6 +59,24 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
     },
     {
       to: "acala",
+      token: "LOVA",
+      xcm: {
+        deliveryFee: { token: "DOT", amount: "311100000" },
+        fee: { token: "LOVA", amount: "803" },
+        weightLimit: "Unlimited",
+      },
+    },
+    {
+      to: "acala",
+      token: "DAMN",
+      xcm: {
+        deliveryFee: { token: "DOT", amount: "311100000" },
+        fee: { token: "DAMN", amount: "803" },
+        weightLimit: "Unlimited",
+      },
+    },
+    {
+      to: "acala",
       token: "PINK",
       xcm: {
         deliveryFee: { token: "DOT", amount: "311100000" },
@@ -137,7 +155,7 @@ export const assetHubKusamaRouteConfigs = createRouteConfigs("assetHubKusama", [
     to: "karura",
     token: "USDT",
     xcm: {
-      fee: { token: "USDT", amount: "808" },
+      fee: { token: "USDT", amount: "0" },
       deliveryFee: { token: "KSM", amount: "1036333296" },
       weightLimit: "Unlimited",
     },
@@ -146,7 +164,7 @@ export const assetHubKusamaRouteConfigs = createRouteConfigs("assetHubKusama", [
     to: "kintsugi",
     token: "USDT",
     xcm: {
-      fee: { token: "USDT", amount: "20000" },
+      fee: { token: "USDT", amount: "0" },
       deliveryFee: { token: "KSM", amount: "1036333296" },
       weightLimit: "Unlimited",
     },
@@ -181,6 +199,20 @@ export const assetHubPolkadotTokensConfig: Record<string, ExtendedToken> = {
     decimals: 10,
     ed: "1",
     toRaw: () => new BN(23),
+  },
+  LOVA: {
+    name: "LOVA",
+    symbol: "LOVA",
+    decimals: 12,
+    ed: "1",
+    toRaw: () => new BN(50000028),
+  },
+  DAMN: {
+    name: "DAMN",
+    symbol: "DAMN",
+    decimals: 12,
+    ed: "1",
+    toRaw: () => new BN(22222012),
   },
 };
 

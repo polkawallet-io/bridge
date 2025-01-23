@@ -156,6 +156,20 @@ export const acalaRouteConfigs = createRouteConfigs("acala", [
       fee: { token: "DOT", amount: "160000000" },
     },
   },
+  {
+    to: "assetHubPolkadot",
+    token: "LOVA",
+    xcm: {
+      fee: { token: "DOT", amount: "160000000" },
+    },
+  },
+  {
+    to: "assetHubPolkadot",
+    token: "DAMN",
+    xcm: {
+      fee: { token: "DOT", amount: "160000000" },
+    },
+  },
 ]);
 
 export const acalaTokensConfig: Record<string, ExtendedToken | BasicToken> = {
@@ -249,5 +263,17 @@ export const acalaTokensConfig: Record<string, ExtendedToken | BasicToken> = {
     symbol: "PINK",
     decimals: 10,
     ed: "1000000000",
+  },
+  LOVA: {
+    name: "LOVA",
+    symbol: "LOVA",
+    decimals: 12,
+    ed: "1",
+  },
+  DAMN: {
+    name: "DAMN",
+    symbol: "DAMN",
+    decimals: 12,
+    ed: "1",
   },
 };
