@@ -1,12 +1,24 @@
 import { AnyApi } from "@acala-network/sdk-core";
 import { checkMessageVersion } from "./check-message-version";
 
+export type XCMType = "V0" | "V1" | "V2" | "V3" | "V4";
+
 export function createPolkadotXCMDest(
   api: AnyApi,
   parachainId: number,
-  parents = 1
+  parents = 1,
+  targetVersion: XCMType | undefined = undefined
 ): any {
-  const version = checkMessageVersion(api);
+  const version = targetVersion ?? checkMessageVersion(api);
+
+  if (version === "V4") {
+    return {
+      V4: {
+        parents,
+        interior: { X1: [{ Parachain: parachainId }] },
+      },
+    };
+  }
 
   return {
     [version]: {
@@ -19,9 +31,28 @@ export function createPolkadotXCMDest(
 export function createPolkadotXCMAccount(
   api: AnyApi,
   accountId: string,
-  accountType = "AccountId32"
+  accountType = "AccountId32",
+  targetVersion: XCMType | undefined = undefined
 ): any {
-  const version = checkMessageVersion(api);
+  const version = targetVersion ?? checkMessageVersion(api);
+
+  if (version === "V4") {
+    return {
+      V4: {
+        parents: 0,
+        interior: {
+          X1: [
+            {
+              [accountType]: {
+                [accountType === "AccountId32" ? "id" : "key"]: accountId,
+                network: undefined,
+              },
+            },
+          ],
+        },
+      },
+    };
+  }
 
   return {
     [version]: {
@@ -41,10 +72,11 @@ export function createPolkadotXCMAccount(
 export function createPolkadotXCMAsset(
   api: AnyApi,
   amount: string,
-  position: "NATIVE" | any[]
+  position: "NATIVE" | any[],
+  targetVersion: XCMType | undefined = undefined
 ): any {
-  const version = checkMessageVersion(api);
-  const tokenPosition =
+  const version = targetVersion ?? checkMessageVersion(api);
+  let tokenPosition: any =
     position === "NATIVE"
       ? {
           id: { Concrete: { parents: 0, interior: "Here" } },
@@ -59,6 +91,25 @@ export function createPolkadotXCMAsset(
             },
           },
         };
+
+  if (version === "V4") {
+    tokenPosition =
+      position === "NATIVE"
+        ? {
+            id: {
+              parents: 0,
+              interior: "Here",
+            },
+          }
+        : {
+            id: {
+              paraents: 1,
+              interior: {
+                X2: position,
+              },
+            },
+          };
+  }
 
   return {
     [version]: [
