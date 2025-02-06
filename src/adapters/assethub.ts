@@ -68,6 +68,15 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
     },
     {
       to: "acala",
+      token: "LOTY",
+      xcm: {
+        deliveryFee: { token: "DOT", amount: "311100000" },
+        fee: { token: "LOTY", amount: "0" },
+        weightLimit: "Unlimited",
+      },
+    },
+    {
+      to: "acala",
       token: "DAMN",
       xcm: {
         deliveryFee: { token: "DOT", amount: "311100000" },
@@ -206,6 +215,13 @@ export const assetHubPolkadotTokensConfig: Record<string, ExtendedToken> = {
     decimals: 12,
     ed: "1",
     toRaw: () => new BN(50000028),
+  },
+  LOTY: {
+    name: "LOTY",
+    symbol: "LOTY",
+    decimals: 12,
+    ed: "100000000",
+    toRaw: () => new BN(50000069),
   },
   DAMN: {
     name: "DAMN",
