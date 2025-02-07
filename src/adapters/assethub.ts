@@ -71,7 +71,7 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
       token: "LOTY",
       xcm: {
         deliveryFee: { token: "DOT", amount: "311100000" },
-        fee: { token: "LOTY", amount: "0" },
+        fee: { token: "LOTY", amount: "9339000" },
         weightLimit: "Unlimited",
       },
     },
