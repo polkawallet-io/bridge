@@ -203,13 +203,26 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
 
       if (!token) throw new TokenNotFound(token);
 
-      return this.api.tx.xTokens.transferMultiasset(
+      return this.api.tx.xTokens.transferMultiassetWithFee(
         createXTokensAssetsParam(
           this.api,
           toChain.paraChainId,
           tokenData.toRaw(),
           amount.toChainData()
         ),
+        {
+          V3: {
+            id: {
+              Concrete: {
+                parents: 1,
+                interior: "Here",
+              },
+            },
+            fun: {
+              Fungible: "3200000000",
+            },
+          },
+        },
         createXTokensDestParam(this.api, toChain.paraChainId, accountId) as any,
         "Unlimited"
       );

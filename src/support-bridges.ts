@@ -245,6 +245,39 @@
       "from": "acala"
     },
     {
+      "to": "assetHubPolkadot",
+      "token": "LOVA",
+      "xcm": {
+        "fee": {
+          "token": "DOT",
+          "amount": "160000000"
+        }
+      },
+      "from": "acala"
+    },
+    {
+      "to": "assetHubPolkadot",
+      "token": "LOTY",
+      "xcm": {
+        "fee": {
+          "token": "DOT",
+          "amount": "160000000"
+        }
+      },
+      "from": "acala"
+    },
+    {
+      "to": "assetHubPolkadot",
+      "token": "DAMN",
+      "xcm": {
+        "fee": {
+          "token": "DOT",
+          "amount": "160000000"
+        }
+      },
+      "from": "acala"
+    },
+    {
       "to": "kusama",
       "token": "KSM",
       "xcm": {
@@ -260,8 +293,8 @@
       "token": "RMRK",
       "xcm": {
         "fee": {
-          "token": "RMRK",
-          "amount": "100000"
+          "token": "KSM",
+          "amount": "3200000000"
         }
       },
       "from": "karura"
@@ -272,7 +305,7 @@
       "xcm": {
         "fee": {
           "token": "KSM",
-          "amount": "16000000000"
+          "amount": "3200000000"
         }
       },
       "from": "karura"
@@ -844,6 +877,54 @@
         "fee": {
           "token": "USDC",
           "amount": "803"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "assetHubPolkadot"
+    },
+    {
+      "to": "acala",
+      "token": "LOVA",
+      "xcm": {
+        "deliveryFee": {
+          "token": "DOT",
+          "amount": "311100000"
+        },
+        "fee": {
+          "token": "LOVA",
+          "amount": "0"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "assetHubPolkadot"
+    },
+    {
+      "to": "acala",
+      "token": "LOTY",
+      "xcm": {
+        "deliveryFee": {
+          "token": "DOT",
+          "amount": "311100000"
+        },
+        "fee": {
+          "token": "LOTY",
+          "amount": "9339000"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "assetHubPolkadot"
+    },
+    {
+      "to": "acala",
+      "token": "DAMN",
+      "xcm": {
+        "deliveryFee": {
+          "token": "DOT",
+          "amount": "311100000"
+        },
+        "fee": {
+          "token": "DAMN",
+          "amount": "0"
         },
         "weightLimit": "Unlimited"
       },
