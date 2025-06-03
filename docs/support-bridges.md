@@ -27,6 +27,9 @@
 | acala | assetHubPolkadot | USDT |
 | acala | assetHubPolkadot | USDC |
 | acala | assetHubPolkadot | PINK |
+| acala | assetHubPolkadot | LOVA |
+| acala | assetHubPolkadot | LOTY |
+| acala | assetHubPolkadot | DAMN |
 | karura | kusama | KSM |
 | karura | assetHubKusama | RMRK |
 | karura | assetHubKusama | ARIS |
@@ -80,6 +83,9 @@
 | assetHubPolkadot | hydradx | USDT |
 | assetHubPolkadot | acala | USDT |
 | assetHubPolkadot | acala | USDC |
+| assetHubPolkadot | acala | LOVA |
+| assetHubPolkadot | acala | LOTY |
+| assetHubPolkadot | acala | DAMN |
 | assetHubPolkadot | acala | PINK |
 | assetHubPolkadot | astar | USDT |
 | assetHubPolkadot | interlay | USDT |

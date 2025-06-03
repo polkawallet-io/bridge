@@ -13,14 +13,14 @@ export const karuraRouteConfigs = createRouteConfigs("karura", [
     to: "assetHubKusama",
     token: "RMRK",
     xcm: {
-      fee: { token: "RMRK", amount: "100000" },
+      fee: { token: "KSM", amount: "3200000000" },
     },
   },
   {
     to: "assetHubKusama",
     token: "ARIS",
     xcm: {
-      fee: { token: "KSM", amount: "16000000000" },
+      fee: { token: "KSM", amount: "3200000000" },
     },
   },
   {

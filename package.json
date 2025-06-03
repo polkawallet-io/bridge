@@ -1,6 +1,6 @@
 {
   "name": "@polkawallet/bridge",
-  "version": "0.1.7-18",
+  "version": "0.1.7-19",
   "description": "polkawallet bridge sdk",
   "main": "index.js",
   "types": "index.d.ts",
@@ -16,7 +16,7 @@
   "repository": "https://github.com/polkawallet-io/bridge.git",
   "homepage": "https://github.com/polkawallet-io/bridge",
   "scripts": {
-    "clain": "rm -rf build",
+    "clean": "rm -rf build",
     "build": "tsc",
     "test": "jest --runInBand --detectOpenHandles --forceExit",
     "lint": "polkadot-dev-run-lint",
@@ -58,5 +58,5 @@
     "ts-node": "^10.9.2",
     "typescript": "^4.7.4"
   },
-  "stableVersion": "0.1.7-17"
+  "stableVersion": "0.1.7-18"
 }
