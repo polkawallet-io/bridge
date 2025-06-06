@@ -294,7 +294,7 @@
       "xcm": {
         "fee": {
           "token": "KSM",
-          "amount": "3200000000"
+          "amount": "3800000000"
         }
       },
       "from": "karura"
@@ -305,7 +305,7 @@
       "xcm": {
         "fee": {
           "token": "KSM",
-          "amount": "3200000000"
+          "amount": "16000000000"
         }
       },
       "from": "karura"

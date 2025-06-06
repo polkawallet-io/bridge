@@ -197,9 +197,7 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
 
     // for asset hub
     if (isChainEqual(toChain, "assetHubKusama")) {
-      const tokenData: ExtendedToken = isChainEqual(toChain, "assetHubKusama")
-        ? assetHubKusamaTokensConfig[token]
-        : assetHubPolkadotTokensConfig[token];
+      const tokenData: ExtendedToken = assetHubKusamaTokensConfig[token];
 
       if (!token) throw new TokenNotFound(token);
 
@@ -219,7 +217,7 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
               },
             },
             fun: {
-              Fungible: "3200000000",
+              Fungible: "3800000000",
             },
           },
         },
