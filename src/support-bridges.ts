@@ -278,6 +278,17 @@
       "from": "acala"
     },
     {
+      "to": "assetHubPolkadot",
+      "token": "ETH",
+      "xcm": {
+        "fee": {
+          "token": "DOT",
+          "amount": "160000000"
+        }
+      },
+      "from": "acala"
+    },
+    {
       "to": "kusama",
       "token": "KSM",
       "xcm": {
@@ -941,6 +952,22 @@
         "fee": {
           "token": "PINK",
           "amount": "80370000"
+        },
+        "weightLimit": "Unlimited"
+      },
+      "from": "assetHubPolkadot"
+    },
+    {
+      "to": "acala",
+      "token": "ETH",
+      "xcm": {
+        "deliveryFee": {
+          "token": "DOT",
+          "amount": "311100000"
+        },
+        "fee": {
+          "token": "ETH",
+          "amount": "933900000000"
         },
         "weightLimit": "Unlimited"
       },

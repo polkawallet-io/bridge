@@ -165,10 +165,67 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
       throw new InvalidAddress(address);
     }
 
+    // for asset hub polkadot
     if (isChainEqual(toChain, "assetHubPolkadot")) {
       const tokenData = assetHubPolkadotTokensConfig[token];
 
       if (!token) throw new TokenNotFound(token);
+
+      // snowbridge eth
+      if (tokenData.name === "Ether") {
+        const dest = {
+          V4: {
+            parents: 1,
+            interior: { X1: [{ Parachain: toChain.paraChainId }] },
+          },
+        };
+        const asset = {
+          V4: [
+            {
+              id: {
+                parents: 2,
+                interior: {
+                  X1: [{ GlobalConsensus: { Ethereum: { chainId: 1 } } }],
+                },
+              },
+              fun: { Fungible: amount.toChainData() },
+            },
+          ],
+        };
+        const assetsTransferType = "DestinationReserve";
+        const remoteFeesId = {
+          V4: {
+            parents: 2,
+            interior: {
+              X1: [{ GlobalConsensus: { Ethereum: { chainId: 1 } } }],
+            },
+          },
+        };
+        const feesTransferType = "DestinationReserve";
+        const customXcmOnDest = {
+          V4: [
+            {
+              DepositAsset: {
+                assets: { Wild: { AllCounted: 1 } },
+                beneficiary: {
+                  parents: 0,
+                  interior: { X1: [{ AccountId32: { id: accountId } }] },
+                },
+              },
+            },
+          ],
+        };
+
+        return this.api?.tx.polkadotXcm.transferAssetsUsingTypeAndThen(
+          dest,
+          asset,
+          assetsTransferType,
+          remoteFeesId,
+          feesTransferType,
+          customXcmOnDest,
+          "Unlimited"
+        );
+      }
 
       return this.api.tx.xTokens.transferMultiassetWithFee(
         createXTokensAssetsParam(
@@ -195,7 +252,7 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
       );
     }
 
-    // for asset hub
+    // for asset hub kusama
     if (isChainEqual(toChain, "assetHubKusama")) {
       const tokenData: ExtendedToken = assetHubKusamaTokensConfig[token];
 

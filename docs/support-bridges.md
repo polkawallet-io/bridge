@@ -30,6 +30,7 @@
 | acala | assetHubPolkadot | LOVA |
 | acala | assetHubPolkadot | LOTY |
 | acala | assetHubPolkadot | DAMN |
+| acala | assetHubPolkadot | ETH |
 | karura | kusama | KSM |
 | karura | assetHubKusama | RMRK |
 | karura | assetHubKusama | ARIS |
@@ -87,6 +88,7 @@
 | assetHubPolkadot | acala | LOTY |
 | assetHubPolkadot | acala | DAMN |
 | assetHubPolkadot | acala | PINK |
+| assetHubPolkadot | acala | ETH |
 | assetHubPolkadot | astar | USDT |
 | assetHubPolkadot | interlay | USDT |
 | assetHubPolkadot | interlay | USDC |
