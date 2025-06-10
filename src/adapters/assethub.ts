@@ -94,6 +94,15 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
       },
     },
     {
+      to: "acala",
+      token: "ETH",
+      xcm: {
+        deliveryFee: { token: "DOT", amount: "311100000" },
+        fee: { token: "ETH", amount: "933900000000" },
+        weightLimit: "Unlimited",
+      },
+    },
+    {
       to: "astar",
       token: "USDT",
       xcm: {
@@ -230,6 +239,16 @@ export const assetHubPolkadotTokensConfig: Record<string, ExtendedToken> = {
     ed: "1",
     toRaw: () => new BN(22222012),
   },
+  ETH: {
+    name: "Ether",
+    symbol: "ETH",
+    decimals: 18,
+    ed: "15000000000000",
+    toRaw: () => ({
+      parents: 2,
+      interior: { X1: [{ GlobalConsensus: { Ethereum: { chainId: 1 } } }] },
+    }),
+  },
 };
 
 export const assetHubKusamaTokensConfig: Record<string, ExtendedToken> = {
@@ -290,6 +309,24 @@ const createBalanceStorages = (api: AnyApi) => {
         path: "query.assets.asset",
         params: [assetId],
       }),
+    foreignAssets: (location: any, address: string) =>
+      Storage.create<any>({
+        api,
+        path: "query.foreignAssets.account",
+        params: [location, address],
+      }),
+    foreignAssetsMeta: (location: any) =>
+      Storage.create<any>({
+        api,
+        path: "query.foreignAssets.metadata",
+        params: [location],
+      }),
+    foreignAssetsInfo: (location: any) =>
+      Storage.create<any>({
+        api,
+        path: "query.foreignAssets.asset",
+        params: [location],
+      }),
   };
 };
 
@@ -330,10 +367,18 @@ class AssetHubBalanceAdapter extends BalanceAdapter {
 
     if (!token) throw new TokenNotFound(tokenName);
 
-    return combineLatest({
-      meta: this.storages.assetsMeta(token.toRaw()).observable,
-      balance: this.storages.assets(token.toRaw(), address).observable,
-    }).pipe(
+    let meta$: Observable<any>;
+    let balance$: Observable<any>;
+
+    if (token.name === "Ether") {
+      meta$ = this.storages.foreignAssetsMeta(token.toRaw()).observable;
+      balance$ = this.storages.foreignAssets(token.toRaw(), address).observable;
+    } else {
+      meta$ = this.storages.assetsMeta(token.toRaw()).observable;
+      balance$ = this.storages.assets(token.toRaw(), address).observable;
+    }
+
+    return combineLatest({ meta: meta$, balance: balance$ }).pipe(
       map(({ balance, meta }) => {
         const amount = FN.fromInner(
           balance.unwrapOrDefault()?.balance?.toString() || "0",
@@ -476,6 +521,65 @@ class BaseAssetHubAdapter extends BaseCrossChainAdapter {
 
     if (tokenName === this.balanceAdapter?.nativeToken || !token) {
       throw new TokenNotFound(tokenName);
+    }
+
+    // snowbridge eth
+    if (token.name === "Ether") {
+      const dest = {
+        V4: {
+          parents: 1,
+          interior: { X1: [{ Parachain: toChain.paraChainId }] },
+        },
+      };
+      const asset = {
+        V4: [
+          {
+            id: {
+              parents: 2,
+              interior: {
+                X1: [{ GlobalConsensus: { Ethereum: { chainId: 1 } } }],
+              },
+            },
+            fun: { Fungible: amount.toChainData() },
+          },
+        ],
+      };
+      const assetsTransferType = "LocalReserve";
+      const remoteFeesId = {
+        V4: {
+          parents: 2,
+          interior: { X1: [{ GlobalConsensus: { Ethereum: { chainId: 1 } } }] },
+        },
+      };
+      const feesTransferType = "LocalReserve";
+      const account = {
+        [accountType]: {
+          [accountType === "AccountId32" ? "id" : "key"]: accountId,
+        },
+      };
+      const customXcmOnDest = {
+        V4: [
+          {
+            DepositAsset: {
+              assets: { Wild: { AllCounted: 1 } },
+              beneficiary: {
+                parents: 0,
+                interior: { X1: [account] },
+              },
+            },
+          },
+        ],
+      };
+
+      return this.api?.tx.polkadotXcm.transferAssetsUsingTypeAndThen(
+        dest,
+        asset,
+        assetsTransferType,
+        remoteFeesId,
+        feesTransferType,
+        customXcmOnDest,
+        this.getDestWeight(tokenName, to)?.toString() as any
+      );
     }
 
     const dst = {
