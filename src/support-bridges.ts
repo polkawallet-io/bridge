@@ -1185,7 +1185,7 @@
       "xcm": {
         "fee": {
           "token": "USDT",
-          "amount": "44306118000000000"
+          "amount": "143870"
         },
         "weightLimit": "Unlimited"
       },
