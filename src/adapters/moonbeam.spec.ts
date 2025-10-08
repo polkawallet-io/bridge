@@ -14,13 +14,13 @@ describe.skip("moonbeam adapter should work", () => {
   beforeAll(async () => {
     const moonbeam = new MoonbeamAdapter();
 
-    const moonbeamApi = new ApiPromise({ provider: new WsProvider("wss://moonbeam-rpc.dwellir.com") });
+    const moonbeamApi = new ApiPromise({ provider: new WsProvider("wss://moonbeam-rpc.n.dwellir.com") });
 
     await moonbeam.init(moonbeamApi);
 
     const acala = new AcalaAdapter();
 
-    const acalaApi = new ApiPromise({ provider: new WsProvider("wss://acala-rpc.dwellir.com") });
+    const acalaApi = new ApiPromise({ provider: new WsProvider("wss://acala-rpc.n.dwellir.com") });
 
     await acala.init(acalaApi);
 

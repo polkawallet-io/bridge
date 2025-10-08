@@ -16,7 +16,7 @@ describe("api-provider", () => {
 
     const res = await firstValueFrom(
       provider.connectFromChain(chains, {
-        karura: ["wss://karura-rpc.dwellir.com", "wss://karura.polkawallet.io"],
+        karura: ["wss://karura-rpc.n.dwellir.com", "wss://karura.polkawallet.io"],
       })
     );
 

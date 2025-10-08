@@ -79,20 +79,20 @@ describe.skip("Interlay/Kintsugi connections tests", () => {
     // connect all adapters
     const connected = await firstValueFrom(
       provider.connectFromChain(chains, {
-        polkadot: ["wss://polkadot-rpc.dwellir.com"],
+        polkadot: ["wss://polkadot-rpc.n.dwellir.com"],
         interlay: ["wss://api.interlay.io/parachain"],
-        assetHubPolkadot: ["wss://statemint-rpc.dwellir.com"],
+        assetHubPolkadot: ["wss://statemint-rpc.n.dwellir.com"],
         acala: ["wss://acala-rpc.aca-api.network"],
-        parallel: ["wss://parallel-rpc.dwellir.com"],
-        bifrostPolkadot: ["wss://bifrost-polkadot-rpc.dwellir.com"],
+        parallel: ["wss://parallel-rpc.n.dwellir.com"],
+        bifrostPolkadot: ["wss://bifrost-polkadot-rpc.n.dwellir.com"],
         hydradx: ["wss://rpc.hydradx.cloud"],
         astar: ["wss://rpc.astar.network"],
-        kusama: ["wss://kusama-rpc.dwellir.com"],
+        kusama: ["wss://kusama-rpc.n.dwellir.com"],
         kintsugi: ["wss://api-kusama.interlay.io/parachain"],
-        assetHubKusama: ["wss://statemine-rpc.dwellir.com"],
+        assetHubKusama: ["wss://statemine-rpc.n.dwellir.com"],
         karura: ["wss://karura-rpc-0.aca-api.network"],
         heiko: ["wss://heiko-rpc.parallel.fi"],
-        bifrost: ["wss://bifrost-rpc.dwellir.com"],
+        bifrost: ["wss://bifrost-rpc.n.dwellir.com"],
       })
     );
     // and set apiProvider for each adapter
