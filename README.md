@@ -29,20 +29,13 @@ All channels support transfers in both directions.
 | bifrost          | VKSM           |
 | heiko            | KBTC KINT      |
 | karura           | KBTC KINT LKSM |
-| kusama           | KSM            |
-| kusama asset hub | USDT           |
+| kusama asset hub | USDT, KSM      |
 
 #### Polkadot:
 
 | channel            | tokens |
 | ------------------ | ------ |
 | polkadot asset hub | DOT    |
-
-#### Kusama:
-
-| channel          | tokens |
-| ---------------- | ------ |
-| kusama asset hub | KSM    |
 
 ## Usage
 
