@@ -296,8 +296,8 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
 
     const assetId = SUPPORTED_TOKENS[token];
     if (
-      to !== "interlay" ||
-      token === this.balanceAdapter?.nativeToken ||
+      (to !== "kintsugi" && to !== "interlay") ||
+      (to === "interlay" && token === this.balanceAdapter?.nativeToken) ||
       !assetId
     ) {
       throw new CurrencyNotFound(token);
