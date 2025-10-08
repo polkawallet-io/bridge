@@ -296,7 +296,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
 
     const assetId = SUPPORTED_TOKENS[token];
     if (
-      (to !== "kintsugi" && to !== "interlay") ||
+      to !== "interlay" ||
       token === this.balanceAdapter?.nativeToken ||
       !assetId
     ) {
