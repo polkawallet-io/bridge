@@ -88,6 +88,7 @@ const SUPPORTED_TOKENS: Record<string, BN> = {
   ARIS: new BN(16),
   USDC: new BN(1337),
   USDT: new BN(1984),
+  KSM: new BN(1984),
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
