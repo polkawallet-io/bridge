@@ -14,7 +14,7 @@ describe.skip("shiden adapter should work", () => {
   beforeAll(async () => {
     const shiden = new ShidenAdapter();
 
-    const shidenApi = new ApiPromise({ provider: new WsProvider("wss://shiden-rpc.dwellir.com") });
+    const shidenApi = new ApiPromise({ provider: new WsProvider("wss://shiden-rpc.n.dwellir.com") });
 
     await shiden.init(shidenApi);
 

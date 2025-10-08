@@ -17,7 +17,7 @@ describe.skip("oak adapter should work", () => {
   beforeAll(async () => {
     const turing = new TuringAdapter();
 
-    const turingApi = new ApiPromise({ provider: new WsProvider("wss://turing-rpc.dwellir.com") });
+    const turingApi = new ApiPromise({ provider: new WsProvider("wss://turing-rpc.n.dwellir.com") });
 
     await turing.init(turingApi);
 

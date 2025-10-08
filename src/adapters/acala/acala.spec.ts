@@ -39,7 +39,7 @@ describe.skip("acala-adapter", () => {
 
     const karuraApi = new ApiPromise({ provider: new WsProvider('wss://karura-rpc-1.aca-api.network') });
     const kusmaApi = new ApiPromise({ provider: new WsProvider('wss://kusama-public-rpc.blockops.network/ws') });
-    const assetHubApi = new ApiPromise({ provider: new WsProvider('wss://statemine-rpc.dwellir.com') });
+    const assetHubApi = new ApiPromise({ provider: new WsProvider('wss://statemine-rpc.n.dwellir.com') });
 
     await karura.init(karuraApi);
     await kusama.init(kusmaApi);
