@@ -66,33 +66,6 @@ export const kusamaRouteConfigs = createRouteConfigs("kusama", [
       weightLimit: "Unlimited",
     },
   },
-  {
-    to: "basilisk",
-    token: "KSM",
-    xcm: {
-      fee: { token: "KSM", amount: "72711796" },
-      deliveryFee: { token: "KSM", amount: "1323333009" },
-      weightLimit: "Unlimited",
-    },
-  },
-  {
-    to: "assetHubKusama",
-    token: "KSM",
-    xcm: {
-      fee: { token: "KSM", amount: "34368318" },
-      deliveryFee: { token: "KSM", amount: "1323333009" },
-      weightLimit: "Unlimited",
-    },
-  },
-  {
-    to: "kintsugi",
-    token: "KSM",
-    xcm: {
-      fee: { token: "KSM", amount: "250000000" },
-      deliveryFee: { token: "KSM", amount: "1323333009" },
-      weightLimit: "Unlimited",
-    },
-  },
 ]);
 
 const polkadotTokensConfig: Record<string, Record<string, BasicToken>> = {
@@ -100,7 +73,7 @@ const polkadotTokensConfig: Record<string, Record<string, BasicToken>> = {
     DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "10000000000" },
   },
   kusama: {
-    KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "79999999" },
+    KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "333333333" },
   },
 };
 
@@ -276,32 +249,51 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
       );
     }
 
-    const dst = {
-      parents: 0,
-      interior: { X1: { Parachain: toChain.paraChainId } },
+    const dest = {
+      V4: {
+        parents: 0,
+        interior: { X1: [{ Parachain: toChain.paraChainId }] },
+      },
     };
-    const acc = {
-      parents: 0,
-      interior: {
-        X1: {
-          [accountType]: {
-            [accountType === "AccountId32" ? "id" : "key"]: accountId,
+    const asset = {
+      V4: [
+        {
+          id: { parents: 0, interior: "Here" },
+          fun: { Fungible: amount.toChainData() },
+        },
+      ],
+    };
+    const assetsTransferType = "LocalReserve";
+    const remoteFeesId = {
+      V4: { parents: 0, interior: "Here" },
+    };
+    const feesTransferType = "LocalReserve";
+    const account = {
+      [accountType]: {
+        [accountType === "AccountId32" ? "id" : "key"]: accountId,
+      },
+    };
+    const customXcmOnDest = {
+      V4: [
+        {
+          DepositAsset: {
+            assets: { Wild: { AllCounted: 1 } },
+            beneficiary: {
+              parents: 0,
+              interior: { X1: [account] },
+            },
           },
         },
-      },
+      ],
     };
-    const ass = [
-      {
-        id: { Concrete: { parents: 0, interior: "Here" } },
-        fun: { Fungible: amount.toChainData() },
-      },
-    ];
 
-    return this.api?.tx.xcmPallet.limitedReserveTransferAssets(
-      { V3: dst },
-      { V3: acc },
-      { V3: ass },
-      0,
+    return this.api?.tx.xcmPallet.transferAssetsUsingTypeAndThen(
+      dest,
+      asset,
+      assetsTransferType,
+      remoteFeesId,
+      feesTransferType,
+      customXcmOnDest,
       this.getDestWeight(token, to)?.toString()
     );
   }

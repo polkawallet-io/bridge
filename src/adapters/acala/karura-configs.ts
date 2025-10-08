@@ -3,7 +3,7 @@ import { BasicToken } from "../../types";
 
 export const karuraRouteConfigs = createRouteConfigs("karura", [
   {
-    to: "kusama",
+    to: "assetHubKusama",
     token: "KSM",
     xcm: {
       fee: { token: "KSM", amount: "79999999" },
