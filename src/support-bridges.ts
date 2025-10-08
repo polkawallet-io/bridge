@@ -289,7 +289,7 @@
       "from": "acala"
     },
     {
-      "to": "kusama",
+      "to": "assetHubKusama",
       "token": "KSM",
       "xcm": {
         "fee": {
@@ -1038,16 +1038,16 @@
       "from": "assetHubPolkadot"
     },
     {
-      "to": "kusama",
+      "to": "karura",
       "token": "KSM",
       "xcm": {
-        "fee": {
-          "token": "KSM",
-          "amount": "90049287"
-        },
         "deliveryFee": {
           "token": "KSM",
-          "amount": "1032333300"
+          "amount": "1036333296"
+        },
+        "fee": {
+          "token": "KSM",
+          "amount": "9918117"
         },
         "weightLimit": "Unlimited"
       },
@@ -1309,17 +1309,6 @@
     }
   ],
   [
-    {
-      "to": "kusama",
-      "token": "KSM",
-      "xcm": {
-        "fee": {
-          "token": "KSM",
-          "amount": "104571640"
-        }
-      },
-      "from": "basilisk"
-    },
     {
       "to": "karura",
       "token": "BSX",
@@ -1649,18 +1638,6 @@
         "fee": {
           "token": "LKSM",
           "amount": "270000000"
-        },
-        "weightLimit": "5000000000"
-      },
-      "from": "kintsugi"
-    },
-    {
-      "to": "kusama",
-      "token": "KSM",
-      "xcm": {
-        "fee": {
-          "token": "KSM",
-          "amount": "100000000"
         },
         "weightLimit": "5000000000"
       },
@@ -2039,54 +2016,6 @@
         "fee": {
           "token": "KSM",
           "amount": "44163610"
-        },
-        "deliveryFee": {
-          "token": "KSM",
-          "amount": "1323333009"
-        },
-        "weightLimit": "Unlimited"
-      },
-      "from": "kusama"
-    },
-    {
-      "to": "basilisk",
-      "token": "KSM",
-      "xcm": {
-        "fee": {
-          "token": "KSM",
-          "amount": "72711796"
-        },
-        "deliveryFee": {
-          "token": "KSM",
-          "amount": "1323333009"
-        },
-        "weightLimit": "Unlimited"
-      },
-      "from": "kusama"
-    },
-    {
-      "to": "assetHubKusama",
-      "token": "KSM",
-      "xcm": {
-        "fee": {
-          "token": "KSM",
-          "amount": "34368318"
-        },
-        "deliveryFee": {
-          "token": "KSM",
-          "amount": "1323333009"
-        },
-        "weightLimit": "Unlimited"
-      },
-      "from": "kusama"
-    },
-    {
-      "to": "kintsugi",
-      "token": "KSM",
-      "xcm": {
-        "fee": {
-          "token": "KSM",
-          "amount": "250000000"
         },
         "deliveryFee": {
           "token": "KSM",

@@ -143,11 +143,11 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
 
 export const assetHubKusamaRouteConfigs = createRouteConfigs("assetHubKusama", [
   {
-    to: "kusama",
+    to: "karura",
     token: "KSM",
     xcm: {
-      fee: { token: "KSM", amount: "90049287" },
-      deliveryFee: { token: "KSM", amount: "1032333300" },
+      deliveryFee: { token: "KSM", amount: "1036333296" },
+      fee: { token: "KSM", amount: "9918117" },
       weightLimit: "Unlimited",
     },
   },
@@ -256,7 +256,7 @@ export const assetHubKusamaTokensConfig: Record<string, ExtendedToken> = {
     name: "KSM",
     symbol: "KSM",
     decimals: 12,
-    ed: "79999999",
+    ed: "3333333",
     toRaw: () => "NATIVE",
   },
   RMRK: {
@@ -516,107 +516,66 @@ class BaseAssetHubAdapter extends BaseCrossChainAdapter {
       );
     }
 
-    // to others
+    // to others - determine asset location
     const token = this.getToken(tokenName) as ExtendedToken;
+    if (!token) throw new TokenNotFound(tokenName);
 
-    if (tokenName === this.balanceAdapter?.nativeToken || !token) {
-      throw new TokenNotFound(tokenName);
+    const isNativeToken = tokenName === this.balanceAdapter?.nativeToken;
+    let assetLocation;
+
+    if (isNativeToken) {
+      assetLocation = { parents: 1, interior: "Here" };
+    } else if (token.name === "Ether") {
+      // Ethereum bridge asset
+      assetLocation = {
+        parents: 2,
+        interior: { X1: [{ GlobalConsensus: { Ethereum: { chainId: 1 } } }] },
+      };
+    } else {
+      assetLocation = {
+        parents: 0,
+        interior: {
+          X2: [{ PalletInstance: 50 }, { GeneralIndex: token.toRaw() }],
+        },
+      };
     }
 
-    // snowbridge eth
-    if (token.name === "Ether") {
-      const dest = {
-        V4: {
-          parents: 1,
-          interior: { X1: [{ Parachain: toChain.paraChainId }] },
-        },
-      };
-      const asset = {
-        V4: [
-          {
-            id: {
-              parents: 2,
-              interior: {
-                X1: [{ GlobalConsensus: { Ethereum: { chainId: 1 } } }],
-              },
-            },
-            fun: { Fungible: amount.toChainData() },
-          },
-        ],
-      };
-      const assetsTransferType = "LocalReserve";
-      const remoteFeesId = {
-        V4: {
-          parents: 2,
-          interior: { X1: [{ GlobalConsensus: { Ethereum: { chainId: 1 } } }] },
-        },
-      };
-      const feesTransferType = "LocalReserve";
-      const account = {
-        [accountType]: {
-          [accountType === "AccountId32" ? "id" : "key"]: accountId,
-        },
-      };
-      const customXcmOnDest = {
-        V4: [
-          {
-            DepositAsset: {
-              assets: { Wild: { AllCounted: 1 } },
-              beneficiary: {
-                parents: 0,
-                interior: { X1: [account] },
-              },
-            },
-          },
-        ],
-      };
-
-      return this.api?.tx.polkadotXcm.transferAssetsUsingTypeAndThen(
-        dest,
-        asset,
-        assetsTransferType,
-        remoteFeesId,
-        feesTransferType,
-        customXcmOnDest,
-        this.getDestWeight(tokenName, to)?.toString() as any
-      );
-    }
-
-    const dst = {
-      parents: 1,
-      interior: { X1: { Parachain: toChain.paraChainId } },
-    };
-    const acc = {
-      parents: 0,
-      interior: {
-        X1: {
-          [accountType]: {
-            [accountType === "AccountId32" ? "id" : "key"]: accountId,
-          },
-        },
+    // Build XCM transfer
+    const dest = {
+      V4: {
+        parents: 1,
+        interior: { X1: [{ Parachain: toChain.paraChainId }] },
       },
     };
-    const ass = [
-      {
-        id: {
-          Concrete: {
-            parents: 0,
-            interior: {
-              X2: [{ PalletInstance: 50 }, { GeneralIndex: token.toRaw() }],
-            },
+    const asset = {
+      V4: [{ id: assetLocation, fun: { Fungible: amount.toChainData() } }],
+    };
+    const assetsTransferType = "LocalReserve";
+    const remoteFeesId = { V4: assetLocation };
+    const feesTransferType = "LocalReserve";
+    const account = {
+      [accountType]: {
+        [accountType === "AccountId32" ? "id" : "key"]: accountId,
+      },
+    };
+    const customXcmOnDest = {
+      V4: [
+        {
+          DepositAsset: {
+            assets: { Wild: { AllCounted: 1 } },
+            beneficiary: { parents: 0, interior: { X1: [account] } },
           },
         },
-        fun: {
-          Fungible: amount.toChainData(),
-        },
-      },
-    ];
+      ],
+    };
 
-    return this.api?.tx.polkadotXcm.limitedReserveTransferAssets(
-      { V3: dst } as any,
-      { V3: acc } as any,
-      { V3: ass } as any,
-      0,
+    return this.api?.tx.polkadotXcm.transferAssetsUsingTypeAndThen(
+      dest,
+      asset,
+      assetsTransferType,
+      remoteFeesId,
+      feesTransferType,
+      customXcmOnDest,
       this.getDestWeight(tokenName, to)?.toString() as any
     );
   }

@@ -25,13 +25,6 @@ import {
 
 export const basiliskRouteConfigs = createRouteConfigs("basilisk", [
   {
-    to: "kusama",
-    token: "KSM",
-    xcm: {
-      fee: { token: "KSM", amount: "104571640" },
-    },
-  },
-  {
     to: "karura",
     token: "BSX",
     xcm: {

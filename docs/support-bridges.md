@@ -31,7 +31,7 @@
 | acala | assetHubPolkadot | LOTY |
 | acala | assetHubPolkadot | DAMN |
 | acala | assetHubPolkadot | ETH |
-| karura | kusama | KSM |
+| karura | assetHubKusama | KSM |
 | karura | assetHubKusama | RMRK |
 | karura | assetHubKusama | ARIS |
 | karura | assetHubKusama | USDT |
@@ -93,7 +93,7 @@
 | assetHubPolkadot | interlay | USDT |
 | assetHubPolkadot | interlay | USDC |
 | assetHubPolkadot | moonbeam | USDT |
-| assetHubKusama | kusama | KSM |
+| assetHubKusama | karura | KSM |
 | assetHubKusama | karura | RMRK |
 | assetHubKusama | karura | ARIS |
 | assetHubKusama | karura | USDT |
@@ -114,7 +114,6 @@
 | bifrost | karura | KAR |
 | bifrost | karura | KUSD |
 | bifrost | kintsugi | VKSM |
-| basilisk | kusama | KSM |
 | basilisk | karura | BSX |
 | basilisk | karura | aUSD |
 | basilisk | karura | KSM |
@@ -144,7 +143,6 @@
 | kintsugi | karura | KINT |
 | kintsugi | karura | KBTC |
 | kintsugi | karura | LKSM |
-| kintsugi | kusama | KSM |
 | kintsugi | assetHubKusama | USDT |
 | kintsugi | bifrost | VKSM |
 | listen | karura | LT |
@@ -175,9 +173,6 @@
 | polkadot | assetHubPolkadot | DOT |
 | polkadot | interlay | DOT |
 | kusama | karura | KSM |
-| kusama | basilisk | KSM |
-| kusama | assetHubKusama | KSM |
-| kusama | kintsugi | KSM |
 | subsocial | hydradx | SUB |
 | subsocial | moonbeam | SUB |
 | unique | acala | UNQ |

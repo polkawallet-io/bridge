@@ -137,14 +137,6 @@ export const kintsugiRouteConfigs = createRouteConfigs("kintsugi", [
     },
   },
   {
-    to: "kusama",
-    token: "KSM",
-    xcm: {
-      fee: { token: "KSM", amount: "100000000" },
-      weightLimit: DEST_WEIGHT,
-    },
-  },
-  {
     to: "assetHubKusama",
     token: "USDT",
     xcm: {
