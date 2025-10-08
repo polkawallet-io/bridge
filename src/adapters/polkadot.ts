@@ -61,7 +61,7 @@ const polkadotTokensConfig: Record<string, Record<string, BasicToken>> = {
   polkadot: {
     DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "10000000000" },
   },
-  kintsugi: {
+  kusama: {
     KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "333333333" },
   },
 };
