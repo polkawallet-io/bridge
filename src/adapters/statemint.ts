@@ -49,7 +49,7 @@ export const statemintRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
 
 export const statemineRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
-    to: "kusama",
+    to: "kintsugi",
     token: "KSM",
     xcm: {
       // chopsticks test: 91_761_280 - use 10x buffer
