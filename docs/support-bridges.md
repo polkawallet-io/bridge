@@ -172,7 +172,6 @@
 | polkadot | hydradx | DOT |
 | polkadot | assetHubPolkadot | DOT |
 | polkadot | interlay | DOT |
-| kusama | karura | KSM |
 | subsocial | hydradx | SUB |
 | subsocial | moonbeam | SUB |
 | unique | acala | UNQ |

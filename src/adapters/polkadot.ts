@@ -56,17 +56,7 @@ export const polkadotRouteConfigs = createRouteConfigs("polkadot", [
   },
 ]);
 
-export const kusamaRouteConfigs = createRouteConfigs("kusama", [
-  {
-    to: "karura",
-    token: "KSM",
-    xcm: {
-      fee: { token: "KSM", amount: "44163610" },
-      deliveryFee: { token: "KSM", amount: "1323333009" },
-      weightLimit: "Unlimited",
-    },
-  },
-]);
+export const kusamaRouteConfigs = createRouteConfigs("kusama", []);
 
 const polkadotTokensConfig: Record<string, Record<string, BasicToken>> = {
   polkadot: {
