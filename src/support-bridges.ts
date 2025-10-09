@@ -2008,22 +2008,6 @@
         "weightLimit": "Unlimited"
       },
       "from": "polkadot"
-    },
-    {
-      "to": "karura",
-      "token": "KSM",
-      "xcm": {
-        "fee": {
-          "token": "KSM",
-          "amount": "44163610"
-        },
-        "deliveryFee": {
-          "token": "KSM",
-          "amount": "1323333009"
-        },
-        "weightLimit": "Unlimited"
-      },
-      "from": "kusama"
     }
   ],
   [
