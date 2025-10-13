@@ -8,8 +8,6 @@ And you're welcome to add your parachain-adapter into the SDK.
 
 ### Supported channels
 
-All channels support transfers in both directions.
-
 #### Interlay:
 
 | channel            | tokens    |
@@ -29,7 +27,9 @@ All channels support transfers in both directions.
 | bifrost          | VKSM           |
 | heiko            | KBTC KINT      |
 | karura           | KBTC KINT LKSM |
-| kusama asset hub | USDT, KSM      |
+| kusama asset hub | USDT, KSM*     |
+
+* KSM can only be transferred from Kintsugi to Kusama Asset Hub. Transfers are not available in the other direction.
 
 #### Polkadot:
 
