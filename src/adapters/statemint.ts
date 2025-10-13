@@ -50,15 +50,6 @@ export const statemintRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
 export const statemineRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
     to: "kintsugi",
-    token: "KSM",
-    xcm: {
-      // chopsticks test: 91_761_280 - use 10x buffer
-      fee: { token: "KSM", amount: "917612800" },
-      weightLimit: "Unlimited",
-    },
-  },
-  {
-    to: "kintsugi",
     token: "USDT",
     // fees from tests on chopsticks: 8_153 planck, add a minimum of 2x buffer
     xcm: { fee: { token: "USDT", amount: "20000" }, weightLimit: "Unlimited" },
@@ -70,7 +61,6 @@ export const statemineTokensConfig: Record<
   Record<string, BasicToken>
 > = {
   statemine: {
-    KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "33333333" },
     // ED set according to minBalance value of assets.asset(1984)
     USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "1000" },
   },
