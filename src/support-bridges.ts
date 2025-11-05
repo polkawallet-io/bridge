@@ -3,7 +3,7 @@
   export default [
   [
     {
-      "to": "polkadot",
+      "to": "assetHubPolkadot",
       "token": "DOT",
       "xcm": {
         "fee": {
@@ -830,7 +830,7 @@
   ],
   [
     {
-      "to": "polkadot",
+      "to": "acala",
       "token": "DOT",
       "xcm": {
         "deliveryFee": {
@@ -1515,18 +1515,6 @@
       "from": "interlay"
     },
     {
-      "to": "polkadot",
-      "token": "DOT",
-      "xcm": {
-        "fee": {
-          "token": "DOT",
-          "amount": "1000000000"
-        },
-        "weightLimit": "5000000000"
-      },
-      "from": "interlay"
-    },
-    {
       "to": "assetHubPolkadot",
       "token": "USDC",
       "xcm": {
@@ -1942,72 +1930,6 @@
         }
       },
       "from": "khala"
-    }
-  ],
-  [
-    {
-      "to": "acala",
-      "token": "DOT",
-      "xcm": {
-        "fee": {
-          "token": "DOT",
-          "amount": "1222070"
-        },
-        "deliveryFee": {
-          "token": "DOT",
-          "amount": "397000000"
-        },
-        "weightLimit": "Unlimited"
-      },
-      "from": "polkadot"
-    },
-    {
-      "to": "hydradx",
-      "token": "DOT",
-      "xcm": {
-        "deliveryFee": {
-          "token": "DOT",
-          "amount": "397000000"
-        },
-        "fee": {
-          "token": "DOT",
-          "amount": "21711791"
-        },
-        "weightLimit": "Unlimited"
-      },
-      "from": "polkadot"
-    },
-    {
-      "to": "assetHubPolkadot",
-      "token": "DOT",
-      "xcm": {
-        "deliveryFee": {
-          "token": "DOT",
-          "amount": "397000000"
-        },
-        "fee": {
-          "token": "DOT",
-          "amount": "15800000"
-        },
-        "weightLimit": "Unlimited"
-      },
-      "from": "polkadot"
-    },
-    {
-      "to": "interlay",
-      "token": "DOT",
-      "xcm": {
-        "deliveryFee": {
-          "token": "DOT",
-          "amount": "397000000"
-        },
-        "fee": {
-          "token": "DOT",
-          "amount": "25000000"
-        },
-        "weightLimit": "Unlimited"
-      },
-      "from": "polkadot"
     }
   ],
   [

@@ -22,7 +22,7 @@ export const assetHubPolkadotRouteConfigs = createRouteConfigs(
   "assetHubPolkadot",
   [
     {
-      to: "polkadot",
+      to: "acala",
       token: "DOT",
       xcm: {
         deliveryFee: { token: "DOT", amount: "309700000" },

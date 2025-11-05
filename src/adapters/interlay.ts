@@ -56,14 +56,6 @@ export const interlayRouteConfigs = createRouteConfigs("interlay", [
     xcm: { fee: { token: "IBTC", amount: "6500000" } },
   },
   {
-    to: "polkadot",
-    token: "DOT",
-    xcm: {
-      fee: { token: "DOT", amount: "1000000000" },
-      weightLimit: DEST_WEIGHT,
-    },
-  },
-  {
     to: "assetHubPolkadot",
     token: "USDC",
     xcm: {

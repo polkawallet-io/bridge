@@ -5,7 +5,7 @@
 
 | From | To | Token |
 | --- | --- | --- |
-| acala | polkadot | DOT |
+| acala | assetHubPolkadot | DOT |
 | acala | moonbeam | GLMR |
 | acala | moonbeam | ACA |
 | acala | moonbeam | AUSD |
@@ -80,7 +80,7 @@
 | karura | listen | KUSD |
 | karura | listen | LKSM |
 | karura | quartz | QTZ |
-| assetHubPolkadot | polkadot | DOT |
+| assetHubPolkadot | acala | DOT |
 | assetHubPolkadot | hydradx | USDT |
 | assetHubPolkadot | acala | USDT |
 | assetHubPolkadot | acala | USDC |
@@ -132,7 +132,6 @@
 | interlay | phala | PHA |
 | interlay | phala | INTR |
 | interlay | phala | IBTC |
-| interlay | polkadot | DOT |
 | interlay | assetHubPolkadot | USDC |
 | interlay | assetHubPolkadot | USDT |
 | interlay | hydradx | IBTC |
@@ -168,10 +167,6 @@
 | khala | karura | PHA |
 | khala | karura | KUSD |
 | khala | karura | KAR |
-| polkadot | acala | DOT |
-| polkadot | hydradx | DOT |
-| polkadot | assetHubPolkadot | DOT |
-| polkadot | interlay | DOT |
 | subsocial | hydradx | SUB |
 | subsocial | moonbeam | SUB |
 | unique | acala | UNQ |

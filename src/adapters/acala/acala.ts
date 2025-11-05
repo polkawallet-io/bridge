@@ -227,26 +227,46 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
         );
       }
 
-      return this.api.tx.xTokens.transferMultiassetWithFee(
-        createXTokensAssetsParam(
-          this.api,
-          toChain.paraChainId,
-          tokenData.toRaw(),
-          amount.toChainData()
-        ),
-        {
-          V3: {
-            id: {
-              Concrete: {
-                parents: 1,
-                interior: "Here",
+      const isNativeDOT = tokenData.toRaw() === "NATIVE";
+
+      const assetParam = isNativeDOT
+        ? {
+            V3: {
+              id: {
+                Concrete: {
+                  parents: 1,
+                  interior: "Here",
+                },
+              },
+              fun: {
+                Fungible: amount.toChainData(),
               },
             },
-            fun: {
-              Fungible: "160000000",
+          }
+        : createXTokensAssetsParam(
+            this.api,
+            toChain.paraChainId,
+            tokenData.toRaw(),
+            amount.toChainData()
+          );
+
+      const feeParam = {
+        V3: {
+          id: {
+            Concrete: {
+              parents: 1,
+              interior: "Here",
             },
           },
+          fun: {
+            Fungible: "160000000",
+          },
         },
+      };
+
+      return this.api.tx.xTokens.transferMultiassetWithFee(
+        assetParam,
+        feeParam,
         createXTokensDestParam(this.api, toChain.paraChainId, accountId) as any,
         "Unlimited"
       );
