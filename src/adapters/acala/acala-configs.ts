@@ -3,7 +3,7 @@ import { BasicToken, ExtendedToken } from "../../types";
 
 export const acalaRouteConfigs = createRouteConfigs("acala", [
   {
-    to: "polkadot",
+    to: "assetHubPolkadot",
     token: "DOT",
     xcm: {
       fee: { token: "DOT", amount: "19978738" },

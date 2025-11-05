@@ -171,13 +171,6 @@ export const basiliskTokensConfig: Record<string, ExtendedToken> = {
 
 export const hydradxRoutersConfig = createRouteConfigs("hydradx", [
   {
-    to: "polkadot",
-    token: "DOT",
-    xcm: {
-      fee: { token: "DOT", amount: "469417452" },
-    },
-  },
-  {
     to: "subsocial",
     token: "SUB",
     xcm: {
