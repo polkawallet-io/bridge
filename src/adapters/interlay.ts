@@ -93,7 +93,7 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     },
   },
   {
-    to: "polkadot",
+    to: "statemint",
     token: "DOT",
     xcm: {
       fee: { token: "DOT", amount: "1000000000" },
