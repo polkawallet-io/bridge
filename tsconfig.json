@@ -3,7 +3,8 @@
   "exclude": ["build/**/*", "**/build/**/*", "scripts/**/*", "docs/**/*", "**/*.spec.ts"],
   "compilerOptions": {
     "target": "es2019",
-    "module": "CommonJS",
+    "module": "nodenext",
+		"moduleResolution": "nodenext",
     "baseUrl": ".",
     "resolveJsonModule": true,
     "skipLibCheck": true,

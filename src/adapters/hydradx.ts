@@ -11,13 +11,13 @@ import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
 import { BalanceData, ExtendedToken, TransferParams } from "../types";
 import { ApiNotFound, TokenNotFound } from "../errors";
-import { isChainEqual } from "../utils/is-chain-equal";
 import {
+  createRouteConfigs,
+  createPolkadotXCMDest,
+  isChainEqual,
   createXTokensAssetsParam,
   createXTokensDestParam,
-  createRouteConfigs,
 } from "../utils";
-
 import {
   assetHubKusamaTokensConfig,
   assetHubPolkadotTokensConfig,
@@ -528,6 +528,71 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
           amount.toChainData()
         ),
         createXTokensDestParam(this.api, toChain.paraChainId, accountId) as any,
+        "Unlimited"
+      );
+    }
+
+    const tokenData: ExtendedToken = this.getToken(token);
+    if (!tokenData) throw new TokenNotFound(token);
+
+    if (token === "KSM" || token === "DOT") {
+      const accountId = this.api.createType("AccountId32", address).toHex();
+      const accountType = "AccountId32";
+      const assetId = {
+        Concrete: {
+          parents: 1,
+          interior: "Here",
+        },
+      };
+      const assetHubLocation = {
+        V3: {
+          parents: 1,
+          interior: {
+            X1: { Parachain: 1000 },
+          },
+        },
+      };
+      const assetsTransferType = { RemoteReserve: assetHubLocation };
+      const feesTransferType = { RemoteReserve: assetHubLocation };
+      const dest = createPolkadotXCMDest(this.api, toChain.paraChainId, 1, "V3");
+      const asset = {
+        V3: [
+          {
+            id: assetId,
+            fun: { Fungible: amount.toChainData() },
+          },
+        ],
+      };
+      const remoteFeesId = {
+        V3: assetId,
+      };
+      const beneficiary = {
+        parents: 0,
+        interior: {
+          X1: {
+            [accountType]: {
+              [accountType === "AccountId32" ? "id" : "key"]: accountId,
+            },
+          },
+        },
+      };
+      const customXcmOnDest = {
+        V3: [
+          {
+            DepositAsset: {
+              assets: { Wild: { AllCounted: 1 } },
+              beneficiary,
+            },
+          },
+        ],
+      };
+      return this.api.tx.polkadotXcm.transferAssetsUsingTypeAndThen(
+        dest,
+        asset,
+        assetsTransferType,
+        remoteFeesId,
+        feesTransferType,
+        customXcmOnDest,
         "Unlimited"
       );
     }

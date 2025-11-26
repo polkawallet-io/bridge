@@ -168,7 +168,7 @@ class TinkernetBaseAdapter extends BaseCrossChainAdapter {
       "0",
       amount.toChainData(),
       {
-        V1: {
+        V3: {
           parents: 1,
           interior: {
             X2: [
@@ -176,7 +176,6 @@ class TinkernetBaseAdapter extends BaseCrossChainAdapter {
               {
                 [accountType]: {
                   [accountType === "AccountId32" ? "id" : "key"]: accountId,
-                  network: "Any",
                 },
               },
             ],
