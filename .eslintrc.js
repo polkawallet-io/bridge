@@ -19,7 +19,6 @@ module.exports = {
   ],
   plugins: [
     ...base.plugins,
-    "unused-imports"
   ],
   parserOptions: {
     ...base.parserOptions,
@@ -49,11 +48,6 @@ module.exports = {
     'react/jsx-closing-bracket-location': 'off',
     'sort-keys': 'off',
     'react/jsx-no-bind': 'off',
-    '@typescript-eslint/no-unused-vars': 'off',
-    "unused-imports/no-unused-imports": "error",
-    "unused-imports/no-unused-vars": [
-      "error",
-      { "vars": "all", "varsIgnorePattern": "^_", "args": "after-used", "argsIgnorePattern": "^_" }
-    ]
+    '@typescript-eslint/no-unused-vars': 'off'
   }
 };

@@ -554,7 +554,12 @@ class BaseHydradxAdapter extends BaseCrossChainAdapter {
       };
       const assetsTransferType = { RemoteReserve: assetHubLocation };
       const feesTransferType = { RemoteReserve: assetHubLocation };
-      const dest = createPolkadotXCMDest(this.api, toChain.paraChainId, 1, "V3");
+      const dest = createPolkadotXCMDest(
+        this.api,
+        toChain.paraChainId,
+        1,
+        "V3"
+      );
       const asset = {
         V3: [
           {
