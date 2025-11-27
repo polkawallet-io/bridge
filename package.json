@@ -1,6 +1,6 @@
 {
   "name": "@polkawallet/bridge",
-  "version": "0.1.9-4",
+  "version": "0.1.9-5",
   "description": "polkawallet bridge sdk",
   "main": "index.js",
   "types": "index.d.ts",
@@ -24,21 +24,21 @@
     "build:release": "polkadot-ci-ghact-build"
   },
   "peerDependencies": {
-    "@acala-network/api": "^5",
+    "@acala-network/api": "^6",
     "@polkadot/api": "^16",
     "ethers": "^5"
   },
   "resolutions": {
-    "@acala-network/api": "^5.1.1",
-    "@acala-network/sdk": "^4.1.9-13",
-    "@acala-network/sdk-core": "^4.1.9-13",
+    "@acala-network/api": "^6.3.0",
+    "@acala-network/sdk": "^4.1.15",
+    "@acala-network/sdk-core": "^4.1.15",
     "@polkadot/api": "^16.4.8",
     "@polkadot/types": "^16.4.8"
   },
   "dependencies": {
-    "@acala-network/api": "^5",
-    "@acala-network/sdk": "^4.1.9-13",
-    "@acala-network/sdk-core": "^4.1.9-13",
+    "@acala-network/api": "^6",
+    "@acala-network/sdk": "^4.1.15",
+    "@acala-network/sdk-core": "^4.1.15",
     "@polkadot/api": "^16.4.8",
     "@polkadot/apps-config": "0.146.1",
     "@polkadot/keyring": "^13.5.6",
@@ -56,7 +56,7 @@
     "eslint-plugin-unused-imports": "^2.0.0",
     "jest": "^28.1.1",
     "ts-node": "^10.9.2",
-    "typescript": "^4.7.4"
+    "typescript": "^5.2.2"
   },
-  "stableVersion": "0.1.9-3"
+  "stableVersion": "0.1.9-4"
 }

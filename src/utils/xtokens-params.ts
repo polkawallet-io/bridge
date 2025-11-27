@@ -93,28 +93,6 @@ export function createXTokensAssetsParam(
 ) {
   const version = checkMessageVersion(api);
 
-  if (version === "V1") {
-    return {
-      V1: {
-        fun: {
-          Fungible: amount,
-        },
-        id: {
-          Concrete: {
-            parents: 1,
-            interior: {
-              X3: [
-                { Parachain: paraChainId },
-                { PalletInstance: 50 },
-                { GeneralIndex: assetId },
-              ],
-            },
-          },
-        },
-      },
-    };
-  }
-
   if (version === "V4") {
     return {
       V4: {
@@ -136,7 +114,7 @@ export function createXTokensAssetsParam(
   }
 
   return {
-    [version]: {
+    V3: {
       fun: {
         Fungible: amount,
       },

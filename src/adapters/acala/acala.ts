@@ -150,6 +150,8 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
 
     const { address, amount, to, token } = params;
     const tokenFormSDK = this.wallet?.getToken(token);
+    if (!tokenFormSDK) throw new Error("token not found from sdk");
+
     const toChain = chains[to];
 
     const useAccountKey20 =
@@ -324,7 +326,7 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
     }
 
     return this.api.tx.xTokens.transfer(
-      tokenFormSDK?.toChainData(),
+      tokenFormSDK.toChainData(),
       amount.toChainData(),
       createXTokensDestParam(this.api, toChain.paraChainId, accountId, {
         isToRelayChain,

@@ -164,31 +164,32 @@ class RobonomicsBaseAdapter extends BaseCrossChainAdapter {
     const toChain = chains[to];
 
     const dst = {
-      interior: { X1: { ParaChain: toChain.paraChainId } },
+      interior: { X1: [{ ParaChain: toChain.paraChainId }] },
       parents: 1,
     };
     const acc = {
       interior: {
-        X1: {
-          [accountType]: {
-            [accountType === "AccountId32" ? "id" : "key"]: accountId,
-            network: "Any",
+        X1: [
+          {
+            [accountType]: {
+              [accountType === "AccountId32" ? "id" : "key"]: accountId,
+            },
           },
-        },
+        ],
       },
       parents: 0,
     };
     const ass = [
       {
         fun: { Fungible: amount.toChainData() },
-        id: { Concrete: { interior: "Here", parents: 0 } },
+        id: { interior: "Here", parents: 0 },
       },
     ];
 
     return this.api?.tx.polkadotXcm.limitedReserveTransferAssets(
-      { V1: dst },
-      { V1: acc },
-      { V1: ass },
+      { V3: dst },
+      { V3: acc },
+      { V3: ass },
       0,
       { Limited: "400000000" }
     );
